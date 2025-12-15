@@ -140,6 +140,7 @@ export default defineComponent({
             // 只有用户切换版本才显示 toast
             if (!initialLoad.value && previousVersion.value && previousVersion.value !== newVersion) {
                 showInfo(`Switched to Version ${newVersion}`);
+                localStorage.setItem('latestBudgetVersion', newVersion.toString());
             }
 
             previousVersion.value = newVersion;
@@ -147,10 +148,9 @@ export default defineComponent({
 
             await fetchBudgetList();
 
-            if (initialLoad.value) initialLoad.value = false; // 标记初始化完成
+            if (initialLoad.value) initialLoad.value = false;
         });
 
-        /* ---------------------- HANDLERS ---------------------- */
         function handleSearch(value: string) {
             search.value = value;
             filters.value.global = { value };

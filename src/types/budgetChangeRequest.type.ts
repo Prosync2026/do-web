@@ -134,6 +134,12 @@ export interface BCRRecommendationPayload {
     files?: string[];
 }
 
+export interface BCRRecommendationEditPayload {
+    RecommendationType: string; // Type of recommendation (e.g., "QS_Recommendation", "Site_Recommendation", "Specific_Quantity")
+    SpecificQuantity?: number | null;
+    Remark?: string | null;
+    files?: string[];
+}
 export interface RecommendationList {
     Id: number;
     BudgetChangeId: number;

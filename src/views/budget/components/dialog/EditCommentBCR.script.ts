@@ -1,5 +1,5 @@
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BCRRecommendationPayload, DiscussionItem } from '@/types/budgetChangeRequest.type';
+import type { BCRRecommendationEditPayload, DiscussionItem } from '@/types/budgetChangeRequest.type';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -18,14 +18,14 @@ export default defineComponent({
         const budgetCRStore = useBudgetChangeRequestStore();
         const toast = useToast();
 
-        const selection = ref('');
-        const specificQuantity = ref('');
-        const remark = ref('');
+        const selection = ref<string>('');
+        const specificQuantity = ref<string>('');
+        const remark = ref<string>('');
         const selectedFiles = ref<File[]>([]);
 
         const user = ref({ role: '', username: '' });
+        const existingDocuments = ref<{ id: number; filename: string; path: string }[]>([]);
 
-        const existingDocuments = ref<any[]>([]);
         onMounted(() => {
             const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
             user.value.role = storedUser.role || 'Project Director';
@@ -35,21 +35,26 @@ export default defineComponent({
         watch(
             () => props.item,
             (item) => {
-                console.log('🟡 watch item triggered:', item);
                 if (!item) return;
                 selection.value = item.selectionType || '';
                 specificQuantity.value = item.quantity?.toString() || '';
                 remark.value = item.message || '';
                 selectedFiles.value = [];
-                existingDocuments.value = item.documentUrl || [];
+                existingDocuments.value = (item.documentUrl || []).map((doc: any, index: number) => ({
+                    id: doc.id ?? index,
+                    filename: doc.filename,
+                    path: doc.path
+                }));
             },
             { immediate: true }
         );
+
         const getFileUrl = (path: string) => {
             const baseUrl = import.meta.env.VITE_API_BASE_URL;
             return `${baseUrl}/${path.replace(/\\/g, '/')}`;
         };
-        function onFileSelect(event: any) {
+
+        function onFileSelect(event: { files: File[] }) {
             selectedFiles.value = event.files;
             toast.add({
                 severity: 'info',
@@ -58,14 +63,6 @@ export default defineComponent({
                 life: 2500
             });
         }
-
-        const normalizeDepartment = (dept: string | null) => {
-            if (!dept) return '';
-            const lower = dept.toLowerCase();
-            if (lower === 'site staff' || lower === 'site') return 'Site';
-            return dept;
-        };
-
         async function handleSubmit() {
             if (!remark.value.trim()) {
                 toast.add({
@@ -77,14 +74,10 @@ export default defineComponent({
                 return;
             }
 
-            const normalizedDept = normalizeDepartment(user.value.role);
-            const payload: BCRRecommendationPayload = {
-                Department: normalizedDept,
-                PersonInCharge: user.value.username,
+            const payload: BCRRecommendationEditPayload = {
                 RecommendationType: selection.value,
                 SpecificQuantity: selection.value === 'Specific_Quantity' ? Number(specificQuantity.value) : null,
-                Remark: remark.value,
-                files: []
+                Remark: remark.value
             };
 
             try {
@@ -113,9 +106,9 @@ export default defineComponent({
             remark,
             selectedFiles,
             user,
+            existingDocuments,
             onFileSelect,
             handleSubmit,
-            existingDocuments,
             getFileUrl
         };
     }
