@@ -6,7 +6,6 @@ export const useAuthStore = defineStore('auth', {
     state: (): AuthState => ({
         token: localStorage.getItem('token') || null,
         user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
-        clientId: localStorage.getItem('clientId') || null,
         isLoading: false
     }),
 
@@ -24,17 +23,17 @@ export const useAuthStore = defineStore('auth', {
                     // Call real API
                     const response = await authService.login(username, password);
 
-                    const { token, user, has_access_client } = response.data || {};
+                    const { token, user } = response.data || {};
                     if (!token) return false;
 
                     this.setToken(token);
                     this.setUser({
                         id: user.id,
-                        username: user.Username || username,
-                        role: user.Role || 'User',
-                        email: user.Email
+                        username: user?.Username || username,
+                        role: user?.project_member_system_user[0].project_member?.project_role?.name,
+                        role_id: user?.project_member_system_user[0].project_member?.project_role_id,
+                        email: user?.Email
                     });
-                    this.setClientId(has_access_client[0].client.id);
 
                     return true;
                 } else {
@@ -62,10 +61,6 @@ export const useAuthStore = defineStore('auth', {
         setUser(user: User) {
             this.user = user;
             localStorage.setItem('user', JSON.stringify(user));
-        },
-        setClientId(clientId: string) {
-            this.clientId = clientId;
-            localStorage.setItem('clientId', clientId);
         }
     }
 });

@@ -15,6 +15,7 @@ export default defineComponent({
     setup() {
         const BudgetChangeRequestSummaryData = computed<CardItem[]>(() => {
             const reviewCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Under Review').length;
+            const pendingReviewCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Pending Review').length;
             const approvedItems = budgetChangeRequestData.value.filter((item) => item.Status === 'Approved');
             const approvedCount = approvedItems.length;
 
@@ -22,7 +23,8 @@ export default defineComponent({
             const formattedTotal = totalApprovedValue.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
             return [
-                { title: 'Under Review', value: reviewCount.toString(), description: 'Ready for review', icon: 'pi pi-comment', color: 'red' },
+                { title: 'Under Review', value: reviewCount.toString(), description: 'Review in progress', icon: 'pi pi-exclamation-triangle', color: 'red' },
+                { title: 'Pending Review', value: pendingReviewCount.toString(), description: 'Ready for review', icon: 'pi pi-comment', color: 'orange' },
                 { title: 'Approved', value: approvedCount.toString(), description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' },
                 { title: 'Total Value', value: `$ ${formattedTotal}`, description: 'Estimated budget impact', icon: 'pi pi-chart-line', color: 'blue' }
             ];
@@ -79,7 +81,7 @@ export default defineComponent({
 
         const tableColumns = computed<TableColumn[]>(() => [
             { field: 'rowIndex', header: '#' },
-            { field: 'DocNo', header: 'Request No' },
+            { field: 'DocNo', header: 'BCR No' },
             { field: 'ProjectId', header: 'Project Code' },
             { field: 'RequestedBy', header: 'Requested By' },
             {
@@ -88,7 +90,7 @@ export default defineComponent({
                 body: (rowData: BudgetChangeRequest) => formatDate(rowData.RequestDate)
             },
             { field: 'Status', header: 'Status', bodySlot: 'status' },
-            { field: 'BudgetChangeItem', header: '# Materials', bodySlot: 'materials' },
+            { field: 'Remark', header: 'Remark' },
             { field: 'TotalAmount', header: 'Variance Amount', bodySlot: 'TotalAmount' },
             { field: 'actions', header: 'Actions', action: true }
         ]);

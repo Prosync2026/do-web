@@ -107,7 +107,7 @@
                             <div class="text-right mt-4 font-semibold">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
                         </div>
 
-                        <DiscussionThread :discussions="discussionData" />
+                        <DiscussionThread />
                     </div>
 
                     <div v-else-if="activeTab === 'activities'">

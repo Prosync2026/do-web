@@ -56,7 +56,7 @@ export default defineComponent({
 
         const handleSubmit = () => {
             const selectedContacts = form.contacts.filter((c) => c.selected);
-            console.log('Information Submitted:', { ...form, selectedContacts });
+
             emit('submit', { ...form, selectedContacts });
             close();
         };

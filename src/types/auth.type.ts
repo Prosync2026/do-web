@@ -3,6 +3,7 @@ export interface AuthUser {
     username: string;
     role: string;
     email?: string;
+    project_member_system_user?: projectMemberSystemUserList[];
 }
 
 export interface ClientDetail {
@@ -47,12 +48,11 @@ export interface User {
     username: string;
     role: string;
     email?: string;
-    project_member_system_user?: projectMemberSystemUserList[];
+    role_id: number;
 }
 
 export interface AuthState {
     token: string | null;
     user: User | null;
-    clientId: string | null;
     isLoading: boolean;
 }

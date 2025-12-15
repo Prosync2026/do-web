@@ -4,21 +4,21 @@
     <Dialog :visible="visible" modal :style="{ width: '40rem' }" @update:visible="$emit('update:visible', $event)">
         <!-- Header -->
         <template #header>
-            <span class="font-bold text-lg">Add Recommendation - Project Director</span>
+            <span class="font-bold text-lg">Add Recommendation - {{ user.role }}</span>
         </template>
 
         <div class="flex flex-col gap-4">
-            <span class="text-gray-600 text-sm"> Submit your recommendation for this budget change request as Project Director department. </span>
+            <span class="text-gray-600 text-sm"> Submit your recommendation for this budget change request as {{ user.role }} department. </span>
 
             <!-- Department & Person in Charge -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="font-medium block mb-1">Roles</label>
-                    <InputText value="Project Director" class="w-full" disabled />
+                    <InputText :value="user.role" class="w-full" disabled />
                 </div>
                 <div>
                     <label class="font-medium block mb-1">Person in Charge</label>
-                    <InputText value="Jane Doe" class="w-full" disabled />
+                    <InputText :value="user.username" class="w-full" disabled />
                 </div>
             </div>
 
@@ -57,10 +57,9 @@
 
             <!-- Upload Attachment -->
             <div>
-                <label class="font-medium block mb-5">Upload Attachment <span class="text-gray-500 text-sm">(Optional)</span></label>
+                <label class="font-medium block mb-5"> Upload Attachment <span class="text-gray-500 text-sm">(Optional)</span> </label>
                 <Toast />
 
-                <!-- Manual upload version (no auto-upload) -->
                 <FileUpload mode="advanced" name="files" :auto="false" :customUpload="true" @select="onFileSelect" accept="image/*" :maxFileSize="1000000" chooseLabel="Upload Attachment" class="custom-file-upload" :multiple="true">
                     <template #empty>
                         <span>Drag and drop files here to upload.</span>

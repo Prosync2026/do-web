@@ -52,7 +52,6 @@ export default defineComponent({
         const handleStep3Update = (data: any) => {
             deliveryData.value.deliveryInfo = data;
             activeStep.value = 4;
-            console.log('Step 3 data received in update', deliveryData.value);
         };
 
         const goStep = (step: number) => {

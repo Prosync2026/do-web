@@ -1,15 +1,13 @@
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BCRRecommendationPayload } from '@/types/budgetChangeRequest.type';
+import type { BCRRecommendationPayload, DiscussionItem } from '@/types/budgetChangeRequest.type';
 import { useToast } from 'primevue/usetoast';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
     props: {
-        visible: {
-            type: Boolean,
-            required: true
-        }
+        visible: { type: Boolean, required: true },
+        item: { type: Object as () => DiscussionItem, required: true }
     },
     emits: ['update:visible', 'submit'],
 
@@ -20,15 +18,37 @@ export default defineComponent({
         const budgetCRStore = useBudgetChangeRequestStore();
         const toast = useToast();
 
-        // Form fields
-        const selection = ref<string>('');
-        const specificQuantity = ref<string>('');
-        const remark = ref<string>('');
-
-        // Selected files (manual upload)
+        const selection = ref('');
+        const specificQuantity = ref('');
+        const remark = ref('');
         const selectedFiles = ref<File[]>([]);
 
-        // When user selects files
+        const user = ref({ role: '', username: '' });
+
+        const existingDocuments = ref<any[]>([]);
+        onMounted(() => {
+            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+            user.value.role = storedUser.role || 'Project Director';
+            user.value.username = storedUser.username || 'Unknown User';
+        });
+
+        watch(
+            () => props.item,
+            (item) => {
+                console.log('🟡 watch item triggered:', item);
+                if (!item) return;
+                selection.value = item.selectionType || '';
+                specificQuantity.value = item.quantity?.toString() || '';
+                remark.value = item.message || '';
+                selectedFiles.value = [];
+                existingDocuments.value = item.documentUrl || [];
+            },
+            { immediate: true }
+        );
+        const getFileUrl = (path: string) => {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL;
+            return `${baseUrl}/${path.replace(/\\/g, '/')}`;
+        };
         function onFileSelect(event: any) {
             selectedFiles.value = event.files;
             toast.add({
@@ -38,6 +58,13 @@ export default defineComponent({
                 life: 2500
             });
         }
+
+        const normalizeDepartment = (dept: string | null) => {
+            if (!dept) return '';
+            const lower = dept.toLowerCase();
+            if (lower === 'site staff' || lower === 'site') return 'Site';
+            return dept;
+        };
 
         async function handleSubmit() {
             if (!remark.value.trim()) {
@@ -50,29 +77,26 @@ export default defineComponent({
                 return;
             }
 
-            const userInfo = JSON.parse(localStorage.getItem('user') || '{}');
-
+            const normalizedDept = normalizeDepartment(user.value.role);
             const payload: BCRRecommendationPayload = {
-                Department: userInfo.role || 'Project Director',
-                PersonInCharge: userInfo.username || 'Unknown User',
+                Department: normalizedDept,
+                PersonInCharge: user.value.username,
                 RecommendationType: selection.value,
-                SpecificQuantity: selection.value === 'Specific_Quantity' ? Number(specificQuantity.value) : undefined,
+                SpecificQuantity: selection.value === 'Specific_Quantity' ? Number(specificQuantity.value) : null,
                 Remark: remark.value,
-                files: [] // backend will read actual uploaded files from FormData
+                files: []
             };
 
-            console.log('BCR ID', budgetChangeRequestId);
-            console.log('Payload', payload);
-            console.log('Selected Files', selectedFiles.value);
-
             try {
-                await budgetCRStore.createBCRRecommendation(budgetChangeRequestId, payload, selectedFiles.value);
+                await budgetCRStore.editBCRRecommendation(budgetChangeRequestId, props.item.id!, payload, selectedFiles.value);
 
                 selection.value = '';
                 specificQuantity.value = '';
                 remark.value = '';
                 selectedFiles.value = [];
+
                 emit('update:visible', false);
+                emit('submit');
             } catch (error) {
                 toast.add({
                     severity: 'error',
@@ -88,8 +112,11 @@ export default defineComponent({
             specificQuantity,
             remark,
             selectedFiles,
+            user,
             onFileSelect,
-            handleSubmit
+            handleSubmit,
+            existingDocuments,
+            getFileUrl
         };
     }
 });

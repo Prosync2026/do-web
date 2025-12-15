@@ -4,21 +4,21 @@
     <Dialog :visible="visible" modal :style="{ width: '40rem' }" @update:visible="$emit('update:visible', $event)">
         <!-- Header -->
         <template #header>
-            <span class="font-bold text-lg">Edit Recommendation - Project Director</span>
+            <span class="font-bold text-lg">Edit Recommendation - {{ user.role }}</span>
         </template>
 
         <div class="flex flex-col gap-4">
-            <span class="text-gray-600 text-sm"> Submit your recommendation for this budget change request as Project Director department. </span>
+            <span class="text-gray-600 text-sm"> Edit your recommendation for this budget change request as {{ user.role }} department. </span>
 
             <!-- Department & Person in Charge -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="font-medium block mb-1">Roles</label>
-                    <InputText value="Project Director" class="w-full" disabled />
+                    <InputText :value="user.role" class="w-full" disabled />
                 </div>
                 <div>
                     <label class="font-medium block mb-1">Person in Charge</label>
-                    <InputText value="Jane Doe" class="w-full" disabled />
+                    <InputText :value="user.username" class="w-full" disabled />
                 </div>
             </div>
 
@@ -56,18 +56,20 @@
             </div>
 
             <!-- Upload Attachment -->
-            <div>
-                <label class="font-medium block mb-5">Upload Attachment <span class="text-gray-500 text-sm">(Optional)</span></label>
-                <Toast />
+            <div v-if="existingDocuments.length">
+                <label class="font-medium block mb-2"> Existing Attachments </label>
 
-                <!-- Manual upload version (no auto-upload) -->
-                <FileUpload mode="advanced" name="files" :auto="false" :customUpload="true" @select="onFileSelect" accept="image/*" :maxFileSize="1000000" chooseLabel="Upload Attachment" class="custom-file-upload" :multiple="true">
-                    <template #empty>
-                        <span>Drag and drop files here to upload.</span>
-                    </template>
-                </FileUpload>
+                <ul class="border rounded p-3 bg-gray-50 space-y-2">
+                    <li v-for="(doc, index) in existingDocuments" :key="index" class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="pi pi-file"></i>
+                            <span class="text-sm">{{ doc.filename }}</span>
+                        </div>
+
+                        <a :href="getFileUrl(doc.path)" target="_blank" class="text-primary text-sm hover:underline"> View </a>
+                    </li>
+                </ul>
             </div>
-
             <!-- Buttons -->
             <div class="flex justify-end gap-2 mt-4">
                 <Button label="Cancel" outlined @click="$emit('update:visible', false)" />
