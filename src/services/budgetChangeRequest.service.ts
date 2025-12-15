@@ -1,5 +1,6 @@
 import axiosInstance from '@/services/backendAxiosInstance';
 import type {
+    BCRRecommendationEditPayload,
     BCRRecommendationPayload,
     BudgetChangeRequestPayload,
     BudgetChangeRequestResponse,
@@ -152,12 +153,10 @@ const createBCRRecommendation = async (budgetChangeRequestId: number, payload: B
     }
 };
 
-const editBCRRecommendation = async (budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationPayload, attachments?: File[]): Promise<CreateRecommendationResponse> => {
+const editBCRRecommendation = async (budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationEditPayload, attachments?: File[]): Promise<CreateRecommendationResponse> => {
     try {
         const formData = new FormData();
 
-        formData.append('Department', payload.Department);
-        formData.append('PersonInCharge', payload.PersonInCharge);
         formData.append('RecommendationType', payload.RecommendationType);
         formData.append('SpecificQuantity', payload.SpecificQuantity ? String(payload.SpecificQuantity) : '');
         formData.append('Remark', payload.Remark ?? '');
