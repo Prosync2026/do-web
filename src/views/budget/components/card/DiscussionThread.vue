@@ -72,7 +72,7 @@
 
         <!-- Modals -->
         <commentBCRModal v-model:visible="createComment" @submit="init" />
-        <editcommentBCRModal v-model:visible="editComment" :item="editingItem" />
+        <editcommentBCRModal v-if="editingItem" v-model:visible="editComment" :item="editingItem" />
     </div>
 </template>
 <script lang="ts">
