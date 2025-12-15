@@ -1,5 +1,4 @@
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import { formatCurrency, formatNumber as formatNum, formatPercent as formatPct } from '@/utils/format.utils';
 import ActivitiesLog from '@/views/budget/components/card/ActivitiesLog.vue';
@@ -80,24 +79,6 @@ export default defineComponent({
             { label: 'Activities Log', value: 'activities' }
         ];
 
-        const discussionData = ref([
-            {
-                role: 'Site',
-                name: 'John Smith',
-                datetime: '08/09/2024, 23:30:00',
-                message: 'Current tiles are adequate. Upgrade not essential from operational perspective.',
-                documentUrl: 'https://example.com/doc1.pdf',
-                isEditing: false
-            },
-            {
-                role: 'PM',
-                name: 'Jane Doe',
-                datetime: '09/09/2024, 19:20:00',
-                message: 'Cost increase is too significant without clear functional benefit. Budget constraints do not allow this upgrade.',
-                isEditing: false
-            }
-        ]);
-
         const goBack = () => router.push({ name: 'bcr' });
 
         const formatPrice = (value: number | string) => {
@@ -120,7 +101,6 @@ export default defineComponent({
             remark,
             itemsWithCalc,
             totalVarianceAmount,
-            discussionData,
             goBack,
             activeTab,
             tabItems,

@@ -8,8 +8,8 @@
                 <Button v-for="(item, index) in discussions" :key="index" @click="active = String(index)" rounded :label="item.role" class="h-8 px-2" :outlined="active !== String(index)" />
             </div>
 
-            <!-- Add Comment Button controlled by canRecommend -->
-            <Button icon="pi pi-plus" label="Add Comment" class="h-8" v-if="canRecommend" @click="showComment = true" />
+            <!-- Add Comment Button -->
+            <Button icon="pi pi-plus" label="Add Comment" class="h-8" v-if="canRecommend" @click="createComment = true" />
         </div>
 
         <!-- Accordion -->
@@ -30,9 +30,12 @@
 
                             <div class="mt-1 text-gray-700 text-sm font-semibold flex flex-wrap items-center gap-1">
                                 <span>Selection:</span>
+
                                 <span>
                                     <template v-if="item.selectionType === 'QS_Recommendation'"> Change Budget Qty according to QS recommendation </template>
+
                                     <template v-else-if="item.selectionType === 'Site_Recommendation'"> Change Budget Qty according to Site recommendation </template>
+
                                     <template v-else-if="item.selectionType === 'Specific_Quantity'">
                                         Change Budget Qty according to Specific Quantity
                                         <span class="font-semibold">(Quantity: {{ item.quantity }})</span>
@@ -52,7 +55,8 @@
                             </div>
                         </div>
 
-                        <Button v-if="editMode" icon="pi pi-pencil" text rounded @click="openEditModal(item.id)" />
+                        <!-- Edit Button -->
+                        <Button v-if="editMode && item.id" icon="pi pi-pencil" text rounded @click="openEditModal(item)" />
                     </div>
 
                     <div v-else class="text-gray-500 italic p-2">No discussion yet.</div>
@@ -67,11 +71,10 @@
         </div>
 
         <!-- Modals -->
-        <commentBCRModal v-model:visible="showComment" />
-        <editcommentBCRModal v-model:visible="showComment" :itemId="editingItemId" />
+        <commentBCRModal v-model:visible="createComment" @submit="init" />
+        <editcommentBCRModal v-model:visible="editComment" :item="editingItem" />
     </div>
 </template>
-
 <script lang="ts">
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
@@ -92,27 +95,37 @@ export default defineComponent({
         const route = useRoute();
 
         const active = ref('0');
-        const showComment = ref(false);
-        const editingItemId = ref<number | null>(null);
+
+        // ---- Corrected modal states ----
+        const createComment = ref(false);
+        const editComment = ref(false);
+        const editingItem = ref<DiscussionItem | null>(null);
+        // ---------------------------------
+
         const discussions = ref<DiscussionItem[]>([]);
         const canRecommend = ref(false);
 
         const ROLE_ORDER = ['QS', 'Purchasing', 'Site', 'Project Director'];
 
-        // 获取用户 department
         const getUserDepartment = (): string | null => {
             const userStr = localStorage.getItem('user');
             if (!userStr) return null;
+
             try {
                 const user = JSON.parse(userStr);
-                const roleObj = Array.isArray(user.roles) ? user.roles[0] : user.roles;
-                return roleObj?.role ?? null;
+                const roleObj = Array.isArray(user.role) ? user.role[0] : user.role;
+                let dept = roleObj ?? null;
+
+                if (dept === 'Site Staff' || dept === 'Site') {
+                    dept = 'SITE';
+                }
+
+                return dept;
             } catch {
                 return null;
             }
         };
 
-        // 获取讨论列表
         const fetchDiscussion = async () => {
             const res = await store.fetchRecommendationList(Number(route.params.budgetChangeRequestId));
             const list = res ?? [];
@@ -149,18 +162,16 @@ export default defineComponent({
             await fetchDiscussion();
 
             const department = getUserDepartment();
+
             if (department) {
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(Number(route.params.budgetChangeRequestId), department);
-                console.log('canReommend', canRecommend);
             }
         };
 
         onMounted(init);
-
-        const openEditModal = (id: number | null) => {
-            if (id === null) return;
-            editingItemId.value = id;
-            showComment.value = true;
+        const openEditModal = (item: DiscussionItem) => {
+            editingItem.value = item;
+            editComment.value = true;
         };
 
         const openFile = (path: string) => {
@@ -169,15 +180,21 @@ export default defineComponent({
 
         return {
             active,
-            showComment,
-            editingItemId,
             discussions,
             canRecommend,
             formatDate,
+
+            createComment,
+            editComment,
+            editingItem,
+
             openEditModal,
             openFile,
+
             onApprove: () => console.log('Approved'),
-            onReject: () => console.log('Rejected')
+            onReject: () => console.log('Rejected'),
+
+            init
         };
     }
 });

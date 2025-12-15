@@ -195,6 +195,23 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
             } finally {
                 this.loading = false;
             }
+        },
+
+        async editBCRRecommendation(budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationPayload, attachments?: File[]) {
+            this.loading = true;
+            try {
+                const response = await budgetChangeRequestService.editBCRRecommendation(budgetChangeRequestId, recommendationId, payload, attachments);
+
+                if (!response.success) {
+                    showError(response.message || 'Failed to create Recommendation.');
+                    return null;
+                }
+
+                showSuccess(response.message);
+                return response.data ?? null;
+            } finally {
+                this.loading = false;
+            }
         }
     }
 });

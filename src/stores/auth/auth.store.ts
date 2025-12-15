@@ -6,7 +6,6 @@ export const useAuthStore = defineStore('auth', {
     state: (): AuthState => ({
         token: localStorage.getItem('token') || null,
         user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
-        clientId: localStorage.getItem('clientId') || null,
         isLoading: false
     }),
 

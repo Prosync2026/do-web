@@ -48,6 +48,16 @@ export default defineComponent({
             });
         }
 
+        const normalizeDepartment = (dept: string | null): string => {
+            if (!dept) return '';
+
+            const lower = dept.toLowerCase();
+
+            if (lower === 'site staff' || lower === 'site') return 'Site';
+
+            return dept;
+        };
+
         async function handleSubmit() {
             if (!remark.value.trim()) {
                 toast.add({
@@ -59,26 +69,24 @@ export default defineComponent({
                 return;
             }
 
+            const normalizedDept = normalizeDepartment(user.value.role);
             const payload: BCRRecommendationPayload = {
-                Department: user.value.role,
+                Department: normalizedDept,
                 PersonInCharge: user.value.username,
                 RecommendationType: selection.value,
-                SpecificQuantity: selection.value === 'Specific_Quantity' ? Number(specificQuantity.value) : undefined,
+                SpecificQuantity: selection.value === 'Specific_Quantity' ? Number(specificQuantity.value) : null,
                 Remark: remark.value,
-                files: [] // backend will read actual uploaded files from FormData
+                files: []
             };
 
-            console.log('BCR ID', budgetChangeRequestId);
-            console.log('Payload', payload);
-            console.log('Selected Files', selectedFiles.value);
-
             try {
-                // await budgetCRStore.createBCRRecommendation(budgetChangeRequestId, payload, selectedFiles.value);
-                // selection.value = '';
-                // specificQuantity.value = '';
-                // remark.value = '';
-                // selectedFiles.value = [];
-                // emit('update:visible', false);
+                await budgetCRStore.createBCRRecommendation(budgetChangeRequestId, payload, selectedFiles.value);
+                selection.value = '';
+                specificQuantity.value = '';
+                remark.value = '';
+                selectedFiles.value = [];
+                emit('update:visible', false);
+                emit('submit');
             } catch (error) {
                 toast.add({
                     severity: 'error',

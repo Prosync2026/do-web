@@ -126,15 +126,47 @@ const createBCRRecommendation = async (budgetChangeRequestId: number, payload: B
     try {
         const formData = new FormData();
 
-        formData.append('data', JSON.stringify(payload));
+        formData.append('Department', payload.Department);
+        formData.append('PersonInCharge', payload.PersonInCharge);
+        formData.append('RecommendationType', payload.RecommendationType);
+        formData.append('SpecificQuantity', payload.SpecificQuantity ? String(payload.SpecificQuantity) : '');
+        formData.append('Remark', payload.Remark ?? '');
 
         if (attachments && attachments.length > 0) {
-            attachments.forEach((file) => {
-                formData.append('attachment', file, file.name);
-            });
+            attachments.forEach((file) => formData.append('files', file, file.name));
         }
 
         const response = await axiosInstance.post<CreateRecommendationData>(`/budgetChange/${budgetChangeRequestId}/recommendation`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+
+        return {
+            success: true,
+            message: 'Recommendation submitted successfully',
+            data: response.data
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            message: error.response?.data?.message || error.response?.data?.error || 'Failed to create Recommendation.',
+            data: {} as CreateRecommendationData
+        };
+    }
+};
+
+const editBCRRecommendation = async (budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationPayload, attachments?: File[]): Promise<CreateRecommendationResponse> => {
+    try {
+        const formData = new FormData();
+
+        formData.append('Department', payload.Department);
+        formData.append('PersonInCharge', payload.PersonInCharge);
+        formData.append('RecommendationType', payload.RecommendationType);
+        formData.append('SpecificQuantity', payload.SpecificQuantity ? String(payload.SpecificQuantity) : '');
+        formData.append('Remark', payload.Remark ?? '');
+
+        if (attachments && attachments.length > 0) {
+            attachments.forEach((file) => formData.append('files', file, file.name));
+        }
+
+        const response = await axiosInstance.put<CreateRecommendationData>(`/budgetChange/${budgetChangeRequestId}/recommendation/${recommendationId}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
         return {
             success: true,
@@ -157,5 +189,6 @@ export const budgetChangeRequestService = {
     getBudgetChangeRequestHistory,
     fetchRecommendationList,
     checkingUserCanCreateRecommendation,
-    createBCRRecommendation
+    createBCRRecommendation,
+    editBCRRecommendation
 };
