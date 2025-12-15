@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router';
 export default defineComponent({
     props: {
         visible: { type: Boolean, required: true },
-        item: { type: Object as () => DiscussionItem, required: true } 
+        item: { type: Object as () => DiscussionItem, required: true }
     },
     emits: ['update:visible', 'submit'],
 
@@ -18,34 +18,37 @@ export default defineComponent({
         const budgetCRStore = useBudgetChangeRequestStore();
         const toast = useToast();
 
-        // 表单字段
         const selection = ref('');
         const specificQuantity = ref('');
         const remark = ref('');
         const selectedFiles = ref<File[]>([]);
 
-        // 用户信息
         const user = ref({ role: '', username: '' });
 
+        const existingDocuments = ref<any[]>([]);
         onMounted(() => {
             const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
             user.value.role = storedUser.role || 'Project Director';
             user.value.username = storedUser.username || 'Unknown User';
         });
 
-        // 当 item 改变时，初始化表单
         watch(
             () => props.item,
             (item) => {
+                console.log('🟡 watch item triggered:', item);
                 if (!item) return;
                 selection.value = item.selectionType || '';
                 specificQuantity.value = item.quantity?.toString() || '';
                 remark.value = item.message || '';
-                selectedFiles.value = []; // 可选：原文件单独处理
+                selectedFiles.value = [];
+                existingDocuments.value = item.documentUrl || [];
             },
             { immediate: true }
         );
-
+        const getFileUrl = (path: string) => {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL;
+            return `${baseUrl}/${path.replace(/\\/g, '/')}`;
+        };
         function onFileSelect(event: any) {
             selectedFiles.value = event.files;
             toast.add({
@@ -111,7 +114,9 @@ export default defineComponent({
             selectedFiles,
             user,
             onFileSelect,
-            handleSubmit
+            handleSubmit,
+            existingDocuments,
+            getFileUrl
         };
     }
 });

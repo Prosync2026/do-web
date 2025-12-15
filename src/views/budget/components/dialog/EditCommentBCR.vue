@@ -1,4 +1,4 @@
-<script lang="ts" src="./CommentBCR.script"></script>
+<script lang="ts" src="./EditCommentBCR.script"></script>
 
 <template>
     <Dialog :visible="visible" modal :style="{ width: '40rem' }" @update:visible="$emit('update:visible', $event)">
@@ -56,17 +56,20 @@
             </div>
 
             <!-- Upload Attachment -->
-            <div>
-                <label class="font-medium block mb-5"> Upload Attachment <span class="text-gray-500 text-sm">(Optional)</span> </label>
-                <Toast />
+            <div v-if="existingDocuments.length">
+                <label class="font-medium block mb-2"> Existing Attachments </label>
 
-                <FileUpload mode="advanced" name="files" :auto="false" :customUpload="true" @select="onFileSelect" accept="image/*" :maxFileSize="1000000" chooseLabel="Upload Attachment" class="custom-file-upload" :multiple="true">
-                    <template #empty>
-                        <span>Drag and drop files here to upload.</span>
-                    </template>
-                </FileUpload>
+                <ul class="border rounded p-3 bg-gray-50 space-y-2">
+                    <li v-for="(doc, index) in existingDocuments" :key="index" class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="pi pi-file"></i>
+                            <span class="text-sm">{{ doc.filename }}</span>
+                        </div>
+
+                        <a :href="getFileUrl(doc.path)" target="_blank" class="text-primary text-sm hover:underline"> View </a>
+                    </li>
+                </ul>
             </div>
-
             <!-- Buttons -->
             <div class="flex justify-end gap-2 mt-4">
                 <Button label="Cancel" outlined @click="$emit('update:visible', false)" />
