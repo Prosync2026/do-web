@@ -65,20 +65,12 @@ export default defineComponent({
         const activeTab = ref('all');
 
         const tabItems = computed(() => {
-            if (isPurchasingRole) {
-                return [
-                    { label: 'All Orders', value: 'all' },
-                    { label: 'Processing', value: 'processing', badge: pendingCount.value },
-                    { label: 'Approved', value: 'approved' },
-                    { label: 'Rejected', value: 'rejected' }
-                ];
-            } else {
-                return [
-                    { label: 'All Orders', value: 'all' },
-                    { label: 'Approved', value: 'approved' },
-                    { label: 'Rejected', value: 'rejected' }
-                ];
-            }
+            return [
+                { label: 'All Orders', value: 'all' },
+                { label: 'Processing', value: 'processing', badge: pendingCount.value },
+                { label: 'Approved', value: 'approved' },
+                { label: 'Rejected', value: 'rejected' }
+            ];
         });
 
         // Fetch orders on mount and whenever filters change
