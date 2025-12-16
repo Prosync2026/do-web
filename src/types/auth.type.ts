@@ -49,6 +49,8 @@ export interface User {
     role: string;
     email?: string;
     role_id: number;
+    project_id?: number;
+    user_project_role_code?: string;
 }
 
 export interface AuthState {
