@@ -78,7 +78,6 @@ const saveProjectToStorage = (project: { company: string; name: string; ProjectI
                 name: project.name,
                 ProjectId: project.ProjectId
             };
-            console.log('Saving project to localStorage:', dataToSave);
             localStorage.setItem('selectedProject', JSON.stringify(dataToSave));
         } else {
             localStorage.removeItem('selectedProject');
@@ -91,7 +90,6 @@ const saveProjectToStorage = (project: { company: string; name: string; ProjectI
 const loadProjectFromStorage = (): { company: string; name: string; ProjectId?: number } | null => {
     try {
         const stored = localStorage.getItem('selectedProject');
-        console.log('Stored project from localStorage:', stored);
         if (stored) {
             const parsed = JSON.parse(stored);
             if (parsed.company && parsed.name) {
@@ -167,8 +165,6 @@ const selectProject = (company: string, project: Project) => {
         ProjectId: projectId || 0
     };
 
-    console.log('Selecting project:', projectToSave);
-
     saveProjectToStorage(projectToSave);
 
     selectedProject.value = projectToSave;
@@ -184,7 +180,6 @@ const selectProject = (company: string, project: Project) => {
 const saveLatestBudgetVersion = (version: number) => {
     try {
         localStorage.setItem('latestBudgetVersion', version.toString());
-        console.log('Latest budget version saved to localStorage:', version);
     } catch (err) {
         console.error('Error saving latest budget version to localStorage', err);
     }
