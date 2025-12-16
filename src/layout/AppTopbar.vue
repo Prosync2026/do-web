@@ -78,6 +78,7 @@ const saveProjectToStorage = (project: { company: string; name: string; ProjectI
                 name: project.name,
                 ProjectId: project.ProjectId
             };
+
             localStorage.setItem('selectedProject', JSON.stringify(dataToSave));
         } else {
             localStorage.removeItem('selectedProject');
@@ -90,6 +91,7 @@ const saveProjectToStorage = (project: { company: string; name: string; ProjectI
 const loadProjectFromStorage = (): { company: string; name: string; ProjectId?: number } | null => {
     try {
         const stored = localStorage.getItem('selectedProject');
+
         if (stored) {
             const parsed = JSON.parse(stored);
             if (parsed.company && parsed.name) {

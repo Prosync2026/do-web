@@ -37,7 +37,7 @@ if (storedUser) {
 export async function login(username: string, password: string) {
     try {
         const response = await axios.post('/auth/login', { username, password });
-        console.log('Login response:', response.data);
+
         if (response.data && response.data.token) {
             const userData = { username: response.data.username, role: response.data.role };
             localStorage.setItem('user', JSON.stringify(userData));

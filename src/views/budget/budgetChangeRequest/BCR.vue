@@ -14,7 +14,7 @@
             </div>
 
             <div class="grid grid-cols-12 gap-4 mt-4 mb-16">
-                <SummaryCard :cardItems="BudgetChangeRequestSummaryData" :cardCol="3" />
+                <SummaryCard :cardItems="BudgetChangeRequestSummaryData" :cardCol="4" />
             </div>
 
             <ReusableTable

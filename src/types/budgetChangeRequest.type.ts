@@ -1,15 +1,15 @@
-export interface DiscussionItem {
-    role: string;
-    name: string;
-    datetime: string;
-    message: string;
-    documentUrl?: string;
-    isEditing: boolean;
-}
-
-export interface FilterOption {
-    label: string;
-    value: string;
+export interface TableItem {
+    id: number;
+    itemCode: string;
+    description: string;
+    uom: string;
+    unitPrice: number;
+    budgetQty: number;
+    orderedQty: number;
+    newOrder: number;
+    remark: string;
+    location1?: string;
+    location2?: string;
 }
 
 export interface BudgetAttachment {
@@ -39,7 +39,6 @@ export interface BudgetChangeItem {
     element: string;
 }
 
-// API RETURN RESPONSE
 export interface BudgetChangeRequest {
     Id: number;
     ProjectId: number;
@@ -71,22 +70,6 @@ export interface SingleBudgetChangeRequestResponse {
     data?: BudgetChangeRequest;
 }
 
-export interface RecommendationData {
-    Id: number;
-    BudgetChangeId: number;
-    Department: string;
-    ReviewerName: string;
-    RecommendationType: string;
-    Remark: string;
-    CreatedAt: string;
-}
-export interface CreateRecommendationResponse {
-    success: boolean;
-    message: string;
-    data: RecommendationData;
-}
-
-// API REQUEST PAYLOAD
 export interface BudgetChangeItemPayload {
     ItemCode: string;
     Uom: string | null;
@@ -112,25 +95,94 @@ export interface BudgetChangeRequestPayload {
     Items: BudgetChangeItemPayload[];
 }
 
+export interface HistoryList {
+    Id: number;
+    ActionDetails: string;
+    ActionType: string;
+    CreatedAt: string;
+    EntityId: number;
+    EntityType: string;
+    Metadata: HistoryMetadata;
+    NewValue: any | null;
+    OldValue: any | null;
+    UserId: number | null;
+    UserName: string | null;
+    UserRole: string | null;
+}
+
+export interface HistoryMetadata {
+    DocNo: string;
+    TotalAmount: number;
+    Department: string;
+    ItemCount: number;
+    Status: string | null;
+    IsDraft: boolean;
+}
+
+export interface HistoryResponse {
+    success: boolean;
+    message?: string;
+    data?: HistoryList[];
+}
+
 export interface BCRRecommendationPayload {
     Department: string;
     PersonInCharge: string;
     RecommendationType: string; // Type of recommendation (e.g., "QS_Recommendation", "Site_Recommendation", "Specific_Quantity")
-    SpecificQuantity?: number;
-    Remark?: string;
+    SpecificQuantity?: number | null;
+    Remark?: string | null;
     files?: string[];
 }
 
-export interface TableItem {
-    id: number;
-    itemCode: string;
-    description: string;
-    uom: string;
-    unitPrice: number;
-    budgetQty: number;
-    orderedQty: number;
-    newOrder: number;
-    remark: string;
-    location1?: string;
-    location2?: string;
+export interface BCRRecommendationEditPayload {
+    RecommendationType: string; // Type of recommendation (e.g., "QS_Recommendation", "Site_Recommendation", "Specific_Quantity")
+    SpecificQuantity?: number | null;
+    Remark?: string | null;
+    files?: string[];
+}
+export interface RecommendationList {
+    Id: number;
+    BudgetChangeId: number;
+    Department: string;
+    ReviewerName: string;
+    RecommendationType: string;
+    SpecificQuantity: string;
+    Remark: string;
+    Attachment: string | null;
+    CreatedAt: string;
+    CreatedBy: string;
+    UpdatedAt: string;
+    UpdatedBy: string | null;
+}
+
+export interface RecommendationResponse {
+    success: boolean;
+    message?: string;
+    data?: RecommendationList[];
+}
+
+export interface CreateRecommendationData {
+    Id: number;
+    BudgetChangeId: number;
+    Department: string;
+    ReviewerName: string;
+    RecommendationType: string;
+    Remark: string;
+    CreatedAt: string;
+}
+export interface CreateRecommendationResponse {
+    success: boolean;
+    message: string;
+    data: CreateRecommendationData;
+}
+
+export interface DiscussionItem {
+    id: number | null;
+    role: string;
+    name: string;
+    datetime: string;
+    selectionType: string;
+    quantity: number | null;
+    message: string;
+    documentUrl: { filename: string; path: string }[];
 }

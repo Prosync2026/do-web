@@ -1,5 +1,5 @@
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
-import type { BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
+import type { BCRRecommendationEditPayload, BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload, HistoryList, RecommendationList } from '@/types/budgetChangeRequest.type';
 import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 
@@ -7,7 +7,7 @@ interface State {
     loading: boolean;
     budgetChangeRequestList: BudgetChangeRequest[];
     singleBudgetChangeRequest: BudgetChangeRequest | null;
-
+    historyList: HistoryList[];
     pagination: {
         page: number;
         pageSize: number;
@@ -26,7 +26,7 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
         loading: false,
         budgetChangeRequestList: [],
         singleBudgetChangeRequest: null,
-
+        historyList: [],
         pagination: {
             page: 1,
             pageSize: 10,
@@ -150,16 +150,30 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
                 this.loading = false;
             }
         },
-        // Unauthorized issue cannot using
+
         async getBudgetChangeRequestActivity(budgetChangeRequestId: number) {
             this.loading = true;
             try {
-                console.log('checking the bcrId', budgetChangeRequestId);
                 const response = await budgetChangeRequestService.getBudgetChangeRequestHistory(budgetChangeRequestId);
-                // console.log('response', response);
+
+                this.historyList = response?.data ?? [];
             } catch (error: any) {
-                showError(error, 'Failed to fetch budget change request.');
-                this.singleBudgetChangeRequest = null;
+                showError(error, 'Failed to fetch budget change request activity log.');
+                return null;
+            } finally {
+                this.loading = false;
+            }
+        },
+        // RECOMMENDATION API
+        async fetchRecommendationList(bcrId: number) {
+            this.loading = true;
+
+            try {
+                const response = await budgetChangeRequestService.fetchRecommendationList(bcrId);
+
+                return response.data as RecommendationList[];
+            } catch (error: any) {
+                showError(error, 'Failed to fetch recommendation list.');
                 return null;
             } finally {
                 this.loading = false;
@@ -170,6 +184,23 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
             this.loading = true;
             try {
                 const response = await budgetChangeRequestService.createBCRRecommendation(budgetChangeRequestId, payload, attachments);
+
+                if (!response.success) {
+                    showError(response.message || 'Failed to create Recommendation.');
+                    return null;
+                }
+
+                showSuccess(response.message);
+                return response.data ?? null;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async editBCRRecommendation(budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationEditPayload, attachments?: File[]) {
+            this.loading = true;
+            try {
+                const response = await budgetChangeRequestService.editBCRRecommendation(budgetChangeRequestId, recommendationId, payload, attachments);
 
                 if (!response.success) {
                     showError(response.message || 'Failed to create Recommendation.');

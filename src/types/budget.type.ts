@@ -75,3 +75,4 @@ export interface BudgetResponse {
         isLatest?: boolean;
     }[];
 }
+

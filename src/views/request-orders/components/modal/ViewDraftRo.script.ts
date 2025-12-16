@@ -1,6 +1,6 @@
 import { requestOrderService } from '@/services/requestOrder.service';
 import type { DraftRO } from '@/types/request-order.type';
-import { showError } from '@/utils/showError.utils';
+import { showError } from '@/utils/showNotification.utils';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Column from 'primevue/column';

@@ -1,16 +1,14 @@
-<script lang="ts" src="./CommentBCR.script"></script>
-
+<script lang="ts" src="./EditCommentBCR.script.ts"></script>
 <template>
     <Dialog :visible="visible" modal :style="{ width: '40rem' }" @update:visible="$emit('update:visible', $event)">
-        <!-- Header -->
         <template #header>
-            <span class="font-bold text-lg">Add Recommendation - {{ user.role }}</span>
+            <span class="font-bold text-lg">Edit Recommendation - {{ user.role }}</span>
         </template>
 
         <div class="flex flex-col gap-4">
-            <span class="text-gray-600 text-sm"> Submit your recommendation for this budget change request as {{ user.role }} department. </span>
+            <span class="text-gray-600 text-sm"> Edit your recommendation for this budget change request as {{ user.role }} department. </span>
 
-            <!-- Department & Person in Charge -->
+            <!-- Roles & PIC -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="font-medium block mb-1">Roles</label>
@@ -22,7 +20,7 @@
                 </div>
             </div>
 
-            <!-- Selection -->
+            <!-- Recommendation Selection -->
             <div>
                 <label class="font-medium block mb-1">Selection (Choose one):</label>
                 <div class="flex flex-col gap-2 ml-2 mt-1">
@@ -30,12 +28,10 @@
                         <RadioButton inputId="qs" name="selection" value="QS_Recommendation" v-model="selection" />
                         <label for="qs">Change Budget Qty according to QS recommendation</label>
                     </div>
-
                     <div class="flex items-center gap-2">
                         <RadioButton inputId="site" name="selection" value="Site_Recommendation" v-model="selection" />
                         <label for="site">Change Budget Qty according to Site recommendation</label>
                     </div>
-
                     <div class="flex items-center gap-2">
                         <RadioButton inputId="specific" name="selection" value="Specific_Quantity" v-model="selection" />
                         <label for="specific">Change Budget Qty to specific amount</label>
@@ -43,7 +39,7 @@
                 </div>
             </div>
 
-            <!-- Quantity -->
+            <!-- Specific Quantity -->
             <div v-if="selection === 'Specific_Quantity'">
                 <label class="font-medium block mb-1">Enter Quantity</label>
                 <InputText v-model="specificQuantity" placeholder="Enter quantity..." class="w-full" />
@@ -55,16 +51,24 @@
                 <Textarea v-model="remark" rows="3" placeholder="Enter your remark..." class="w-full" />
             </div>
 
-            <!-- Upload Attachment -->
-            <div>
-                <label class="font-medium block mb-5"> Upload Attachment <span class="text-gray-500 text-sm">(Optional)</span> </label>
-                <Toast />
+            <!-- Existing Attachments -->
+            <div v-if="existingDocuments.length">
+                <label class="font-medium block mb-2">Existing Attachments</label>
+                <ul class="border rounded p-3 bg-gray-50 space-y-2">
+                    <li v-for="doc in existingDocuments" :key="doc.id" class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="pi pi-file"></i>
+                            <span class="text-sm">{{ doc.filename }}</span>
+                        </div>
+                        <a :href="getFileUrl(doc.path)" target="_blank" class="text-primary text-sm hover:underline">View</a>
+                    </li>
+                </ul>
+            </div>
 
-                <FileUpload mode="advanced" name="files" :auto="false" :customUpload="true" @select="onFileSelect" accept="image/*" :maxFileSize="1000000" chooseLabel="Upload Attachment" class="custom-file-upload" :multiple="true">
-                    <template #empty>
-                        <span>Drag and drop files here to upload.</span>
-                    </template>
-                </FileUpload>
+            <!-- Upload New Files -->
+            <div>
+                <label class="font-medium block mb-2">Upload New Attachment</label>
+                <FileUpload mode="basic" chooseLabel="Choose File" multiple customUpload @select="onFileSelect" />
             </div>
 
             <!-- Buttons -->

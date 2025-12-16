@@ -4,7 +4,7 @@ import { useDashboard } from '@/composables/useDashboard';
 import { requestOrderService } from '@/services/requestOrder.service';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import type { TableColumn } from '@/types/table.type';
-import { showError } from '@/utils/showError.utils';
+import { showError } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import { useConfirm } from 'primevue/useconfirm';
