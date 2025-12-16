@@ -3,7 +3,7 @@
 <template>
     <!--HEADER-->
     <div class="grid grid-cols-12 gap-4 mb-3 mt-4">
-        <BudgetSummaryData :cardItems="BudgetSummaryData" :cardCol="3" />
+        <BudgetSummaryData :cardItems="BudgetSummaryDataList" :cardCol="3" />
     </div>
 
     <!-- BODY CHART -->

@@ -74,4 +74,14 @@ const createBudget = async (formData: FormData) => {
     }
 };
 
-export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget };
+const budgetStatistics = async (budgetId: number) => {
+    try {
+        const response = await axiosInstance.get(`/budgets/${budgetId}/statistics`);
+        return response.data;
+    } catch (error) {
+        showError(error, 'Failed to fetch budget statistics.');
+        throw error;
+    }
+};
+
+export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget, budgetStatistics };
