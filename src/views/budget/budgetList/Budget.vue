@@ -1,4 +1,4 @@
-<script lang="ts" src="./BudgetLogic"></script>
+<script src="./BudgetLogic.ts"></script>
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">

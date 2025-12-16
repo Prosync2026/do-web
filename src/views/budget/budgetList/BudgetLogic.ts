@@ -103,7 +103,7 @@ export default defineComponent({
 
             const latest = versions.value.find((v) => v.latest);
             if (latest) {
-                selectedVersion.value = latest.value; // 触发 watch
+                selectedVersion.value = latest.value;
                 latestBudgetId.value = latest.id!;
             }
         };
@@ -137,7 +137,6 @@ export default defineComponent({
             const selected = versions.value.find((v) => v.value === newVersion);
             if (!selected) return;
 
-            // 只有用户切换版本才显示 toast
             if (!initialLoad.value && previousVersion.value && previousVersion.value !== newVersion) {
                 showInfo(`Switched to Version ${newVersion}`);
                 localStorage.setItem('latestBudgetVersion', newVersion.toString());
