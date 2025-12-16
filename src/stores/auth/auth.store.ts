@@ -32,6 +32,7 @@ export const useAuthStore = defineStore('auth', {
                         username: user?.Username || username,
                         role: user?.project_member_system_user[0].project_member?.project_role?.name,
                         role_id: user?.project_member_system_user[0].project_member?.project_role_id,
+                        access_level: user?.client_management_group_system_user[0]?.access_level.code,
                         email: user?.Email
                     });
 

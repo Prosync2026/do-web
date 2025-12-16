@@ -186,3 +186,10 @@ export interface DiscussionItem {
     message: string;
     documentUrl: { filename: string; path: string }[];
 }
+
+export interface BCRFinalDecisionPayload {
+    ReviewerName: string;
+    Status: string;
+    RecommendationType: string; // Type of recommendation (e.g., "QS_Recommendation", "Site_Recommendation", "Specific_Quantity")
+    Remark?: string;
+}

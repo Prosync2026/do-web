@@ -1,4 +1,4 @@
-<script lang="ts" src="./Overview.script.ts"></script>
+<script src="./Overview.script.ts"></script>
 
 <template>
     <!--HEADER-->
@@ -7,8 +7,8 @@
     </div>
 
     <!-- BODY CHART -->
-    <div class="grid grid-cols-12 gap-4 mt-6 items-stretch">
-        <!-- Left: Budget by Location -->
+    <!-- <div class="grid grid-cols-12 gap-4 mt-6 items-stretch">
+        
         <div class="col-span-12 lg:col-span-6 flex flex-col">
             <div class="glossy-card mb-0 p-4 rounded-lg border border-gray-300 relative flex-1 flex flex-col items-center">
                 <span class="self-start font-bold text-black-500 mb-10"> <i class="pi pi-map-marker" style="margin-right: 5px"></i> Budget by Location </span>
@@ -18,7 +18,7 @@
             </div>
         </div>
 
-        <!-- Right: Drilldown Chart -->
+     
         <div class="col-span-12 lg:col-span-6 flex flex-col">
             <div class="glossy-card mb-0 p-4 rounded-lg border border-gray-300 relative flex-1 flex flex-col">
                 <div class="w-full flex items-center justify-between mb-4">
@@ -34,5 +34,5 @@
                 <highcharts :options="chartOptions" :style="{ height: '300px', width: '100%' }" />
             </div>
         </div>
-    </div>
+    </div> -->
 </template>

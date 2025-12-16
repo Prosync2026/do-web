@@ -4,6 +4,17 @@ export interface AuthUser {
     role: string;
     email?: string;
     project_member_system_user?: projectMemberSystemUserList[];
+    client_management_group_system_user?: clientManagementGroupSystemUserList[];
+}
+
+export interface clientManagementGroupSystemUserList {
+    access_level: AccessLevelDetail;
+}
+
+export interface AccessLevelDetail {
+    id: number;
+    code: string;
+    name: string;
 }
 
 export interface ClientDetail {
@@ -49,6 +60,7 @@ export interface User {
     role: string;
     email?: string;
     role_id: number;
+    access_level?: string;
 }
 
 export interface AuthState {
