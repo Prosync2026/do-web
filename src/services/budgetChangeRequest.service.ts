@@ -1,5 +1,6 @@
 import axiosInstance from '@/services/backendAxiosInstance';
 import type {
+    BCRFinalDecisionPayload,
     BCRRecommendationEditPayload,
     BCRRecommendationPayload,
     BudgetChangeRequestPayload,
@@ -116,7 +117,7 @@ const checkingUserCanCreateRecommendation = async (budgetChangeRequestId: number
     try {
         const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/can-recommend`, { params: { department } });
 
-        return response.data ?? [];
+        return response.data.data.canRecommend;
     } catch (error) {
         showError(error, 'Failed to fetch recommendation list.');
         throw error;
@@ -180,6 +181,25 @@ const editBCRRecommendation = async (budgetChangeRequestId: number, recommendati
         };
     }
 };
+
+const createManagementFinalDecisionRecommendation = async (budgetChangeRequestId: number, payload: BCRFinalDecisionPayload) => {
+    try {
+        const response = await axiosInstance.post(`/budgetChange/${budgetChangeRequestId}/review`, payload);
+
+        return {
+            success: true,
+            message: 'Final decision submitted successfully',
+            data: response.data
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            message: error.response?.data?.message || error.response?.data?.error || 'Failed to submit final decision.',
+            data: {}
+        };
+    }
+};
+
 export const budgetChangeRequestService = {
     getBudgetChangeRequests,
     createBudgetChangeRequest,
@@ -189,5 +209,6 @@ export const budgetChangeRequestService = {
     fetchRecommendationList,
     checkingUserCanCreateRecommendation,
     createBCRRecommendation,
-    editBCRRecommendation
+    editBCRRecommendation,
+    createManagementFinalDecisionRecommendation
 };

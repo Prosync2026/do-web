@@ -1,4 +1,4 @@
-<script lang="ts" src="./EditCommentBCR.script.ts"></script>
+<script src="./EditCommentBCR.script.ts"></script>
 <template>
     <Dialog :visible="visible" modal :style="{ width: '40rem' }" @update:visible="$emit('update:visible', $event)">
         <template #header>

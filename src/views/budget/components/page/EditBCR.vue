@@ -1,4 +1,4 @@
-<script lang="ts" src="./EditBCR.script.ts"></script>
+<script src="./EditBCR.script.ts"></script>
 
 <template>
     <div class="p-6 card">

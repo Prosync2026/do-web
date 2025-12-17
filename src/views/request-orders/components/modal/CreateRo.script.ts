@@ -98,7 +98,6 @@ export default defineComponent({
             budgetStore.pagination.page = 1;
         });
 
-        // ✅ FIXED: Keep selected items that are still in the budget
         watch(
             () => allBudgetItems.value,
             (newItems) => {
