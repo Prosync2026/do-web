@@ -42,7 +42,7 @@ export function useLoginForm() {
                 toast.add({
                     severity: 'success',
                     summary: 'Login Successful',
-                    detail: `Welcome ${authStore.userRole}!`,
+                    detail: `Welcome ${authStore.userName}!`,
                     life: 3000
                 });
 

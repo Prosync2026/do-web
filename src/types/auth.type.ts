@@ -61,6 +61,8 @@ export interface User {
     email?: string;
     role_id: number;
     access_level?: string;
+    project_id?: number;
+    user_project_role_code?: string;
 }
 
 export interface AuthState {

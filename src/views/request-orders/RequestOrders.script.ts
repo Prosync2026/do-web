@@ -54,31 +54,23 @@ export default defineComponent({
         if (user) {
             try {
                 const parsed = JSON.parse(user);
-                userRole = parsed.role || '';
+                userRole = parsed.user_project_role_code || '';
             } catch {
                 userRole = '';
             }
         }
-        const isPurchasingRole = userRole.toLowerCase() === 'purchasing';
-        const isPmPdRole = userRole.toLowerCase() === 'pm' || userRole.toLowerCase() === 'pd';
+        const isPurchasingRole = userRole === 'PURC';
+        const isPmPdRole = userRole === 'PM' || userRole === 'PD';
         // const activeTab = ref(isPurchasingRole ? 'all' : 'all');
         const activeTab = ref('all');
 
         const tabItems = computed(() => {
-            if (isPurchasingRole) {
-                return [
-                    { label: 'All Orders', value: 'all' },
-                    { label: 'Pending', value: 'pending', badge: pendingCount.value },
-                    { label: 'Approved', value: 'approved' },
-                    { label: 'Rejected', value: 'rejected' }
-                ];
-            } else {
-                return [
-                    { label: 'All Orders', value: 'all' },
-                    { label: 'Approved', value: 'approved' },
-                    { label: 'Rejected', value: 'rejected' }
-                ];
-            }
+            return [
+                { label: 'All Orders', value: 'all' },
+                { label: 'Processing', value: 'processing', badge: pendingCount.value },
+                { label: 'Approved', value: 'approved' },
+                { label: 'Rejected', value: 'rejected' }
+            ];
         });
 
         // Fetch orders on mount and whenever filters change
@@ -91,7 +83,7 @@ export default defineComponent({
             try {
                 const res = await requestOrderService.getRequestOrders({ page: 1, pageSize: 10000 });
                 const orders = res.data;
-                totalCounts.value.pending = orders.filter((o) => o.Status === 'Pending').length;
+                totalCounts.value.pending = orders.filter((o) => o.Status === 'Processing').length;
                 totalCounts.value.approved = orders.filter((o) => o.Status === 'Approved').length;
                 totalCounts.value.rejected = orders.filter((o) => o.Status === 'Rejected').length;
                 totalCounts.value.totalValue = orders.reduce((sum, o) => sum + Number(o.TotalAmount || 0), 0);
@@ -144,16 +136,12 @@ export default defineComponent({
                         action: true,
                         actions: (row: Order) => {
                             const rowActions: ActionType[] = ['view'];
-
-                            if (isPurchasingRole) {
-                                if (row.status === 'Pending') {
-                                    rowActions.push('approve', 'reject', 'edit');
-                                }
-                                rowActions.push('delete');
+                            if ((isPurchasingRole || isPmPdRole) && (row.status === 'Processing' || row.status === 'Submitted')) {
+                                rowActions.push('approve', 'reject', 'edit');
                             }
 
-                            if (isPmPdRole) {
-                                rowActions.push('edit');
+                            if (isPurchasingRole) {
+                                rowActions.push('delete');
                             }
 
                             return rowActions;
@@ -163,7 +151,7 @@ export default defineComponent({
             }
 
             if (isPmPdRole) {
-                actions = [...actions, 'edit'];
+                actions = [...actions, 'edit', 'approve', 'reject'];
             }
 
             return [
@@ -191,7 +179,7 @@ export default defineComponent({
                 placeholder: 'Filter by Status',
                 options: [
                     { label: 'All Statuses', value: '' },
-                    { label: 'Pending', value: 'Pending' },
+                    { label: 'Processing', value: 'Processing' },
                     { label: 'Approved', value: 'Approved' },
                     { label: 'Rejected', value: 'Rejected' }
                 ],
@@ -216,7 +204,7 @@ export default defineComponent({
                     return 'success';
                 case 'Rejected':
                     return 'danger';
-                case 'Pending':
+                case 'Processing':
                     return 'warning';
                 default:
                     return 'info';
@@ -289,6 +277,11 @@ export default defineComponent({
             });
         }
 
+        function handleCloseModal(): void {
+            showDetailsModal.value = false;
+            selectedOrder.value = null;
+        }
+
         function handleSaveOrder(formData: Partial<Order>): void {
             if (selectedOrder.value) {
                 Object.assign(selectedOrder.value, formData);
@@ -301,7 +294,7 @@ export default defineComponent({
             if (order) {
                 order.status = 'Approved';
                 store.fetchOrders();
-                showDetailsModal.value = false;
+                handleCloseModal();
             }
         }
 
@@ -309,7 +302,7 @@ export default defineComponent({
             if (order) {
                 order.status = 'Rejected';
                 store.fetchOrders();
-                showDetailsModal.value = false;
+                handleCloseModal();
             }
         }
 
@@ -321,23 +314,38 @@ export default defineComponent({
                 acceptClass: 'p-button-success',
                 acceptLabel: 'Yes, Approve',
                 rejectLabel: 'Cancel',
-                accept: () => {
-                    confirm.close();
+                accept: async () => {
+                    try {
+                        await requestOrderService.processROApproval(order.id, 'Approved');
+                        toast.add({
+                            severity: 'success',
+                            summary: 'Approved',
+                            detail: 'Request order approved.',
+                            life: 3000
+                        });
+                        await store.fetchOrders();
+                        confirm.close();
+                    } catch (err: any) {
+                        const errorDetail = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to approve';
+                        console.log('Approval error:', errorDetail);
 
-                    (async () => {
-                        try {
-                            await requestOrderService.approveRejectRequestOrder(order.id, 'Approved');
-                            toast.add({
-                                severity: 'success',
-                                summary: 'Approved',
-                                detail: 'Request order approved.',
-                                life: 3000
-                            });
-                            await store.fetchOrders();
-                        } catch (err) {
-                            showError(err);
-                        }
-                    })();
+                        toast.add({
+                            severity: 'warn',
+                            summary: 'Cannot Approve',
+                            detail: errorDetail,
+                            life: 3000
+                        });
+                        confirm.close();
+                    }
+                },
+                reject: () => {
+                    confirm.close();
+                    toast.add({
+                        severity: 'info',
+                        summary: 'Cancelled',
+                        detail: 'Approve cancelled.',
+                        life: 2500
+                    });
                 }
             });
         }
@@ -350,23 +358,38 @@ export default defineComponent({
                 acceptClass: 'p-button-danger',
                 acceptLabel: 'Yes, Reject',
                 rejectLabel: 'Cancel',
-                accept: () => {
-                    confirm.close();
+                accept: async () => {
+                    try {
+                        await requestOrderService.processROApproval(order.id, 'Rejected');
+                        toast.add({
+                            severity: 'warn',
+                            summary: 'Rejected',
+                            detail: 'Request order rejected.',
+                            life: 3000
+                        });
+                        await store.fetchOrders();
+                        confirm.close();
+                    } catch (err: any) {
+                        confirm.close();
+                        const errorDetail = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to reject';
+                        console.log('Rejection error:', errorDetail);
 
-                    (async () => {
-                        try {
-                            await requestOrderService.approveRejectRequestOrder(order.id, 'Rejected');
-                            toast.add({
-                                severity: 'warn',
-                                summary: 'Rejected',
-                                detail: 'Request order rejected.',
-                                life: 3000
-                            });
-                            await store.fetchOrders();
-                        } catch (err) {
-                            showError(err);
-                        }
-                    })();
+                        toast.add({
+                            severity: 'warn',
+                            summary: 'Cannot Reject',
+                            detail: errorDetail,
+                            life: 3000
+                        });
+                    }
+                },
+                reject: () => {
+                    confirm.close();
+                    toast.add({
+                        severity: 'info',
+                        summary: 'Cancelled',
+                        detail: 'Reject cancelled.',
+                        life: 2500
+                    });
                 }
             });
         }
@@ -456,7 +479,8 @@ export default defineComponent({
             totalCounts,
             useDashboard,
             handleSearch,
-            onSearchWrapper: handleSearch
+            onSearchWrapper: handleSearch,
+            handleCloseModal
         };
     }
 });

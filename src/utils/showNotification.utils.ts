@@ -37,7 +37,7 @@ export function showError(error: any, fallbackMessage = 'Something went wrong.')
         return;
     }
 
-    const message = error?.response?.data?.message || error?.message || fallbackMessage;
+    const message = error?.response?.data?.message || error?.message || error?.error || fallbackMessage;
 
     toast.add({
         severity: 'error',

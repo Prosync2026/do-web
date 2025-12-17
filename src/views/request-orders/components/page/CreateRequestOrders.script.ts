@@ -648,7 +648,6 @@ export default defineComponent({
         const submitRequestOrder = async () => {
             try {
                 const projectId = getCurrentProjectId();
-
                 const payload: CreateRequestOrderPayload = {
                     ProjectId: projectId,
                     DocNo: roNumber.value,
@@ -661,7 +660,7 @@ export default defineComponent({
                     Type: 'requestOrder',
                     Remark: overallRemark.value || '',
                     CreatedBy: getCurrentUsername() || 'Unknown User',
-                    Status: 'Pending',
+                    Status: 'Processing',
                     Currency: 'MYR',
                     Items: items.value.map((item) => ({
                         BudgetItemId: item.budgetItemId ?? null,
@@ -697,7 +696,7 @@ export default defineComponent({
                     toast.add({
                         severity: 'success',
                         summary: 'Request Order Submitted',
-                        detail: `RO ${roNumber.value} has been submitted successfully`,
+                        detail: `New RO has been created successfully`,
                         life: 3000
                     });
 
@@ -768,7 +767,7 @@ export default defineComponent({
                     Type: 'requestOrder',
                     Remark: overallRemark.value || '',
                     CreatedBy: getCurrentUsername() || 'Unknown User',
-                    Status: 'Pending',
+                    Status: 'Processing',
                     Currency: 'MYR',
                     TotalAmount: grandTotal.value,
                     Items: items.value.map((item) => ({
