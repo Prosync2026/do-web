@@ -48,7 +48,7 @@
                 <!-- Subcon AutoComplete for Unbudgeted Items -->
                 <Motion v-if="budgetType === 'Unbudgeted Item'" :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 1 }">
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1"> Subcon <span class="text-red-600 font-bold">*</span> </label>
+                        <label class="block text-sm text-gray-600 mb-1"> Subcon </label>
                         <div class="flex flex-col gap-2">
                             <AutoComplete v-model="selectedSubcon" :suggestions="filteredSubconList" field="name" option-label="name" forceSelection dropdown placeholder="Search Subcon" @complete="handleSubconSearch" />
                             <Message v-if="showValidation && !selectedSubcon" severity="error" icon="pi pi-times-circle">Subcon is required for Unbudgeted Items</Message>

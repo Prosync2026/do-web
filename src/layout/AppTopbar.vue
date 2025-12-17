@@ -78,7 +78,7 @@ const saveProjectToStorage = (project: { company: string; name: string; ProjectI
                 name: project.name,
                 ProjectId: project.ProjectId
             };
-            console.log('Saving project to localStorage:', dataToSave);
+
             localStorage.setItem('selectedProject', JSON.stringify(dataToSave));
         } else {
             localStorage.removeItem('selectedProject');
@@ -91,7 +91,7 @@ const saveProjectToStorage = (project: { company: string; name: string; ProjectI
 const loadProjectFromStorage = (): { company: string; name: string; ProjectId?: number } | null => {
     try {
         const stored = localStorage.getItem('selectedProject');
-        console.log('Stored project from localStorage:', stored);
+
         if (stored) {
             const parsed = JSON.parse(stored);
             if (parsed.company && parsed.name) {
@@ -107,51 +107,53 @@ const loadProjectFromStorage = (): { company: string; name: string; ProjectId?: 
 watch(
     companyProjects,
     (groups) => {
-        if (groups.length === 0) return;
+        if (!groups || groups.length === 0) return;
 
         const storedProject = loadProjectFromStorage();
 
-        if (storedProject) {
-            let matchedProject: Project | null = null;
-            let matchedCompany: string | null = null;
+        let matchedProject: any | null = null;
+        let matchedCompany: string | null = null;
 
-            outerLoop: for (const group of groups) {
+        if (storedProject) {
+            outer: for (const group of groups) {
                 for (const project of group.projects) {
                     const projectId = project.ProjectId || project.id;
                     if (projectId === storedProject.ProjectId) {
                         matchedProject = project;
-                        matchedCompany = project.system_company?.name || group.company;
-                        break outerLoop;
+                        matchedCompany = group.company;
+                        break outer;
                     }
                 }
             }
 
-            // Fallback: match by name
             if (!matchedProject) {
-                outerLoop2: for (const group of groups) {
+                outer2: for (const group of groups) {
                     for (const project of group.projects) {
                         if (project.name === storedProject.name) {
                             matchedProject = project;
-                            matchedCompany = project.system_company?.name || group.company;
-                            break outerLoop2;
+                            matchedCompany = group.company;
+                            break outer2;
                         }
                     }
                 }
             }
+        }
 
-            if (matchedProject && matchedCompany) {
-                const projectId = matchedProject.ProjectId || matchedProject.id;
-                selectedProject.value = {
-                    company: matchedCompany,
-                    name: matchedProject.name,
-                    ProjectId: projectId || 0
-                };
-            } else {
-                // Default if no match found
-                selectedProject.value = { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
-            }
+        if (matchedProject && matchedCompany) {
+            selectedProject.value = {
+                company: matchedCompany,
+                name: matchedProject.name,
+                ProjectId: matchedProject.ProjectId || matchedProject.id
+            };
         } else {
-            selectedProject.value = { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
+            selectedProject.value = null;
+
+            toast.add({
+                severity: 'warn',
+                summary: 'Project Required',
+                detail: 'Please select a project before continuing.',
+                life: 3000
+            });
         }
     },
     { immediate: true }
@@ -166,8 +168,6 @@ const selectProject = (company: string, project: Project) => {
         name: project.name,
         ProjectId: projectId || 0
     };
-
-    console.log('Selecting project:', projectToSave);
 
     saveProjectToStorage(projectToSave);
 
@@ -184,7 +184,6 @@ const selectProject = (company: string, project: Project) => {
 const saveLatestBudgetVersion = (version: number) => {
     try {
         localStorage.setItem('latestBudgetVersion', version.toString());
-        console.log('Latest budget version saved to localStorage:', version);
     } catch (err) {
         console.error('Error saving latest budget version to localStorage', err);
     }

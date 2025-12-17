@@ -8,7 +8,6 @@ const login = async (username: string, password: string): Promise<LoginResponse>
             username,
             password
         });
-        console.log('response', response.data);
         return response.data;
     } catch (error) {
         showError(error, 'Failed to login. Please check your credentials.');

@@ -6,13 +6,13 @@ export const useAuthStore = defineStore('auth', {
     state: (): AuthState => ({
         token: localStorage.getItem('token') || null,
         user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
-        clientId: localStorage.getItem('clientId') || null,
         isLoading: false
     }),
 
     getters: {
         isAuthenticated: (state): boolean => !!state.token,
-        userRole: (state): string | null => state.user?.role || null
+        userRole: (state): string | null => state.user?.role || null,
+        userName: (state): string | null => state.user?.username || null
     },
 
     actions: {
@@ -21,21 +21,20 @@ export const useAuthStore = defineStore('auth', {
 
             try {
                 if (useAPI) {
-                    // Call real API
                     const response = await authService.login(username, password);
-
                     const { token, user } = response.data || {};
                     if (!token) return false;
 
                     this.setToken(token);
                     this.setUser({
                         id: user.id,
-                        username: user.Username || username,
-                        role: user.project_member_system_user[0].project_member.project_role.code || 'User',
-                        role_id: user.project_member_system_user[0].project_member.project_role_id,
-                        email: user.Email
+                        username: user?.Username || username,
+                        role: user?.project_member_system_user[0].project_member?.project_role?.name,
+                        role_id: user?.project_member_system_user[0].project_member?.project_role_id,
+                        project_id: user.project_member_system_user[0].project_member.project_id,
+                        user_project_role_code: user?.project_member_system_user[0].project_member?.project_role?.code,
+                        email: user?.email
                     });
-
                     return true;
                 } else {
                     return false;

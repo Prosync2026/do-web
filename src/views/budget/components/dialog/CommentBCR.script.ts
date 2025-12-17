@@ -1,7 +1,7 @@
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRRecommendationPayload } from '@/types/budgetChangeRequest.type';
 import { useToast } from 'primevue/usetoast';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
@@ -28,6 +28,15 @@ export default defineComponent({
         // Selected files (manual upload)
         const selectedFiles = ref<File[]>([]);
 
+        // User info from localStorage
+        const user = ref({ role: '', username: '' });
+
+        onMounted(() => {
+            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+            user.value.role = storedUser.role || 'Project Director';
+            user.value.username = storedUser.username || 'Unknown User';
+        });
+
         // When user selects files
         function onFileSelect(event: any) {
             selectedFiles.value = event.files;
@@ -38,6 +47,16 @@ export default defineComponent({
                 life: 2500
             });
         }
+
+        const normalizeDepartment = (dept: string | null): string => {
+            if (!dept) return '';
+
+            const lower = dept.toLowerCase();
+
+            if (lower === 'site staff' || lower === 'site') return 'Site';
+
+            return dept;
+        };
 
         async function handleSubmit() {
             if (!remark.value.trim()) {
@@ -50,29 +69,24 @@ export default defineComponent({
                 return;
             }
 
-            const userInfo = JSON.parse(localStorage.getItem('user') || '{}');
-
+            const normalizedDept = normalizeDepartment(user.value.role);
             const payload: BCRRecommendationPayload = {
-                Department: userInfo.role || 'Project Director',
-                PersonInCharge: userInfo.username || 'Unknown User',
+                Department: normalizedDept,
+                PersonInCharge: user.value.username,
                 RecommendationType: selection.value,
-                SpecificQuantity: selection.value === 'Specific_Quantity' ? Number(specificQuantity.value) : undefined,
+                SpecificQuantity: selection.value === 'Specific_Quantity' ? Number(specificQuantity.value) : null,
                 Remark: remark.value,
-                files: [] // backend will read actual uploaded files from FormData
+                files: []
             };
-
-            console.log('BCR ID', budgetChangeRequestId);
-            console.log('Payload', payload);
-            console.log('Selected Files', selectedFiles.value);
 
             try {
                 await budgetCRStore.createBCRRecommendation(budgetChangeRequestId, payload, selectedFiles.value);
-
                 selection.value = '';
                 specificQuantity.value = '';
                 remark.value = '';
                 selectedFiles.value = [];
                 emit('update:visible', false);
+                emit('submit');
             } catch (error) {
                 toast.add({
                     severity: 'error',
@@ -88,6 +102,7 @@ export default defineComponent({
             specificQuantity,
             remark,
             selectedFiles,
+            user,
             onFileSelect,
             handleSubmit
         };

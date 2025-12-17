@@ -1,5 +1,5 @@
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
-import type { BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload, HistoryList, RecommendationList } from '@/types/budgetChangeRequest.type';
+import type { BCRRecommendationEditPayload, BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload, HistoryList, RecommendationList } from '@/types/budgetChangeRequest.type';
 import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 
@@ -170,7 +170,6 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
 
             try {
                 const response = await budgetChangeRequestService.fetchRecommendationList(bcrId);
-                console.log('response', response.data);
 
                 return response.data as RecommendationList[];
             } catch (error: any) {
@@ -185,6 +184,23 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
             this.loading = true;
             try {
                 const response = await budgetChangeRequestService.createBCRRecommendation(budgetChangeRequestId, payload, attachments);
+
+                if (!response.success) {
+                    showError(response.message || 'Failed to create Recommendation.');
+                    return null;
+                }
+
+                showSuccess(response.message);
+                return response.data ?? null;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async editBCRRecommendation(budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationEditPayload, attachments?: File[]) {
+            this.loading = true;
+            try {
+                const response = await budgetChangeRequestService.editBCRRecommendation(budgetChangeRequestId, recommendationId, payload, attachments);
 
                 if (!response.success) {
                     showError(response.message || 'Failed to create Recommendation.');

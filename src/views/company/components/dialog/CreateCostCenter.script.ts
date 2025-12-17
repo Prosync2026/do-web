@@ -28,7 +28,7 @@ export default defineComponent({
 
         const handleSubmit = () => {
             const selectedRows = tableData.filter((row) => row.selected);
-            console.log('Selected Rows:', selectedRows);
+
             emit('submit', selectedRows);
             close();
         };

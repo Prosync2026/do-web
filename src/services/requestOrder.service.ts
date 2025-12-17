@@ -1,4 +1,5 @@
 // src/services/requestOrder.service.ts
+import type { ApiErrorResponse } from '@/types/api.type';
 import type { ApiResponse, AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, GetRequestOrdersParams, GetRequestOrdersResponse } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
 import type { AxiosError } from 'axios';
@@ -114,16 +115,27 @@ const deleteRequestOrder = async (id: number): Promise<void> => {
 };
 
 /**
- * Approve or reject a request order
+ * Process RO approval (approve / reject)
  */
-const approveRejectRequestOrder = async (id: number | string, status: 'Approved' | 'Rejected'): Promise<CreateRequestOrderResponse> => {
+const processROApproval = async (id: number | string, action: 'Approved' | 'Rejected', remark?: string): Promise<CreateRequestOrderResponse> => {
     try {
-        const response = await axiosInstance.put(`/requestOrder/${id}/approve/${status}`);
+        const response = await axiosInstance.post(`/roApproval/${id}/process`, {
+            action,
+            remark
+        });
+
+        if (response.data?.success === false) {
+            throw new Error(response.data.error || response.data.message);
+        }
+
         return { success: true, data: response.data };
     } catch (error: unknown) {
-        const message = (error as AxiosError<{ message: string }>)?.response?.data?.message || `Failed to ${status.toLowerCase()} request order`;
+        const apiError = error as AxiosError<ApiErrorResponse>;
+
+        const message = apiError?.response?.data?.error || apiError?.response?.data?.message || (error as Error)?.message || `Failed to ${action.toLowerCase()} request order`;
+
         showError(error, message);
-        return { success: false, message };
+        throw error;
     }
 };
 
@@ -241,7 +253,7 @@ export const requestOrderService = {
     getRequestOrders,
     getRequestOrderById,
     submitDraftRequestOrder,
-    approveRejectRequestOrder,
+    processROApproval,
     getAttachmentUrl,
     downloadAttachment,
     previewAttachment,

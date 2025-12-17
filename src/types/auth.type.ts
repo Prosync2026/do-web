@@ -49,11 +49,12 @@ export interface User {
     role: string;
     email?: string;
     role_id: number;
+    project_id?: number;
+    user_project_role_code?: string;
 }
 
 export interface AuthState {
     token: string | null;
     user: User | null;
-    clientId: string | null;
     isLoading: boolean;
 }

@@ -61,10 +61,7 @@ const getBudgetVersion = async (params?: GetBudgetsParams): Promise<GetBudgetsRe
 const createBudget = async (formData: FormData) => {
     try {
         for (const [key, value] of formData.entries()) {
-            console.log('FormData =>', key, value);
         }
-
-        console.log('formData payload', formData);
 
         const response = await axiosInstance.post('/budgets/import', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }

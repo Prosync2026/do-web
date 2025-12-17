@@ -83,7 +83,7 @@ export default defineComponent({
 
             if (singleBudgetChangeRequest.value) {
                 const s = singleBudgetChangeRequest.value as BudgetChangeRequest;
-                console.log('s', s);
+
                 roNumber.value = s.DocNo ?? '';
                 requestBy.value = s.RequestedBy ?? '';
                 requestDate.value = s.RequestDate ? new Date(s.RequestDate) : null;
