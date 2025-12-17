@@ -136,7 +136,7 @@ export default defineComponent({
                         action: true,
                         actions: (row: Order) => {
                             const rowActions: ActionType[] = ['view'];
-                            if ((isPurchasingRole || isPmPdRole) && row.status === 'Processing') {
+                            if ((isPurchasingRole || isPmPdRole) && (row.status === 'Processing' || row.status === 'Submitted')) {
                                 rowActions.push('approve', 'reject', 'edit');
                             }
 

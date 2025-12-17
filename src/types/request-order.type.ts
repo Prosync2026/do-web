@@ -85,7 +85,7 @@ export interface Order {
     deliveryDate: string | Date | null;
     totalAmount: string;
     budgetType: string;
-    status: 'Approved' | 'Processing' | 'Rejected';
+    status: 'Approved' | 'Processing' | 'Rejected' | 'Submitted';
     requestedAt: string;
     items: OrderItem[];
     RequestOrderItems?: RequestOrderItemDetail[];
@@ -292,7 +292,7 @@ export interface RequestOrderResponse {
     RequestOrderDate: string | Date;
     TotalAmount: number | string;
     PrType: string;
-    Status: 'Approved' | 'Processing' | 'Rejected';
+    Status: 'Approved' | 'Processing' | 'Rejected' | 'Submitted';
     CreatedAt: string | Date;
     DebtorId?: number | null;
     Remark?: string | null;
@@ -311,7 +311,7 @@ export interface UpdateRequestOrderPayload {
     RequestOrderDate: string;
     Terms: string;
     RefDoc: string;
-    Status: 'Approved' | 'Processing' | 'Rejected';
+    Status: 'Approved' | 'Processing' | 'Rejected' | 'Submitted';
     BudgetType: 'Budgeted' | 'NonBudgeted';
     Type: string;
     Remark: string;
