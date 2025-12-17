@@ -69,7 +69,7 @@
                     <p>No items added yet</p>
                     <div class="flex gap-2 justify-center mt-2">
                         <Button v-if="budgetType === 'Budgeted Item'" label="Add from Budget" icon="pi pi-box" outlined @click="openBulkItemModal" />
-                        <Button v-if="budgetType === 'Unbudgeted Item'" label="+ Add First Item" @click="addItem" />
+                        <Button v-if="budgetType === 'Unbudgeted Item'" label="+ Add First Item" @click="openStockItemModal" />
                     </div>
                 </div>
             </Motion>
@@ -81,7 +81,7 @@
 
             <div class="flex gap-2 justify-end mt-4">
                 <Button v-if="budgetType === 'Budgeted Item'" label="Add from Budget" icon="pi pi-box" outlined @click="openBulkItemModal" />
-                <Button v-if="budgetType === 'Unbudgeted Item'" label="+ Add First Item" @click="addItem" />
+                <Button v-if="budgetType === 'Unbudgeted Item'" label="+ Add First Item" @click="openStockItemModal" />
             </div>
 
             <DataTable :value="items" class="rounded-lg" v-model:expandedRows="expandedRows" dataKey="itemCode" scrollable scrollHeight="400px">
@@ -220,6 +220,8 @@
 
         <!-- Modals -->
         <CreateROModal v-model:visible="showBulkItemModal" @items-selected="handleSelectedItems" />
+        <CreateStockItem v-model:visible="showStockItemModal" @items-selected="handleStockItemsSelected" />
+
         <PreviewRo v-model:visible="showPreviewModal" :summaryData="previewSummary" @submit="submitRequestOrder" />
         <ConfirmDialog />
     </div>

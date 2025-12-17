@@ -14,6 +14,8 @@ export interface Item {
     isBudgeted: boolean;
     budgetItemId?: number | null;
     nonBudgetItemId?: number | null;
+    StockItemId?: number | null;
+    stockItemId?: number;
 }
 
 export interface ItemOption {
@@ -129,6 +131,7 @@ export interface PreviewSummary {
 export interface CreateRequestOrderItem {
     BudgetItemId: number | null;
     NonBudgetItemId: number | null;
+    StockItemId: number | null;
     Description: string;
     Uom: string;
     Quantity: number;

@@ -10,11 +10,13 @@ import Menu from 'primevue/menu';
 import ProgressBar from 'primevue/progressbar';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
+import type { StockItem } from 'src/types/stockItem.type.ts';
 import { ComponentPublicInstance, computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 import CreateROModal from '../modal/CreateRo.vue';
+import CreateStockItem from '../modal/CreateStockItem.vue';
 import PreviewRo from '../modal/PreviewRo.vue';
 
 type MenuInstance = ComponentPublicInstance & {
@@ -23,7 +25,7 @@ type MenuInstance = ComponentPublicInstance & {
 
 export default defineComponent({
     name: 'CreateRequestOrders',
-    components: { Motion, BudgetInfoCard, Menu, CreateROModal, PreviewRo, FileUpload, ProgressBar },
+    components: { Motion, BudgetInfoCard, Menu, CreateROModal, CreateStockItem, PreviewRo, FileUpload, ProgressBar },
     setup() {
         const router = useRouter();
         const route = useRoute();
@@ -47,6 +49,7 @@ export default defineComponent({
         ]);
 
         const showBulkItemModal = ref(false);
+        const showStockItemModal = ref(false);
         const showPreviewModal = ref(false);
         const menuRefs = ref<(MenuInstance | null)[]>([]);
 
@@ -422,6 +425,10 @@ export default defineComponent({
             }
         };
 
+        const openStockItemModal = () => {
+            showStockItemModal.value = true;
+        };
+
         const handleSelectedItems = (selectedBudgetItems: BudgetItem[]) => {
             const duplicates: string[] = [];
             const newUniqueItems: Item[] = [];
@@ -480,6 +487,69 @@ export default defineComponent({
                     severity: 'warn',
                     summary: 'Duplicate Items',
                     detail: `These items were already added: ${duplicates.join(', ')}. Only new items were added.`,
+                    life: 9000
+                });
+            }
+        };
+
+        const handleStockItemsSelected = (selectedStockItems: StockItem[]) => {
+            const duplicates: string[] = [];
+            const newUniqueItems: Item[] = [];
+
+            selectedStockItems.forEach((stockItem) => {
+                const exists = items.value.some((i) => i.itemCode === stockItem.itemCode);
+
+                if (exists) {
+                    duplicates.push(stockItem.itemCode);
+                } else {
+                    newUniqueItems.push({
+                        itemCode: stockItem.itemCode,
+                        itemType: stockItem.itemType,
+                        description: stockItem.name,
+                        location: `${stockItem.element} > ${stockItem.subElement}`,
+                        uom: stockItem.uom,
+                        budgetItemId: null,
+                        nonBudgetItemId: stockItem.id,
+                        qty: 1,
+                        deliveryDate: globalDeliveryDate.value,
+                        notes: '',
+                        remark: '',
+                        price: 0,
+                        showNotes: false,
+                        showRemark: false,
+                        isBudgeted: false
+                    });
+                    console.log('Adding stock item to items:', newUniqueItems);
+                    const existingOption = itemOptions.value.find((opt) => opt.value === stockItem.itemCode);
+
+                    if (!existingOption) {
+                        itemOptions.value.push({
+                            label: stockItem.itemCode,
+                            value: stockItem.itemCode,
+                            description: stockItem.name,
+                            location: `${stockItem.element} > ${stockItem.subElement}`,
+                            uom: stockItem.uom
+                        });
+                    }
+                }
+            });
+
+            if (newUniqueItems.length > 0) {
+                items.value.push(...newUniqueItems);
+
+                toast.add({
+                    severity: 'success',
+                    summary: 'Items Added',
+                    detail: `${newUniqueItems.length} item(s) added from stock`,
+                    life: 2500
+                });
+            }
+
+            if (duplicates.length > 0) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Duplicate Items',
+                    detail: `These items were already added: ${duplicates.join(', ')}`,
                     life: 9000
                 });
             }
@@ -664,6 +734,7 @@ export default defineComponent({
                     Currency: 'MYR',
                     Items: items.value.map((item) => ({
                         BudgetItemId: item.budgetItemId ?? null,
+                        StockItemId: item.nonBudgetItemId ?? null,
                         NonBudgetItemId: item.nonBudgetItemId ?? null,
                         Description: item.description,
                         Uom: item.uom,
@@ -681,6 +752,7 @@ export default defineComponent({
                         DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                     }))
                 };
+                console.log('Submitting Request Order with payload:', payload);
                 const isDraft = !!route.query.draftId; // check if editing a draft
                 const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
 
@@ -884,7 +956,10 @@ export default defineComponent({
             currentProject,
             formatDateToAPI,
             applyDeliveryDateToAll,
-            globalDeliveryDate
+            globalDeliveryDate,
+            openStockItemModal,
+            showStockItemModal,
+            handleStockItemsSelected
         };
     }
 });
