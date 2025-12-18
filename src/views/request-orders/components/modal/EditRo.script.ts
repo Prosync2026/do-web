@@ -1,7 +1,7 @@
 import { requestOrderService } from '@/services/requestOrder.service';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import type { AttachmentItem, CreateRequestOrderPayload, EditForm, Order } from '@/types/request-order.type';
-import { formatDateToAPI } from '@/utils/dateHelper';
+import { formatDateToAPI, parseDDMMYYYY } from '@/utils/dateHelper';
 import { storeToRefs } from 'pinia';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
@@ -87,15 +87,15 @@ export default defineComponent({
             () => props.order,
             (newOrder) => {
                 if (!newOrder) return;
-
                 const sourceItems = newOrder.RequestOrderItems?.length ? newOrder.RequestOrderItems : newOrder.items || [];
                 attachments.value = newOrder.attachments || [];
 
                 editForm.value = {
                     roNumber: newOrder.roNumber,
                     requestedBy: newOrder.requestedBy,
-                    roDate: newOrder.roDate ? new Date(newOrder.roDate) : null,
-                    deliveryDate: newOrder.deliveryDate ? new Date(newOrder.deliveryDate) : null,
+                    roDate: parseDDMMYYYY(newOrder.roDate),
+                    deliveryDate: parseDDMMYYYY(newOrder.deliveryDate),
+
                     totalAmount: Number(newOrder.totalAmount),
                     budgetType: newOrder.budgetType === 'Budgeted' ? 'Budgeted' : 'NonBudgeted',
                     remark: newOrder.remark || '',
@@ -108,7 +108,7 @@ export default defineComponent({
                         description: item.Description || item.description || '',
                         uom: item.Unit || item.uom || '',
                         qty: Number(item.Quantity ?? item.qty ?? 0),
-                        deliveryDate: item.DeliveryDate ? new Date(item.DeliveryDate) : item.deliveryDate ? new Date(item.deliveryDate) : null,
+                        deliveryDate: parseDDMMYYYY(item.DeliveryDate ?? item.deliveryDate),
                         notes: item.Notes ?? item.notes ?? item.note ?? '',
                         remark: item.Remark ?? item.remark ?? '',
                         budgetItemId: item.BudgetItemId ?? item.budgetItemId ?? null,
@@ -134,7 +134,7 @@ export default defineComponent({
                 RequestOrderDate: formatDateToAPI(editForm.value.roDate),
                 Terms: editForm.value.terms || 'Net 30',
                 RefDoc: editForm.value.refDoc || '',
-                Status: props.order.status as 'Approved' | 'Pending' | 'Rejected',
+                Status: props.order.status as 'Approved' | 'Rejected' | 'Processing' | 'Submitted',
                 BudgetType: editForm.value.budgetType === 'Budgeted' ? 'Budgeted' : 'NonBudgeted',
                 Currency: 'MYR',
                 Type: 'requestOrder',
