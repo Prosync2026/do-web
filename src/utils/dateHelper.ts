@@ -36,3 +36,18 @@ export function formatDateToAPI(date: string | Date | null | undefined): string 
     // Return YYYY-MM-DD without timezone shift
     return `${year}-${month}-${day}`;
 }
+
+export function parseDDMMYYYY(dateStr: string | Date | null): Date | null {
+    if (!dateStr) return null;
+    if (dateStr instanceof Date) return dateStr;
+
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return null;
+
+    const day = Number(parts[0]);
+    const month = Number(parts[1]) - 1; // JS month is 0-indexed
+    const year = Number(parts[2]);
+
+    const d = new Date(year, month, day);
+    return isNaN(d.getTime()) ? null : d;
+}
