@@ -176,9 +176,24 @@ export default defineComponent({
             await fetchBudgetList();
         }
 
-        /* ---------------------- INIT ---------------------- */
         onMounted(() => {
             fetchBudgetVersionList();
+        });
+
+        const showImportFile = computed(() => {
+            try {
+                const userStr = localStorage.getItem('user');
+                if (!userStr) return false;
+
+                const user = JSON.parse(userStr);
+
+                const role = user?.role;
+                if (!role) return false;
+
+                return role.toLowerCase() === 'quantity surveyor';
+            } catch (e) {
+                return false;
+            }
         });
 
         return {
@@ -193,6 +208,7 @@ export default defineComponent({
             showImportModal,
             pagination,
             filters,
+            showImportFile,
 
             formatCurrency,
             handleImportSuccess,

@@ -40,6 +40,26 @@
                                 </span>
                             </div>
 
+                          
+                            <div class="mt-3">
+                                <table class="min-w-full border border-gray-200 text-sm text-left">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-3 py-2 border">Item Code</th>
+                                            <th class="px-3 py-2 border">Old Quantity</th>
+                                            <th class="px-3 py-2 border">New Quantity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="px-3 py-2 border">BRC-A11-STD</td>
+                                            <td class="px-3 py-2 border">22</td>
+                                            <td class="px-3 py-2 border">15</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
                             <p class="mt-2 text-sm text-gray-700"><span class="font-semibold">Remark: </span>{{ item.message || 'No comments yet.' }}</p>
 
                             <div v-if="item.documentUrl?.length" class="mt-4">
@@ -141,7 +161,7 @@ export default defineComponent({
             { label: 'Specific Quantity', value: 'Specific_Quantity' }
         ];
 
-        const ROLE_ORDER = ['QS', 'Purchasing', 'Project Director'];
+        const ROLE_ORDER = ['QS', 'Purchasing', 'Project Director', 'Project Manager'];
 
         const getUser = (): any | null => {
             const userStr = localStorage.getItem('user');
@@ -159,12 +179,20 @@ export default defineComponent({
             }
         };
 
+        function normalizeRole(role: string | null): string {
+            if (!role) return '';
+            const lower = role.toLowerCase();
+            if (lower === 'site staff' || lower === 'site' || lower === 'project manager') return 'Site';
+            return role;
+        }
+
         const fetchDiscussion = async () => {
             const res = await store.fetchRecommendationList(Number(route.params.budgetChangeRequestId));
+            console.log('fetched res', res);
 
             const mapped: DiscussionItem[] = (res ?? []).map((item: any) => ({
                 id: item.Id ?? null,
-                role: item.Department ?? '',
+                role: normalizeRole(item.Department ?? ''),
                 name: item.ReviewerName ?? '',
                 datetime: item.CreatedAt ?? '',
                 message: item.Remark ?? '',
@@ -173,12 +201,14 @@ export default defineComponent({
                 documentUrl: item.Attachment ? JSON.parse(item.Attachment) : []
             }));
 
+            // 遍历 ROLE_ORDER，确保每个角色都有对应讨论项
             discussions.value = ROLE_ORDER.map((role) => {
-                const found = mapped.find((x) => x.role === role);
+                const normalizedRole = normalizeRole(role); // Project Manager -> Site
+                const found = mapped.find((x) => x.role === normalizedRole);
                 return (
                     found || {
                         id: null,
-                        role,
+                        role: normalizedRole,
                         name: '-',
                         datetime: '-',
                         message: '',
@@ -192,10 +222,11 @@ export default defineComponent({
 
         const init = async () => {
             await fetchDiscussion();
-            const department = getUserDepartment();
-
-            if (department) {
+            const department = normalizeRole(getUserDepartment());
+            if (department && ROLE_ORDER.includes(department)) {
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(Number(route.params.budgetChangeRequestId), department);
+            } else {
+                canRecommend.value = false;
             }
 
             const user = getUser();
