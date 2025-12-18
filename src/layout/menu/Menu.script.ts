@@ -53,7 +53,7 @@ export default defineComponent({
         ]);
 
         const rolePermissions = {
-            purchasing: ['Dashboard', 'Request Orders', 'Purchase Orders'],
+            purchasing: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders'],
             site: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders', 'Deliveries'],
             pm: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders', 'Deliveries']
         };

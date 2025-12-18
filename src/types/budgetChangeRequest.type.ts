@@ -129,6 +129,7 @@ export interface BCRRecommendationPayload {
     Department: string;
     PersonInCharge: string;
     RecommendationType: string; // Type of recommendation (e.g., "QS_Recommendation", "Site_Recommendation", "Specific_Quantity")
+    RecommendedItems: { BudgetChangeItemId: number; RecommendedQty: number }[];
     SpecificQuantity?: number | null;
     Remark?: string | null;
     files?: string[];
