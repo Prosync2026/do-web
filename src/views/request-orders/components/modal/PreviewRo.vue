@@ -29,10 +29,10 @@
                     <span class="text-gray-600 dark:text-gray-400">Delivery Date:</span>
                     <span class="ml-2 font-medium">{{ summaryData.globalDeliveryDate }}</span>
                 </div>
-                <div>
+                <!-- <div>
                     <span class="text-gray-600 dark:text-gray-400">RO Number:</span>
                     <span class="ml-2 font-medium">{{ summaryData.roNumber }}</span>
-                </div>
+                </div> -->
                 <div>
                     <span class="text-gray-600 dark:text-gray-400">Requested By:</span>
                     <span class="ml-2 font-medium">{{ summaryData.requestedBy }}</span>
@@ -86,21 +86,21 @@
                     </template>
                 </Column>
 
-                <Column field="QtyReq" header="QtyReq" style="min-width: 80px; text-align: center">
+                <Column field="qtyRequested" header="QtyReq" style="min-width: 80px; text-align: center">
                     <template #body="{ data }">
-                        {{ data.QtyReq || '' }}
+                        {{ data.qtyRequested || '' }}
                     </template>
                 </Column>
 
-                <Column field="QtyOrd" header="QtyOrd" style="min-width: 80px; text-align: center">
+                <Column field="qtyOrdered" header="QtyOrd" style="min-width: 80px; text-align: center">
                     <template #body="{ data }">
-                        {{ data.QtyOrd || '' }}
+                        {{ data.qtyOrdered || '' }}
                     </template>
                 </Column>
 
-                <Column field="QtyDelivered" header="QtyDelivered" style="min-width: 100px; text-align: center">
+                <Column field="qtyDelivered" header="QtyDelivered" style="min-width: 100px; text-align: center">
                     <template #body="{ data }">
-                        {{ data.QtyDelivered || '' }}
+                        {{ data.qtyDelivered || '' }}
                     </template>
                 </Column>
 

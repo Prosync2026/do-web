@@ -76,7 +76,7 @@ const createBudget = async (formData: FormData) => {
 
 const budgetStatistics = async (budgetId: number) => {
     try {
-        const response = await axiosInstance.get(`/budgets/${budgetId}/statistics`);
+        const response = await axiosInstance.get(`/budget/item/${budgetId}/statistics`);
         return response.data;
     } catch (error) {
         showError(error, 'Failed to fetch budget statistics.');

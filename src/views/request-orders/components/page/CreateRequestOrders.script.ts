@@ -1,4 +1,6 @@
+import { budgetService } from '@/services/budget.service';
 import { requestOrderService } from '@/services/requestOrder.service';
+import type { BudgetStatisticsResponse } from '@/types/budget.type';
 import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, PreviewSummary } from '@/types/request-order.type';
 import { getCurrentProjectId, getCurrentProjectName, getCurrentUsername } from '@/utils/contextHelper';
 import { formatDateToAPI } from '@/utils/dateHelper';
@@ -472,7 +474,6 @@ export default defineComponent({
             // Add only unique items
             if (newUniqueItems.length > 0) {
                 items.value.push(...newUniqueItems);
-                console.log('Items after adding from budget:', items.value);
                 toast.add({
                     severity: 'success',
                     summary: 'Items Added',
@@ -630,6 +631,48 @@ export default defineComponent({
             return hasItems && hasRoNumber && hasRoDate && hasBudgetType;
         });
 
+        const itemStats = ref<Record<number, BudgetStatisticsResponse>>({});
+
+        watch(
+            () => items.value,
+            async (newItems) => {
+                const budgetItems = (newItems as typeof items.value).filter((i) => {
+                    return i.budgetItemId != null;
+                });
+
+                const budgetItemIds = budgetItems.map((i) => i.budgetItemId).filter((id): id is number => id != null);
+
+                if (budgetItemIds.length > 0) {
+                    await fetchItemStatistics(budgetItemIds);
+                } else {
+                    console.log('No budgeted items found, clearing stats');
+                    itemStats.value = {};
+                }
+            },
+            { immediate: true, deep: true }
+        );
+
+        async function fetchItemStatistics(budgetItemIds: number[]) {
+            const stats: Record<number, BudgetStatisticsResponse> = {};
+
+            await Promise.all(
+                budgetItemIds.map(async (id) => {
+                    try {
+                        const response = await budgetService.budgetStatistics(id);
+                        if (response.success) {
+                            stats[id] = response.data;
+                        } else {
+                            console.warn(`Stats fetch returned success=false for item ${id}`);
+                        }
+                    } catch (error) {
+                        console.error(`Failed to fetch stats for item ${id}:`, error);
+                    }
+                })
+            );
+
+            itemStats.value = stats;
+        }
+
         const previewSummary = computed<PreviewSummary>(() => {
             const data: PreviewSummary = {
                 totalItems: items.value.length,
@@ -640,22 +683,31 @@ export default defineComponent({
                 roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
                 roNumber: roNumber.value,
                 requestedBy: getCurrentUsername() || 'Unknown User',
-                items: items.value.map((item) => ({
-                    itemCode: item.itemCode,
-                    itemType: item.itemType || '',
-                    description: item.description,
-                    uom: item.uom,
-                    qty: item.qty,
-                    price: item.price ?? 0,
-                    // convert string to Date
-                    deliveryDate: item.deliveryDate ? (item.deliveryDate instanceof Date ? item.deliveryDate : new Date(item.deliveryDate)) : null,
-                    location: item.location,
-                    notes: item.notes,
-                    remark: item.remark
-                })),
+                items: items.value.map((item) => {
+                    const budgetItemId = item.budgetItemId;
+                    const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
+
+                    return {
+                        itemCode: item.itemCode,
+                        itemType: item.itemType || '',
+                        description: item.description,
+                        uom: item.uom,
+                        qty: item.qty,
+                        price: item.price ?? 0,
+                        deliveryDate: item.deliveryDate ? (item.deliveryDate instanceof Date ? item.deliveryDate : new Date(item.deliveryDate)) : null,
+                        location: item.location,
+                        notes: item.notes,
+                        remark: item.remark,
+                        qtyRequested: stats?.totalRequestedQty ?? 0,
+                        qtyOrdered: stats?.totalOrderedQty ?? 0,
+                        qtyDelivered: stats?.totalDeliveredQty ?? 0,
+                        balance: stats?.totalBalance ?? 0
+                    };
+                }),
                 overallRemark: overallRemark.value,
                 attachmentsCount: attachments.value.length
             };
+
             return data;
         });
 
@@ -732,34 +784,38 @@ export default defineComponent({
                     CreatedBy: getCurrentUsername() || 'Unknown User',
                     Status: 'Processing',
                     Currency: 'MYR',
-                    Items: items.value.map((item) => ({
-                        BudgetItemId: item.budgetItemId ?? null,
-                        StockItemId: item.nonBudgetItemId ?? null,
-                        NonBudgetItemId: item.nonBudgetItemId ?? null,
-                        Description: item.description,
-                        Uom: item.uom,
-                        ItemCode: item.itemCode,
-                        ItemType: item.itemType,
-                        Quantity: item.qty,
-                        // later adjust when the api is ready for the OrgBgtQty, BgtBalQty, TotalPOQty
-                        OrgBgtQty: 0,
-                        BgtBalQty: 0,
-                        TotalPOQty: 0,
-                        //
-                        Rate: item.price ?? 0,
-                        Notes: item.notes ?? '',
-                        Reason: '',
-                        DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
-                    }))
+                    Items: items.value.map((item) => {
+                        const budgetItemId = item.budgetItemId;
+                        const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
+
+                        return {
+                            BudgetItemId: item.budgetItemId ?? null,
+                            NonBudgetItemId: item.nonBudgetItemId ?? null,
+                            StockItemId: item.nonBudgetItemId ?? null,
+                            Description: item.description,
+                            Uom: item.uom,
+                            ItemCode: item.itemCode,
+                            ItemType: item.itemType,
+                            Quantity: item.qty,
+                            OrgBgtQty: stats?.totalOrderedQty ?? 0,
+                            BgtBalQty: stats?.totalBalance ?? 0,
+                            TotalGrnQty: stats?.totalDeliveredQty ?? 0,
+                            TotalPOQty: 0,
+                            Rate: item.price ?? 0,
+                            Notes: item.notes ?? '',
+                            Reason: '',
+                            DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
+                        };
+                    })
                 };
-                console.log('Submitting Request Order with payload:', payload);
-                const isDraft = !!route.query.draftId; // check if editing a draft
+
+                const isDraft = !!route.query.draftId;
                 const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
 
                 let result: CreateRequestOrderResponse;
 
                 if (isDraft) {
-                    result = await requestOrderService.submitDraftRequestOrder(route.query.draftId as string, payload, attachments.value.length > 0 ? attachments.value : undefined);
+                    result = await requestOrderService.submitDraftRequestOrder(route.query.draftId as string, payload, attachmentsToSend);
                 } else {
                     result = await requestOrderService.createRequestOrder(payload, attachmentsToSend);
                 }
@@ -842,22 +898,29 @@ export default defineComponent({
                     Status: 'Processing',
                     Currency: 'MYR',
                     TotalAmount: grandTotal.value,
-                    Items: items.value.map((item) => ({
-                        BudgetItemId: item.budgetItemId ?? null,
-                        NonBudgetItemId: item.nonBudgetItemId ?? null,
-                        Description: item.description,
-                        Uom: item.uom,
-                        ItemCode: item.itemCode,
-                        ItemType: item.itemType || 'CO',
-                        Quantity: item.qty, // corrected
-                        OrgBgtQty: 0,
-                        BgtBalQty: 0,
-                        TotalPOQty: 0,
-                        Rate: item.price ?? 0,
-                        Notes: item.notes ?? '',
-                        Reason: '',
-                        DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
-                    }))
+                    Items: items.value.map((item) => {
+                        const budgetItemId = item.budgetItemId;
+                        const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
+
+                        return {
+                            BudgetItemId: item.budgetItemId ?? null,
+                            NonBudgetItemId: item.nonBudgetItemId ?? null,
+                            StockItemId: item.nonBudgetItemId ?? null,
+                            Description: item.description,
+                            Uom: item.uom,
+                            ItemCode: item.itemCode,
+                            ItemType: item.itemType || 'CO',
+                            Quantity: item.qty,
+                            OrgBgtQty: stats?.totalOrderedQty ?? 0,
+                            BgtBalQty: stats?.totalBalance ?? 0,
+                            TotalGrnQty: stats?.totalDeliveredQty ?? 0,
+                            TotalPOQty: 0,
+                            Rate: item.price ?? 0,
+                            Notes: item.notes ?? '',
+                            Reason: '',
+                            DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
+                        };
+                    })
                 };
 
                 const result = await requestOrderService.createRequestOrderDraft(payload, attachments.value.length > 0 ? attachments.value : undefined);

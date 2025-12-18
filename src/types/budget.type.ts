@@ -76,3 +76,24 @@ export interface BudgetResponse {
     }[];
 }
 
+export interface BudgetStatisticsResponse {
+    budgetItemId: number;
+    budgetId: number;
+    itemCode: string;
+    description: string;
+    unit: string;
+    budgetQty: number;
+    budgetAmount: number;
+    totalRequested: number;
+    totalOrdered: number;
+    totalDelivered: number;
+    totalBalance: number;
+    totalRequestedQty: number;
+    totalOrderedQty: number;
+    totalDeliveredQty: number;
+    utilization: {
+        requestedPercent: number;
+        orderedPercent: number;
+        deliveredPercent: number;
+    };
+}
