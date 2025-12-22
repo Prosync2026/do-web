@@ -171,7 +171,8 @@ export default defineComponent({
         const finalRemark = ref('');
         const loading = ref(false);
 
-        const ROLE_ORDER = ['QS', 'Purchasing', 'SITE', 'Project Director', 'Project Manager'];
+        // ================= 新的角色順序 =================
+        const ROLE_ORDER = ['QS', 'CM', 'PM', 'PD', 'MNGM'];
 
         const finalSelectionOptions = [
             { label: 'QS Recommendation', value: 'QS_Recommendation' },
@@ -179,13 +180,13 @@ export default defineComponent({
             { label: 'Specific Quantity', value: 'Specific_Quantity' }
         ];
 
-        /* ================= Specific Quantity table ================= */
         const specificItem = ref({
             itemCode: 'BRC-A11-STD',
             oldQty: 22,
             newQty: null as number | null
         });
 
+        // ================= Helper Functions =================
         const getUserDepartment = (): string | null => {
             const userStr = localStorage.getItem('user');
             if (!userStr) return null;
@@ -209,9 +210,12 @@ export default defineComponent({
             if (d.includes('qs')) return 'QS';
             if (d.includes('purchasing')) return 'Purchasing';
             if (d.includes('director')) return 'Project Director';
+            if (d.includes('cm')) return 'CM';
+            if (d.includes('mngm')) return 'MNGM';
             return dept;
         };
 
+        // ================= Fetch Discussions =================
         const fetchDiscussion = async () => {
             const res = await store.fetchRecommendationList(Number(route.params.budgetChangeRequestId));
 
@@ -243,9 +247,29 @@ export default defineComponent({
             active.value = discussions.value.map((_, i) => String(i));
         };
 
+        // ================= Final Decision Authority =================
+        // const checkFinalDecisionAuthority = () => {
+        //     const mngmItem = discussions.value.find((d) => d.role === 'MNGM');
+        //     const pdItem = discussions.value.find((d) => d.role === 'PD');
+
+        //     const userDept = normalizeDepartment(getUserDepartment());
+
+        //     if (!mngmItem?.id && userDept === 'PD') {
+        //         // MNGM 沒做，PD 可以做 final decision
+        //         canShowFinalDecision.value = true;
+        //     } else if (userDept === 'MNGM') {
+        //         // MNGM 做 final decision
+        //         canShowFinalDecision.value = true;
+        //     } else {
+        //         canShowFinalDecision.value = false;
+        //     }
+        // };
+
+        // ================= Init =================
         const init = async () => {
             await fetchDiscussion();
 
+            // 是否可 create recommendation
             const department = normalizeDepartment(getUserDepartment());
             if (department && ROLE_ORDER.includes(department)) {
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(Number(route.params.budgetChangeRequestId), department);
@@ -253,14 +277,17 @@ export default defineComponent({
                 canRecommend.value = false;
             }
 
+            // 是否顯示 action buttons
             const user = getUser();
             showActionButtons.value = !!(user?.access_level && user.access_level.toUpperCase() !== 'USER');
 
-            canShowFinalDecision.value = true;
+            // 檢查 final decision 權限
+            checkFinalDecisionAuthority();
         };
 
         onMounted(init);
 
+        // ================= Step & Accordion Helpers =================
         const firstPendingIndex = () => discussions.value.findIndex((d) => !d.id);
 
         const getStepStatusText = (item: DiscussionItem, index: number) => {
@@ -290,11 +317,12 @@ export default defineComponent({
 
         const openFile = (url: string) => window.open(url, '_blank');
 
+        // ================= Submit Final Decision =================
         const submitFinalDecision = async (status: 'Approved' | 'Rejected') => {
             loading.value = true;
 
             const payload: BCRFinalDecisionPayload = {
-                ReviewerName: 'Management',
+                ReviewerName: getUser()?.name || 'Management',
                 Status: status,
                 RecommendationType: finalSelection.value!,
                 Remark: finalRemark.value
