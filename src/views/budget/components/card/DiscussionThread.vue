@@ -164,7 +164,7 @@ export default defineComponent({
         const editComment = ref(false);
         const editingItem = ref<DiscussionItem | null>(null);
 
-        const canRecommend = ref(false);
+        const canRecommend = ref(true);
         const showActionButtons = ref(false);
         const canShowFinalDecision = ref(true);
         const finalSelection = ref<string | null>(null);
@@ -274,7 +274,7 @@ export default defineComponent({
             if (department && ROLE_ORDER.includes(department)) {
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(Number(route.params.budgetChangeRequestId), department);
             } else {
-                canRecommend.value = false;
+                canRecommend.value = true;
             }
 
             // 是否顯示 action buttons
@@ -298,7 +298,7 @@ export default defineComponent({
 
         const getStepSeverity = (item: DiscussionItem, index: number) => {
             if (item.id) return 'success';
-            if (index === firstPendingIndex()) return 'warning';
+            if (index === firstPendingIndex()) return 'warn';
             return 'secondary';
         };
 
