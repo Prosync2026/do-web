@@ -1,19 +1,21 @@
+import type { BcrRoleConfig } from '@/constants/enum/bcrApproval.constants';
+import { BcrReasonEnum, BcrRecommendationEnum, BcrRoleEnum } from '@/constants/enum/bcrApproval.enum';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRRecommendationPayload } from '@/types/budgetChangeRequest.type';
+import { getRoleConfig } from '@/utils/bcrApproval.utils';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 interface AdjustmentItem {
-    id: number | null; // 对应 BudgetChangeItemId
-    code: string | null; // 显示 ItemCode
+    id: number | null;
+    code: string | null;
     value: string;
 }
 
 export default defineComponent({
     props: { visible: { type: Boolean, required: true } },
     emits: ['update:visible', 'submit'],
-
     setup(props, { emit }) {
         const route = useRoute();
         const toast = useToast();
@@ -21,25 +23,30 @@ export default defineComponent({
         const budgetChangeRequestId = Number(route.params.budgetChangeRequestId);
 
         const user = ref({ role: '', username: '' });
-        const singleBudgetChangeRequest = ref<any>(null);
+
+        const reasonSelection = ref<BcrReasonEnum | ''>('');
+        const selection = ref<BcrRecommendationEnum | ''>('');
+        const remark = ref('');
         const adjustments = ref<AdjustmentItem[]>([]);
-        const selection = ref<string>('');
-        const remark = ref<string>('');
         const selectedFiles = ref<File[]>([]);
 
-        onMounted(async () => {
+        // Dynamic Options (初始化为空数组，避免 TS undefined)
+        const reasonOptions = ref<BcrRoleConfig['reasons']>([]);
+        const recommendationOptions = ref<BcrRoleConfig['recommendations']>([]);
+        const budgetItemList = ref<any[]>([]);
+
+        onMounted(() => {
             const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-            user.value.role = storedUser.role || 'Project Director';
+            user.value.role = storedUser.user_project_role_code || '';
             user.value.username = storedUser.username || 'Unknown User';
 
-            if (budgetChangeRequestId) {
-                const data = await budgetCRStore.getSingleBudgetChange(budgetChangeRequestId);
-                singleBudgetChangeRequest.value = data;
-                console.log('🔥 singleBudgetChangeRequest:', singleBudgetChangeRequest.value);
-            }
+            const roleConfig: BcrRoleConfig = getRoleConfig(user.value.role as BcrRoleEnum);
+            reasonOptions.value = roleConfig.reasons ?? [];
+            recommendationOptions.value = roleConfig.recommendations ?? [];
         });
 
-        const budgetItemList = computed(() => singleBudgetChangeRequest.value?.budget_change_items || []);
+        // Show Adjustment List only when recommendation = CHANGE_BUDGET
+        const showAdjustmentList = computed(() => selection.value === BcrRecommendationEnum.CHANGE_BUDGET);
 
         function addAdjustment() {
             adjustments.value.push({ id: null, code: null, value: '' });
@@ -47,13 +54,6 @@ export default defineComponent({
 
         function removeAdjustment(index: number) {
             adjustments.value.splice(index, 1);
-        }
-        // HERE IN THE API WANT TO CHANGE CORRECT , SITE = PM
-        function normalizeDepartment(dept: string | null): string {
-            if (!dept) return '';
-            const lower = dept.toLowerCase();
-            if (lower === 'site staff' || lower === 'site' || lower === 'project manager') return 'Site';
-            return dept;
         }
 
         function onFileSelect(event: { files: File[] }) {
@@ -66,7 +66,7 @@ export default defineComponent({
             });
         }
 
-        async function handleSubmit() {
+        function handleSubmit() {
             if (!remark.value.trim()) {
                 toast.add({
                     severity: 'warn',
@@ -77,45 +77,47 @@ export default defineComponent({
                 return;
             }
 
-            const recommendedItems = adjustments.value
-                .filter((a) => a.id != null && a.value)
-                .map((a) => ({
-                    BudgetChangeItemId: a.id!,
-                    RecommendedQty: Number(a.value)
-                }));
-
             const payload: BCRRecommendationPayload = {
-                Department: normalizeDepartment(user.value.role),
+                Department: user.value.role,
                 PersonInCharge: user.value.username,
                 RecommendationType: selection.value,
                 Remark: remark.value,
                 files: [],
-                RecommendedItems: recommendedItems
+                RecommendedItems: adjustments.value.map((a) => ({
+                    BudgetChangeItemId: a.id!,
+                    RecommendedQty: Number(a.value)
+                }))
             };
 
-            try {
-                await budgetCRStore.createBCRRecommendation(budgetChangeRequestId, payload, selectedFiles.value);
-                // Reset
-                selection.value = '';
-                remark.value = '';
-                adjustments.value = [];
-                selectedFiles.value = [];
-                emit('update:visible', false);
-                emit('submit');
-            } catch (error) {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to submit recommendation', life: 3000 });
-            }
+            budgetCRStore
+                .createBCRRecommendation(budgetChangeRequestId, payload, selectedFiles.value)
+                .then(() => {
+                    selection.value = '';
+                    reasonSelection.value = '';
+                    remark.value = '';
+                    adjustments.value = [];
+                    selectedFiles.value = [];
+                    emit('update:visible', false);
+                    emit('submit');
+                })
+                .catch(() => {
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to submit recommendation', life: 3000 });
+                });
         }
 
         return {
             user,
+            reasonOptions,
+            recommendationOptions,
+            reasonSelection,
             selection,
             remark,
-            selectedFiles,
             adjustments,
-            budgetItemList,
             addAdjustment,
             removeAdjustment,
+            showAdjustmentList,
+            budgetItemList,
+            selectedFiles,
             onFileSelect,
             handleSubmit
         };

@@ -1,7 +1,10 @@
+import type { BcrRoleConfig } from '@/constants/enum/bcrApproval.constants';
+import { BcrRecommendationEnum, BcrRoleEnum } from '@/constants/enum/bcrApproval.enum';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BCRRecommendationEditPayload, DiscussionItem } from '@/types/budgetChangeRequest.type';
+import type { DiscussionItem } from '@/types/budgetChangeRequest.type';
+import { getRoleConfig } from '@/utils/bcrApproval.utils';
 import { useToast } from 'primevue/usetoast';
-import { defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
@@ -13,103 +16,109 @@ export default defineComponent({
 
     setup(props, { emit }) {
         const route = useRoute();
-        const budgetChangeRequestId = Number(route.params.budgetChangeRequestId);
-
-        const budgetCRStore = useBudgetChangeRequestStore();
         const toast = useToast();
 
-        const selection = ref<string>('');
-        const specificQuantity = ref<string>('');
-        const remark = ref<string>('');
-        const selectedFiles = ref<File[]>([]);
+        const budgetCRStore = useBudgetChangeRequestStore();
+        const budgetChangeRequestId = Number(route.params.budgetChangeRequestId);
 
         const user = ref({ role: '', username: '' });
-        const existingDocuments = ref<{ id: number; filename: string; path: string }[]>([]);
+
+        const reasonSelection = ref('');
+        const selection = ref<BcrRecommendationEnum | ''>('');
+        const remark = ref('');
+        const adjustments = ref<{ id: number | null; value: string }[]>([]);
+        const selectedFiles = ref<File[]>([]);
+
+        const reasonOptions = ref<BcrRoleConfig['reasons']>([]);
+        const recommendationOptions = ref<BcrRoleConfig['recommendations']>([]);
+        const budgetItemList = ref<any[]>([]);
 
         onMounted(() => {
             const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-            user.value.role = storedUser.role || 'Project Director';
-            user.value.username = storedUser.username || 'Unknown User';
+            user.value.role = storedUser.user_project_role_code || '';
+            user.value.username = storedUser.username || '';
+
+            const roleConfig = getRoleConfig(user.value.role as BcrRoleEnum);
+            reasonOptions.value = roleConfig.reasons ?? [];
+            recommendationOptions.value = roleConfig.recommendations ?? [];
         });
 
         watch(
             () => props.item,
             (item) => {
                 if (!item) return;
-                selection.value = item.selectionType || '';
-                specificQuantity.value = item.quantity?.toString() || '';
-                remark.value = item.message || '';
+
+                // reasonSelection.value = item.reason ?? '';
+                // selection.value = item.selectionType ?? '';
+                remark.value = item.message ?? '';
+
+                // adjustments.value =
+                //     item.adjustments?.map((a) => ({
+                //         id: a.BudgetChangeItemId,
+                //         value: a.RecommendedQty?.toString() ?? ''
+                //     })) ?? [];
+
                 selectedFiles.value = [];
-                existingDocuments.value = (item.documentUrl || []).map((doc: any, index: number) => ({
-                    id: doc.id ?? index,
-                    filename: doc.filename,
-                    path: doc.path
-                }));
             },
             { immediate: true }
         );
 
-        const getFileUrl = (path: string) => {
-            const baseUrl = import.meta.env.VITE_API_BASE_URL;
-            return `${baseUrl}/${path.replace(/\\/g, '/')}`;
-        };
+        const showAdjustmentList = computed(() => selection.value === BcrRecommendationEnum.CHANGE_BUDGET);
+
+        function addAdjustment() {
+            adjustments.value.push({ id: null, value: '' });
+        }
+
+        function removeAdjustment(index: number) {
+            adjustments.value.splice(index, 1);
+        }
 
         function onFileSelect(event: { files: File[] }) {
             selectedFiles.value = event.files;
-            toast.add({
-                severity: 'info',
-                summary: 'Files Attached',
-                detail: `${event.files.length} file(s) added`,
-                life: 2500
-            });
         }
-        async function handleSubmit() {
-            if (!remark.value.trim()) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Remark Required',
-                    detail: 'Please enter your remark before submitting.',
-                    life: 3000
-                });
-                return;
-            }
 
-            const payload: BCRRecommendationEditPayload = {
-                RecommendationType: selection.value,
-                SpecificQuantity: selection.value === 'Specific_Quantity' ? Number(specificQuantity.value) : null,
-                Remark: remark.value
-            };
+        // async function handleSubmit() {
+        //     if (!remark.value.trim()) {
+        //         toast.add({
+        //             severity: 'warn',
+        //             summary: 'Remark Required',
+        //             detail: 'Please enter your remark before submitting.',
+        //             life: 3000
+        //         });
+        //         return;
+        //     }
 
-            try {
-                await budgetCRStore.editBCRRecommendation(budgetChangeRequestId, props.item.id!, payload, selectedFiles.value);
+        //     const payload: BCRRecommendationEditPayload = {
+        //         RecommendationType: selection.value,
+        //         Remark: remark.value,
+        //         RecommendedItems: showAdjustmentList.value
+        //             ? adjustments.value.map((a) => ({
+        //                   BudgetChangeItemId: a.id!,
+        //                   RecommendedQty: Number(a.value)
+        //               }))
+        //             : []
+        //     };
 
-                selection.value = '';
-                specificQuantity.value = '';
-                remark.value = '';
-                selectedFiles.value = [];
+        //     await budgetCRStore.editBCRRecommendation(budgetChangeRequestId, props.item.id!, payload, selectedFiles.value);
 
-                emit('update:visible', false);
-                emit('submit');
-            } catch (error) {
-                toast.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Failed to submit recommendation',
-                    life: 3000
-                });
-            }
-        }
+        //     emit('update:visible', false);
+        //     emit('submit');
+        // }
 
         return {
-            selection,
-            specificQuantity,
-            remark,
-            selectedFiles,
             user,
-            existingDocuments,
-            onFileSelect,
-            handleSubmit,
-            getFileUrl
+            reasonOptions,
+            recommendationOptions,
+            reasonSelection,
+            selection,
+            remark,
+            adjustments,
+            showAdjustmentList,
+            budgetItemList,
+            selectedFiles,
+            addAdjustment,
+            removeAdjustment,
+            onFileSelect
         };
     }
 });
