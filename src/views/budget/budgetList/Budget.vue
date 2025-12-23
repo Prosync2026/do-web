@@ -70,7 +70,6 @@ export default defineComponent({
             { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
         ];
 
-        /* ---------------------- STATES ---------------------- */
         const versions = ref<FilterVersion[]>([]);
         const selectedVersion = ref<string>('');
         const latestBudgetId = ref<number | null>(null);
@@ -86,12 +85,13 @@ export default defineComponent({
         });
 
         const viewMode = ref<'overview' | 'detail'>('overview');
-        const detailViewMode = ref<'list' | 'tree'>('list'); // 新增默认 list
+        const detailViewMode = ref<'list' | 'tree' | 'treeLocation'>('list');
         const search = ref('');
         const showImportModal = ref(false);
         const filters = ref<Record<string, any>>({});
 
-        const treeNodes = ref<any[]>([]); // Tree Table nodes
+        const treeNodes = ref<any[]>([]);
+        const treeLocationNodes = ref<any[]>([]);
 
         /* ---------------------- API ---------------------- */
         const fetchBudgetVersionList = async () => {
@@ -128,7 +128,12 @@ export default defineComponent({
             pagination.value.total = budgetStore.pagination.total;
             pagination.value.totalPages = budgetStore.pagination.totalPages;
 
-            // Build Tree Table nodes grouped by itemCode > description
+            buildTreeNodes();
+            buildTreeLocationNodes();
+        };
+
+        /* ---------------------- Tree Node Builders ---------------------- */
+        const buildTreeNodes = () => {
             const grouped: Record<string, any> = {};
             budgetItems.value.forEach((item) => {
                 if (!grouped[item.itemCode]) grouped[item.itemCode] = {};
@@ -136,31 +141,70 @@ export default defineComponent({
                 grouped[item.itemCode][item.description].push(item);
             });
 
-            const nodes: any[] = [];
             let keyCounter = 0;
+            const nodes: any[] = [];
             for (const itemCode in grouped) {
-                const itemNode: any = {
-                    key: `item-${keyCounter++}`,
-                    data: { label: itemCode },
-                    leaf: false,
-                    children: []
-                };
+                const itemNode: any = { key: `item-${keyCounter++}`, data: { label: itemCode }, leaf: false, children: [] };
                 for (const desc in grouped[itemCode]) {
                     const descNode: any = {
                         key: `desc-${keyCounter++}`,
                         data: { label: desc },
                         leaf: false,
-                        children: grouped[itemCode][desc].map((b: any) => ({
-                            key: `child-${keyCounter++}`,
-                            data: b,
-                            leaf: true
-                        }))
+                        children: grouped[itemCode][desc].map((b: any) => ({ key: `child-${keyCounter++}`, data: b, leaf: true }))
                     };
                     itemNode.children.push(descNode);
                 }
                 nodes.push(itemNode);
             }
             treeNodes.value = nodes;
+        };
+
+        const buildTreeLocationNodes = () => {
+            const grouped: Record<string, any> = {};
+            budgetItems.value.forEach((item) => {
+                const loc1 = item.location1 || 'N/A';
+                const loc2 = item.location2 || 'N/A';
+                const element = item.elementCode || 'N/A';
+                const sub1 = item.subElement || 'N/A';
+                const sub2 = item.subSubElement || 'N/A';
+
+                if (!grouped[loc1]) grouped[loc1] = {};
+                if (!grouped[loc1][loc2]) grouped[loc1][loc2] = {};
+                if (!grouped[loc1][loc2][element]) grouped[loc1][loc2][element] = {};
+                if (!grouped[loc1][loc2][element][sub1]) grouped[loc1][loc2][element][sub1] = {};
+                if (!grouped[loc1][loc2][element][sub1][sub2]) grouped[loc1][loc2][element][sub1][sub2] = [];
+
+                grouped[loc1][loc2][element][sub1][sub2].push(item);
+            });
+
+            let keyCounter = 0;
+            const nodes: any[] = [];
+            for (const loc1 in grouped) {
+                const loc1Node: any = { key: `loc1-${keyCounter++}`, data: { label: loc1 }, leaf: false, children: [] };
+                for (const loc2 in grouped[loc1]) {
+                    const loc2Node: any = { key: `loc2-${keyCounter++}`, data: { label: loc2 }, leaf: false, children: [] };
+                    for (const element in grouped[loc1][loc2]) {
+                        const elementNode: any = { key: `el-${keyCounter++}`, data: { label: element }, leaf: false, children: [] };
+                        for (const sub1 in grouped[loc1][loc2][element]) {
+                            const sub1Node: any = { key: `sub1-${keyCounter++}`, data: { label: sub1 }, leaf: false, children: [] };
+                            for (const sub2 in grouped[loc1][loc2][element][sub1]) {
+                                const sub2Node: any = {
+                                    key: `sub2-${keyCounter++}`,
+                                    data: { label: sub2 },
+                                    leaf: false,
+                                    children: grouped[loc1][loc2][element][sub1][sub2].map((b: any) => ({ key: `item-${keyCounter++}`, data: b, leaf: true }))
+                                };
+                                sub1Node.children.push(sub2Node);
+                            }
+                            elementNode.children.push(sub1Node);
+                        }
+                        loc2Node.children.push(elementNode);
+                    }
+                    loc1Node.children.push(loc2Node);
+                }
+                nodes.push(loc1Node);
+            }
+            treeLocationNodes.value = nodes;
         };
 
         /* ---------------------- COMPUTED ---------------------- */
@@ -223,10 +267,8 @@ export default defineComponent({
                 const userStr = localStorage.getItem('user');
                 if (!userStr) return false;
                 const user = JSON.parse(userStr);
-                const role = user?.role;
-                if (!role) return false;
-                return role.toLowerCase() === 'quantity surveyor';
-            } catch (e) {
+                return user?.role?.toLowerCase() === 'quantity surveyor';
+            } catch {
                 return false;
             }
         });
@@ -246,6 +288,7 @@ export default defineComponent({
             filters,
             showImportFile,
             treeNodes,
+            treeLocationNodes,
 
             formatCurrency,
             handleImportSuccess,
@@ -269,7 +312,6 @@ export default defineComponent({
                     <h1 class="text-2xl font-bold dark:text-white">Budget Management</h1>
                     <p class="text-gray-500 dark:text-white">Interactive charts showing budget distribution.</p>
                 </div>
-
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <Dropdown v-model="selectedVersion" :options="versions" optionLabel="label" optionValue="value" class="w-full md:w-64 h-10 rounded-lg" placeholder="Select Version">
                         <template #option="slotProps">
@@ -278,7 +320,6 @@ export default defineComponent({
                                 <Badge v-if="slotProps.option.latest" value="Latest" severity="primary" class="ml-2" />
                             </div>
                         </template>
-
                         <template #value="slotProps">
                             <div class="flex items-center" v-if="slotProps.value">
                                 <span>{{ versions.find((v) => v.value === slotProps.value)?.label }}</span>
@@ -297,6 +338,7 @@ export default defineComponent({
             <div v-if="viewMode === 'detail'" class="flex gap-2 mt-2 mb-4">
                 <Button label="List View" icon="pi pi-list" :outlined="detailViewMode !== 'list'" @click="detailViewMode = 'list'" />
                 <Button label="Tree View" icon="pi pi-sitemap" :outlined="detailViewMode !== 'tree'" @click="detailViewMode = 'tree'" />
+                <Button label="Tree Location View" icon="pi pi-map" :outlined="detailViewMode !== 'treeLocation'" @click="detailViewMode = 'treeLocation'" />
             </div>
 
             <!-- OVERVIEW -->
@@ -327,15 +369,35 @@ export default defineComponent({
             <!-- DETAIL TREE VIEW -->
             <div v-else-if="detailViewMode === 'tree'">
                 <BaseTreeTable :nodes="treeNodes" :pagination="pagination">
-                  
                     <Column field="label" header="Item / Description" :expander="true" />
-
                     <Column field="rowIndex" header="#" />
+                    <Column field="itemCode" header="Item Code" />
+                    <Column field="description" header="Description" />
                     <Column field="location1" header="Location 1" />
                     <Column field="location2" header="Location 2" />
                     <Column field="elementCode" header="Element" />
                     <Column field="subElement" header="1st Sub Element" />
                     <Column field="subSubElement" header="2nd Sub Element" />
+                    <Column field="unit" header="UOM" />
+                    <Column header="Qty">
+                        <template #body="{ node }">{{ node.data?.qty }}</template>
+                    </Column>
+                    <Column header="Rate">
+                        <template #body="{ node }">RM {{ formatCurrency(node.data?.rate) }}</template>
+                    </Column>
+                    <Column header="Amount">
+                        <template #body="{ node }">RM {{ formatCurrency(node.data?.amount) }}</template>
+                    </Column>
+                </BaseTreeTable>
+            </div>
+
+            <!-- DETAIL TREE LOCATION VIEW -->
+            <div v-else-if="detailViewMode === 'treeLocation'">
+                <BaseTreeTable :nodes="treeLocationNodes" :pagination="pagination">
+                    <Column field="label" header="Location / Element / Sub Element / Sub Sub Element" :expander="true" />
+                    <Column field="rowIndex" header="#" />
+                    <Column field="itemCode" header="Item Code" />
+                    <Column field="description" header="Description" />
                     <Column field="unit" header="UOM" />
                     <Column header="Qty">
                         <template #body="{ node }">{{ node.data?.qty }}</template>
