@@ -1,4 +1,4 @@
-<script  src="./CreateBCRModal.script.ts"></script>
+<script src="./CreateBCRModal.script.ts"></script>
 
 <template>
     <Dialog v-model:visible="localVisible" modal :header="modalTitle" :style="{ width: '90vw', maxWidth: '1200px' }" :closable="true" @hide="closeModal">

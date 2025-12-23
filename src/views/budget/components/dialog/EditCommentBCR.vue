@@ -5,7 +5,7 @@
             <span class="font-bold text-xl"> Edit Recommendation - {{ user.role }} </span>
         </template>
 
-        <div class="flex flex-col gap-5 p-5 text-base">
+        <div class="flex flex-col gap-5">
             <!-- User Info -->
             <div class="grid grid-cols-2 gap-5">
                 <div>
