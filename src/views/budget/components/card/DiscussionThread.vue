@@ -185,6 +185,15 @@ export default defineComponent({
 
         const init = async () => {
             await fetchDiscussion();
+
+            //ACCEES PERMISSION CODE
+            //   if (department && ROLE_ORDER.includes(department)) {
+            //     canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(Number(route.params.budgetChangeRequestId), department);
+            // } else {
+            //     canRecommend.value = false;
+            // }
+            // const user = getUser();
+            // showActionButtons.value = user?.access_level && user.access_level.toUpperCase() !== 'USER';
         };
 
         onMounted(init);

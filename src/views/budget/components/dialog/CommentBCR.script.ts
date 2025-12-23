@@ -30,7 +30,6 @@ export default defineComponent({
         const adjustments = ref<AdjustmentItem[]>([]);
         const selectedFiles = ref<File[]>([]);
 
-        // Dynamic Options (初始化为空数组，避免 TS undefined)
         const reasonOptions = ref<BcrRoleConfig['reasons']>([]);
         const recommendationOptions = ref<BcrRoleConfig['recommendations']>([]);
         const budgetItemList = ref<any[]>([]);
@@ -65,6 +64,20 @@ export default defineComponent({
                 life: 2500
             });
         }
+        //Enhancement budget item list
+        // onMounted(async () => {
+        //     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        //     user.value.role = storedUser.role || 'Project Director';
+        //     user.value.username = storedUser.username || 'Unknown User';
+
+        //     if (budgetChangeRequestId) {
+        //         const data = await budgetCRStore.getSingleBudgetChange(budgetChangeRequestId);
+        //         singleBudgetChangeRequest.value = data;
+        //         console.log('🔥 singleBudgetChangeRequest:', singleBudgetChangeRequest.value);
+        //     }
+        // });
+
+        // const budgetItemList = computed(() => singleBudgetChangeRequest.value?.budget_change_items || []);
 
         function handleSubmit() {
             if (!remark.value.trim()) {
@@ -77,6 +90,12 @@ export default defineComponent({
                 return;
             }
 
+            // const recommendedItems = adjustments.value
+            //     .filter((a) => a.id != null && a.value)
+            //     .map((a) => ({
+            //         BudgetChangeItemId: a.id!,
+            //         RecommendedQty: Number(a.value)
+            //     }));
             const payload: BCRRecommendationPayload = {
                 Department: user.value.role,
                 PersonInCharge: user.value.username,

@@ -42,6 +42,21 @@ export default defineComponent({
             reasonOptions.value = roleConfig.reasons ?? [];
             recommendationOptions.value = roleConfig.recommendations ?? [];
         });
+        //ENHANCEMENT CODE FOR DOCUMENT
+        // const existingDocuments = ref<{ id: number; filename: string; path: string }[]>([]);
+        // const getFileUrl = (path: string) => {
+        //     const baseUrl = import.meta.env.VITE_API_BASE_URL;
+        //     return `${baseUrl}/${path.replace(/\\/g, '/')}`;
+        // };
+        // function onFileSelect(event: { files: File[] }) {
+        //     selectedFiles.value = event.files;
+        //     toast.add({
+        //         severity: 'info',
+        //         summary: 'Files Attached',
+        //         detail: `${event.files.length} file(s) added`,
+        //         life: 2500
+        //     });
+        // }
 
         watch(
             () => props.item,
@@ -59,6 +74,11 @@ export default defineComponent({
                 //     })) ?? [];
 
                 selectedFiles.value = [];
+                // existingDocuments.value = (item.documentUrl || []).map((doc: any, index: number) => ({
+                //     id: doc.id ?? index,
+                //     filename: doc.filename,
+                //     path: doc.path
+                // }));
             },
             { immediate: true }
         );
