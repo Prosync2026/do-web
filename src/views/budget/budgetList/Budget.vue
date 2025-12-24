@@ -46,7 +46,7 @@
                     :filters="filters"
                     :search="search"
                     @search="onSearchWrapper"
-                    :showImportFile="true"
+                    :showImportFile="showImportFile"
                     :onImportFile="handleImportClick"
                 >
                     <template #rate="{ data }"> RM {{ formatCurrency(data.rate) }} </template>

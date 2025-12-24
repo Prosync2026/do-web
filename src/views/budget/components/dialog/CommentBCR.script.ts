@@ -1,44 +1,62 @@
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRRecommendationPayload } from '@/types/budgetChangeRequest.type';
 import { useToast } from 'primevue/usetoast';
-import { defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
+interface AdjustmentItem {
+    id: number | null; // 对应 BudgetChangeItemId
+    code: string | null; // 显示 ItemCode
+    value: string;
+}
+
 export default defineComponent({
-    props: {
-        visible: {
-            type: Boolean,
-            required: true
-        }
-    },
+    props: { visible: { type: Boolean, required: true } },
     emits: ['update:visible', 'submit'],
 
     setup(props, { emit }) {
         const route = useRoute();
+        const toast = useToast();
+        const budgetCRStore = useBudgetChangeRequestStore();
         const budgetChangeRequestId = Number(route.params.budgetChangeRequestId);
 
-        const budgetCRStore = useBudgetChangeRequestStore();
-        const toast = useToast();
-
-        // Form fields
+        const user = ref({ role: '', username: '' });
+        const singleBudgetChangeRequest = ref<any>(null);
+        const adjustments = ref<AdjustmentItem[]>([]);
         const selection = ref<string>('');
-        const specificQuantity = ref<string>('');
         const remark = ref<string>('');
-
-        // Selected files (manual upload)
         const selectedFiles = ref<File[]>([]);
 
-        // User info from localStorage
-        const user = ref({ role: '', username: '' });
-
-        onMounted(() => {
+        onMounted(async () => {
             const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
             user.value.role = storedUser.role || 'Project Director';
             user.value.username = storedUser.username || 'Unknown User';
+
+            if (budgetChangeRequestId) {
+                const data = await budgetCRStore.getSingleBudgetChange(budgetChangeRequestId);
+                singleBudgetChangeRequest.value = data;
+                console.log('🔥 singleBudgetChangeRequest:', singleBudgetChangeRequest.value);
+            }
         });
 
-        // When user selects files
-        function onFileSelect(event: any) {
+        const budgetItemList = computed(() => singleBudgetChangeRequest.value?.budget_change_items || []);
+
+        function addAdjustment() {
+            adjustments.value.push({ id: null, code: null, value: '' });
+        }
+
+        function removeAdjustment(index: number) {
+            adjustments.value.splice(index, 1);
+        }
+        // HERE IN THE API WANT TO CHANGE CORRECT , SITE = PM
+        function normalizeDepartment(dept: string | null): string {
+            if (!dept) return '';
+            const lower = dept.toLowerCase();
+            if (lower === 'site staff' || lower === 'site' || lower === 'project manager') return 'Site';
+            return dept;
+        }
+
+        function onFileSelect(event: { files: File[] }) {
             selectedFiles.value = event.files;
             toast.add({
                 severity: 'info',
@@ -47,16 +65,6 @@ export default defineComponent({
                 life: 2500
             });
         }
-
-        const normalizeDepartment = (dept: string | null): string => {
-            if (!dept) return '';
-
-            const lower = dept.toLowerCase();
-
-            if (lower === 'site staff' || lower === 'site') return 'Site';
-
-            return dept;
-        };
 
         async function handleSubmit() {
             if (!remark.value.trim()) {
@@ -69,40 +77,45 @@ export default defineComponent({
                 return;
             }
 
-            const normalizedDept = normalizeDepartment(user.value.role);
+            const recommendedItems = adjustments.value
+                .filter((a) => a.id != null && a.value)
+                .map((a) => ({
+                    BudgetChangeItemId: a.id!,
+                    RecommendedQty: Number(a.value)
+                }));
+
             const payload: BCRRecommendationPayload = {
-                Department: normalizedDept,
+                Department: normalizeDepartment(user.value.role),
                 PersonInCharge: user.value.username,
                 RecommendationType: selection.value,
-                SpecificQuantity: selection.value === 'Specific_Quantity' ? Number(specificQuantity.value) : null,
                 Remark: remark.value,
-                files: []
+                files: [],
+                RecommendedItems: recommendedItems
             };
 
             try {
                 await budgetCRStore.createBCRRecommendation(budgetChangeRequestId, payload, selectedFiles.value);
+                // Reset
                 selection.value = '';
-                specificQuantity.value = '';
                 remark.value = '';
+                adjustments.value = [];
                 selectedFiles.value = [];
                 emit('update:visible', false);
                 emit('submit');
             } catch (error) {
-                toast.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Failed to submit recommendation',
-                    life: 3000
-                });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to submit recommendation', life: 3000 });
             }
         }
 
         return {
+            user,
             selection,
-            specificQuantity,
             remark,
             selectedFiles,
-            user,
+            adjustments,
+            budgetItemList,
+            addAdjustment,
+            removeAdjustment,
             onFileSelect,
             handleSubmit
         };
