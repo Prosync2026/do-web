@@ -31,9 +31,11 @@
 
                 <div>
                     <label class="block text-sm text-gray-600 mb-1"> RO Date <span class="text-red-600 font-bold">*</span> </label>
+
                     <div class="flex flex-col gap-2">
-                        <DatePicker :showIcon="true" :showButtonBar="true" v-model="calendarValue" :invalid="showValidation && !calendarValue" placeholder="Select Date" />
-                        <Message v-if="showValidation && !calendarValue" severity="error" icon="pi pi-times-circle">RO Date is required</Message>
+                        <DatePicker v-model="calendarValue" :showIcon="true" :showButtonBar="false" readonlyInput disabled />
+
+                        <Message v-if="showValidation && !calendarValue" severity="error" icon="pi pi-times-circle"> RO Date is required </Message>
                     </div>
                 </div>
 

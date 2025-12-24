@@ -72,6 +72,7 @@ export default defineComponent({
         const globalDeliveryDate = ref<Date | null>(null);
 
         onMounted(async () => {
+            calendarValue.value = new Date(); // default to today
             if (route.query.mode === 'edit-draft' && route.query.draftId) {
                 const draftId = route.query.draftId as string;
 
@@ -808,7 +809,6 @@ export default defineComponent({
                         };
                     })
                 };
-
                 const isDraft = !!route.query.draftId;
                 const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
 
