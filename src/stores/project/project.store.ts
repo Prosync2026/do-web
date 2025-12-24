@@ -1,4 +1,5 @@
 import { projectService } from '@/services/project.service';
+import { useAuthStore } from '@/stores/auth/auth.store';
 import type { Project } from '@/types/project.type';
 import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
@@ -40,7 +41,10 @@ export const useProjectStore = defineStore('project', () => {
                 return;
             }
 
-            projects.value = res.data;
+            const authStore = useAuthStore();
+            const userProjectId = authStore.user?.project_id;
+
+            projects.value = userProjectId ? res.data.filter((p: any) => p.id === userProjectId) : [];
         } catch (error: any) {
             showError(error.message || 'Failed to load project list');
         } finally {
