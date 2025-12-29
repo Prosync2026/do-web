@@ -1,5 +1,5 @@
 import { budgetService } from '@/services/budget.service';
-import { Budget, BudgetItem, BudgetVersion, Pagination } from '@/types/newBudget.type';
+import { Budget, BudgetItem, BudgetVersion, GetBudgetItemsParams, Pagination } from '@/types/newBudget.type';
 import { getCurrentProjectId } from '@/utils/contextHelper';
 import { formatDate } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
@@ -61,15 +61,36 @@ export const useBudgetStore = defineStore('budget', () => {
         }
     }
 
-    async function fetchBudgetItems(budgetId: number, page = pagination.value.page, pageSize = pagination.value.pageSize) {
+    async function fetchBudgetItems(filters: GetBudgetItemsParams) {
         loading.value = true;
+
         try {
-            const response = await budgetService.getBudgetItems({ projectId: getCurrentProjectId(), budgetId, page, pageSize });
-            budgetItems.value = response.data.map((item: any, index: number) => ({
+            // Build query params object - only include defined values
+            const queryParams: GetBudgetItemsParams = {
+                projectId: getCurrentProjectId(),
+                budgetId: filters.budgetId,
+                page: filters.page || 1,
+                pageSize: filters.pageSize || 10
+            };
+
+            // Add optional filters only if they have values
+            if (filters.search) queryParams.search = filters.search;
+            if (filters.category) queryParams.category = filters.category;
+            if (filters.element) queryParams.element = filters.element;
+            if (filters.subElement) queryParams.subElement = filters.subElement;
+            if (filters.location1) queryParams.location1 = filters.location1;
+            if (filters.location2) queryParams.location2 = filters.location2;
+            if (filters.itemCode) queryParams.itemCode = filters.itemCode;
+            if (filters.status) queryParams.status = filters.status;
+
+            const response = await budgetService.getBudgetItems(queryParams);
+
+            budgetItems.value = response.data.map((item: any) => ({
                 id: item.Id,
                 budgetId: item.BudgetId,
                 itemCode: item.ItemCode,
-                itemType: item.ItemType,
+                itemType: item.ItemType || '',
+                itemClass: item.ItemClass || '',
                 description: item.Description,
                 description2: item.Description2,
                 location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
@@ -87,14 +108,18 @@ export const useBudgetStore = defineStore('budget', () => {
                 unit: item.Unit,
                 rate: Number(item.Rate) || 0,
                 amount: (Number(item.Quantity) || 0) * (Number(item.Rate) || 0),
+                wastage: Number(item.Wastage) || 0,
                 status: item.Status,
                 createdAt: formatDate(item.CreatedAt),
-                updatedAt: formatDate(item.UpdatedAt),
-                rowIndex: (page - 1) * pageSize + index + 1
+                createdBy: item.CreatedBy,
+                updatedAt: item.UpdatedAt ? formatDate(item.UpdatedAt) : null,
+                updatedBy: item.UpdatedBy
             }));
+
             pagination.value = mapPagination(response.pagination);
         } catch (error) {
             showError(error, 'Failed to fetch budget items.');
+            budgetItems.value = [];
         } finally {
             loading.value = false;
         }

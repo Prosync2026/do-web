@@ -41,11 +41,15 @@ export interface BudgetItem {
     uom: string;
     qty: number;
     price: number;
+    rate?: number;
 }
 
 export interface FilterOption {
     label: string;
     value: string;
+    category?: string;
+    element?: string;
+    subElement?: string;
 }
 
 export interface OrderItem {
