@@ -5,6 +5,13 @@ export interface FilterVersion {
     id?: number;
 }
 
+export interface BudgetVersion {
+    id: number;
+    versionCode: number;
+    name: string;
+    createdAt: string;
+}
+
 export interface BudgetItem {
     Id: number;
     BudgetId: number;
@@ -59,7 +66,7 @@ export interface Budget {
 }
 
 export interface Pagination {
-    totalBudgetItems: number;
+    total: number;
     totalPages: number;
     page: number;
     pageSize: number;
@@ -96,4 +103,19 @@ export interface BudgetStatisticsResponse {
         orderedPercent: number;
         deliveredPercent: number;
     };
+}
+
+export interface GetBudgetItemsParams {
+    projectId?: number;
+    budgetId?: number;
+    category?: string;
+    element?: string;
+    subElement?: string;
+    location1?: string;
+    location2?: string;
+    itemCode?: string;
+    status?: string;
+    search?: string;
+    page?: number;
+    pageSize?: number;
 }
