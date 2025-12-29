@@ -1,15 +1,18 @@
-export interface TableItem {
+export interface BCRTableItem {
     id: number;
     itemCode: string;
     description: string;
     uom: string;
     unitPrice: number;
-    budgetQty: number;
-    orderedQty: number;
-    newOrder: number;
-    remark: string;
+    remark?: string;
     location1?: string;
     location2?: string;
+
+    statistics: {
+        budgetQty: number;
+        totalOrderedQty: number;
+        totalRequestedQty: number;
+    };
 }
 
 export interface BudgetAttachment {
@@ -77,14 +80,14 @@ export interface BudgetChangeItemPayload {
     OrderedQty: number;
     NewOrder: number;
     Description: string;
-    Remark: string;
+    Remark?: string;
     location?: string;
     element?: string;
 }
 
 export interface BudgetChangeRequestPayload {
     ProjectId: number;
-    DocNo: string;
+    DocNo?: string;
     RequestDate: string;
     RequestedBy: string;
     Department: string;

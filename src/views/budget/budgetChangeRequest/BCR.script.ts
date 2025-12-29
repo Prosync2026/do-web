@@ -42,6 +42,8 @@ export default defineComponent({
             }));
         });
 
+        console.log('budgetChangeRequestData', budgetChangeRequestData);
+
         const searchTerm = ref<string>('');
         const activeFilters = ref<Record<string, string | number | boolean> | null>(null);
 
@@ -78,18 +80,16 @@ export default defineComponent({
             const end = start + budgetCRStore.pagination.pageSize;
             return filteredRequests.value.slice(start, end);
         });
-
         const tableColumns = computed<TableColumn[]>(() => [
             { field: 'rowIndex', header: '#' },
             { field: 'DocNo', header: 'BCR No' },
-            { field: 'ProjectId', header: 'Project Code' },
             { field: 'RequestedBy', header: 'Requested By' },
             {
                 field: 'RequestDate',
                 header: 'Date Requested',
                 body: (rowData: BudgetChangeRequest) => formatDate(rowData.RequestDate)
             },
-            { field: 'Status', header: 'Status', bodySlot: 'status' },
+            { field: 'Status', header: 'Status', bodySlot: 'status', style: 'min-width: 120px; width: 120px' },
             { field: 'Remark', header: 'Remark' },
             { field: 'TotalAmount', header: 'Variance Amount', bodySlot: 'TotalAmount' },
             { field: 'actions', header: 'Actions', action: true }

@@ -1,6 +1,6 @@
 // CreateBCR.script.ts
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BudgetChangeItemPayload, BudgetChangeRequestPayload, TableItem } from '@/types/budgetChangeRequest.type';
+import type { BCRTableItem, BudgetChangeItemPayload, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
 import { getCurrentProjectId, getCurrentProjectName } from '@/utils/contextHelper';
 import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
@@ -16,7 +16,6 @@ export default defineComponent({
         const budgetCRStore = useBudgetChangeRequestStore();
 
         // --- Header ---
-        const roNumber = ref('RO2025208757');
         const localUser = JSON.parse(localStorage.getItem('user') || '{}');
         const requestBy = ref(localUser.username || '');
         const department = ref(localUser.role || '');
@@ -37,23 +36,18 @@ export default defineComponent({
         ]);
 
         // --- Items Table ---
-        const items = ref<TableItem[]>([]);
-        const itemOptions = ref([
-            { label: 'STL-01', value: 'STL-01', description: 'Steel reinforcement bar 60mm', uom: 'Ton' },
-            { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', uom: 'Bag' }
-        ]);
+        const items = ref<BCRTableItem[]>([]);
 
-        const fillItemDetails = (item: TableItem) => {
-            const selected = itemOptions.value.find((o) => o.value === item.itemCode);
+        const fillItemDetails = (item: BCRTableItem) => {
+            const selected = items.value.find((o) => o.itemCode === item.itemCode);
             if (selected) {
-                item.description = selected.description ?? item.description;
-                item.uom = selected.uom ?? item.uom;
+                item.description = selected.description ?? '';
+                item.uom = selected.uom ?? '';
             }
         };
-
-        const getItemLabel = (value: string) => {
-            const selected = itemOptions.value.find((o) => o.value === value);
-            return selected ? selected.label : value;
+        const getItemLabel = (itemCode: string) => {
+            const found = items.value.find((o) => o.itemCode === itemCode);
+            return found ? found.description : itemCode;
         };
 
         // --- Modal ---
@@ -72,19 +66,20 @@ export default defineComponent({
                     });
                     return;
                 }
-
                 items.value.push({
                     id: mat.id || mat.Id || 0,
-                    itemCode: mat.itemCode || mat.ItemCode,
-                    location1: mat.location1 || '',
-                    location2: mat.location2 || '',
+                    itemCode: mat.itemCode || mat.ItemCode || '',
                     description: mat.description || mat.Name || '',
                     uom: mat.uom || mat.Uom || '',
                     unitPrice: Number(mat.price || mat.UnitPrice || 0),
-                    budgetQty: 0,
-                    orderedQty: Number(mat.Quantity || mat.quantity || 0),
-                    newOrder: Number(mat.newOrder || mat.NewOrder || 0),
-                    remark: mat.remark || mat.Remark || ''
+                    remark: mat.remark || mat.Remark || '',
+                    location1: mat.location1 || '',
+                    location2: mat.location2 || '',
+                    statistics: {
+                        budgetQty: Number(mat.statistics?.budgetQty || 0),
+                        totalOrderedQty: Number(mat.statistics?.totalOrderedQty || 0),
+                        totalRequestedQty: Number(mat.statistics?.totalRequestedQty || 0)
+                    }
                 });
             });
 
@@ -92,22 +87,26 @@ export default defineComponent({
         };
 
         // --- Calculations ---
-        const calcExceedQty = (item: TableItem) => (item.newOrder || 0) - (item.orderedQty || 0);
-        const calcExceedPercent = (item: TableItem) => {
-            const budget = item.budgetQty || 0;
+        const calcExceedQty = (item: BCRTableItem) => (item.statistics.totalRequestedQty || 0) - (item.statistics.totalOrderedQty || 0);
+
+        const calcExceedPercent = (item: BCRTableItem) => {
+            const budget = item.statistics.budgetQty || 0;
             if (!budget) return 0;
             return (calcExceedQty(item) / budget) * 100;
         };
-        const calcEstimatedExceed = (item: TableItem) => calcExceedQty(item) * (item.unitPrice || 0);
+
+        const calcEstimatedExceed = (item: BCRTableItem) => calcExceedQty(item) * (item.unitPrice || 0);
+
         const totalVarianceAmount = computed(() => items.value.reduce((acc, it) => acc + calcEstimatedExceed(it), 0));
 
         const isAttachmentValid = ref(true);
-
-        // --- Export CSV ---
         const handleExport = () => {
             const headers = ['Item Code', 'Description', 'UOM', 'Unit Price', 'Budget Qty', 'Ordered Qty', 'New Order', 'Remark'];
-            const rows = items.value.map((it) => [it.itemCode, it.description, it.uom, it.unitPrice, it.budgetQty, it.orderedQty, it.newOrder, it.remark]);
+
+            const rows = items.value.map((it) => [it.itemCode, it.description, it.uom, it.unitPrice, it.statistics.budgetQty, it.statistics.totalOrderedQty, it.statistics.totalRequestedQty, it.remark || '']);
+
             const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -148,7 +147,6 @@ export default defineComponent({
 
             const payload: BudgetChangeRequestPayload = {
                 ProjectId: getCurrentProjectId(),
-                DocNo: roNumber.value,
                 RequestDate: requestDate.value,
                 RequestedBy: requestBy.value,
                 Department: department.value,
@@ -161,11 +159,12 @@ export default defineComponent({
                     Name: i.description,
                     Uom: i.uom,
                     UnitPrice: i.unitPrice,
-                    OrderedQty: i.orderedQty,
-                    NewOrder: i.newOrder,
+                    BudgetQty: i.statistics.budgetQty,
+                    OrderedQty: i.statistics.totalOrderedQty,
+                    NewOrder: i.statistics.totalRequestedQty,
                     Description: i.description,
                     Remark: i.remark,
-                    location: '',
+                    location: i.location1 || '',
                     element: ''
                 }))
             };
@@ -179,7 +178,6 @@ export default defineComponent({
         const goBack = () => router.push({ name: 'budgetChangeRequest' });
 
         return {
-            roNumber,
             requestBy,
             department,
             requestDate,
@@ -187,7 +185,6 @@ export default defineComponent({
             remarks,
             reasonOptions,
             items,
-            itemOptions,
             fillItemDetails,
             getItemLabel,
             showBulkItemModal,

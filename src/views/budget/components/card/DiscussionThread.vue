@@ -20,8 +20,8 @@
                         <i v-if="index < discussions.length - 1" class="pi pi-angle-right text-gray-400" />
                     </template>
                 </div>
-
-                <Button icon="pi pi-plus" label="Add Comment" class="h-8" v-if="canRecommend" @click="createComment = true" />
+                <!---CHECK ACCESS PERMISSION -->
+                <Button icon="pi pi-plus" label="Add Comment" class="h-8"  @click="createComment = true" />
             </div>
 
             <!-- ================= Accordion ================= -->
@@ -107,8 +107,8 @@ import Button from 'primevue/button';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { DiscussionItem } from '@/types/budgetChangeRequest.type';
 import { formatDate } from '@/utils/dateHelper';
+import commentBCRModal from '@/views/budget/components/dialog/CommentBCR.vue';
 import editcommentBCRModal from '@/views/budget/components/dialog/EditCommentBCR.vue';
-
 export default defineComponent({
     name: 'DiscussionThread',
     components: {
@@ -118,7 +118,8 @@ export default defineComponent({
         AccordionContent,
         Button,
         Badge,
-        editcommentBCRModal
+        editcommentBCRModal,
+        commentBCRModal
     },
     props: {
         editMode: {

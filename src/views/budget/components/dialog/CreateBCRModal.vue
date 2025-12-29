@@ -57,7 +57,7 @@
             dataKey="Id"
             emptyTitle="No budget items found"
         >
-            <template #itemTypeSlot="{ data }">
+            <template #itemType="{ data }">
                 <Tag :value="data.itemType" :severity="getItemTypeSeverity(data.itemType)" />
             </template>
 
