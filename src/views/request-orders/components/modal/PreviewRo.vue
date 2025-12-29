@@ -15,8 +15,12 @@
                 </div>
                 <div>
                     <span class="text-gray-600 dark:text-gray-400">Budget Type:</span>
-                    <span class="ml-2 font-medium">{{ summaryData.budgetType }}</span>
+                    <span class="ml-2 font-medium">
+                        {{ summaryData.budgetType }}
+                        <span v-if="summaryData.subcon" class="ml-1 text-sm text-gray-500"> (Subcon: {{ summaryData.subcon }}) </span>
+                    </span>
                 </div>
+
                 <div>
                     <span class="text-gray-600 dark:text-gray-400">Project:</span>
                     <span class="ml-2 font-medium">{{ summaryData.project }}</span>

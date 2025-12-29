@@ -53,7 +53,7 @@
                         <label class="block text-sm text-gray-600 mb-1"> Subcon </label>
                         <div class="flex flex-col gap-2">
                             <AutoComplete v-model="selectedSubcon" :suggestions="filteredSubconList" field="name" option-label="name" forceSelection dropdown placeholder="Search Subcon" @complete="handleSubconSearch" />
-                            <Message v-if="showValidation && !selectedSubcon" severity="error" icon="pi pi-times-circle">Subcon is required for Unbudgeted Items</Message>
+                            <Message v-if="showValidation && !selectedSubcon" severity="error" icon="pi pi-times-circle"> Subcon is required for Unbudgeted Items </Message>
                         </div>
                     </div>
                 </Motion>

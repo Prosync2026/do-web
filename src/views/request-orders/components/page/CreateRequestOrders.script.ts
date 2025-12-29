@@ -1,5 +1,6 @@
 import { budgetService } from '@/services/budget.service';
 import { requestOrderService } from '@/services/requestOrder.service';
+import { subconService, type Subcon } from '@/services/subcon.service';
 import type { BudgetStatisticsResponse } from '@/types/budget.type';
 import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, PreviewSummary } from '@/types/request-order.type';
 import { getCurrentProjectId, getCurrentProjectName, getCurrentUsername } from '@/utils/contextHelper';
@@ -145,58 +146,34 @@ export default defineComponent({
         });
 
         // subcon dropdown part
-        const subconList = ref<{ id: number; name: string }[]>([]);
-        const filteredSubconList = ref<{ id: number; name: string }[]>([]);
-        const selectedSubcon = ref<{ id: number; name: string } | null>(null);
+        const subconList = ref<Subcon[]>([]);
+        const filteredSubconList = ref<Subcon[]>([]);
+        const selectedSubcon = ref<Subcon | null>(null);
         const searchSubcon = ref('');
 
-        const allMockSubcons = [
-            { id: 1, name: 'Alpha Construction' },
-            { id: 2, name: 'Beta Engineering' },
-            { id: 3, name: 'Citra Builders' },
-            { id: 4, name: 'Delta Subcontractor' },
-            { id: 5, name: 'Evergreen Infra' },
-            { id: 6, name: 'Falcon Civil Works' },
-            { id: 7, name: 'Gamma Industries' },
-            { id: 8, name: 'Helix Builders' },
-            { id: 9, name: 'Icon Engineering' },
-            { id: 10, name: 'Jade Construction' },
-            { id: 11, name: 'Kinetic Engineering' },
-            { id: 12, name: 'Lighthouse Infra' },
-            { id: 13, name: 'Metro Builders' },
-            { id: 14, name: 'Nova Contractors' },
-            { id: 15, name: 'Omega Structures' },
-            { id: 16, name: 'Prime Engineering' },
-            { id: 17, name: 'Quantum Infra' },
-            { id: 18, name: 'Radiant Builders' },
-            { id: 19, name: 'Summit Contractors' },
-            { id: 20, name: 'Titan Engineering' }
-        ];
-
-        const subconId = computed(() => selectedSubcon.value?.id || null);
+        // Fetch all subcon from API
+        const fetchSubcons = async () => {
+            subconList.value = await subconService.getAll();
+            filteredSubconList.value = [...subconList.value];
+        };
 
         // Handle AutoComplete search
         const handleSubconSearch = async (event: { query: string }) => {
             const query = event.query || '';
-            // Simulate network delay
-            await new Promise((resolve) => setTimeout(resolve, 300));
-
+            await new Promise((resolve) => setTimeout(resolve, 200)); // optional delay
             if (!query.trim()) {
-                filteredSubconList.value = allMockSubcons;
+                filteredSubconList.value = [...subconList.value];
             } else {
-                filteredSubconList.value = allMockSubcons.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
+                filteredSubconList.value = subconList.value.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
             }
         };
 
-        // expandedRows for item table
-        const expandedRows = ref<{ [key: string]: boolean }>({});
-
+        // Watch budgetType to reset subcon selection
         watch(
             budgetType,
             async (newType) => {
                 if (newType === 'Unbudgeted Item') {
-                    // Show all subcons initially
-                    filteredSubconList.value = allMockSubcons;
+                    await fetchSubcons();
                     selectedSubcon.value = null;
                 } else {
                     selectedSubcon.value = null;
@@ -206,6 +183,9 @@ export default defineComponent({
             },
             { immediate: true }
         );
+
+        // expandedRows for item table
+        const expandedRows = ref<{ [key: string]: boolean }>({});
 
         watch(budgetType, (newType, oldType) => {
             if (budgetSwitching.value || newType === oldType) return;
@@ -684,6 +664,7 @@ export default defineComponent({
                 roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
                 roNumber: roNumber.value,
                 requestedBy: getCurrentUsername() || 'Unknown User',
+                subcon: selectedSubcon.value ? selectedSubcon.value.name : 'N/A',
                 items: items.value.map((item) => {
                     const budgetItemId = item.budgetItemId;
                     const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
@@ -1010,7 +991,6 @@ export default defineComponent({
             searchSubcon,
             selectedSubcon,
             filteredSubconList,
-            subconId,
             handleSubconSearch,
             downloadAttachment,
             expandedRows,

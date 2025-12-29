@@ -130,6 +130,7 @@ export interface PreviewSummary {
     overallRemark?: string;
     attachmentsCount: number;
     remark?: string;
+    subcon?: string;
 }
 
 export interface CreateRequestOrderItem {
