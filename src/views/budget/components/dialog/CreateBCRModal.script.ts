@@ -118,6 +118,7 @@ export default defineComponent({
 
         const addSelectedItems = () => {
             if (selectedItems.value.length > 0) {
+                console.log('selected items', selectedItems.value);
                 emit('items-selected', [...selectedItems.value]);
                 closeModal();
             }
@@ -163,9 +164,9 @@ export default defineComponent({
             { field: 'description', header: 'Description', sortable: true },
             { field: 'location', header: 'Location' },
             { field: 'element', header: 'Element' },
-            { field: 'itemType', header: 'Item Type', bodySlot: 'itemTypeSlot' },
+            { field: 'itemType', header: 'Item Type', bodySlot: 'itemType' },
             { field: 'uom', header: 'UoM' },
-            { field: 'quantity', header: 'Qty' },
+            { field: 'qty', header: 'Qty' },
             { field: 'price', header: 'Unit Price', bodySlot: 'priceSlot' },
             { field: 'total', header: 'Total', bodySlot: 'totalSlot' }
         ];

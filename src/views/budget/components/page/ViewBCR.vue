@@ -64,7 +64,7 @@
                                         </template>
                                     </Column>
 
-                                    <Column field="NewOrder" header="New Order Qty">
+                                    <Column field="NewOrder" header="Request Qty">
                                         <template #body="{ data }">
                                             {{ formatNumber(data.NewOrder) }}
                                         </template>

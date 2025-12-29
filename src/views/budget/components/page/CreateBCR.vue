@@ -112,24 +112,23 @@
                                 </template>
                             </Column>
 
-                            <!-- Ordered Qty -->
-                            <Column field="orderedQty" header="Ordered Qty" style="min-width: 10rem">
-                                <template #body="slotProps">
-                                    <InputText type="number" v-model.number="slotProps.data.orderedQty" class="w-full" />
-                                </template>
-                            </Column>
-
                             <!-- Budgeted Qty -->
                             <Column field="budgetQty" header="Budgeted Qty" style="min-width: 10rem">
                                 <template #body="slotProps">
-                                    <InputText type="number" v-model.number="slotProps.data.budgetQty" class="w-full" />
+                                    <InputText type="number" v-model.number="slotProps.data.statistics.budgetQty" class="w-full" />
+                                </template>
+                            </Column>
+                            <!-- Ordered Qty -->
+                            <Column field="orderedQty" header="Ordered Qty" style="min-width: 10rem">
+                                <template #body="slotProps">
+                                    <InputText type="number" v-model.number="slotProps.data.statistics.totalOrderedQty" class="w-full" />
                                 </template>
                             </Column>
 
                             <!-- New Order -->
-                            <Column field="newOrder" header="New Order" style="min-width: 10rem">
+                            <Column field="newOrder" header="Request Qty" style="min-width: 10rem">
                                 <template #body="slotProps">
-                                    <InputText type="number" v-model.number="slotProps.data.newOrder" class="w-full" />
+                                    <InputText type="number" v-model.number="slotProps.data.statistics.totalRequestedQty" class="w-full" />
                                 </template>
                             </Column>
 

@@ -70,7 +70,7 @@
                     </template>
                 </Column>
 
-                <Column field="NewOrder" header="New Order Qty" style="min-width: 120px">
+                <Column field="NewOrder" header="Request Qty" style="min-width: 120px">
                     <template #body="{ data }">
                         <InputText v-model="data.NewOrder" type="number" class="w-full" />
                     </template>
