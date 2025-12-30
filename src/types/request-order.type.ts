@@ -130,6 +130,7 @@ export interface PreviewSummary {
     overallRemark?: string;
     attachmentsCount: number;
     remark?: string;
+    reason?: string;
     subcon?: string;
 }
 
@@ -165,6 +166,7 @@ export interface CreateRequestOrderPayload {
     BudgetType: 'Budgeted' | 'NonBudgeted';
     Type: string;
     Remark: string;
+    Reason?: string;
     Currency: string;
     Items: CreateRequestOrderItem[];
     PrType?: string;

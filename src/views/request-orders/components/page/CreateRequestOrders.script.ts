@@ -184,6 +184,26 @@ export default defineComponent({
             { immediate: true }
         );
 
+        // Reason dropdown
+        const reasonOptions = [
+            { label: 'Damage', value: 'Damage' },
+            { label: 'Defect', value: 'Defect' },
+            { label: 'Missing', value: 'Missing' },
+            { label: 'Prelim', value: 'Prelim' },
+            { label: 'Renovation', value: 'Renovation' },
+            { label: 'Show house', value: 'Show house' },
+            { label: 'VO', value: 'VO' }
+        ];
+
+        const selectedReason = ref<string | null>(null);
+
+        // reset reason dropdown
+        watch(budgetType, (newType) => {
+            if (newType !== 'Unbudgeted Item') {
+                selectedReason.value = null;
+            }
+        });
+
         // expandedRows for item table
         const expandedRows = ref<{ [key: string]: boolean }>({});
 
@@ -603,15 +623,6 @@ export default defineComponent({
             }, 0);
         });
 
-        const canSubmit = computed(() => {
-            const hasItems = items.value.length > 0;
-            const hasRoNumber = roNumber.value.trim() !== '';
-            const hasRoDate = calendarValue.value !== null;
-            const hasBudgetType = budgetType.value !== '';
-
-            return hasItems && hasRoNumber && hasRoDate && hasBudgetType;
-        });
-
         const itemStats = ref<Record<number, BudgetStatisticsResponse>>({});
 
         watch(
@@ -663,6 +674,7 @@ export default defineComponent({
                 project: getCurrentProjectName() || '',
                 roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
                 roNumber: roNumber.value,
+                reason: selectedReason.value || '',
                 requestedBy: getCurrentUsername() || 'Unknown User',
                 subcon: selectedSubcon.value ? selectedSubcon.value.name : 'N/A',
                 items: items.value.map((item) => {
@@ -691,6 +703,16 @@ export default defineComponent({
             };
 
             return data;
+        });
+
+        const canSubmit = computed(() => {
+            const hasItems = items.value.length > 0;
+            const hasRoNumber = roNumber.value.trim() !== '';
+            const hasRoDate = calendarValue.value !== null;
+            const hasBudgetType = budgetType.value !== '';
+            const hasGlobalDeliveryDate = globalDeliveryDate.value !== null;
+
+            return hasItems && hasRoNumber && hasRoDate && hasBudgetType && hasGlobalDeliveryDate;
         });
 
         function openPreviewModal() {
@@ -766,6 +788,7 @@ export default defineComponent({
                     CreatedBy: getCurrentUsername() || 'Unknown User',
                     Status: 'Processing',
                     Currency: 'MYR',
+                    Reason: selectedReason.value || '',
                     Items: items.value.map((item) => {
                         const budgetItemId = item.budgetItemId;
                         const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
@@ -785,7 +808,7 @@ export default defineComponent({
                             TotalPOQty: 0,
                             Rate: item.price ?? 0,
                             Notes: item.notes ?? '',
-                            Reason: '',
+                            Reason: selectedReason.value || '',
                             DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                         };
                     })
@@ -898,7 +921,7 @@ export default defineComponent({
                             TotalPOQty: 0,
                             Rate: item.price ?? 0,
                             Notes: item.notes ?? '',
-                            Reason: '',
+                            Reason: selectedReason.value || '',
                             DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                         };
                     })
@@ -1002,7 +1025,9 @@ export default defineComponent({
             globalDeliveryDate,
             openStockItemModal,
             showStockItemModal,
-            handleStockItemsSelected
+            handleStockItemsSelected,
+            reasonOptions,
+            selectedReason
         };
     }
 });
