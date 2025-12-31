@@ -695,7 +695,8 @@ export default defineComponent({
                         qtyRequested: stats?.totalRequestedQty ?? 0,
                         qtyOrdered: stats?.totalOrderedQty ?? 0,
                         qtyDelivered: stats?.totalDeliveredQty ?? 0,
-                        balance: stats?.totalBalance ?? 0
+                        balance: stats?.totalBalance ?? 0,
+                        budgetQty: stats?.budgetQty ?? 0
                     };
                 }),
                 overallRemark: overallRemark.value,
