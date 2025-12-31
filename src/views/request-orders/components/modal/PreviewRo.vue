@@ -90,12 +90,16 @@
                     </template>
                 </Column>
 
-                <Column field="qtyRequested" header="QtyReq" style="min-width: 80px; text-align: center">
+                <Column field="qtyRequested" header="ReqQty" style="min-width: 80px; text-align: center">
                     <template #body="{ data }">
                         {{ data.qtyRequested || '' }}
                     </template>
                 </Column>
-
+                <Column field="budgetQty" header="BgtQty" style="min-width: 80px; text-align: center">
+                    <template #body="{ data }">
+                        {{ data.budgetQty || '' }}
+                    </template>
+                </Column>
                 <Column field="qtyOrdered" header="QtyOrd" style="min-width: 80px; text-align: center">
                     <template #body="{ data }">
                         {{ data.qtyOrdered || '' }}
