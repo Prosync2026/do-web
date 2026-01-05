@@ -2,7 +2,7 @@
 <template>
     <Dialog :visible="visible" modal :style="{ width: '50rem' }" @update:visible="$emit('update:visible', $event)">
         <template #header>
-            <span class="font-bold text-xl"> Edit Recommendation - {{ user.role }} </span>
+            <span class="font-bold text-xl"> Edit Comments - {{ user.role }} </span>
         </template>
 
         <div class="flex flex-col gap-5">
@@ -19,14 +19,12 @@
             </div>
 
             <!-- Reason -->
-            <div v-if="reasonOptions.length">
+            <div v-if="reasonOptions.length === '0'">
                 <label class="block text-sm font-medium text-gray-700"> Reason (choose one): </label>
                 <div class="flex flex-col gap-2 ml-3 mt-1">
                     <div v-for="(reason, idx) in reasonOptions" :key="idx" class="flex items-center gap-2">
                         <RadioButton :inputId="'reason_' + idx" name="reasonSelection" :value="reason.value" v-model="reasonSelection" />
-                        <label :for="'reason_' + idx" class="text-base">
-                            {{ reason.label }}
-                        </label>
+                        <label :for="'reason_' + idx" class="text-base">{{ reason.label }}</label>
                     </div>
                 </div>
             </div>
@@ -37,36 +35,51 @@
                 <div class="flex flex-col gap-2 ml-3 mt-1">
                     <div v-for="(rec, idx) in recommendationOptions" :key="idx" class="flex items-center gap-2">
                         <RadioButton :inputId="'rec_' + idx" name="recommendation" :value="rec.value" v-model="selection" :uncheckable="true" />
-                        <label :for="'rec_' + idx" class="text-base">
-                            {{ rec.label }}
-                        </label>
+                        <label :for="'rec_' + idx" class="text-base">{{ rec.label }}</label>
                     </div>
                 </div>
             </div>
 
-            <!-- Adjustment -->
             <div v-if="showAdjustmentList" class="adjustment-container text-sm">
-                <label class="block font-medium text-gray-700 mb-2"> Budget Item Adjustment </label>
+                <label class="block font-medium text-gray-700 mb-2">Budget Item Adjustment</label>
 
                 <div class="border border-gray-200 rounded-lg p-3 flex flex-col gap-3">
+                    <!-- Header -->
                     <div class="flex justify-between items-center mb-2">
                         <span class="font-semibold text-gray-700">Adjustment List</span>
                         <Button label="Add" icon="pi pi-plus" size="small" class="p-button-sm" @click="addAdjustment" />
                     </div>
 
-                    <div v-if="adjustments.length === 0" class="text-gray-400 py-2">No adjustment added.</div>
+                    <!-- Column Titles -->
+                    <div class="grid grid-cols-9 gap-4 text-gray-500 font-medium border-b border-gray-200 pb-1">
+                        <span class="col-span-1 text-center">#</span>
+                        <span class="col-span-3">Item Code</span>
+                        <span class="col-span-2">Old Qty</span>
+                        <span class="col-span-2">New Qty</span>
+                        <span class="col-span-1"></span>
+                        <!-- Delete button column -->
+                    </div>
 
-                    <div v-for="(item, index) in adjustments" :key="index" class="grid grid-cols-12 gap-2 items-center">
-                        <span class="col-span-1">{{ index + 1 }}</span>
-                        <Dropdown v-model="item.id" :options="budgetItemList" optionLabel="ItemCode" optionValue="Id" placeholder="Budget Item Code" class="col-span-5 text-sm" />
-                        <InputText v-model="item.value" placeholder="Value" class="col-span-5 text-sm" />
+                    <!-- Empty State -->
+                    <div v-if="adjustments.length === 0" class="text-gray-400 py-2 italic">No adjustment added.</div>
+
+                    <!-- Adjustment Rows -->
+                    <div v-for="(item, index) in adjustments" :key="index" class="grid grid-cols-9 gap-4 items-center text-gray-700">
+                        <span class="col-span-1 text-center">{{ index + 1 }}</span>
+
+                        <Dropdown v-model="item.id" :options="budgetItemList" optionLabel="ItemCode" optionValue="Id" placeholder="Budget Item Code" class="col-span-3 text-sm" @change="() => onSelectItem(item)" />
+
+                        <InputText :value="item.OrderedQty?.toString()" placeholder="Ordered Qty" class="col-span-2 text-sm" disabled />
+
+                        <InputText v-model="item.value" placeholder="New Request Qty" class="col-span-2 text-sm" />
+
                         <Button icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm col-span-1" @click="removeAdjustment(index)" />
                     </div>
                 </div>
             </div>
 
             <!-- Attachment -->
-            <div>
+            <div  v-if="showAttachment">
                 <label class="block text-sm font-medium text-gray-700"> Upload Attachment (Optional) </label>
                 <FileUpload mode="advanced" name="files" :auto="false" :customUpload="true" @select="onFileSelect" :multiple="true" class="text-sm" />
             </div>

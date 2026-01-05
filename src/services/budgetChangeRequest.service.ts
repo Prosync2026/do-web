@@ -1,7 +1,6 @@
 import axiosInstance from '@/services/backendAxiosInstance';
 import type {
     BCRFinalDecisionPayload,
-    BCRRecommendationEditPayload,
     BCRRecommendationPayload,
     BudgetChangeRequestPayload,
     BudgetChangeRequestResponse,
@@ -113,11 +112,22 @@ const fetchRecommendationList = async (budgetChangeRequestId: number): Promise<R
     }
 };
 
-const checkingUserCanCreateRecommendation = async (budgetChangeRequestId: number, department: string): Promise<boolean> => {
+const checkingUserCanCreateRecommendation = async (budgetChangeRequestId: number): Promise<boolean> => {
     try {
-        const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/can-recommend`, { params: { department } });
+        const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/recommendation/info`);
 
         return response.data.data.canRecommend;
+    } catch (error) {
+        showError(error, 'Failed to fetch recommendation list.');
+        throw error;
+    }
+};
+
+const checkingUserCanReviewRecommendation = async (budgetChangeRequestId: number): Promise<boolean> => {
+    try {
+        const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/review/info`);
+
+        return response.data.data.canReview;
     } catch (error) {
         showError(error, 'Failed to fetch recommendation list.');
         throw error;
@@ -128,11 +138,9 @@ const createBCRRecommendation = async (budgetChangeRequestId: number, payload: B
     try {
         const formData = new FormData();
 
-        formData.append('Department', payload.Department);
-        formData.append('PersonInCharge', payload.PersonInCharge);
         formData.append('RecommendationType', payload.RecommendationType);
-        formData.append('SpecificQuantity', payload.SpecificQuantity ? String(payload.SpecificQuantity) : '');
         formData.append('Remark', payload.Remark ?? '');
+        formData.append('RecommendedItems', JSON.stringify(payload.RecommendedItems));
 
         if (attachments && attachments.length > 0) {
             attachments.forEach((file) => formData.append('files', file, file.name));
@@ -148,18 +156,18 @@ const createBCRRecommendation = async (budgetChangeRequestId: number, payload: B
     } catch (error: any) {
         return {
             success: false,
-            message: error.response?.data?.message || error.response?.data?.error || 'Failed to create Recommendation.',
+            message: error?.response?.data?.message || error.message || 'Submit failed',
             data: {} as CreateRecommendationData
         };
     }
 };
 
-const editBCRRecommendation = async (budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationEditPayload, attachments?: File[]): Promise<CreateRecommendationResponse> => {
+const editBCRRecommendation = async (budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationPayload, attachments?: File[]): Promise<CreateRecommendationResponse> => {
     try {
         const formData = new FormData();
 
         formData.append('RecommendationType', payload.RecommendationType);
-        formData.append('SpecificQuantity', payload.SpecificQuantity ? String(payload.SpecificQuantity) : '');
+        formData.append('RecommendedItems', JSON.stringify(payload.RecommendedItems));
         formData.append('Remark', payload.Remark ?? '');
 
         if (attachments && attachments.length > 0) {
@@ -182,7 +190,7 @@ const editBCRRecommendation = async (budgetChangeRequestId: number, recommendati
     }
 };
 
-const createManagementFinalDecisionRecommendation = async (budgetChangeRequestId: number, payload: BCRFinalDecisionPayload) => {
+const rolesReviewRecommendation = async (budgetChangeRequestId: number, payload: BCRFinalDecisionPayload) => {
     try {
         const response = await axiosInstance.post(`/budgetChange/${budgetChangeRequestId}/review`, payload);
 
@@ -200,6 +208,17 @@ const createManagementFinalDecisionRecommendation = async (budgetChangeRequestId
     }
 };
 
+const fetchReviewList = async (budgetChangeRequestId: number) => {
+    try {
+        const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/review`);
+
+        return response.data.data ?? [];
+    } catch (error) {
+        showError(error, 'Failed to fetch recommendation list.');
+        throw error;
+    }
+};
+
 export const budgetChangeRequestService = {
     getBudgetChangeRequests,
     createBudgetChangeRequest,
@@ -208,7 +227,9 @@ export const budgetChangeRequestService = {
     getBudgetChangeRequestHistory,
     fetchRecommendationList,
     checkingUserCanCreateRecommendation,
+    checkingUserCanReviewRecommendation,
     createBCRRecommendation,
     editBCRRecommendation,
-    createManagementFinalDecisionRecommendation
+    rolesReviewRecommendation,
+    fetchReviewList
 };

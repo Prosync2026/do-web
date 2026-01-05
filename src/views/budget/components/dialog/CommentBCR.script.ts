@@ -1,16 +1,18 @@
 import type { BcrRoleConfig } from '@/constants/enum/bcrApproval.constants';
 import { BcrReasonEnum, BcrRecommendationEnum, BcrRoleEnum } from '@/constants/enum/bcrApproval.enum';
+import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BCRRecommendationPayload } from '@/types/budgetChangeRequest.type';
+import type { BCRFinalDecisionPayload, BCRRecommendationPayload } from '@/types/budgetChangeRequest.type';
 import { getRoleConfig } from '@/utils/bcrApproval.utils';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-
 interface AdjustmentItem {
     id: number | null;
-    code: string | null;
+    ItemCode: string | null;
     value: string;
+    Description: string | null;
+    OrderedQty: string | null;
 }
 
 export default defineComponent({
@@ -45,16 +47,31 @@ export default defineComponent({
         });
 
         // Show Adjustment List only when recommendation = CHANGE_BUDGET
-        const showAdjustmentList = computed(() => selection.value === BcrRecommendationEnum.CHANGE_BUDGET);
+        const showAdjustmentList = computed(() => selection.value === BcrRecommendationEnum.Specific_Quantity);
 
         function addAdjustment() {
-            adjustments.value.push({ id: null, code: null, value: '' });
+            adjustments.value.push({
+                id: null,
+                ItemCode: '',
+                Description: '',
+                OrderedQty: '',
+                value: ''
+            });
         }
 
         function removeAdjustment(index: number) {
             adjustments.value.splice(index, 1);
         }
 
+        function onSelectItem(rowItem: any) {
+            const selected = budgetItemList.value.find((b) => b.Id === rowItem.Id);
+            if (selected) {
+                rowItem.id = selected.Id;
+                rowItem.ItemCode = selected.ItemCode;
+                rowItem.Description = selected.Description;
+                rowItem.OrderedQty = selected.OrderedQty;
+            }
+        }
         function onFileSelect(event: { files: File[] }) {
             selectedFiles.value = event.files;
             toast.add({
@@ -64,20 +81,21 @@ export default defineComponent({
                 life: 2500
             });
         }
-        //Enhancement budget item list
-        // onMounted(async () => {
-        //     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-        //     user.value.role = storedUser.role || 'Project Director';
-        //     user.value.username = storedUser.username || 'Unknown User';
 
-        //     if (budgetChangeRequestId) {
-        //         const data = await budgetCRStore.getSingleBudgetChange(budgetChangeRequestId);
-        //         singleBudgetChangeRequest.value = data;
-        //         console.log('🔥 singleBudgetChangeRequest:', singleBudgetChangeRequest.value);
-        //     }
-        // });
+        onMounted(async () => {
+            if (budgetChangeRequestId) {
+                const data = await budgetCRStore.getSingleBudgetChange(budgetChangeRequestId);
 
-        // const budgetItemList = computed(() => singleBudgetChangeRequest.value?.budget_change_items || []);
+                if (data?.budget_change_items) {
+                    budgetItemList.value = data.budget_change_items.map((item: any) => ({
+                        Id: item.Id,
+                        ItemCode: item.ItemCode,
+                        Description: item.Description,
+                        OrderedQty: item.OrderedQty
+                    }));
+                }
+            }
+        });
 
         function handleSubmit() {
             if (!remark.value.trim()) {
@@ -90,15 +108,7 @@ export default defineComponent({
                 return;
             }
 
-            // const recommendedItems = adjustments.value
-            //     .filter((a) => a.id != null && a.value)
-            //     .map((a) => ({
-            //         BudgetChangeItemId: a.id!,
-            //         RecommendedQty: Number(a.value)
-            //     }));
             const payload: BCRRecommendationPayload = {
-                Department: user.value.role,
-                PersonInCharge: user.value.username,
                 RecommendationType: selection.value,
                 Remark: remark.value,
                 files: [],
@@ -124,6 +134,36 @@ export default defineComponent({
                 });
         }
 
+        function handleReviewSubmit(action: 'approve' | 'reject') {
+            const payload: BCRFinalDecisionPayload = {
+                ReviewType: selection.value,
+                Remark: remark.value
+            };
+
+            if (selection.value === BcrRecommendationEnum.Specific_Quantity) {
+                payload.ReviewedItems = adjustments.value.map((a) => ({
+                    BudgetChangeItemId: String(a.id),
+                    ApprovedQty: String(a.value)
+                }));
+            }
+
+            console.log('payload', payload);
+            budgetChangeRequestService
+                .rolesReviewRecommendation(budgetChangeRequestId, payload)
+                .then(() => {
+                    selection.value = '';
+                    reasonSelection.value = '';
+                    remark.value = '';
+                    adjustments.value = [];
+                    selectedFiles.value = [];
+                    emit('update:visible', false);
+                    emit('submit');
+                })
+                .catch(() => {
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to submit review', life: 3000 });
+                });
+        }
+
         return {
             user,
             reasonOptions,
@@ -133,7 +173,9 @@ export default defineComponent({
             remark,
             adjustments,
             addAdjustment,
+            onSelectItem,
             removeAdjustment,
+            handleReviewSubmit,
             showAdjustmentList,
             budgetItemList,
             selectedFiles,

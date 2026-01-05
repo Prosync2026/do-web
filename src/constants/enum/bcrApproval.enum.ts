@@ -7,23 +7,25 @@ export enum BcrRoleEnum {
 }
 
 export enum BcrReasonEnum {
-    PM_VO_AI_EI_SI = 'PM_VO_AI_EI_SI',
-    PM_THEFT_DAMAGE = 'PM_THEFT_DAMAGE',
-    PM_MOCKUP_BUDGET = 'PM_MOCKUP_BUDGET',
-    PM_INACCURATE_BUDGET = 'PM_INACCURATE_BUDGET',
-    PM_OTHERS = 'PM_OTHERS',
-    QS_OVERALL_REMEASUREMENT = 'QS_OVERALL_REMEASUREMENT',
-    QS_MOCKUP_BUDGET = 'QS_MOCKUP_BUDGET',
-    QS_BUDGET_ADJUSTMENT = 'QS_BUDGET_ADJUSTMENT',
-    QS_VO_CHANGES = 'QS_VO_CHANGES',
-    OTHERS_REASON = 'OTHERS_REASON'
+    PM_VO_AI_EI_SI = 'VO: AI/EI or Site Instruction (SI) to be attached',
+    PM_THEFT_DAMAGE = 'Theft case / material damages (police report or photo to be attached)',
+    PM_MOCKUP_BUDGET = 'Mock up budget: request of material budget revision based on completed mock up unit',
+    PM_INACCURATE_BUDGET = 'Inaccurate budget',
+    PM_OTHERS = 'Others (please specify)',
+    QS_OVERALL_REMEASUREMENT = 'Overall remeasurement (please attached revised budgetory sheet)',
+    QS_MOCKUP_BUDGET = 'Mock up budget: revise of material budget revision based on completed mock up unit',
+    QS_BUDGET_ADJUSTMENT = 'Budget adjustment/refinement; ie. BQ quantity insufficient etc.',
+    QS_VO_CHANGES = 'VO and changes (could be own initiation etc)',
+    OTHERS_REASON = 'Others (please specify)'
 }
 
 export enum BcrRecommendationEnum {
-    REMAIN_BUDGET = 'REMAIN_BUDGET',
-    CHANGE_BUDGET = 'CHANGE_BUDGET',
-    ACCEPT_CHANGE_QS = 'ACCEPT_CHANGE_QS',
-    REJECT_CHANGE_QS = 'REJECT_CHANGE_QS',
-    ACCEPT_CHANGE_SITE = 'ACCEPT_CHANGE_SITE',
-    ACCEPT_CHANGE_PD = 'ACCEPT_CHANGE_PD'
+    Keep_Original = 'Keep_Original',
+    Specific_Quantity = 'Specific_Quantity',
+    ACCEPT_CHANGE_QS = 'Approve',
+    REJECT_CHANGE_QS = 'Reject',
+    APPROVE_QS_CHANGE = 'Approve_QS',
+    APPROVE_SITE_CHANGE = 'Approve_SITE',
+    APPROVE_ORIGINAL = 'Approve_As_Requested',
+    APPROVE_PD_CHANGE = 'Approve_PD',
 }

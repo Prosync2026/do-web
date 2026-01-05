@@ -21,7 +21,7 @@
                     </template>
                 </div>
                 <!---CHECK ACCESS PERMISSION -->
-                <Button icon="pi pi-plus" label="Add Comment" class="h-8"  @click="createComment = true" />
+                <Button icon="pi pi-plus" label="Add Comment" class="h-8" v-if="canRecommend" @click="createComment = true" />
             </div>
 
             <!-- ================= Accordion ================= -->
@@ -29,27 +29,27 @@
                 <AccordionPanel v-for="(item, index) in discussions" :key="index" :value="String(index)">
                     <AccordionHeader>
                         <div class="flex items-center gap-2 w-full">
-                            <span class="font-semibold"> {{ item.role }} : {{ item.name }} </span>
-                            <Badge :value="getStepStatusText(item, index)" :severity="getStepSeverity(item, index)" style="font-size: 0.65rem; height: 1rem" />
+                            <span class="font-bold">{{ item.role }} : {{ item.name }} </span>
+                            <Badge :value="getStepStatusText(item, index)" :severity="getStepSeverity(item, index)" style="font-size: 0.75rem; height: 1.3rem" />
                         </div>
                     </AccordionHeader>
 
                     <AccordionContent>
                         <div v-if="item.id !== null" class="flex justify-between gap-4">
                             <div class="w-full">
-                                <p class="text-xs text-gray-400">
+                                <p class="text-sm text-gray-400">
                                     {{ formatDate(item.datetime) }}
                                 </p>
 
-                                <p class="text-sm font-semibold mt-1">
+                                <p class="text-base font-semibold mt-1">
                                     Selection:
                                     <span class="font-normal">
-                                        {{ item.selectionType || 'Not specified' }}
+                                        {{ item.RecommendationType || 'Not specified' }}
                                     </span>
                                 </p>
 
-                                <div class="mt-3">
-                                    <table class="min-w-full border border-gray-200 text-sm text-left">
+                                <div v-if="item.recommendationItem.length" class="mt-3">
+                                    <table class="min-w-full border border-gray-200 text-base text-left">
                                         <thead class="bg-gray-100">
                                             <tr>
                                                 <th class="px-3 py-2 border">Item Code</th>
@@ -58,18 +58,29 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="px-3 py-2 border">BRC-A11-STD</td>
-                                                <td class="px-3 py-2 border">22</td>
-                                                <td class="px-3 py-2 border">15</td>
+                                            <tr v-for="(row, rIndex) in item.recommendationItem" :key="rIndex">
+                                                <td class="px-3 py-2 border">
+                                                    {{ row.ItemCode }}
+                                                </td>
+                                                <td class="px-3 py-2 border">
+                                                    {{ row.OrderedQty }}
+                                                </td>
+                                                <td class="px-3 py-2 border">
+                                                    {{ row.RecommendedQty }}
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
 
-                                <p class="text-sm mt-2">
+                                <p class="text-base mt-2" v-if="item.Reason">
+                                    <strong>Reason:</strong>
+                                    {{ item.Reason }}
+                                </p>
+
+                                <p class="text-base mt-1">
                                     <strong>Remark:</strong>
-                                    {{ item.message || 'No comments.' }}
+                                    {{ item.Remark || 'No remarks.' }}
                                 </p>
 
                                 <div v-if="item.documentUrl?.length" class="flex flex-wrap gap-2 mt-3">
@@ -80,7 +91,7 @@
                             <Button v-if="editMode && item.id" icon="pi pi-pencil" text rounded @click="openEditModal(item)" />
                         </div>
 
-                        <div v-else class="italic text-gray-500">No action taken yet.</div>
+                        <div v-else class="italic text-gray-500">No any data, waiting review</div>
                     </AccordionContent>
                 </AccordionPanel>
             </Accordion>
@@ -104,8 +115,9 @@ import AccordionPanel from 'primevue/accordionpanel';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 
+import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { DiscussionItem } from '@/types/budgetChangeRequest.type';
+import type { DiscussionItem, ReviewList } from '@/types/budgetChangeRequest.type';
 import { formatDate } from '@/utils/dateHelper';
 import commentBCRModal from '@/views/budget/components/dialog/CommentBCR.vue';
 import editcommentBCRModal from '@/views/budget/components/dialog/EditCommentBCR.vue';
@@ -133,68 +145,110 @@ export default defineComponent({
 
         const showApprovalFlow = ref(true);
         const active = ref<string[]>([]);
-        const discussions = ref<DiscussionItem[]>([]);
+
         const createComment = ref(false);
         const editComment = ref(false);
         const editingItem = ref<DiscussionItem | null>(null);
         const canRecommend = ref(true);
 
         const ROLE_ORDER = ['QS', 'CM', 'PM', 'PD', 'MNGM'];
+        const discussions = ref<DiscussionItem[]>([]);
 
-        const normalizeDepartment = (dept?: string) => {
-            if (!dept) return '';
-            const d = dept.toLowerCase();
-            if (d.includes('site') || d.includes('pm')) return 'PM';
-            if (d.includes('qs')) return 'QS';
-            if (d.includes('cm')) return 'CM';
-            if (d.includes('director') || d.includes('pd')) return 'PD';
-            if (d.includes('mngm')) return 'MNGM';
-            return dept;
-        };
+        const fetchCombinedDiscussion = async () => {
+            const bcrId = Number(route.params.budgetChangeRequestId);
+            const ROLE_ORDER = ['QS', 'CM', 'PM', 'PD', 'MNGM'];
 
-        const fetchDiscussion = async () => {
-            const res = await store.fetchRecommendationList(Number(route.params.budgetChangeRequestId));
+            // API calls
+            const discussionRes = await store.fetchRecommendationList(bcrId);
+            const reviewRes = await budgetChangeRequestService.fetchReviewList(bcrId);
 
             discussions.value = ROLE_ORDER.map((role) => {
-                const found = res?.find((r: any) => normalizeDepartment(r.Department) === role);
+                const disc = discussionRes?.find((r) => r.Department === role);
+                if (disc) {
+                    return {
+                        id: disc.Id,
+                        role,
+                        name: disc.ReviewerName ?? '',
+                        datetime: disc.CreatedAt ?? '',
+                        RecommendationType: disc.RecommendationType ?? '',
+                        Reason: disc.Reason ?? '',
+                        Remark: disc.Remark ?? '',
+                        recommendationItem:
+                            disc.recommendation_items?.map((item) => ({
+                                BudgetChangeItemId: item.BudgetChangeItemId,
+                                ItemCode: item.budget_change_item?.ItemCode ?? '-',
+                                OrderedQty: item.budget_change_item?.OrderedQty ?? '',
+                                RecommendedQty: item.RecommendedQty ?? '',
+                                Uom: item.budget_change_item?.Uom ?? ''
+                            })) ?? [],
+                        documentUrl: disc.Attachment ? JSON.parse(disc.Attachment) : []
+                    } as DiscussionItem;
+                }
 
-                return found
-                    ? {
-                          id: found.Id,
-                          role,
-                          name: found.ReviewerName,
-                          datetime: found.CreatedAt,
-                          message: found.Remark,
-                          selectionType: found.RecommendationType,
-                          quantity: Number(found.SpecificQuantity),
-                          documentUrl: found.Attachment ? JSON.parse(found.Attachment) : []
-                      }
-                    : {
-                          id: null,
-                          role,
-                          name: '',
-                          datetime: '',
-                          message: '',
-                          selectionType: '',
-                          quantity: null,
-                          documentUrl: []
-                      };
+                const reviews: ReviewList[] = Array.isArray(reviewRes) ? reviewRes : reviewRes?.data || [];
+
+                const rev = reviews.find((r) => r.ReviewerRole === role);
+                if (rev) {
+                    return {
+                        id: rev.Id,
+                        role,
+                        name: rev.ReviewerName ?? '',
+                        datetime: rev.CreatedAt ?? '',
+                        RecommendationType: rev.ReviewType ?? '',
+                        Reason: '',
+                        Remark: rev.Remark ?? '',
+                        recommendationItem:
+                            rev.review_items?.map((item) => ({
+                                BudgetChangeItemId: item.BudgetChangeItemId,
+                                ItemCode: '-',
+                                OrderedQty: '',
+                                RecommendedQty: item.RecommendedQty ?? '',
+                                Uom: '',
+                                NewOrder: '',
+                                Description: ''
+                            })) ?? [],
+                        documentUrl: []
+                    } as DiscussionItem;
+                }
+
+                return {
+                    id: null,
+                    role,
+                    name: '',
+                    datetime: '',
+                    RecommendationType: '',
+                    Reason: '',
+                    Remark: '',
+                    recommendationItem: [],
+                    documentUrl: []
+                } as DiscussionItem;
             });
 
-            active.value = discussions.value.map((_, i) => String(i));
+            console.log('Final Combined Discussions:', discussions.value);
         };
 
         const init = async () => {
-            await fetchDiscussion();
+            await fetchCombinedDiscussion();
 
-            //ACCEES PERMISSION CODE
-            //   if (department && ROLE_ORDER.includes(department)) {
-            //     canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(Number(route.params.budgetChangeRequestId), department);
-            // } else {
-            //     canRecommend.value = false;
-            // }
-            // const user = getUser();
-            // showActionButtons.value = user?.access_level && user.access_level.toUpperCase() !== 'USER';
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const roleCode: string | undefined = user?.user_project_role_code;
+
+            const ROLE_ORDER = ['QS', 'CM', 'PM', 'PD', 'MNGM'];
+            const CREATOR_ROLES = ['QS', 'PM'];
+
+            const bcrId = Number(route.params.budgetChangeRequestId);
+
+            if (!roleCode || !ROLE_ORDER.includes(roleCode)) {
+                canRecommend.value = false;
+            } else if (CREATOR_ROLES.includes(roleCode)) {
+                console.log('checking this');
+                canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(bcrId);
+            } else {
+                console.log('checking that');
+                canRecommend.value = await budgetChangeRequestService.checkingUserCanReviewRecommendation(bcrId);
+            }
+
+            console.log('can recommend', canRecommend.value);
         };
 
         onMounted(init);

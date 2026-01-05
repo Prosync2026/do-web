@@ -24,8 +24,8 @@ export const BCR_ROLE_CONFIG: Record<BcrRoleEnum, BcrRoleConfig> = {
     QS: {
         reasons: QS_REASONS,
         recommendations: [
-            { value: BcrRecommendationEnum.CHANGE_BUDGET, label: 'Please change Budget Quantity' },
-            { value: BcrRecommendationEnum.REMAIN_BUDGET, label: 'Remain original budget' }
+            { value: BcrRecommendationEnum.Specific_Quantity, label: 'Please change Budget Quantity' },
+            { value: BcrRecommendationEnum.Keep_Original, label: 'Remain original budget' }
         ]
     },
     CM: {
@@ -37,23 +37,23 @@ export const BCR_ROLE_CONFIG: Record<BcrRoleEnum, BcrRoleConfig> = {
     PM: {
         reasons: PM_REASONS,
         recommendations: [
-            { value: BcrRecommendationEnum.CHANGE_BUDGET, label: 'Please change Budget Quantity' },
-            { value: BcrRecommendationEnum.REMAIN_BUDGET, label: 'Remain original budget' }
+            { value: BcrRecommendationEnum.Specific_Quantity, label: 'Please change Budget Quantity' },
+            { value: BcrRecommendationEnum.Keep_Original, label: 'Remain original budget' }
         ]
     },
     PD: {
         recommendations: [
-            { value: BcrRecommendationEnum.ACCEPT_CHANGE_QS, label: 'Please change Budget Qty according to QS recommendation' },
-            { value: BcrRecommendationEnum.ACCEPT_CHANGE_SITE, label: 'Please change Budget Qty according to Site recommendation' },
-            { value: BcrRecommendationEnum.CHANGE_BUDGET, label: 'Please change Budget Qty to' }
+            { value: BcrRecommendationEnum.APPROVE_QS_CHANGE, label: 'Please change Budget Qty according to QS recommendation' },
+            { value: BcrRecommendationEnum.APPROVE_SITE_CHANGE, label: 'Please change Budget Qty according to Site recommendation' },
+            { value: BcrRecommendationEnum.Specific_Quantity, label: 'Please change Budget Qty to' }
         ]
     },
     MNGM: {
         recommendations: [
-            { value: BcrRecommendationEnum.ACCEPT_CHANGE_QS, label: 'Please change Budget Qty according to QS recommendation' },
-            { value: BcrRecommendationEnum.ACCEPT_CHANGE_SITE, label: 'Please change Budget Qty according to Site recommendation' },
-            { value: BcrRecommendationEnum.ACCEPT_CHANGE_PD, label: 'Please change Budget Qty according to Project Head recommendation' },
-            { value: BcrRecommendationEnum.CHANGE_BUDGET, label: 'Please change Budget Qty to' }
+            { value: BcrRecommendationEnum.APPROVE_QS_CHANGE, label: 'Please change Budget Qty according to QS recommendation' },
+            { value: BcrRecommendationEnum.APPROVE_SITE_CHANGE, label: 'Please change Budget Qty according to Site recommendation' },
+            { value: BcrRecommendationEnum.APPROVE_PD_CHANGE, label: 'Please change Budget Qty according to Project Director recommendation' },
+            { value: BcrRecommendationEnum.Specific_Quantity, label: 'Please change Budget Qty to' }
         ]
     }
 };
