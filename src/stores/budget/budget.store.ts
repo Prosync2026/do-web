@@ -1,5 +1,5 @@
 import { budgetService } from '@/services/budget.service';
-import { Budget, BudgetItem, BudgetVersion, GetBudgetItemsParams, Pagination } from '@/types/newBudget.type';
+import { Budget, BudgetItem, BudgetVersion, Pagination } from '@/types/newBudget.type';
 import { getCurrentProjectId } from '@/utils/contextHelper';
 import { formatDate } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
@@ -61,65 +61,68 @@ export const useBudgetStore = defineStore('budget', () => {
         }
     }
 
-    async function fetchBudgetItems(filters: GetBudgetItemsParams) {
+    async function fetchBudgetItems(budgetId: number, page = pagination.value.page, pageSize = pagination.value.pageSize) {
         loading.value = true;
-
         try {
-            // Build query params object - only include defined values
-            const queryParams: GetBudgetItemsParams = {
-                projectId: getCurrentProjectId(),
-                budgetId: filters.budgetId,
-                page: filters.page || 1,
-                pageSize: filters.pageSize || 10
-            };
+            const response = await budgetService.getBudgetItems({ projectId: getCurrentProjectId(), budgetId, page, pageSize });
+            budgetItems.value = response.data.map((item: any, index: number) => {
+                const statistics = item.statistics || {};
+                const utilization = statistics.utilization || {};
 
-            // Add optional filters only if they have values
-            if (filters.search) queryParams.search = filters.search;
-            if (filters.category) queryParams.category = filters.category;
-            if (filters.element) queryParams.element = filters.element;
-            if (filters.subElement) queryParams.subElement = filters.subElement;
-            if (filters.location1) queryParams.location1 = filters.location1;
-            if (filters.location2) queryParams.location2 = filters.location2;
-            if (filters.itemCode) queryParams.itemCode = filters.itemCode;
-            if (filters.status) queryParams.status = filters.status;
-
-            const response = await budgetService.getBudgetItems(queryParams);
-
-            budgetItems.value = response.data.map((item: any) => ({
-                id: item.Id,
-                budgetId: item.BudgetId,
-                itemCode: item.ItemCode,
-                itemType: item.ItemType || '',
-                itemClass: item.ItemClass || '',
-                description: item.Description,
-                description2: item.Description2,
-                location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
-                location1: item.Location1,
-                location2: item.Location2,
-                category: item.Category,
-                element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
-                elementCode: item.Element,
-                subElement: item.SubElement,
-                subSubElement: item.SubSubElement,
-                uom: item.Unit,
-                qty: Number(item.Quantity),
-                price: Number(item.Rate),
-                total: Number(item.Quantity) * Number(item.Rate),
-                unit: item.Unit,
-                rate: Number(item.Rate) || 0,
-                amount: (Number(item.Quantity) || 0) * (Number(item.Rate) || 0),
-                wastage: Number(item.Wastage) || 0,
-                status: item.Status,
-                createdAt: formatDate(item.CreatedAt),
-                createdBy: item.CreatedBy,
-                updatedAt: item.UpdatedAt ? formatDate(item.UpdatedAt) : null,
-                updatedBy: item.UpdatedBy
-            }));
+                return {
+                    id: item.Id,
+                    budgetId: item.BudgetId,
+                    itemCode: item.ItemCode,
+                    itemType: item.ItemType,
+                    description: item.Description,
+                    description2: item.Description2,
+                    location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
+                    location1: item.Location1,
+                    location2: item.Location2,
+                    category: item.Category,
+                    element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
+                    elementCode: item.Element,
+                    subElement: item.SubElement,
+                    subSubElement: item.SubSubElement,
+                    uom: item.Unit,
+                    qty: Number(item.Quantity),
+                    price: Number(item.Rate),
+                    total: Number(item.Quantity) * Number(item.Rate),
+                    unit: item.Unit,
+                    rate: Number(item.Rate) || 0,
+                    amount: (Number(item.Quantity) || 0) * (Number(item.Rate) || 0),
+                    status: item.Status,
+                    createdAt: formatDate(item.CreatedAt),
+                    updatedAt: formatDate(item.UpdatedAt),
+                    rowIndex: (page - 1) * pageSize + index + 1,
+                    budget: item.budget || null,
+                    statistics: {
+                        budgetItemId: statistics.budgetItemId ?? null,
+                        budgetId: statistics.budgetId ?? null,
+                        itemCode: statistics.itemCode ?? null,
+                        description: statistics.description ?? null,
+                        unit: statistics.unit ?? null,
+                        budgetQty: statistics.budgetQty ?? 0,
+                        budgetAmount: statistics.budgetAmount ?? 0,
+                        totalRequested: statistics.totalRequested ?? 0,
+                        totalOrdered: statistics.totalOrdered ?? 0,
+                        totalDelivered: statistics.totalDelivered ?? 0,
+                        totalBalance: statistics.totalBalance ?? 0,
+                        totalRequestedQty: statistics.totalRequestedQty ?? 0,
+                        totalOrderedQty: statistics.totalOrderedQty ?? 0,
+                        totalDeliveredQty: statistics.totalDeliveredQty ?? 0,
+                        utilization: {
+                            requestedPercent: utilization.requestedPercent ?? 0,
+                            orderedPercent: utilization.orderedPercent ?? 0,
+                            deliveredPercent: utilization.deliveredPercent ?? 0
+                        }
+                    }
+                };
+            });
 
             pagination.value = mapPagination(response.pagination);
         } catch (error) {
             showError(error, 'Failed to fetch budget items.');
-            budgetItems.value = [];
         } finally {
             loading.value = false;
         }

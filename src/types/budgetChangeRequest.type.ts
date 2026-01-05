@@ -1,15 +1,18 @@
-export interface TableItem {
+export interface BCRTableItem {
     id: number;
     itemCode: string;
     description: string;
     uom: string;
     unitPrice: number;
-    budgetQty: number;
-    orderedQty: number;
-    newOrder: number;
-    remark: string;
+    remark?: string;
     location1?: string;
     location2?: string;
+
+    statistics: {
+        budgetQty: number;
+        totalOrderedQty: number;
+        totalRequestedQty: number;
+    };
 }
 
 export interface BudgetAttachment {
@@ -77,14 +80,14 @@ export interface BudgetChangeItemPayload {
     OrderedQty: number;
     NewOrder: number;
     Description: string;
-    Remark: string;
+    Remark?: string;
     location?: string;
     element?: string;
 }
 
 export interface BudgetChangeRequestPayload {
     ProjectId: number;
-    DocNo: string;
+    DocNo?: string;
     RequestDate: string;
     RequestedBy: string;
     Department: string;
@@ -126,40 +129,10 @@ export interface HistoryResponse {
 }
 
 export interface BCRRecommendationPayload {
-    Department: string;
-    PersonInCharge: string;
-    RecommendationType: string; // Type of recommendation (e.g., "QS_Recommendation", "Site_Recommendation", "Specific_Quantity")
-    RecommendedItems: { BudgetChangeItemId: number; RecommendedQty: number }[];
-    SpecificQuantity?: number | null;
-    Remark?: string | null;
-    files?: string[];
-}
-
-export interface BCRRecommendationEditPayload {
-    RecommendationType: string; // Type of recommendation (e.g., "QS_Recommendation", "Site_Recommendation", "Specific_Quantity")
-    SpecificQuantity?: number | null;
-    Remark?: string | null;
-    files?: string[];
-}
-export interface RecommendationList {
-    Id: number;
-    BudgetChangeId: number;
-    Department: string;
-    ReviewerName: string;
     RecommendationType: string;
-    SpecificQuantity: string;
-    Remark: string;
-    Attachment: string | null;
-    CreatedAt: string;
-    CreatedBy: string;
-    UpdatedAt: string;
-    UpdatedBy: string | null;
-}
-
-export interface RecommendationResponse {
-    success: boolean;
-    message?: string;
-    data?: RecommendationList[];
+    RecommendedItems: { BudgetChangeItemId: number; RecommendedQty: number }[];
+    Remark?: string | null;
+    files?: string[];
 }
 
 export interface CreateRecommendationData {
@@ -177,20 +150,87 @@ export interface CreateRecommendationResponse {
     data: CreateRecommendationData;
 }
 
+export interface RecommendationResponse {
+    success: boolean;
+    message?: string;
+    data?: RecommendationList[];
+}
+
+export interface RecommendationList {
+    Id: number;
+    BudgetChangeId: number;
+    Department: string;
+    ReviewerName: string;
+    RecommendationType: string;
+    Remark: string | null;
+    Reason: string | null;
+    Attachment: string | null;
+    CreatedAt: string;
+    CreatedBy: string;
+    UpdatedAt: string;
+    UpdatedBy: string | null;
+    recommendation_items: RecommendationItem[];
+}
+
+export interface RecommendationItem {
+    BudgetChangeItemId: number;
+    RecommendedQty: string;
+    budget_change_item: BudgetChangeItemDetails;
+}
+
+export interface BudgetChangeItemDetails {
+    Id: number;
+    ItemCode: string;
+    NewOrder: string;
+    OrderedQty: string;
+    QsQty?: string | null;
+    SiteQty?: string | null;
+    Uom: string;
+}
+
 export interface DiscussionItem {
     id: number | null;
     role: string;
     name: string;
     datetime: string;
-    selectionType: string;
-    quantity: number | null;
-    message: string;
+    RecommendationType: string;
+    Reason: string | null;
+    Remark: string | null;
+    recommendationItem: DiscussionRowItem[];
     documentUrl: { filename: string; path: string }[];
 }
 
+export interface DiscussionRowItem {
+    BudgetChangeItemId: number;
+    ItemCode: string;
+    NewOrder: string;
+    OrderedQty: string;
+    RecommendedQty: string;
+    Description: string;
+    Uom: string;
+}
 export interface BCRFinalDecisionPayload {
-    ReviewerName: string;
-    Status: string;
-    RecommendationType: string; // Type of recommendation (e.g., "QS_Recommendation", "Site_Recommendation", "Specific_Quantity")
+    ReviewType: string;
+    ReviewedItems?: { BudgetChangeItemId: string; ApprovedQty: string }[];
     Remark?: string;
+}
+
+export interface ReviewList {
+    Id: number;
+    BudgetChangeId: number;
+    ReviewerRole: string;
+    ReviewerName: string;
+    ReviewType: string;
+    Remark: string | null;
+    Status: string | null;
+    CreatedAt: string;
+    CreatedBy: string;
+    UpdatedAt: string;
+    UpdatedBy: string | null;
+    review_items: reviewItem[];
+}
+
+export interface reviewItem {
+    BudgetChangeItemId: number;
+    RecommendedQty: string;
 }

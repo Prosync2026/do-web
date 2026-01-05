@@ -1,5 +1,5 @@
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
-import type { BCRRecommendationEditPayload, BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload, HistoryList, RecommendationList } from '@/types/budgetChangeRequest.type';
+import type { BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload, HistoryList, RecommendationList } from '@/types/budgetChangeRequest.type';
 import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 
@@ -197,7 +197,7 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
             }
         },
 
-        async editBCRRecommendation(budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationEditPayload, attachments?: File[]) {
+        async editBCRRecommendation(budgetChangeRequestId: number, recommendationId: number, payload: BCRRecommendationPayload, attachments?: File[]) {
             this.loading = true;
             try {
                 const response = await budgetChangeRequestService.editBCRRecommendation(budgetChangeRequestId, recommendationId, payload, attachments);
