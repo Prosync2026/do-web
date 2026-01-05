@@ -151,16 +151,18 @@ export default defineComponent({
         const editingItem = ref<DiscussionItem | null>(null);
         const canRecommend = ref(true);
 
-        const ROLE_ORDER = ['QS', 'CM', 'PM', 'PD', 'MNGM'];
+        const ROLE_ORDER = ['QS', 'CM', 'Site', 'PD', 'MNGM'];
         const discussions = ref<DiscussionItem[]>([]);
 
         const fetchCombinedDiscussion = async () => {
             const bcrId = Number(route.params.budgetChangeRequestId);
-            const ROLE_ORDER = ['QS', 'CM', 'PM', 'PD', 'MNGM'];
+            const ROLE_ORDER = ['QS', 'CM', 'Site', 'PD', 'MNGM'];
 
             // API calls
             const discussionRes = await store.fetchRecommendationList(bcrId);
             const reviewRes = await budgetChangeRequestService.fetchReviewList(bcrId);
+            console.log('checking discussion res', discussionRes);
+            console.log('review res', reviewRes);
 
             discussions.value = ROLE_ORDER.map((role) => {
                 const disc = discussionRes?.find((r) => r.Department === role);
@@ -233,8 +235,8 @@ export default defineComponent({
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const roleCode: string | undefined = user?.user_project_role_code;
 
-            const ROLE_ORDER = ['QS', 'CM', 'PM', 'PD', 'MNGM'];
-            const CREATOR_ROLES = ['QS', 'PM'];
+            const ROLE_ORDER = ['QS', 'CM', 'Site', 'PD', 'MNGM'];
+            const CREATOR_ROLES = ['QS', 'Site'];
 
             const bcrId = Number(route.params.budgetChangeRequestId);
 
