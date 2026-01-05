@@ -2,6 +2,7 @@
 import { useLayout } from '@/layout/composables/layout';
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { useBudgetStore } from '@/stores/budget/budget.store';
+import { usePermissionStore } from '@/stores/permission/permission.store';
 import { useProjectStore } from '@/stores/project/project.store';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
@@ -18,6 +19,7 @@ const toast = useToast();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 const router = useRouter();
 const authStore = useAuthStore();
+const permissionStore = usePermissionStore();
 
 watch(isDarkTheme, (dark) => {
     document.documentElement.classList.toggle('dark', dark);
@@ -140,11 +142,14 @@ watch(
         }
 
         if (matchedProject && matchedCompany) {
+            const projectId = matchedProject.ProjectId || matchedProject.id;
+
             selectedProject.value = {
                 company: matchedCompany,
                 name: matchedProject.name,
-                ProjectId: matchedProject.ProjectId || matchedProject.id
+                ProjectId: projectId
             };
+            permissionStore.fetchPermissions(projectId);
         } else {
             selectedProject.value = null;
 
@@ -175,6 +180,8 @@ const selectProject = (company: string, project: Project) => {
     showProjectDialog.value = false;
 
     showReloadSpinner.value = true;
+    // permissions immediately
+    permissionStore.fetchPermissions(projectId);
 
     setTimeout(() => {
         window.location.reload();
