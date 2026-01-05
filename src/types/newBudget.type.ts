@@ -12,32 +12,25 @@ export interface BudgetItem {
     budgetId: number;
     itemCode: string;
     itemType?: string;
+    itemClass?: string;
     description: string;
     description2?: string;
-
-    location: string;
-    location1: string;
+    location1?: string;
     location2?: string;
-
-    category?: string;
+    category: string;
     element: string;
-    elementCode: string;
-    subElement?: string;
+    subElement: string;
     subSubElement?: string;
-
-    uom?: string;
-    qty: number;
-    price: number;
-    total: number;
-
-    unit?: string;
-    rate: number;
+    uom: string;
+    qty: number | string;
+    rate?: number;
     amount: number;
-
-    status?: string;
+    wastage?: number;
+    status: string;
     createdAt: string;
-    updatedAt?: string;
-
+    createdBy: string;
+    updatedAt?: string | null;
+    updatedBy?: string | null;
     rowIndex?: number;
 }
 
@@ -75,4 +68,20 @@ export interface GetBudgetsResponse<T = any> {
     // IF STABLE DON'T USE T BCS T IS CALL ANY
     data: T[];
     pagination: Pagination;
+}
+
+export interface GetBudgetItemsParams {
+    projectId?: number;
+    budgetId?: number;
+    category?: string;
+    element?: string;
+    subElement?: string;
+    subSubElement?: string;
+    location1?: string;
+    location2?: string;
+    itemCode?: string;
+    status?: string;
+    search?: string;
+    page?: number;
+    pageSize?: number;
 }

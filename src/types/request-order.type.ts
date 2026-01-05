@@ -41,11 +41,15 @@ export interface BudgetItem {
     uom: string;
     qty: number;
     price: number;
+    rate?: number;
 }
 
 export interface FilterOption {
     label: string;
     value: string;
+    category?: string;
+    element?: string;
+    subElement?: string;
 }
 
 export interface OrderItem {
@@ -126,6 +130,8 @@ export interface PreviewSummary {
     overallRemark?: string;
     attachmentsCount: number;
     remark?: string;
+    reason?: string;
+    subcon?: string;
 }
 
 export interface CreateRequestOrderItem {
@@ -160,6 +166,7 @@ export interface CreateRequestOrderPayload {
     BudgetType: 'Budgeted' | 'NonBudgeted';
     Type: string;
     Remark: string;
+    Reason?: string;
     Currency: string;
     Items: CreateRequestOrderItem[];
     PrType?: string;

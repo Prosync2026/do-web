@@ -6,8 +6,10 @@ import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { budgetFilterService } from '@/services/budgetFilter.service';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { TableColumn } from '@/types/table.type';
+import { useToast } from 'primevue/usetoast';
 import type { BudgetItem, FilterOption } from '../../../../types/request-order.type';
 
 export default defineComponent({
@@ -33,105 +35,97 @@ export default defineComponent({
             (val) => (localVisible.value = val)
         );
         watch(localVisible, (val) => emit('update:visible', val));
-
+        const toast = useToast();
         const modalTitle = ref('Add Bulk Items from Budget');
         const loading = ref(false);
 
+        // Filter state
         const searchTerm = ref('');
-        const selectedLocation = ref<string | null>(null);
+        const selectedLocation1 = ref<string | null>(null);
+        const selectedLocation2 = ref<string | null>(null);
+        const selectedCategory = ref<string | null>(null);
         const selectedElement = ref<string | null>(null);
-        const selectedItemType = ref<string | null>(null);
+        const selectedSubElement = ref<string | null>(null);
+        const selectedSubSubElement = ref<string | null>(null);
+        const selectedItemCode = ref<string | null>(null);
+        const selectedStatus = ref<string | null>(null);
 
-        // Selection - PrimeVue expects array, so use array directly
+        // Filter options from backend
+        const location1Options = ref<FilterOption[]>([]);
+        const location2Options = ref<FilterOption[]>([]);
+        const elementOptions = ref<FilterOption[]>([]);
+        const subElementOptions = ref<FilterOption[]>([]);
+        const subSubElementOptions = ref<FilterOption[]>([]);
+        const categoryOptions = ref<FilterOption[]>([]);
+        const statusOptions = ref<FilterOption[]>([]);
+
+        // handler
+        const onSubElementClick = () => {
+            if (!selectedElement.value) {
+                toast.add({ severity: 'warn', summary: 'Attention', detail: 'Please select an Element first.', life: 3000 });
+                return false; // prevent dropdown from opening if needed
+            }
+            return true;
+        };
+
+        const onSubSubElementClick = () => {
+            if (!selectedElement.value || !selectedSubElement.value) {
+                toast.add({ severity: 'warn', summary: 'Attention', detail: 'Please select Element and Sub Element first.', life: 3000 });
+                return false;
+            }
+            return true;
+        };
+
+        const onLocation2Click = () => {
+            if (!selectedLocation1.value) {
+                toast.add({ severity: 'warn', summary: 'Attention', detail: 'Please select Location 1 first.', life: 3000 });
+                return false;
+            }
+            return true;
+        };
+
+        // Selection
         const selectedItems = ref<BudgetItem[]>([]);
 
         // Budget store
         const budgetStore = useBudgetStore();
+        const currentVersion = ref<number | null>(props.version || Number(localStorage.getItem('latestBudgetVersion')));
 
-        const loadLatestBudgetVersion = (): number | null => {
-            const v = localStorage.getItem('latestBudgetVersion');
-            return v ? Number(v) : null;
-        };
-
-        const currentVersion = ref<number | null>(props.version || loadLatestBudgetVersion());
-
-        const fetchBudgetItems = async () => {
+        // Fetch budget items with server-side filters
+        const fetchBudgetItems = async (page: number = 1, pageSize: number = budgetStore.pagination.pageSize) => {
             if (!currentVersion.value) return;
-            loading.value = true;
-            try {
-                await budgetStore.fetchBudgetItems(currentVersion.value, budgetStore.pagination.page, budgetStore.pagination.pageSize);
-            } catch (error) {
-                console.error('Error loading budget items:', error);
-            } finally {
-                loading.value = false;
-            }
+
+            await budgetStore.fetchBudgetItems({
+                budgetId: currentVersion.value,
+                search: searchTerm.value || undefined,
+                category: selectedCategory.value || undefined,
+                element: selectedElement.value || undefined,
+                subElement: selectedSubElement.value || undefined,
+                subSubElement: selectedSubSubElement.value || undefined,
+                location1: selectedLocation1.value || undefined,
+                location2: selectedLocation2.value || undefined,
+                itemCode: selectedItemCode.value || undefined,
+                status: selectedStatus.value || undefined,
+                page,
+                pageSize
+            });
         };
 
-        // Use store's pagination directly
         const pagination = computed(() => budgetStore.pagination);
-
-        // All budget items from store
         const allBudgetItems = computed(() => budgetStore.budgetItems);
 
-        const filteredItems = computed(() => {
-            let items = [...allBudgetItems.value];
+        // Category and Status still computed from current items
+        watch(allBudgetItems, (items) => {
+            const cats = [...new Set(items.map((i) => i.category))];
+            categoryOptions.value = cats.map((c) => ({ label: c, value: c }));
 
-            if (searchTerm.value) {
-                const search = searchTerm.value.toLowerCase();
-                items = items.filter((item) => item.itemCode.toLowerCase().includes(search) || item.description.toLowerCase().includes(search));
-            }
-            if (selectedLocation.value) {
-                items = items.filter((item) => item.location === selectedLocation.value);
-            }
-            if (selectedElement.value) {
-                items = items.filter((item) => item.element === selectedElement.value);
-            }
-            if (selectedItemType.value) {
-                items = items.filter((item) => item.itemType === selectedItemType.value);
-            }
-
-            return items;
+            const stats = [...new Set(items.map((i) => i.status))];
+            statusOptions.value = stats.map((s) => ({ label: s, value: s }));
         });
 
-        // Update pagination when filters change
-        watch([searchTerm, selectedLocation, selectedElement, selectedItemType], async () => {
-            budgetStore.pagination.page = 1;
-        });
-
-        watch(
-            () => allBudgetItems.value,
-            (newItems) => {
-                const validIds = new Set(newItems.map((item) => item.id));
-                selectedItems.value = selectedItems.value.filter((selected) => validIds.has(selected.id));
-            }
+        const hasActiveFilters = computed(
+            () => !!(searchTerm.value || selectedCategory.value || selectedElement.value || selectedSubElement.value || selectedLocation1.value || selectedLocation2.value || selectedItemCode.value || selectedStatus.value)
         );
-
-        const grandTotal = computed(() => {
-            return selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.qty ?? 0), 0);
-        });
-
-        const locationOptions = computed<FilterOption[]>(() => {
-            const locations = [...new Set(allBudgetItems.value.map((item) => item.location))];
-            return locations.map((loc) => ({ label: loc, value: loc }));
-        });
-
-        const elementOptions = computed<FilterOption[]>(() => {
-            const elements = [...new Set(allBudgetItems.value.map((item) => item.element))];
-            return elements.map((el) => ({ label: el, value: el }));
-        });
-
-        // const itemTypeOptions = computed<FilterOption[]>(() => {
-        //     const types = [...new Set(allBudgetItems.value.map((item) => item.itemType))];
-        //     return types.map((type) => ({ label: type, value: type }));
-        // });
-
-        const filterOptions = computed(() => [
-            { type: 'select' as const, field: 'location', placeholder: 'Filter by Location', options: locationOptions.value },
-            { type: 'select' as const, field: 'element', placeholder: 'Filter by Element', options: elementOptions.value },
-            { type: 'select' as const, field: 'itemType', placeholder: 'Filter by Item Type', options: elementOptions.value }
-        ]);
-
-        const hasActiveFilters = computed(() => !!(searchTerm.value || selectedLocation.value || selectedElement.value || selectedItemType.value));
 
         const closeModal = () => {
             emit('update:visible', false);
@@ -143,12 +137,17 @@ export default defineComponent({
             clearFilters();
         };
 
-        const clearFilters = () => {
+        const clearFilters = async () => {
             searchTerm.value = '';
-            selectedLocation.value = null;
+            selectedCategory.value = null;
             selectedElement.value = null;
-            selectedItemType.value = null;
+            selectedSubElement.value = null;
+            selectedLocation1.value = null;
+            selectedLocation2.value = null;
+            selectedItemCode.value = null;
+            selectedStatus.value = null;
             budgetStore.pagination.page = 1;
+            await fetchBudgetItems(1);
         };
 
         const addSelectedItems = () => {
@@ -168,87 +167,139 @@ export default defineComponent({
             return severityMap[itemType] || 'info';
         };
 
+        // Load filter options from backend
+        const loadFilterOptions = async () => {
+            const loc1 = await budgetFilterService.getLocation1();
+            location1Options.value = loc1.map((l) => ({ label: l, value: l }));
+
+            const els = await budgetFilterService.getElements();
+            elementOptions.value = els.map((e) => ({ label: e, value: e }));
+        };
+
+        // Dependent dropdowns
+        watch(selectedLocation1, async (val) => {
+            if (val) {
+                const loc2 = await budgetFilterService.getLocation2(val);
+                location2Options.value = loc2.map((l) => ({ label: l, value: l }));
+            } else location2Options.value = [];
+        });
+
+        watch(selectedElement, async (val) => {
+            if (val) {
+                const subs = await budgetFilterService.getSubElements(val);
+                subElementOptions.value = subs.map((s) => ({ label: s, value: s }));
+                subSubElementOptions.value = [];
+            } else {
+                subElementOptions.value = [];
+                subSubElementOptions.value = [];
+            }
+        });
+
+        watch(selectedSubElement, async (val) => {
+            if (val && selectedElement.value) {
+                const subsSub = await budgetFilterService.getSubSubElements(selectedElement.value, val);
+                subSubElementOptions.value = subsSub.map((s) => ({ label: s, value: s }));
+            } else subSubElementOptions.value = [];
+        });
+
+        watch([selectedElement, selectedSubElement], async ([element, subElement]) => {
+            if (element && subElement) {
+                const subsSub = await budgetFilterService.getSubSubElements(element, subElement);
+                subSubElementOptions.value = subsSub.map((s) => ({ label: s, value: s }));
+            } else {
+                subSubElementOptions.value = [];
+            }
+        });
+
+        // Watch for modal visibility
         watch(localVisible, async (visible) => {
             if (visible) {
-                if (!currentVersion.value) {
-                    currentVersion.value = loadLatestBudgetVersion();
-                }
+                if (!currentVersion.value) currentVersion.value = Number(localStorage.getItem('latestBudgetVersion'));
                 if (currentVersion.value) {
                     await fetchBudgetItems();
+                    await loadFilterOptions();
                 }
             }
         });
 
-        const handlePageChange = async (page: number) => {
-            budgetStore.pagination.page = page;
-            await fetchBudgetItems();
+        // Watch for filter changes - debounced
+        let filterTimeout: ReturnType<typeof setTimeout>;
+        const debouncedFetchOnFilter = () => {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(async () => {
+                budgetStore.pagination.page = 1;
+                await fetchBudgetItems(1);
+            }, 500);
         };
 
+        watch([searchTerm, selectedCategory, selectedElement, selectedSubElement, selectedSubSubElement, selectedLocation1, selectedLocation2, selectedItemCode, selectedStatus], () => {
+            budgetStore.pagination.page = 1;
+            debouncedFetchOnFilter();
+        });
+
+        const handlePageChange = async (page: number) => {
+            await fetchBudgetItems(page, budgetStore.pagination.pageSize);
+        };
         const handlePageSizeChange = async (pageSize: number) => {
             budgetStore.pagination.pageSize = pageSize;
-            budgetStore.pagination.page = 1;
-            await fetchBudgetItems();
+            await fetchBudgetItems(1, pageSize);
         };
 
-        // Add rowIndex to items
+        // Selected items validation
+        watch(allBudgetItems, (newItems) => {
+            const validIds = new Set(newItems.map((i) => i.id));
+            selectedItems.value = selectedItems.value.filter((s) => validIds.has(s.id));
+        });
+
+        const grandTotal = computed(() => {
+            return selectedItems.value.reduce((sum, item) => sum + Number(item.rate ?? 0) * Number(item.qty ?? 0), 0);
+        });
+
         const paginatedItems = computed(() => {
-            return budgetStore.budgetItems.map((item, index) => ({
-                ...item,
-                rowIndex: (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1
-            }));
-        });
-
-        const handleSearch = (value: string) => {
-            searchTerm.value = value;
-            budgetStore.pagination.page = 1;
-        };
-
-        const handleFilterChange = (filters: Record<string, any>) => {
-            selectedLocation.value = filters.location || null;
-            selectedElement.value = filters.element || null;
-            selectedItemType.value = filters.itemType || null;
-            budgetStore.pagination.page = 1;
-        };
-
-        // Define ReusableTable columns
-        const columns: TableColumn[] = [
-            { field: 'rowIndex', header: '#', sortable: false },
-            { field: 'itemCode', header: 'Item Code', sortable: true },
-            { field: 'description', header: 'Description', sortable: true },
-            { field: 'location', header: 'Location', sortable: false },
-            { field: 'element', header: 'Element', sortable: false },
-            { field: 'itemType', header: 'Item Type', sortable: true, bodySlot: 'itemTypeSlot' },
-            { field: 'uom', header: 'UOM', sortable: false },
-            { field: 'qty', header: 'Quantity', sortable: true },
-            { field: 'price', header: 'Price', sortable: true, bodySlot: 'priceSlot', visible: false },
-            { field: 'total', header: 'Total', bodySlot: 'totalSlot', visible: false }
-        ];
-
-        onMounted(() => {
-            budgetStore.fetchBudgets();
-        });
-
-        const displayItems = computed(() => {
-            // Don't create new objects - mutate the existing ones with rowIndex
             budgetStore.budgetItems.forEach((item, index) => {
                 (item as any).rowIndex = (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1;
             });
             return budgetStore.budgetItems;
         });
 
+        const columns: TableColumn[] = [
+            { field: 'rowIndex', header: '#', sortable: false },
+            { field: 'itemCode', header: 'Item Code', sortable: true },
+            { field: 'description', header: 'Description', sortable: true },
+            { field: 'location1', header: 'Location', sortable: false },
+            { field: 'location2', header: 'Location 2', sortable: false },
+            { field: 'category', header: 'Category', sortable: true },
+            { field: 'elementCode', header: 'Element', sortable: true },
+            { field: 'subElement', header: 'Sub Element', sortable: true },
+            { field: 'subSubElement', header: 'Sub Sub Element', sortable: true },
+            { field: 'uom', header: 'UOM', sortable: false },
+            { field: 'qty', header: 'Quantity', sortable: true },
+            { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rateSlot', visible: false },
+            { field: 'amount', header: 'Amount', bodySlot: 'amountSlot', visible: false }
+        ];
+
+        onMounted(async () => {
+            if (currentVersion.value) {
+                await budgetStore.fetchBudgets(currentVersion.value);
+                await loadFilterOptions();
+            }
+        });
+
         return {
             modalTitle,
             loading,
             localVisible,
-            paginatedItems: displayItems,
-            filteredItems,
+            paginatedItems,
             selectedItems,
             allBudgetItems,
-            locationOptions,
+            categoryOptions,
             elementOptions,
-            //itemTypeOptions,
+            subElementOptions,
+            subSubElementOptions,
+            location1Options,
+            location2Options,
+            statusOptions,
             pagination,
-            filterOptions,
             grandTotal,
             hasActiveFilters,
             closeModal,
@@ -257,13 +308,19 @@ export default defineComponent({
             getItemTypeSeverity,
             handlePageChange,
             handlePageSizeChange,
-            handleSearch,
-            handleFilterChange,
-            columns,
+            onLocation2Click,
+            onSubElementClick,
+            onSubSubElementClick,
             searchTerm,
-            selectedLocation,
+            selectedCategory,
             selectedElement,
-            selectedItemType
+            selectedSubElement,
+            selectedSubSubElement,
+            selectedLocation1,
+            selectedLocation2,
+            selectedItemCode,
+            selectedStatus,
+            columns
         };
     }
 });

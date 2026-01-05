@@ -2,7 +2,7 @@
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRTableItem, BudgetChangeItemPayload, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
 import { getCurrentProjectId, getCurrentProjectName } from '@/utils/contextHelper';
-import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
+import MeterialModal from '@/views/request-orders/components/modal/CreateRo.vue';
 import { Motion } from '@motionone/vue';
 import { useToast } from 'primevue';
 import { computed, defineComponent, ref } from 'vue';

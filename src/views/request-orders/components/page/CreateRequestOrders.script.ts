@@ -1,5 +1,6 @@
 import { budgetService } from '@/services/budget.service';
 import { requestOrderService } from '@/services/requestOrder.service';
+import { subconService, type Subcon } from '@/services/subcon.service';
 import type { BudgetStatisticsResponse } from '@/types/budget.type';
 import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, PreviewSummary } from '@/types/request-order.type';
 import { getCurrentProjectId, getCurrentProjectName, getCurrentUsername } from '@/utils/contextHelper';
@@ -72,6 +73,7 @@ export default defineComponent({
         const globalDeliveryDate = ref<Date | null>(null);
 
         onMounted(async () => {
+            calendarValue.value = new Date(); // default to today
             if (route.query.mode === 'edit-draft' && route.query.draftId) {
                 const draftId = route.query.draftId as string;
 
@@ -144,58 +146,34 @@ export default defineComponent({
         });
 
         // subcon dropdown part
-        const subconList = ref<{ id: number; name: string }[]>([]);
-        const filteredSubconList = ref<{ id: number; name: string }[]>([]);
-        const selectedSubcon = ref<{ id: number; name: string } | null>(null);
+        const subconList = ref<Subcon[]>([]);
+        const filteredSubconList = ref<Subcon[]>([]);
+        const selectedSubcon = ref<Subcon | null>(null);
         const searchSubcon = ref('');
 
-        const allMockSubcons = [
-            { id: 1, name: 'Alpha Construction' },
-            { id: 2, name: 'Beta Engineering' },
-            { id: 3, name: 'Citra Builders' },
-            { id: 4, name: 'Delta Subcontractor' },
-            { id: 5, name: 'Evergreen Infra' },
-            { id: 6, name: 'Falcon Civil Works' },
-            { id: 7, name: 'Gamma Industries' },
-            { id: 8, name: 'Helix Builders' },
-            { id: 9, name: 'Icon Engineering' },
-            { id: 10, name: 'Jade Construction' },
-            { id: 11, name: 'Kinetic Engineering' },
-            { id: 12, name: 'Lighthouse Infra' },
-            { id: 13, name: 'Metro Builders' },
-            { id: 14, name: 'Nova Contractors' },
-            { id: 15, name: 'Omega Structures' },
-            { id: 16, name: 'Prime Engineering' },
-            { id: 17, name: 'Quantum Infra' },
-            { id: 18, name: 'Radiant Builders' },
-            { id: 19, name: 'Summit Contractors' },
-            { id: 20, name: 'Titan Engineering' }
-        ];
-
-        const subconId = computed(() => selectedSubcon.value?.id || null);
+        // Fetch all subcon from API
+        const fetchSubcons = async () => {
+            subconList.value = await subconService.getAll();
+            filteredSubconList.value = [...subconList.value];
+        };
 
         // Handle AutoComplete search
         const handleSubconSearch = async (event: { query: string }) => {
             const query = event.query || '';
-            // Simulate network delay
-            await new Promise((resolve) => setTimeout(resolve, 300));
-
+            await new Promise((resolve) => setTimeout(resolve, 200)); // optional delay
             if (!query.trim()) {
-                filteredSubconList.value = allMockSubcons;
+                filteredSubconList.value = [...subconList.value];
             } else {
-                filteredSubconList.value = allMockSubcons.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
+                filteredSubconList.value = subconList.value.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
             }
         };
 
-        // expandedRows for item table
-        const expandedRows = ref<{ [key: string]: boolean }>({});
-
+        // Watch budgetType to reset subcon selection
         watch(
             budgetType,
             async (newType) => {
                 if (newType === 'Unbudgeted Item') {
-                    // Show all subcons initially
-                    filteredSubconList.value = allMockSubcons;
+                    await fetchSubcons();
                     selectedSubcon.value = null;
                 } else {
                     selectedSubcon.value = null;
@@ -205,6 +183,29 @@ export default defineComponent({
             },
             { immediate: true }
         );
+
+        // Reason dropdown
+        const reasonOptions = [
+            { label: 'Damage', value: 'Damage' },
+            { label: 'Defect', value: 'Defect' },
+            { label: 'Missing', value: 'Missing' },
+            { label: 'Prelim', value: 'Prelim' },
+            { label: 'Renovation', value: 'Renovation' },
+            { label: 'Show house', value: 'Show house' },
+            { label: 'VO', value: 'VO' }
+        ];
+
+        const selectedReason = ref<string | null>(null);
+
+        // reset reason dropdown
+        watch(budgetType, (newType) => {
+            if (newType !== 'Unbudgeted Item') {
+                selectedReason.value = null;
+            }
+        });
+
+        // expandedRows for item table
+        const expandedRows = ref<{ [key: string]: boolean }>({});
 
         watch(budgetType, (newType, oldType) => {
             if (budgetSwitching.value || newType === oldType) return;
@@ -622,15 +623,6 @@ export default defineComponent({
             }, 0);
         });
 
-        const canSubmit = computed(() => {
-            const hasItems = items.value.length > 0;
-            const hasRoNumber = roNumber.value.trim() !== '';
-            const hasRoDate = calendarValue.value !== null;
-            const hasBudgetType = budgetType.value !== '';
-
-            return hasItems && hasRoNumber && hasRoDate && hasBudgetType;
-        });
-
         const itemStats = ref<Record<number, BudgetStatisticsResponse>>({});
 
         watch(
@@ -682,7 +674,9 @@ export default defineComponent({
                 project: getCurrentProjectName() || '',
                 roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
                 roNumber: roNumber.value,
+                reason: selectedReason.value || '',
                 requestedBy: getCurrentUsername() || 'Unknown User',
+                subcon: selectedSubcon.value ? selectedSubcon.value.name : 'N/A',
                 items: items.value.map((item) => {
                     const budgetItemId = item.budgetItemId;
                     const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
@@ -701,7 +695,8 @@ export default defineComponent({
                         qtyRequested: stats?.totalRequestedQty ?? 0,
                         qtyOrdered: stats?.totalOrderedQty ?? 0,
                         qtyDelivered: stats?.totalDeliveredQty ?? 0,
-                        balance: stats?.totalBalance ?? 0
+                        balance: stats?.totalBalance ?? 0,
+                        budgetQty: stats?.budgetQty ?? 0
                     };
                 }),
                 overallRemark: overallRemark.value,
@@ -709,6 +704,16 @@ export default defineComponent({
             };
 
             return data;
+        });
+
+        const canSubmit = computed(() => {
+            const hasItems = items.value.length > 0;
+            const hasRoNumber = roNumber.value.trim() !== '';
+            const hasRoDate = calendarValue.value !== null;
+            const hasBudgetType = budgetType.value !== '';
+            const hasGlobalDeliveryDate = globalDeliveryDate.value !== null;
+
+            return hasItems && hasRoNumber && hasRoDate && hasBudgetType && hasGlobalDeliveryDate;
         });
 
         function openPreviewModal() {
@@ -784,6 +789,7 @@ export default defineComponent({
                     CreatedBy: getCurrentUsername() || 'Unknown User',
                     Status: 'Processing',
                     Currency: 'MYR',
+                    Reason: selectedReason.value || '',
                     Items: items.value.map((item) => {
                         const budgetItemId = item.budgetItemId;
                         const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
@@ -803,12 +809,11 @@ export default defineComponent({
                             TotalPOQty: 0,
                             Rate: item.price ?? 0,
                             Notes: item.notes ?? '',
-                            Reason: '',
+                            Reason: selectedReason.value || '',
                             DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                         };
                     })
                 };
-
                 const isDraft = !!route.query.draftId;
                 const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
 
@@ -917,7 +922,7 @@ export default defineComponent({
                             TotalPOQty: 0,
                             Rate: item.price ?? 0,
                             Notes: item.notes ?? '',
-                            Reason: '',
+                            Reason: selectedReason.value || '',
                             DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                         };
                     })
@@ -1010,7 +1015,6 @@ export default defineComponent({
             searchSubcon,
             selectedSubcon,
             filteredSubconList,
-            subconId,
             handleSubconSearch,
             downloadAttachment,
             expandedRows,
@@ -1022,7 +1026,9 @@ export default defineComponent({
             globalDeliveryDate,
             openStockItemModal,
             showStockItemModal,
-            handleStockItemsSelected
+            handleStockItemsSelected,
+            reasonOptions,
+            selectedReason
         };
     }
 });

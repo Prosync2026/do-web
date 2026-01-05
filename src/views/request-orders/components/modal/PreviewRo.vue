@@ -15,8 +15,12 @@
                 </div>
                 <div>
                     <span class="text-gray-600 dark:text-gray-400">Budget Type:</span>
-                    <span class="ml-2 font-medium">{{ summaryData.budgetType }}</span>
+                    <span class="ml-2 font-medium">
+                        {{ summaryData.budgetType }}
+                        <span v-if="summaryData.subcon" class="ml-1 text-sm text-gray-500"> (Subcon: {{ summaryData.subcon }}) </span>
+                    </span>
                 </div>
+
                 <div>
                     <span class="text-gray-600 dark:text-gray-400">Project:</span>
                     <span class="ml-2 font-medium">{{ summaryData.project }}</span>
@@ -86,12 +90,16 @@
                     </template>
                 </Column>
 
-                <Column field="qtyRequested" header="QtyReq" style="min-width: 80px; text-align: center">
+                <Column field="qtyRequested" header="ReqQty" style="min-width: 80px; text-align: center">
                     <template #body="{ data }">
                         {{ data.qtyRequested || '' }}
                     </template>
                 </Column>
-
+                <Column field="budgetQty" header="BgtQty" style="min-width: 80px; text-align: center">
+                    <template #body="{ data }">
+                        {{ data.budgetQty || '' }}
+                    </template>
+                </Column>
                 <Column field="qtyOrdered" header="QtyOrd" style="min-width: 80px; text-align: center">
                     <template #body="{ data }">
                         {{ data.qtyOrdered || '' }}
@@ -128,6 +136,14 @@
             <div class="text-sm">
                 <span class="font-semibold text-gray-700 dark:text-gray-300">Overall Remark:</span>
                 <p class="mt-1 text-gray-600 dark:text-gray-400">{{ summaryData.overallRemark }}</p>
+            </div>
+        </div>
+
+        <!-- Reason -->
+        <div v-if="summaryData.reason" class="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg mb-4">
+            <div class="text-sm">
+                <span class="font-semibold text-gray-700 dark:text-gray-300">Reason:</span>
+                <p class="mt-1 text-gray-600 dark:text-gray-400">{{ summaryData.reason }}</p>
             </div>
         </div>
 

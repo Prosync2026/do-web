@@ -12,46 +12,54 @@
 
         <div class="card p-4 mb-6 shadow">
             <h2 class="text-lg font-semibold mb-4">Request Order Details</h2>
-            <div class="grid grid-cols-3 gap-4">
-                <!-- <div>
-                    <label class="block text-sm text-gray-600 mb-1"> RO Number <span class="text-red-600 font-bold">*</span> </label>
-                    <div class="flex flex-col gap-2">
-                        <InputText v-model="roNumber" type="text" class="w-full" :class="{ 'p-invalid': showValidation && !roNumber.trim() }" placeholder="Enter RO Number" />
-                        <Message v-if="showValidation && !roNumber.trim()" severity="error" icon="pi pi-times-circle">RO Number is required</Message>
-                    </div>
-                </div> -->
 
+            <div class="grid grid-cols-3 gap-4">
+                <!-- Budget Type -->
                 <div>
                     <label class="block text-sm text-gray-600 mb-1"> Budget Type <span class="text-red-600 font-bold">*</span> </label>
                     <div class="flex flex-col gap-2">
                         <Select id="budgetType" v-model="budgetType" :options="budgetOptions" optionLabel="label" optionValue="value" placeholder="Select Budget Type" class="w-full" :invalid="showValidation && !budgetType" />
-                        <Message v-if="showValidation && !budgetType" severity="error" icon="pi pi-times-circle">Budget Type is required</Message>
+                        <Message v-if="showValidation && !budgetType" severity="error" icon="pi pi-times-circle"> Budget Type is required </Message>
                     </div>
                 </div>
 
+                <!-- RO Date -->
                 <div>
-                    <label class="block text-sm text-gray-600 mb-1"> RO Date <span class="text-red-600 font-bold">*</span> </label>
+                    <label class="block text-sm text-gray-600 mb-1"> RO Date </label>
                     <div class="flex flex-col gap-2">
-                        <DatePicker :showIcon="true" :showButtonBar="true" v-model="calendarValue" :invalid="showValidation && !calendarValue" placeholder="Select Date" />
-                        <Message v-if="showValidation && !calendarValue" severity="error" icon="pi pi-times-circle">RO Date is required</Message>
+                        <DatePicker v-model="calendarValue" :showIcon="true" readonlyInput disabled />
+                        <Message v-if="showValidation && !calendarValue" severity="error" icon="pi pi-times-circle"> RO Date is required </Message>
                     </div>
                 </div>
 
+                <!-- Delivery Date -->
                 <div>
                     <label class="block text-sm text-gray-600 mb-1"> Delivery Date <span class="text-red-600 font-bold">*</span> </label>
                     <div class="flex flex-col gap-2">
-                        <DatePicker :showIcon="true" :showButtonBar="true" v-model="globalDeliveryDate" :invalid="showValidation && !globalDeliveryDate" placeholder="Select Delivery Date" @update:modelValue="applyDeliveryDateToAll" />
+                        <DatePicker v-model="globalDeliveryDate" :showIcon="true" placeholder="Select Delivery Date" :invalid="showValidation && !globalDeliveryDate" @update:modelValue="applyDeliveryDateToAll" />
                         <Message v-if="showValidation && !globalDeliveryDate" severity="error" icon="pi pi-times-circle"> Delivery Date is required </Message>
                     </div>
                 </div>
 
-                <!-- Subcon AutoComplete for Unbudgeted Items -->
-                <Motion v-if="budgetType === 'Unbudgeted Item'" :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 1 }">
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-1"> Subcon </label>
-                        <div class="flex flex-col gap-2">
-                            <AutoComplete v-model="selectedSubcon" :suggestions="filteredSubconList" field="name" option-label="name" forceSelection dropdown placeholder="Search Subcon" @complete="handleSubconSearch" />
-                            <Message v-if="showValidation && !selectedSubcon" severity="error" icon="pi pi-times-circle">Subcon is required for Unbudgeted Items</Message>
+                <!-- Subcon & Reason -->
+                <Motion v-if="budgetType === 'Unbudgeted Item'" class="col-span-3" :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 1 }">
+                    <div class="grid grid-cols-12 gap-6">
+                        <!-- Subcon -->
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block text-sm text-gray-600 mb-1">Subcon</label>
+                            <div class="flex flex-col gap-2">
+                                <AutoComplete v-model="selectedSubcon" :suggestions="filteredSubconList" field="name" option-label="name" forceSelection dropdown placeholder="Search Subcon" class="w-full" @complete="handleSubconSearch" />
+                                <Message v-if="showValidation && !selectedSubcon" severity="error" icon="pi pi-times-circle"> Subcon is required for Unbudgeted Items </Message>
+                            </div>
+                        </div>
+
+                        <!-- Reason -->
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block text-sm text-gray-600 mb-1">Reason</label>
+                            <div class="flex flex-col gap-2">
+                                <Dropdown v-model="selectedReason" :options="reasonOptions" optionLabel="label" optionValue="value" placeholder="Select Reason" class="w-full" />
+                                <Message v-if="showValidation && !selectedReason" severity="error" icon="pi pi-times-circle"> Reason is required for Unbudgeted Items </Message>
+                            </div>
                         </div>
                     </div>
                 </Motion>
