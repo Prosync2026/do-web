@@ -37,6 +37,7 @@ const getBudgets = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse
 const getBudgetItems = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
     try {
         const response = await axiosInstance.get('/budget/items', { params: cleanParams(params) });
+        console.log('budget item response', response.data.data);
         return {
             success: response.data.success,
             data: response.data.data || [],

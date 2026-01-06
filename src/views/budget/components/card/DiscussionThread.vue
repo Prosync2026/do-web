@@ -20,6 +20,7 @@
                         <i v-if="index < discussions.length - 1" class="pi pi-angle-right text-gray-400" />
                     </template>
                 </div>
+
                 <!---CHECK ACCESS PERMISSION -->
                 <Button icon="pi pi-plus" label="Add Comment" class="h-8" v-if="canRecommend" @click="createComment = true" />
             </div>
@@ -59,15 +60,9 @@
                                         </thead>
                                         <tbody>
                                             <tr v-for="(row, rIndex) in item.recommendationItem" :key="rIndex">
-                                                <td class="px-3 py-2 border">
-                                                    {{ row.ItemCode }}
-                                                </td>
-                                                <td class="px-3 py-2 border">
-                                                    {{ row.OrderedQty }}
-                                                </td>
-                                                <td class="px-3 py-2 border">
-                                                    {{ row.RecommendedQty }}
-                                                </td>
+                                                <td class="px-3 py-2 border">{{ row.ItemCode }}</td>
+                                                <td class="px-3 py-2 border">{{ row.OrderedQty }}</td>
+                                                <td class="px-3 py-2 border">{{ row.RecommendedQty }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -88,7 +83,8 @@
                                 </div>
                             </div>
 
-                            <Button v-if="editMode && item.id" icon="pi pi-pencil" text rounded @click="openEditModal(item)" />
+                            <!-- ✅ Edit button controlled by role -->
+                            <Button v-if="canEditItem(item)" icon="pi pi-pencil" text rounded @click="openEditModal(item)" />
                         </div>
 
                         <div v-else class="italic text-gray-500">No any data, waiting review</div>
@@ -99,7 +95,6 @@
 
         <!-- ================= Modals ================= -->
         <commentBCRModal v-model:visible="createComment" @submit="init" />
-
         <editcommentBCRModal v-if="editingItem" v-model:visible="editComment" :item="editingItem" @submit="init" />
     </div>
 </template>
@@ -121,6 +116,7 @@ import type { DiscussionItem, ReviewList } from '@/types/budgetChangeRequest.typ
 import { formatDate } from '@/utils/dateHelper';
 import commentBCRModal from '@/views/budget/components/dialog/CommentBCR.vue';
 import editcommentBCRModal from '@/views/budget/components/dialog/EditCommentBCR.vue';
+
 export default defineComponent({
     name: 'DiscussionThread',
     components: {
@@ -139,7 +135,7 @@ export default defineComponent({
             default: true
         }
     },
-    setup() {
+    setup(props) {
         const route = useRoute();
         const store = useBudgetChangeRequestStore();
 
@@ -151,18 +147,19 @@ export default defineComponent({
         const editingItem = ref<DiscussionItem | null>(null);
         const canRecommend = ref(true);
 
-        const ROLE_ORDER = ['QS', 'CM', 'Site', 'PD', 'MNGM'];
         const discussions = ref<DiscussionItem[]>([]);
+        const currentUserRole = ref<string | null>(null);
+
+        const ROLE_ORDER = ['QS', 'CM', 'Site', 'PD', 'MNGM'];
+        const CREATOR_ROLES = ['QS', 'Site'];
 
         const fetchCombinedDiscussion = async () => {
             const bcrId = Number(route.params.budgetChangeRequestId);
-            const ROLE_ORDER = ['QS', 'CM', 'Site', 'PD', 'MNGM'];
 
-            // API calls
             const discussionRes = await store.fetchRecommendationList(bcrId);
             const reviewRes = await budgetChangeRequestService.fetchReviewList(bcrId);
-            console.log('checking discussion res', discussionRes);
-            console.log('review res', reviewRes);
+
+            const reviews: ReviewList[] = Array.isArray(reviewRes) ? reviewRes : reviewRes?.data || [];
 
             discussions.value = ROLE_ORDER.map((role) => {
                 const disc = discussionRes?.find((r) => r.Department === role);
@@ -186,8 +183,6 @@ export default defineComponent({
                         documentUrl: disc.Attachment ? JSON.parse(disc.Attachment) : []
                     } as DiscussionItem;
                 }
-
-                const reviews: ReviewList[] = Array.isArray(reviewRes) ? reviewRes : reviewRes?.data || [];
 
                 const rev = reviews.find((r) => r.ReviewerRole === role);
                 if (rev) {
@@ -225,36 +220,36 @@ export default defineComponent({
                     documentUrl: []
                 } as DiscussionItem;
             });
-
-            console.log('Final Combined Discussions:', discussions.value);
         };
 
         const init = async () => {
             await fetchCombinedDiscussion();
 
             const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const roleCode: string | undefined = user?.user_project_role_code;
-
-            const ROLE_ORDER = ['QS', 'CM', 'Site', 'PD', 'MNGM'];
-            const CREATOR_ROLES = ['QS', 'Site'];
+            currentUserRole.value = user?.user_project_role_code || null;
 
             const bcrId = Number(route.params.budgetChangeRequestId);
 
-            if (!roleCode || !ROLE_ORDER.includes(roleCode)) {
+            if (!currentUserRole.value || !ROLE_ORDER.includes(currentUserRole.value)) {
                 canRecommend.value = false;
-            } else if (CREATOR_ROLES.includes(roleCode)) {
-                console.log('checking this');
+            } else if (CREATOR_ROLES.includes(currentUserRole.value)) {
+                console.log('checking ');
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(bcrId);
             } else {
-                console.log('checking that');
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanReviewRecommendation(bcrId);
             }
 
-            console.log('can recommend', canRecommend.value);
+            const canEditItem = (item: DiscussionItem) => {
+                if (!props.editMode) return false;
+                if (!item.id) return false;
+                if (!currentUserRole.value) return false;
+                return currentUserRole.value === item.role;
+            };
         };
 
         onMounted(init);
 
+        // ==================== Step helpers ====================
         const firstPendingIndex = () => discussions.value.findIndex((d) => !d.id);
 
         const getStepStatusText = (item: DiscussionItem, index: number) => {
@@ -270,7 +265,6 @@ export default defineComponent({
         };
 
         const getStepIcon = (item: DiscussionItem) => (item.id ? 'pi pi-check-circle' : 'pi pi-clock');
-
         const getStepLabel = (item: DiscussionItem) => item.role;
 
         const togglePanel = (index: number) => {
@@ -287,6 +281,14 @@ export default defineComponent({
             window.open(url, '_blank');
         };
 
+        // ==================== New: Check edit permission ====================
+        const canEditItem = (item: DiscussionItem) => {
+            if (!props.editMode) return false;
+            if (!item.id) return false;
+            if (!currentUserRole.value) return false;
+            return currentUserRole.value === item.role;
+        };
+
         return {
             showApprovalFlow,
             active,
@@ -295,6 +297,7 @@ export default defineComponent({
             editComment,
             editingItem,
             canRecommend,
+            canEditItem,
             formatDate,
             getStepLabel,
             getStepIcon,

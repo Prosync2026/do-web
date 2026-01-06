@@ -4,14 +4,13 @@ import type { BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
 import { formatDate } from '@/utils/dateHelper';
-import CommentBCR from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import Badge from 'primevue/badge';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
-    components: { ReusableTable, CommentBCR, Badge },
+    components: { ReusableTable, Badge },
     setup() {
         const BudgetChangeRequestSummaryData = computed<CardItem[]>(() => {
             const reviewCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Under Review').length;
