@@ -14,9 +14,10 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 
-
 import { setGlobalToast } from '@/utils/showNotification.utils';
 import { useToast } from 'primevue/usetoast';
+
+import { vPermission } from '@/directives/permission.directive';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -64,5 +65,7 @@ app.mixin({
         }
     }
 });
+
+app.directive('permission', vPermission);
 
 app.mount('#app');

@@ -1,0 +1,18 @@
+export const PermissionCodes = {
+    // Request Order
+    VIEW_REQUEST_ORDER: 'VIEW_REQUEST_ORDER',
+    CREATE_REQUEST_ORDER: 'CREATE_REQUEST_ORDER',
+    EDIT_REQUEST_ORDER: 'EDIT_REQUEST_ORDER',
+    APPROVE_REJECT_REQUEST_ORDER: 'APPROVE_REJECT_REQUEST_ORDER',
+    DELETE_REQUEST_ORDER: 'DELETE_REQUEST_ORDER',
+
+    // Purchase Order
+    VIEW_PURCHASE_ORDER: 'VIEW_PURCHASE_ORDER',
+    CREATE_PURCHASE_ORDER: 'CREATE_PURCHASE_ORDER',
+
+    // Budget / BCR
+    VIEW_BUDGET: 'VIEW_BUDGET',
+    CREATE_BCR: 'CREATE_BCR'
+} as const;
+
+export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];

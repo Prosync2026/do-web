@@ -11,19 +11,23 @@
         <!-- Header -->
         <div class="card p-4 mb-6 shadow">
             <h3 class="text-lg font-semibold mb-4">Header Information</h3>
+
             <div class="grid grid-cols-2 gap-4 text-sm">
                 <div>
                     <label>Requested By</label>
                     <InputText v-model="requestBy" class="w-full" />
                 </div>
+
                 <div>
                     <label>Date Requested</label>
                     <Calendar v-model="requestDate" dateFormat="yy-mm-dd" class="w-full" showIcon />
                 </div>
+
                 <div>
                     <label>Reason</label>
                     <Dropdown v-model="reason" :options="reasonOptions" optionLabel="label" optionValue="value" class="w-full" />
                 </div>
+
                 <div>
                     <label>Remark</label>
                     <InputText v-model="remark" class="w-full" />
@@ -70,7 +74,7 @@
                     </template>
                 </Column>
 
-                <Column field="NewOrder" header="New Order Qty" style="min-width: 120px">
+                <Column field="NewOrder" header="Request Qty" style="min-width: 120px">
                     <template #body="{ data }">
                         <InputText v-model="data.NewOrder" type="number" class="w-full" />
                     </template>
@@ -123,3 +127,10 @@
         </div>
     </div>
 </template>
+
+<style>
+.p-calendar,
+.p-inputtext {
+    width: 100% !important;
+}
+</style>
