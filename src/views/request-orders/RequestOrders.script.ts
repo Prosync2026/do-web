@@ -11,7 +11,7 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { nextTick } from 'vue';
 
-import { usePermissionStore } from '@/stores/permission/permission.store';
+import { useRequestOrderPermission } from '@/permissions';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import type { ActionType, Order, RequestOrdersFilters } from '../../types/request-order.type';
 import EditRo from './components/modal/EditRo.vue';
@@ -60,6 +60,10 @@ export default defineComponent({
                 userRole = '';
             }
         }
+
+        // permission
+        const { canViewRO, canCreateRO, canEditRO, canApproveRO, canDeleteRO, canAccessROModule } = useRequestOrderPermission();
+
         const isPurchasingRole = userRole === 'PURC';
         const isPmPdRole = userRole === 'PM' || userRole === 'PD';
         // const activeTab = ref(isPurchasingRole ? 'all' : 'all');
@@ -92,19 +96,6 @@ export default defineComponent({
                 console.error(err);
             }
         };
-
-        // access permission
-        const permissionStore = usePermissionStore();
-
-        const canViewRO = computed(() => permissionStore.hasPermission('VIEW_REQUEST_ORDER'));
-
-        const canCreateRO = computed(() => permissionStore.hasPermission('CREATE_REQUEST_ORDER'));
-
-        const canEditRO = computed(() => permissionStore.hasPermission('EDIT_REQUEST_ORDER'));
-
-        const canApproveRO = computed(() => permissionStore.hasPermission('APPROVE_REJECT_REQUEST_ORDER'));
-
-        const canDeleteRO = computed(() => permissionStore.hasPermission('DELETE_REQUEST_ORDER'));
 
         onMounted(() => {
             fetchOrders();

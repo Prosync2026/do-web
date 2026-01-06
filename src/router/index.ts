@@ -1,6 +1,9 @@
 import AppLayout from '@/layout/AppLayout.vue';
+import type { PermissionCode } from '@/permissions';
+import { PermissionCodes } from '@/permissions'; //for type only
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { usePermissionStore } from '@/stores/permission/permission.store';
+
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
@@ -20,7 +23,7 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/request-orders/RequestOrders.vue'),
                 meta: {
                     requiresAuth: true,
-                    permissions: ['VIEW_REQUEST_ORDER'],
+                    permissions: [PermissionCodes.VIEW_REQUEST_ORDER],
                     breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }]
                 }
             },
@@ -30,7 +33,7 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/request-orders/components/page/CreateRequestOrders.vue'),
                 meta: {
                     requiresAuth: true,
-                    permissions: ['CREATE_REQUEST_ORDER'],
+                    permissions: [PermissionCodes.CREATE_REQUEST_ORDER],
                     breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }, { label: 'Create' }]
                 }
             },
@@ -167,7 +170,7 @@ router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
     const permissionStore = usePermissionStore();
 
-    //  Auth check
+    // Auth check
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
         return next({ name: 'login' });
     }
@@ -176,8 +179,8 @@ router.beforeEach(async (to, from, next) => {
         return next({ name: 'dashboard' });
     }
 
-    //  Permission check
-    const requiredPermissions = to.meta.permissions as string[] | undefined;
+    // Permission check
+    const requiredPermissions = to.meta.permissions as PermissionCode[] | undefined;
 
     if (requiredPermissions && requiredPermissions.length > 0) {
         // Ensure permissions are loaded
