@@ -11,6 +11,7 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { nextTick } from 'vue';
 
+import { usePermissionStore } from '@/stores/permission/permission.store';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import type { ActionType, Order, RequestOrdersFilters } from '../../types/request-order.type';
 import EditRo from './components/modal/EditRo.vue';
@@ -92,6 +93,19 @@ export default defineComponent({
             }
         };
 
+        // access permission
+        const permissionStore = usePermissionStore();
+
+        const canViewRO = computed(() => permissionStore.hasPermission('VIEW_REQUEST_ORDER'));
+
+        const canCreateRO = computed(() => permissionStore.hasPermission('CREATE_REQUEST_ORDER'));
+
+        const canEditRO = computed(() => permissionStore.hasPermission('EDIT_REQUEST_ORDER'));
+
+        const canApproveRO = computed(() => permissionStore.hasPermission('APPROVE_REJECT_REQUEST_ORDER'));
+
+        const canDeleteRO = computed(() => permissionStore.hasPermission('DELETE_REQUEST_ORDER'));
+
         onMounted(() => {
             fetchOrders();
             fetchTotalCounts();
@@ -115,59 +129,40 @@ export default defineComponent({
 
         // Table config
         const tableColumns = computed<TableColumn[]>(() => {
-            const baseActions: ActionType[] = ['view'];
-            let actions: ActionType[] = [...baseActions];
-
-            if (isPurchasingRole) {
-                actions = [...baseActions, 'delete'];
-
-                return [
-                    { field: 'rowIndex', header: '#', sortable: true },
-                    { field: 'roNumber', header: 'RO Number', sortable: true },
-                    { field: 'requestedBy', header: 'Requested By', sortable: true },
-                    { field: 'roDate', header: 'RO Date', sortable: true },
-                    { field: 'deliveryDate', header: 'Delivery Date', sortable: true },
-                    { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
-                    { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
-                    { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
-                    {
-                        field: 'actions',
-                        header: 'Actions',
-                        action: true,
-                        actions: (row: Order) => {
-                            const rowActions: ActionType[] = ['view'];
-                            if ((isPurchasingRole || isPmPdRole) && (row.status === 'Processing' || row.status === 'Submitted')) {
-                                rowActions.push('approve', 'reject', 'edit');
-                            }
-
-                            if (isPurchasingRole) {
-                                rowActions.push('delete');
-                            }
-
-                            return rowActions;
-                        }
-                    }
-                ];
-            }
-
-            if (isPmPdRole) {
-                actions = [...actions, 'edit', 'approve', 'reject'];
-            }
-
             return [
                 { field: 'rowIndex', header: '#', sortable: true },
                 { field: 'roNumber', header: 'RO Number', sortable: true },
                 { field: 'requestedBy', header: 'Requested By', sortable: true },
                 { field: 'roDate', header: 'RO Date', sortable: true },
                 { field: 'deliveryDate', header: 'Delivery Date', sortable: true },
-                { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount', visible: false },
+                { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
                 { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
                 { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
                 {
                     field: 'actions',
                     header: 'Actions',
                     action: true,
-                    actions
+                    actions: (row: Order) => {
+                        const actions: ActionType[] = [];
+
+                        if (canViewRO.value) {
+                            actions.push('view');
+                        }
+
+                        if (canEditRO.value && (row.status === 'Processing' || row.status === 'Submitted')) {
+                            actions.push('edit');
+                        }
+
+                        if (canApproveRO.value && (row.status === 'Processing' || row.status === 'Submitted')) {
+                            actions.push('approve', 'reject');
+                        }
+
+                        if (canDeleteRO.value) {
+                            actions.push('delete');
+                        }
+
+                        return actions;
+                    }
                 }
             ];
         });
@@ -480,7 +475,12 @@ export default defineComponent({
             useDashboard,
             handleSearch,
             onSearchWrapper: handleSearch,
-            handleCloseModal
+            handleCloseModal,
+            canDeleteRO,
+            canEditRO,
+            canApproveRO,
+            canCreateRO,
+            canViewRO
         };
     }
 });

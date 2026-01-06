@@ -1,6 +1,8 @@
 import AppLayout from '@/layout/AppLayout.vue';
 import { useAuthStore } from '@/stores/auth/auth.store';
+import { usePermissionStore } from '@/stores/permission/permission.store';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
@@ -17,6 +19,8 @@ const routes: RouteRecordRaw[] = [
                 name: 'request-orders',
                 component: () => import('@/views/request-orders/RequestOrders.vue'),
                 meta: {
+                    requiresAuth: true,
+                    permissions: ['VIEW_REQUEST_ORDER'],
                     breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }]
                 }
             },
@@ -25,6 +29,8 @@ const routes: RouteRecordRaw[] = [
                 name: 'create-request-orders',
                 component: () => import('@/views/request-orders/components/page/CreateRequestOrders.vue'),
                 meta: {
+                    requiresAuth: true,
+                    permissions: ['CREATE_REQUEST_ORDER'],
                     breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }, { label: 'Create' }]
                 }
             },
@@ -157,15 +163,36 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
+    const permissionStore = usePermissionStore();
 
+    //  Auth check
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
         return next({ name: 'login' });
     }
 
     if (to.name === 'login' && authStore.isAuthenticated) {
         return next({ name: 'dashboard' });
+    }
+
+    //  Permission check
+    const requiredPermissions = to.meta.permissions as string[] | undefined;
+
+    if (requiredPermissions && requiredPermissions.length > 0) {
+        // Ensure permissions are loaded
+        if (permissionStore.permissions.length === 0) {
+            await permissionStore.fetchPermissions(authStore.user?.project_id);
+        }
+
+        const hasAccess = requiredPermissions.some((p) => permissionStore.hasPermission(p));
+
+        if (!hasAccess) {
+            return next({
+                name: 'dashboard',
+                query: { unauthorized: '1' }
+            });
+        }
     }
 
     next();
