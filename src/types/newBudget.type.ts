@@ -12,6 +12,7 @@ export interface BudgetItem {
     budgetId: number;
     itemCode: string;
     itemType?: string;
+    remark?: string;
     itemClass?: string;
     description: string;
     description2?: string;
@@ -32,6 +33,9 @@ export interface BudgetItem {
     updatedAt?: string | null;
     updatedBy?: string | null;
     rowIndex?: number;
+    budgetQty?: string;
+    totalOrderedQty?: string;
+    totalRequestedQty?: string;
 }
 
 export interface Budget {

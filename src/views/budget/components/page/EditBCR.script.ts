@@ -30,7 +30,7 @@ export default defineComponent({
         const requestDate = ref<Date | null>(null);
         const reason = ref('');
         const remark = ref('');
-        const items = ref<BudgetChangeItem[]>([]);
+        const items = ref<any[]>([]);
 
         const reasonOptions = ref([
             { label: 'Exceed Budget', value: 'Exceed Budget' },
@@ -40,26 +40,7 @@ export default defineComponent({
             { label: 'Others', value: 'Others' }
         ]);
 
-        const searchTerm = ref('');
-        const selectedLocation = ref<string | null>(null);
-        const selectedElement = ref<string | null>(null);
-        const selectedItemType = ref<string | null>(null);
-
         const allBudgetItems = computed(() => budgetStore.budgetItems);
-
-        const filteredItems = computed(() => {
-            let data = [...allBudgetItems.value];
-
-            if (searchTerm.value) {
-                const search = searchTerm.value.toLowerCase();
-                data = data.filter((item) => item.itemCode.toLowerCase().includes(search) || item.description.toLowerCase().includes(search));
-            }
-            if (selectedLocation.value) data = data.filter((item) => item.location === selectedLocation.value);
-            if (selectedElement.value) data = data.filter((item) => item.element === selectedElement.value);
-            if (selectedItemType.value) data = data.filter((item) => item.itemType === selectedItemType.value);
-
-            return data;
-        });
 
         const fetchBudgetItems = async () => {
             const version = Number(localStorage.getItem('latestBudgetVersion'));
@@ -67,7 +48,11 @@ export default defineComponent({
 
             loading.value = true;
             try {
-                await budgetStore.fetchBudgetItems(version, 1, 9999);
+                await budgetStore.fetchBudgetItems({
+                    budgetId: version,
+                    page: 1,
+                    pageSize: 1000
+                });
             } catch (err) {
                 console.error('Failed to fetch budget items:', err);
             } finally {
@@ -83,7 +68,6 @@ export default defineComponent({
 
             if (singleBudgetChangeRequest.value) {
                 const s = singleBudgetChangeRequest.value as BudgetChangeRequest;
-
                 roNumber.value = s.DocNo ?? '';
                 requestBy.value = s.RequestedBy ?? '';
                 requestDate.value = s.RequestDate ? new Date(s.RequestDate) : null;
@@ -113,39 +97,17 @@ export default defineComponent({
                 await fetchBudgetItems();
             }
         });
-
-        const addItem = () => {
-            items.value.push({
-                Id: 0,
-                BudgetChangeId: 0,
-                BudgetItemId: 0,
-                ItemCode: '',
-                Uom: '',
-                UnitPrice: '0',
-                OrderedQty: '0',
-                NewOrder: '0',
-                ExceededQty: '0',
-                Description: '',
-                Remark: '',
-                CreatedAt: '',
-                CreatedBy: null,
-                UpdatedAt: '',
-                UpdatedBy: null,
-                location: '',
-                element: ''
-            });
-        };
-
-        const removeItem = (index: number) => items.value.splice(index, 1);
-
         const fillSelectedItem = (item: BudgetChangeItem) => {
-            const opt = filteredItems.value.find((b) => b.itemCode === item.ItemCode);
+            const opt = allBudgetItems.value.find((b: any) => b.itemCode === item.ItemCode);
+            console.log('opt', opt);
             if (opt) {
                 item.Description = opt.description;
                 item.Uom = opt.uom ?? '';
-                item.UnitPrice = opt.price?.toString() ?? '0';
-                item.location = opt.location;
-                item.element = opt.element;
+                item.UnitPrice = opt.amount;
+                item.Remark = opt.remark ?? '';
+                item.BudgetQty = opt.budgetQty;
+                item.OrderedQty = opt.totalOrderedQty ?? '';
+                item.NewOrder = opt.totalRequestedQty ?? '';
             }
         };
 
@@ -168,7 +130,6 @@ export default defineComponent({
         const submitRequest = async () => {
             const payload: BudgetChangeRequestPayload = {
                 ProjectId: singleBudgetChangeRequest.value?.ProjectId ?? 0,
-                DocNo: roNumber.value,
                 RequestDate: requestDate.value ? formatDateToAPI(requestDate.value) : '',
                 RequestedBy: requestBy.value,
                 Reason: reason.value,
@@ -202,21 +163,15 @@ export default defineComponent({
             reasonOptions,
             remark,
             items,
-            addItem,
-            removeItem,
+            totalVarianceAmount,
+            allBudgetItems,
             fillSelectedItem,
             calcExceedQty,
             calcExceedPercent,
             calcEstimatedExceed,
-            totalVarianceAmount,
             getColorClass,
             submitRequest,
-            goBack: () => router.push('/bcr'),
-            filteredItems,
-            searchTerm,
-            selectedLocation,
-            selectedElement,
-            selectedItemType
+            goBack: () => router.push('/bcr')
         };
     }
 });

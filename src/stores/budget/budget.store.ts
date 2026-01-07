@@ -106,6 +106,7 @@ export const useBudgetStore = defineStore('budget', () => {
                 price: Number(item.Rate),
                 total: Number(item.Quantity) * Number(item.Rate),
                 unit: item.Unit,
+                remark: item.Remark,
                 rate: Number(item.Rate) || 0,
                 amount: (Number(item.Quantity) || 0) * (Number(item.Rate) || 0),
                 wastage: Number(item.Wastage) || 0,

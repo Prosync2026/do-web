@@ -39,14 +39,12 @@
         <div class="card p-4 shadow overflow-auto">
             <div class="flex justify-between mb-4">
                 <h3 class="text-lg font-semibold">Materials</h3>
-                <!-- Enhancement : In the API haven't doing can create or delete budget item -->
-                <!-- <Button label="Add Item" icon="pi pi-plus" @click="addItem" outlined /> -->
             </div>
 
             <DataTable :value="items" class="text-sm" style="min-width: 2000px">
                 <Column field="ItemCode" header="Item Code" style="min-width: 150px">
                     <template #body="{ data }">
-                        <Dropdown v-model="data.ItemCode" :options="filteredItems.map((b) => ({ label: b.itemCode, value: b.itemCode }))" optionLabel="label" optionValue="value" @change="() => fillSelectedItem(data)" class="w-full" />
+                        <Dropdown v-model="data.ItemCode" :options="allBudgetItems.map((b) => ({ label: b.itemCode, value: b.itemCode }))" optionLabel="label" optionValue="value" @change="() => fillSelectedItem(data)" class="w-full" />
                     </template>
                 </Column>
 
@@ -107,13 +105,6 @@
                         <InputText v-model="data.Remark" class="w-full" />
                     </template>
                 </Column>
-
-                <!-- Enhancement : In the API haven't doing can create or delete budget item -->
-                <!-- <Column header="Action" style="min-width: 80px">
-                    <template #body="{ index }">
-                        <Button icon="pi pi-trash" severity="danger" text @click="removeItem(index)" />
-                    </template>
-                </Column> -->
             </DataTable>
         </div>
 

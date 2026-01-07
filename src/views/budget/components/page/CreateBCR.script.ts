@@ -1,11 +1,12 @@
 // CreateBCR.script.ts
+import { useBudgetStore } from '@/stores/budget/budget.store';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRTableItem, BudgetChangeItemPayload, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
 import { getCurrentProjectName } from '@/utils/contextHelper';
 import MeterialModal from '@/views/request-orders/components/modal/CreateRo.vue';
 import { Motion } from '@motionone/vue';
 import { useToast } from 'primevue';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -35,26 +36,72 @@ export default defineComponent({
             { label: 'Others', value: 'Others' }
         ]);
 
-        // --- Items Table ---
-        const items = ref<BCRTableItem[]>([]);
+        const budgetStore = useBudgetStore();
 
-        const fillItemDetails = (item: BCRTableItem) => {
-            const selected = items.value.find((o) => o.itemCode === item.itemCode);
-            if (selected) {
-                item.description = selected.description ?? '';
-                item.uom = selected.uom ?? '';
-            }
+        // --- Current Budget Version ---
+        let latestVersionStr = localStorage.getItem('latestBudgetVersion');
+        const currentVersion = ref<number | null>(latestVersionStr !== null && !isNaN(Number(latestVersionStr)) ? Number(latestVersionStr) : null);
+
+        // --- Budget Items from Store ---
+
+        const budgetItems = ref<any[]>([]);
+
+        const fetchBudgetItems = async () => {
+            if (!currentVersion.value) return;
+
+            await budgetStore.fetchBudgetItems({
+                budgetId: currentVersion.value,
+                page: 1,
+                pageSize: 1000
+            });
+
+            budgetItems.value = budgetStore.budgetItems.map((item: any) => ({
+                ...item,
+                value: item.itemCode,
+                label: `${item.itemCode} - ${item.description}`
+            }));
         };
+
+        onMounted(() => {
+            fetchBudgetItems();
+        });
+
+        // --- BCR Items Table ---
+        const items = ref<any[]>([]);
+
+        const fillItemDetails = (row: BCRTableItem) => {
+            const selected = budgetItems.value.find((b) => b.value === row.itemCode);
+            if (!selected) return;
+
+            row.budgetId = selected.budgetId;
+            row.description = selected.description;
+            row.uom = selected.uom;
+            row.unitPrice = selected.unitPrice;
+            row.remark = selected.remark;
+            row.location1 = selected.location1;
+            row.location2 = selected.location2;
+            row.category = selected.category;
+            row.element = selected.element;
+            row.subElement = selected.subElement;
+            row.subsubElement = selected.subsubElement;
+            row.wastage = selected.wastage;
+
+            row.statistics = {
+                budgetQty: selected.budgetQty || 0,
+                totalOrderedQty: selected.totalOrderedQty || 0,
+                totalRequestedQty: selected.totalRequestedQty || 0
+            };
+        };
+
         const getItemLabel = (itemCode: string) => {
-            const found = items.value.find((o) => o.itemCode === itemCode);
-            return found ? found.description : itemCode;
+            const found = budgetItems.value.find((b) => b.value === itemCode);
+            return found ? found.label : itemCode;
         };
 
         // --- Modal ---
         const showBulkItemModal = ref(false);
         const openMeterial = () => (showBulkItemModal.value = true);
         const handleBulkItems = (selectedMaterials: any[]) => {
-            console.log('selectedMaterials', selectedMaterials);
             selectedMaterials.forEach((mat) => {
                 const isDuplicate = items.value.some((i) => i.id === mat.id);
 
@@ -215,7 +262,8 @@ export default defineComponent({
             submitRequest,
             goBack,
             projectName,
-            showValidation
+            showValidation,
+            budgetItems
         };
     }
 });

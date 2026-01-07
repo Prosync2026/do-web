@@ -60,9 +60,9 @@
                     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
                         <DataTable :value="items" :paginator="items?.length > 0" :rows="10" :rowsPerPageOptions="[10]" resizableColumns columnResizeMode="expand" scrollable scrollHeight="600px" tableStyle="min-width: 140rem" class="overflow-hidden">
                             <!-- Item Code -->
-                            <Column field="itemCode" header="Item Code" style="min-width: 12rem">
+                            <Column field="itemCode" header="Item Code" style="min-width: 14rem">
                                 <template #body="slotProps">
-                                    <Dropdown v-model="slotProps.data.itemCode" :options="itemOptions" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(slotProps.data)">
+                                    <Dropdown v-model="slotProps.data.itemCode" :options="budgetItems" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(slotProps.data)">
                                         <template #option="slotProps">
                                             <div class="flex flex-col">
                                                 <span class="font-medium">{{ slotProps.option.label }}</span>

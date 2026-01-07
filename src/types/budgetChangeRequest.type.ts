@@ -31,14 +31,15 @@ export interface BudgetChangeItem {
     Id: number;
     BudgetChangeId: number;
     BudgetItemId: number;
+    BudgetQty?: string;
     ItemCode: string;
     Uom: string | null;
-    UnitPrice: string;
+    UnitPrice: string | number;
     OrderedQty: string;
     NewOrder: string;
     ExceededQty: string;
     Description: string;
-    Remark: string;
+    Remark?: string;
     CreatedAt: string;
     CreatedBy: string | null;
     UpdatedAt: string;
@@ -97,6 +98,7 @@ export interface BudgetChangeItemPayload {
 }
 
 export interface BudgetChangeRequestPayload {
+    ProjectId?: string | number;
     RequestDate: string;
     RequestedBy: string;
     Department: string;
