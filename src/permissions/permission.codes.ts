@@ -1,4 +1,5 @@
 export const PermissionCodes = {
+    VIEW_PRICING: 'VIEW_PRICING',
     // Request Order
     VIEW_REQUEST_ORDER: 'VIEW_REQUEST_ORDER',
     CREATE_REQUEST_ORDER: 'CREATE_REQUEST_ORDER',
