@@ -148,20 +148,15 @@ export default defineComponent({
             }
 
             console.log('payload', payload);
-            budgetChangeRequestService
-                .rolesReviewRecommendation(budgetChangeRequestId, payload)
-                .then(() => {
-                    selection.value = '';
-                    reasonSelection.value = '';
-                    remark.value = '';
-                    adjustments.value = [];
-                    selectedFiles.value = [];
-                    emit('update:visible', false);
-                    emit('submit');
-                })
-                .catch(() => {
-                    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to submit review', life: 3000 });
-                });
+            budgetChangeRequestService.rolesReviewRecommendation(budgetChangeRequestId, payload).then(() => {
+                selection.value = '';
+                reasonSelection.value = '';
+                remark.value = '';
+                adjustments.value = [];
+                selectedFiles.value = [];
+                emit('update:visible', false);
+                emit('submit');
+            });
         }
 
         return {

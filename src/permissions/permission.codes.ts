@@ -1,4 +1,5 @@
 export const PermissionCodes = {
+    VIEW_PRICING: 'VIEW_PRICING',
     // Request Order
     VIEW_REQUEST_ORDER: 'VIEW_REQUEST_ORDER',
     CREATE_REQUEST_ORDER: 'CREATE_REQUEST_ORDER',
@@ -12,7 +13,12 @@ export const PermissionCodes = {
 
     // Budget / BCR
     VIEW_BUDGET: 'VIEW_BUDGET',
-    CREATE_BCR: 'CREATE_BCR'
+    CREATE_BCR: 'CREATE_BCR',
+    EDIT_BCR: 'EDIT_BCR',
+    IMPORT_NEW_BUDGET: 'IMPORT_NEW_BUDGET',
+
+    // Deliveries
+    VIEW_DELIVERY_ORDER: 'VIEW_DELIVERY_ORDER'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];

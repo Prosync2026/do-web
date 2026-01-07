@@ -113,7 +113,10 @@ export const useBudgetStore = defineStore('budget', () => {
                 createdAt: formatDate(item.CreatedAt),
                 createdBy: item.CreatedBy,
                 updatedAt: item.UpdatedAt ? formatDate(item.UpdatedAt) : null,
-                updatedBy: item.UpdatedBy
+                updatedBy: item.UpdatedBy,
+                budgetQty: item.statistics?.budgetQty,
+                totalOrderedQty: item.statistics?.totalOrderedQty,
+                totalRequestedQty: item.statistics?.totalRequestedQty
             }));
 
             pagination.value = mapPagination(response.pagination);

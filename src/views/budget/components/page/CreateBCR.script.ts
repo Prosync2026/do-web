@@ -1,7 +1,7 @@
 // CreateBCR.script.ts
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRTableItem, BudgetChangeItemPayload, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
-import { getCurrentProjectId, getCurrentProjectName } from '@/utils/contextHelper';
+import { getCurrentProjectName } from '@/utils/contextHelper';
 import MeterialModal from '@/views/request-orders/components/modal/CreateRo.vue';
 import { Motion } from '@motionone/vue';
 import { useToast } from 'primevue';
@@ -54,6 +54,7 @@ export default defineComponent({
         const showBulkItemModal = ref(false);
         const openMeterial = () => (showBulkItemModal.value = true);
         const handleBulkItems = (selectedMaterials: any[]) => {
+            console.log('selectedMaterials', selectedMaterials);
             selectedMaterials.forEach((mat) => {
                 const isDuplicate = items.value.some((i) => i.id === mat.id);
 
@@ -68,6 +69,7 @@ export default defineComponent({
                 }
                 items.value.push({
                     id: mat.id || mat.Id || 0,
+                    budgetId: mat.budgetId,
                     itemCode: mat.itemCode || mat.ItemCode || '',
                     description: mat.description || mat.Name || '',
                     uom: mat.uom || mat.Uom || '',
@@ -75,10 +77,15 @@ export default defineComponent({
                     remark: mat.remark || mat.Remark || '',
                     location1: mat.location1 || '',
                     location2: mat.location2 || '',
+                    category: mat.category,
+                    element: mat.elementCode,
+                    subElement: mat.subElement,
+                    subsubElement: mat.subsubElement,
+                    wastage: mat.wastage,
                     statistics: {
-                        budgetQty: Number(mat.statistics?.budgetQty || 0),
-                        totalOrderedQty: Number(mat.statistics?.totalOrderedQty || 0),
-                        totalRequestedQty: Number(mat.statistics?.totalRequestedQty || 0)
+                        budgetQty: Number(mat.budgetQty || 0),
+                        totalOrderedQty: Number(mat.totalOrderedQty || 0),
+                        totalRequestedQty: Number(mat.totalRequestedQty || 0)
                     }
                 });
             });
@@ -146,15 +153,18 @@ export default defineComponent({
             }
 
             const payload: BudgetChangeRequestPayload = {
-                ProjectId: getCurrentProjectId(),
+                BudgetId: items.value[0]?.budgetId,
                 RequestDate: requestDate.value,
                 RequestedBy: requestBy.value,
                 Department: department.value,
+                Reason: selectedReason.value || '',
                 Remark: remarks.value,
                 TotalAmount: totalVarianceAmount.value,
-                Reason: selectedReason.value || '',
+
                 Type: 'BudgetChangeRequest',
                 Items: items.value.map<BudgetChangeItemPayload>((i) => ({
+                    BudgetItemId: i.id,
+                    ItemType: 'ExistingItem',
                     ItemCode: i.itemCode,
                     Name: i.description,
                     Uom: i.uom,
@@ -164,11 +174,17 @@ export default defineComponent({
                     NewOrder: i.statistics.totalRequestedQty,
                     Description: i.description,
                     Remark: i.remark,
-                    location: i.location1 || '',
-                    element: ''
+                    Location1: i.location1 || '',
+                    Location2: i.location2 || '',
+                    Element: i.element || '',
+                    SubEelement: i.subElement || '',
+                    SubSubElement: i.subsubElement || '',
+                    Category: i.category || '',
+                    Wastage: i.wastage,
+                    ExceededQty: calcExceedQty(i)
                 }))
             };
-
+            console.log('Submitting BCR Payload', payload);
             const result = await budgetCRStore.createBudgetChangeRequest(payload);
             if (result) {
                 router.push({ name: 'budgetChangeRequest' });

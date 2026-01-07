@@ -34,7 +34,7 @@ export const BCR_ROLE_CONFIG: Record<BcrRoleEnum, BcrRoleConfig> = {
             { value: BcrRecommendationEnum.REJECT_CHANGE_QS, label: 'Reject Budget Qty according to QS recommendation' }
         ]
     },
-    PM: {
+    SITE: {
         reasons: PM_REASONS,
         recommendations: [
             { value: BcrRecommendationEnum.Specific_Quantity, label: 'Please change Budget Quantity' },

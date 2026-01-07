@@ -1,4 +1,6 @@
+import { PermissionCodes } from '@/permissions';
 import { requestOrderService } from '@/services/requestOrder.service';
+import { usePermissionStore } from '@/stores/permission/permission.store';
 import type { MenuItemType } from '@/types/sidebar.type';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import MenuItem from './MenuItem.vue';
@@ -8,6 +10,17 @@ export default defineComponent({
     setup() {
         const userRole = ref<string | null>(null);
         const pendingCount = ref(0);
+
+        // access permission
+        const permissionStore = usePermissionStore();
+
+        const canViewRO = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_REQUEST_ORDER));
+
+        const canViewBudget = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_BUDGET));
+
+        const canViewPO = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_PURCHASE_ORDER));
+
+        const canViewDelivery = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_DELIVERY_ORDER));
 
         const loadUserRole = () => {
             try {
@@ -35,6 +48,7 @@ export default defineComponent({
                     {
                         label: 'Budget',
                         icon: 'pi pi-fw pi-chart-bar',
+                        visible: canViewBudget.value,
                         items: [
                             { label: 'Budget List', icon: 'pi pi-fw pi-ticket', to: '/budget' },
                             { label: 'Budget Change Request', icon: 'pi pi-fw pi-tags', to: '/bcr' }
@@ -44,47 +58,32 @@ export default defineComponent({
                         label: 'Request Orders',
                         icon: 'pi pi-fw pi-shopping-cart',
                         to: '/request-orders',
-                        badge: pendingCount.value
+                        badge: pendingCount.value,
+                        visible: canViewRO.value
                     },
-                    { label: 'Purchase Orders', icon: 'pi pi-fw pi-book', to: '/purchase-orders' },
-                    { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' }
+                    {
+                        label: 'Purchase Orders',
+                        icon: 'pi pi-fw pi-book',
+                        to: '/purchase-orders',
+                        visible: canViewPO.value
+                    },
+                    {
+                        label: 'Deliveries',
+                        icon: 'pi pi-fw pi-car',
+                        to: '/deliveries',
+                        visible: canViewDelivery.value
+                    }
                 ]
             }
         ]);
 
-        const rolePermissions = {
-            purchasing: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders'],
-            site: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders', 'Deliveries'],
-            pm: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders', 'Deliveries']
-        };
-
-        const filterMenuByRole = (menuItems: MenuItemType[], allowedItems: string[]) =>
-            menuItems
-                .map((item) => {
-                    if (item.separator) return item;
-                    const isAllowed = allowedItems.includes(item.label || '');
-                    if (!isAllowed && !item.items) return { ...item, visible: false };
-                    if (item.items) {
-                        const filteredItems = item.items.filter((sub) => allowedItems.includes(sub.label || ''));
-                        if (filteredItems.length === 0 && !isAllowed) return { ...item, visible: false };
-                        return { ...item, items: filteredItems, visible: filteredItems.length > 0 || isAllowed };
-                    }
-                    return { ...item, visible: isAllowed };
-                })
-                .filter((item) => item.visible !== false || item.separator);
-
-        const model = computed<MenuItemType[]>(() => {
-            if (!userRole.value) return fullMenuModel.value;
-            const allowedItems = rolePermissions[userRole.value.toLowerCase() as keyof typeof rolePermissions];
-            if (!allowedItems) return fullMenuModel.value;
-            return filterMenuByRole(fullMenuModel.value, allowedItems);
-        });
+        const model = fullMenuModel;
 
         onMounted(async () => {
             loadUserRole();
             await fetchTotalPending(); // fetch total pending count for the menu
         });
 
-        return { model };
+        return { model, canViewRO, canViewBudget, canViewPO, canViewDelivery };
     }
 });

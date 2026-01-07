@@ -1,17 +1,17 @@
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { usePermission } from '@/permissions/budgetChangeRequest.permission';
+import { PermissionCodes } from '@/permissions/permission.codes';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
 import { formatDate } from '@/utils/dateHelper';
-import CommentBCR from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import Badge from 'primevue/badge';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
 export default defineComponent({
     name: 'BudgetChangeRequest',
-    components: { ReusableTable, CommentBCR, Badge },
+    components: { ReusableTable, Badge },
     setup() {
         const BudgetChangeRequestSummaryData = computed<CardItem[]>(() => {
             const reviewCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Under Review').length;
@@ -29,20 +29,30 @@ export default defineComponent({
                 { title: 'Total Value', value: `$ ${formattedTotal}`, description: 'Estimated budget impact', icon: 'pi pi-chart-line', color: 'blue' }
             ];
         });
-
         const budgetCRStore = useBudgetChangeRequestStore();
         onMounted(async () => {
             await budgetCRStore.fetchBudgetChangesRequestList();
         });
 
-        const budgetChangeRequestData = computed(() => {
-            return budgetCRStore.budgetChangeRequestList.map((item) => ({
-                ...item,
-                actions: item.Status === 'Approved' ? ['view'] : ['view', 'edit']
-            }));
-        });
+        const { hasPermission } = usePermission();
 
-        console.log('budgetChangeRequestData', budgetChangeRequestData);
+        const canCreateBCR = hasPermission(PermissionCodes.CREATE_BCR);
+        const canEditBCR = hasPermission(PermissionCodes.EDIT_BCR);
+        const canViewPricing = hasPermission(PermissionCodes.VIEW_PRICING);
+        const budgetChangeRequestData = computed(() => {
+            return budgetCRStore.budgetChangeRequestList.map((item) => {
+                const actions = ['view'];
+
+                if (canEditBCR.value && item.Status !== 'Approved') {
+                    actions.push('edit');
+                }
+
+                return {
+                    ...item,
+                    actions
+                };
+            });
+        });
 
         const searchTerm = ref<string>('');
         const activeFilters = ref<Record<string, string | number | boolean> | null>(null);
@@ -54,6 +64,7 @@ export default defineComponent({
                 placeholder: 'All Status',
                 options: [
                     { label: 'All Status', value: '' },
+                    { label: 'Draft', value: 'Draft' },
                     { label: 'Under Review', value: 'Under Review' },
                     { label: 'Approved', value: 'Approved' },
                     { label: 'Rejected', value: 'Rejected' }
@@ -80,20 +91,32 @@ export default defineComponent({
             const end = start + budgetCRStore.pagination.pageSize;
             return filteredRequests.value.slice(start, end);
         });
-        const tableColumns = computed<TableColumn[]>(() => [
-            { field: 'rowIndex', header: '#' },
-            { field: 'DocNo', header: 'BCR No' },
-            { field: 'RequestedBy', header: 'Requested By' },
-            {
-                field: 'RequestDate',
-                header: 'Date Requested',
-                body: (rowData: BudgetChangeRequest) => formatDate(rowData.RequestDate)
-            },
-            { field: 'Status', header: 'Status', bodySlot: 'status', style: 'min-width: 120px; width: 120px' },
-            { field: 'Remark', header: 'Remark' },
-            { field: 'TotalAmount', header: 'Variance Amount', bodySlot: 'TotalAmount' },
-            { field: 'actions', header: 'Actions', action: true }
-        ]);
+        const tableColumns = computed<TableColumn[]>(() => {
+            const columns: TableColumn[] = [
+                { field: 'rowIndex', header: '#' },
+                { field: 'DocNo', header: 'BCR No' },
+                { field: 'RequestedBy', header: 'Requested By' },
+                {
+                    field: 'RequestDate',
+                    header: 'Date Requested',
+                    body: (rowData: BudgetChangeRequest) => formatDate(rowData.RequestDate)
+                },
+                { field: 'Status', header: 'Status', bodySlot: 'status', style: 'min-width: 120px; width: 120px' },
+                { field: 'Remark', header: 'Remark' }
+            ];
+
+            if (canViewPricing.value) {
+                columns.push({
+                    field: 'TotalAmount',
+                    header: 'Variance Amount',
+                    bodySlot: 'TotalAmount'
+                });
+            }
+
+            columns.push({ field: 'actions', header: 'Actions', action: true });
+
+            return columns;
+        });
 
         function getStatusSeverity(Status: string) {
             switch (Status) {
@@ -152,19 +175,20 @@ export default defineComponent({
             activeFilters,
             extraFilters,
             tableColumns,
-            getStatusSeverity,
-            handleSearch,
-            handleFilterChange,
-            handleActionClick,
+            canCreateBCR,
             showCommentModal,
             selectedRequestNo,
             BudgetChangeRequestSummaryData,
             paginatedRequests,
-            handlePageChange,
-            handlePageSizeChange,
             pagination: budgetCRStore.pagination,
             budgetCRStore,
-            numberedRequests
+            numberedRequests,
+            getStatusSeverity,
+            handleSearch,
+            handleFilterChange,
+            handleActionClick,
+            handlePageChange,
+            handlePageSizeChange
         };
     }
 });

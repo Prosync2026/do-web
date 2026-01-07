@@ -115,7 +115,7 @@ const fetchRecommendationList = async (budgetChangeRequestId: number): Promise<R
 const checkingUserCanCreateRecommendation = async (budgetChangeRequestId: number): Promise<boolean> => {
     try {
         const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/recommendation/info`);
-
+        console.log('response', response.data.data);
         return response.data.data.canRecommend;
     } catch (error) {
         showError(error, 'Failed to fetch recommendation list.');
@@ -154,11 +154,8 @@ const createBCRRecommendation = async (budgetChangeRequestId: number, payload: B
             data: response.data
         };
     } catch (error: any) {
-        return {
-            success: false,
-            message: error?.response?.data?.message || error.message || 'Submit failed',
-            data: {} as CreateRecommendationData
-        };
+        showError(error, 'Failed to create budget changes recommendation.');
+        throw error;
     }
 };
 
@@ -182,11 +179,8 @@ const editBCRRecommendation = async (budgetChangeRequestId: number, recommendati
             data: response.data
         };
     } catch (error: any) {
-        return {
-            success: false,
-            message: error.response?.data?.message || error.response?.data?.error || 'Failed to create Recommendation.',
-            data: {} as CreateRecommendationData
-        };
+        showError(error, 'Failed to edit budget changes recommendation.');
+        throw error;
     }
 };
 
@@ -200,11 +194,8 @@ const rolesReviewRecommendation = async (budgetChangeRequestId: number, payload:
             data: response.data
         };
     } catch (error: any) {
-        return {
-            success: false,
-            message: error.response?.data?.message || error.response?.data?.error || 'Failed to submit final decision.',
-            data: {}
-        };
+        showError(error, 'Failed to submit review recommendation.');
+        throw error;
     }
 };
 

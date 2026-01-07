@@ -7,7 +7,12 @@ export interface BCRTableItem {
     remark?: string;
     location1?: string;
     location2?: string;
-
+    budgetId?: number;
+    category: string;
+    element: string;
+    subElement: string;
+    subsubElement: string;
+    wastage: string;
     statistics: {
         budgetQty: number;
         totalOrderedQty: number;
@@ -81,18 +86,23 @@ export interface BudgetChangeItemPayload {
     NewOrder: number;
     Description: string;
     Remark?: string;
-    location?: string;
-    element?: string;
+    Location1?: string;
+    Location2?: string;
+    Category?: string;
+    Element?: string;
+    SubElement?: string;
+    SubSubElement?: string;
+    Wastage?: string;
+    ExceededQty?: number;
 }
 
 export interface BudgetChangeRequestPayload {
-    ProjectId: number;
-    DocNo?: string;
     RequestDate: string;
     RequestedBy: string;
     Department: string;
     Remark: string;
     TotalAmount: number;
+    BudgetId?: number;
     Reason: string;
     Type: 'BudgetChangeRequest';
     Items: BudgetChangeItemPayload[];
