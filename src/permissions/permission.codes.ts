@@ -15,7 +15,10 @@ export const PermissionCodes = {
     VIEW_BUDGET: 'VIEW_BUDGET',
     CREATE_BCR: 'CREATE_BCR',
     EDIT_BCR: 'EDIT_BCR',
-    IMPORT_NEW_BUDGET: 'IMPORT_NEW_BUDGET'
+    IMPORT_NEW_BUDGET: 'IMPORT_NEW_BUDGET',
+
+    // Deliveries
+    VIEW_DELIVERY_ORDER: 'VIEW_DELIVERY_ORDER'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];
