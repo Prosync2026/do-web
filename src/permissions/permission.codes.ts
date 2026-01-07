@@ -12,7 +12,9 @@ export const PermissionCodes = {
 
     // Budget / BCR
     VIEW_BUDGET: 'VIEW_BUDGET',
-    CREATE_BCR: 'CREATE_BCR'
+    CREATE_BCR: 'CREATE_BCR',
+    EDIT_BCR: 'EDIT_BCR',
+    IMPORT_NEW_BUDGET: 'IMPORT_NEW_BUDGET'
 } as const;
 
 export type PermissionCode = (typeof PermissionCodes)[keyof typeof PermissionCodes];

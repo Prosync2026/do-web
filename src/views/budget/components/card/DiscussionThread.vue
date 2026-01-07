@@ -150,8 +150,8 @@ export default defineComponent({
         const discussions = ref<DiscussionItem[]>([]);
         const currentUserRole = ref<string | null>(null);
 
-        const ROLE_ORDER = ['QS', 'CM', 'Site', 'PD', 'MNGM'];
-        const CREATOR_ROLES = ['QS', 'Site'];
+        const ROLE_ORDER = ['QS', 'CM', 'SITE', 'PD', 'MNGM'];
+        const CREATOR_ROLES = ['QS', 'SITE'];
 
         const fetchCombinedDiscussion = async () => {
             const bcrId = Number(route.params.budgetChangeRequestId);
@@ -162,7 +162,8 @@ export default defineComponent({
             const reviews: ReviewList[] = Array.isArray(reviewRes) ? reviewRes : reviewRes?.data || [];
 
             discussions.value = ROLE_ORDER.map((role) => {
-                const disc = discussionRes?.find((r) => r.Department === role);
+                const disc = discussionRes?.find((r) => r.Department?.toLowerCase() === role.toLowerCase());
+
                 if (disc) {
                     return {
                         id: disc.Id,

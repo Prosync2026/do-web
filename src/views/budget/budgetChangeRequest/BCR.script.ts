@@ -1,4 +1,6 @@
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { usePermission } from '@/permissions/budgetChangeRequest.permission';
+import { PermissionCodes } from '@/permissions/permission.codes';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import type { CardItem } from '@/types/card.type';
@@ -7,7 +9,6 @@ import { formatDate } from '@/utils/dateHelper';
 import Badge from 'primevue/badge';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
 export default defineComponent({
     name: 'BudgetChangeRequest',
     components: { ReusableTable, Badge },
@@ -28,20 +29,31 @@ export default defineComponent({
                 { title: 'Total Value', value: `$ ${formattedTotal}`, description: 'Estimated budget impact', icon: 'pi pi-chart-line', color: 'blue' }
             ];
         });
-
         const budgetCRStore = useBudgetChangeRequestStore();
         onMounted(async () => {
             await budgetCRStore.fetchBudgetChangesRequestList();
         });
 
-        const budgetChangeRequestData = computed(() => {
-            return budgetCRStore.budgetChangeRequestList.map((item) => ({
-                ...item,
-                actions: item.Status === 'Approved' ? ['view'] : ['view', 'edit']
-            }));
-        });
+        const { hasPermission } = usePermission();
 
-        console.log('budgetChangeRequestData', budgetChangeRequestData);
+        const canCreateBCR = hasPermission(PermissionCodes.CREATE_BCR);
+
+        const canEditBCR = hasPermission(PermissionCodes.EDIT_BCR);
+
+        const budgetChangeRequestData = computed(() => {
+            return budgetCRStore.budgetChangeRequestList.map((item) => {
+                const actions = ['view'];
+
+                if (canEditBCR.value && item.Status !== 'Approved') {
+                    actions.push('edit');
+                }
+
+                return {
+                    ...item,
+                    actions
+                };
+            });
+        });
 
         const searchTerm = ref<string>('');
         const activeFilters = ref<Record<string, string | number | boolean> | null>(null);
@@ -53,6 +65,7 @@ export default defineComponent({
                 placeholder: 'All Status',
                 options: [
                     { label: 'All Status', value: '' },
+                    { label: 'Draft', value: 'Draft' },
                     { label: 'Under Review', value: 'Under Review' },
                     { label: 'Approved', value: 'Approved' },
                     { label: 'Rejected', value: 'Rejected' }
@@ -151,19 +164,20 @@ export default defineComponent({
             activeFilters,
             extraFilters,
             tableColumns,
-            getStatusSeverity,
-            handleSearch,
-            handleFilterChange,
-            handleActionClick,
+            canCreateBCR,
             showCommentModal,
             selectedRequestNo,
             BudgetChangeRequestSummaryData,
             paginatedRequests,
-            handlePageChange,
-            handlePageSizeChange,
             pagination: budgetCRStore.pagination,
             budgetCRStore,
-            numberedRequests
+            numberedRequests,
+            getStatusSeverity,
+            handleSearch,
+            handleFilterChange,
+            handleActionClick,
+            handlePageChange,
+            handlePageSizeChange
         };
     }
 });

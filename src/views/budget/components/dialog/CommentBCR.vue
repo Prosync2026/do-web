@@ -89,7 +89,7 @@
             </div>
 
             <!-- File Upload -->
-            <div v-if="user.role === 'QS' || user.role === 'PM'" class="text-sm">
+            <div v-if="user.role === 'QS' || user.role === 'SITE'" class="text-sm">
                 <label class="block font-medium text-gray-700">Upload Attachment (Optional)</label>
                 <FileUpload mode="advanced" name="files" :auto="false" :customUpload="true" @select="onFileSelect" accept="image/*" :maxFileSize="1000000" chooseLabel="Upload Attachment" :multiple="true" class="text-sm">
                     <template #empty>

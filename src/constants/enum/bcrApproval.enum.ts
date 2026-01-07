@@ -1,7 +1,7 @@
 export enum BcrRoleEnum {
     QS = 'QS',
     CM = 'CM',
-    PM = 'PM',
+    SITE = 'SITE',
     PD = 'PD',
     MNGM = 'MNGM'
 }
@@ -27,5 +27,5 @@ export enum BcrRecommendationEnum {
     APPROVE_QS_CHANGE = 'Approve_QS',
     APPROVE_SITE_CHANGE = 'Approve_SITE',
     APPROVE_ORIGINAL = 'Approve_As_Requested',
-    APPROVE_PD_CHANGE = 'Approve_PD',
+    APPROVE_PD_CHANGE = 'Approve_PD'
 }
