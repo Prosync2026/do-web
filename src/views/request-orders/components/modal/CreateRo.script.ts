@@ -32,9 +32,12 @@ export default defineComponent({
         const localVisible = ref(props.visible);
         watch(
             () => props.visible,
-            (val) => (localVisible.value = val)
+            (val) => {
+                if (localVisible.value !== val) {
+                    localVisible.value = val;
+                }
+            }
         );
-        watch(localVisible, (val) => emit('update:visible', val));
         const toast = useToast();
         const modalTitle = ref('Add Bulk Items from Budget');
         const loading = ref(false);
@@ -132,8 +135,8 @@ export default defineComponent({
         );
 
         const closeModal = () => {
+            selectedItems.value = [];
             emit('update:visible', false);
-            resetModal();
         };
 
         const resetModal = () => {
@@ -286,12 +289,6 @@ export default defineComponent({
             budgetStore.pagination.pageSize = pageSize;
             await fetchBudgetItems(1, pageSize);
         };
-
-        // Selected items validation
-        watch(allBudgetItems, (newItems) => {
-            const validIds = new Set(newItems.map((i) => i.id));
-            selectedItems.value = selectedItems.value.filter((s) => validIds.has(s.id));
-        });
 
         const grandTotal = computed(() => {
             return selectedItems.value.reduce((sum, item) => sum + Number(item.rate ?? 0) * Number(item.qty ?? 0), 0);

@@ -77,7 +77,7 @@
         <!-- Table -->
         <ReusableTable
             :value="paginatedItems"
-            dataKey="Id"
+            dataKey="id"
             :columns="columns"
             :selection-mode="'checkbox'"
             v-model:selection="selectedItems"
