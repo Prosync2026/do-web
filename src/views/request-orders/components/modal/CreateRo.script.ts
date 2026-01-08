@@ -59,6 +59,10 @@ export default defineComponent({
         const categoryOptions = ref<FilterOption[]>([]);
         const statusOptions = ref<FilterOption[]>([]);
 
+        // delivery date
+        const deliveryDate = ref<Date | null>(null);
+        const showValidation = ref(false);
+
         // handler
         const onSubElementClick = () => {
             if (!selectedElement.value) {
@@ -134,6 +138,7 @@ export default defineComponent({
 
         const resetModal = () => {
             selectedItems.value = [];
+            deliveryDate.value = null;
             clearFilters();
         };
 
@@ -151,10 +156,37 @@ export default defineComponent({
         };
 
         const addSelectedItems = () => {
-            if (selectedItems.value.length > 0) {
-                emit('items-selected', [...selectedItems.value]);
-                closeModal();
+            showValidation.value = true;
+
+            // Validate selected items
+            if (selectedItems.value.length === 0) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'No Items Selected',
+                    detail: 'Please select at least one item.',
+                    life: 3000
+                });
+                return;
             }
+
+            // Validate delivery date
+            if (!deliveryDate.value) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Delivery Date Required',
+                    detail: 'Please select a delivery date before adding items.',
+                    life: 3000
+                });
+                return;
+            }
+
+            const itemsWithDeliveryDate = selectedItems.value.map((item) => ({
+                ...item,
+                deliveryDate: deliveryDate.value
+            }));
+
+            emit('items-selected', itemsWithDeliveryDate);
+            closeModal();
         };
 
         const getItemTypeSeverity = (itemType: string): string => {
@@ -320,7 +352,9 @@ export default defineComponent({
             selectedLocation2,
             selectedItemCode,
             selectedStatus,
-            columns
+            columns,
+            deliveryDate,
+            showValidation
         };
     }
 });

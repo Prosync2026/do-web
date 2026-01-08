@@ -66,9 +66,6 @@ export const usePermissionStore = defineStore('permission', () => {
 
             permissions.value = Array.from(collectedPermissions);
             projectContext.value = matchedProjectContext;
-
-            console.log('permissions', permissions.value);
-            console.log('projectContext', projectContext.value);
         } catch (error: any) {
             showError(error.message || 'Failed to load permissions');
         } finally {
