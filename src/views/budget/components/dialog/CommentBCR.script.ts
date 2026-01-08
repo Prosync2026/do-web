@@ -98,16 +98,6 @@ export default defineComponent({
         });
 
         function handleSubmit() {
-            if (!remark.value.trim()) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Remark Required',
-                    detail: 'Please enter your remark before submitting.',
-                    life: 3000
-                });
-                return;
-            }
-
             const payload: BCRRecommendationPayload = {
                 RecommendationType: selection.value,
                 Remark: remark.value,

@@ -138,18 +138,27 @@ export default defineComponent({
                 TotalAmount: totalVarianceAmount.value,
                 Type: 'BudgetChangeRequest',
                 Items: items.value.map((i) => ({
+                    BudgetItemId: i.BudgetItemId,
                     ItemCode: i.ItemCode,
+                    ItemType: 'ExistingItem',
                     Uom: i.Uom,
                     UnitPrice: Number(i.UnitPrice),
                     OrderedQty: Number(i.OrderedQty),
                     NewOrder: Number(i.NewOrder),
                     Description: i.Description,
                     Remark: i.Remark,
-                    location: i.location,
-                    element: i.element
+                    Location1: i.location1 || '',
+                    Location2: i.location2 || '',
+                    Element: i.element || '',
+                    SubEelement: i.subElement || '',
+                    SubSubElement: i.subsubElement || '',
+                    Category: i.category || '',
+                    Wastage: i.wastage,
+                    ExceededQty: calcExceedQty(i)
                 }))
             };
 
+            console.log('budgetChangeItem', payload);
             const isSuccess = await budgetCRStore.editBudgetChangeRequest(payload, singleBudgetChangeRequest.value?.Id ?? 0);
             if (isSuccess) router.push('/bcr');
         };

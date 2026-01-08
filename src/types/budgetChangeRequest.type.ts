@@ -98,7 +98,7 @@ export interface BudgetChangeItemPayload {
 }
 
 export interface BudgetChangeRequestPayload {
-    ProjectId?: string | number;
+    ProjectId: string | number | undefined;
     RequestDate: string;
     RequestedBy: string;
     Department: string;

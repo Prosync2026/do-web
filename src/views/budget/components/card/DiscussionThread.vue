@@ -31,7 +31,7 @@
                     <AccordionHeader>
                         <div class="flex items-center gap-2 w-full">
                             <span class="font-bold">{{ item.role }} : {{ item.name }} </span>
-                            <Badge :value="getStepStatusText(item, index)" :severity="getStepSeverity(item, index)" style="font-size: 0.75rem; height: 1.3rem" />
+                            <Tag :value="getStepStatusText(item, index)" :severity="getStepSeverity(item, index)" style="font-size: 0.75rem; height: 1.3rem" />
                         </div>
                     </AccordionHeader>
 
@@ -40,13 +40,6 @@
                             <div class="w-full">
                                 <p class="text-sm text-gray-400">
                                     {{ formatDate(item.datetime) }}
-                                </p>
-
-                                <p class="text-base font-semibold mt-1">
-                                    Selection:
-                                    <span class="font-normal">
-                                        {{ item.RecommendationType || 'Not specified' }}
-                                    </span>
                                 </p>
 
                                 <div v-if="item.recommendationItem.length" class="mt-3">
@@ -254,14 +247,17 @@ export default defineComponent({
         const firstPendingIndex = () => discussions.value.findIndex((d) => !d.id);
 
         const getStepStatusText = (item: DiscussionItem, index: number) => {
-            if (item.id) return 'Approved';
-            if (index === firstPendingIndex()) return 'Pending Approval';
+            if (item.RecommendationType) return item.RecommendationType;
+            const firstPending = firstPendingIndex();
+            if (index === firstPending) return 'Pending';
             return 'Waiting';
         };
 
         const getStepSeverity = (item: DiscussionItem, index: number) => {
-            if (item.id) return 'success';
-            if (index === firstPendingIndex()) return 'warn';
+            if (item.RecommendationType === 'Reject') return 'danger';
+            if (item.RecommendationType) return 'success';
+            const firstPending = firstPendingIndex();
+            if (index === firstPending) return 'warn';
             return 'secondary';
         };
 

@@ -198,8 +198,10 @@ export default defineComponent({
                 }
                 return;
             }
-
+            const selectedProject = ref(JSON.parse(localStorage.getItem('selectedProject') || '{}'));
+            const projectId = computed(() => selectedProject.value.ProjectId);
             const payload: BudgetChangeRequestPayload = {
+                ProjectId: projectId.value,
                 BudgetId: items.value[0]?.budgetId,
                 RequestDate: requestDate.value,
                 RequestedBy: requestBy.value,
