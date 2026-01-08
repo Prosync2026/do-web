@@ -3,6 +3,8 @@ export interface Item {
     itemType: string;
     description: string;
     location: string;
+    location1?: string;
+    location2?: string;
     uom: string;
     qty: number;
     price?: number;
@@ -36,6 +38,9 @@ export interface BudgetItem {
     itemCode: string;
     description: string;
     location: string;
+    location1?: string;
+    location2?: string;
+    category: string;
     element: string;
     itemType: string;
     uom: string;
