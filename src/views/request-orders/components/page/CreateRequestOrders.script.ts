@@ -450,7 +450,7 @@ export default defineComponent({
                         uom: budgetItem.uom,
                         budgetItemId: budgetItem.id,
                         qty: budgetItem.qty,
-                        deliveryDate: globalDeliveryDate.value,
+                        deliveryDate: formatDateToAPI(budgetItem.deliveryDate ?? null),
                         notes: '',
                         remark: '',
                         price: budgetItem.price,
@@ -711,9 +711,7 @@ export default defineComponent({
             const hasRoNumber = roNumber.value.trim() !== '';
             const hasRoDate = calendarValue.value !== null;
             const hasBudgetType = budgetType.value !== '';
-            const hasGlobalDeliveryDate = globalDeliveryDate.value !== null;
-
-            return hasItems && hasRoNumber && hasRoDate && hasBudgetType && hasGlobalDeliveryDate;
+            return hasItems && hasRoNumber && hasRoDate && hasBudgetType;
         });
 
         function openPreviewModal() {
@@ -810,7 +808,7 @@ export default defineComponent({
                             Rate: item.price ?? 0,
                             Notes: item.notes ?? '',
                             Reason: selectedReason.value || '',
-                            DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
+                            DeliveryDate: formatDateToAPI(item.deliveryDate)
                         };
                     })
                 };
@@ -960,13 +958,6 @@ export default defineComponent({
                 });
             }
         }
-        function applyDeliveryDateToAll(value: Date | Date[] | (Date | null)[] | null | undefined) {
-            const date = value instanceof Date ? value : null;
-
-            items.value.forEach((item) => {
-                item.deliveryDate = date;
-            });
-        }
 
         return {
             roNumber,
@@ -1022,7 +1013,6 @@ export default defineComponent({
             handleNoteInput,
             currentProject,
             formatDateToAPI,
-            applyDeliveryDateToAll,
             globalDeliveryDate,
             openStockItemModal,
             showStockItemModal,

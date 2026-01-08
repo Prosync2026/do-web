@@ -32,15 +32,6 @@
                     </div>
                 </div>
 
-                <!-- Delivery Date -->
-                <div>
-                    <label class="block text-sm text-gray-600 mb-1"> Delivery Date <span class="text-red-600 font-bold">*</span> </label>
-                    <div class="flex flex-col gap-2">
-                        <DatePicker v-model="globalDeliveryDate" :showIcon="true" placeholder="Select Delivery Date" :invalid="showValidation && !globalDeliveryDate" @update:modelValue="applyDeliveryDateToAll" />
-                        <Message v-if="showValidation && !globalDeliveryDate" severity="error" icon="pi pi-times-circle"> Delivery Date is required </Message>
-                    </div>
-                </div>
-
                 <!-- Subcon & Reason -->
                 <Motion v-if="budgetType === 'Unbudgeted Item'" class="col-span-3" :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 1 }">
                     <div class="grid grid-cols-12 gap-6">
@@ -123,6 +114,12 @@
                     </template>
                 </Column>
 
+                <Column field="deliveryDate" header="Delivery Date" style="min-width: 150px; width: 150px">
+                    <template #body="{ data }">
+                        <DatePicker v-model="data.deliveryDate" placeholder="mm/dd/yyyy" dateFormat="mm/dd/yy" class="w-full" />
+                    </template>
+                </Column>
+
                 <Column field="price" header="Price" style="min-width: 140px; width: 140px; display: none">
                     <template #body="{ data }">
                         <InputNumber v-model="data.price" mode="currency" currency="MYR" locale="en-MY" class="w-full" :minFractionDigits="2" />
@@ -141,12 +138,6 @@
                         </span>
                     </template>
                 </Column>
-
-                <!-- <Column field="deliveryDate" header="Delivery Date" style="min-width: 150px; width: 150px">
-                    <template #body="{ data }">
-                        <DatePicker v-model="data.deliveryDate" placeholder="mm/dd/yyyy" dateFormat="mm/dd/yy" class="w-full" />
-                    </template>
-                </Column> -->
 
                 <Column header="Action" style="min-width: 60px; width: 60px; text-align: center">
                     <template #body="{ data, index }">

@@ -42,6 +42,7 @@ export interface BudgetItem {
     qty: number;
     price: number;
     rate?: number;
+    deliveryDate?: string | null;
 }
 
 export interface FilterOption {

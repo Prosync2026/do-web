@@ -112,6 +112,12 @@
                     </template>
                 </Column>
 
+                <Column field="deliveryDate" header="Del. Date" style="min-width: 100px; text-align: center">
+                    <template #body="{ data }">
+                        {{ data.deliveryDate || '' }}
+                    </template>
+                </Column>
+
                 <Column field="price" header="APPLY" style="min-width: 120px; text-align: right; display: none">
                     <template #body="{ data }">
                         <div>

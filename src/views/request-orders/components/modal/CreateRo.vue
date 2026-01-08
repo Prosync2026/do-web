@@ -72,6 +72,7 @@
             </div>
             <div v-if="loading" class="text-xs text-blue-600"><i class="pi pi-spinner pi-spin mr-2"></i>Loading...</div>
         </div>
+        <Message v-if="showValidation && selectedItems.length === 0" severity="error" icon="pi pi-times-circle"> At least one item must be selected </Message>
 
         <!-- Table -->
         <ReusableTable
@@ -96,11 +97,28 @@
 
         <!-- Footer -->
         <template #footer>
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-600">{{ selectedItems.length }} item(s) selected</div>
-                <div class="flex gap-3">
-                    <Button label="Cancel" icon="pi pi-times" outlined @click="closeModal" />
-                    <Button :label="`Add Items (${selectedItems.length})`" icon="pi pi-check" @click="addSelectedItems" :disabled="selectedItems.length === 0" />
+            <div class="flex flex-col gap-3 w-full">
+                <!-- Delivery Date -->
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-semibold w-32"> Delivery Date <span class="text-red-500">*</span> </label>
+
+                        <Calendar v-model="deliveryDate" dateFormat="dd/mm/yy" showIcon placeholder="Select delivery date" class="w-60" />
+
+                        <span class="text-xs text-gray-500"> (Applied to selected items) </span>
+                    </div>
+
+                    <Message v-if="showValidation && !deliveryDate" severity="error" icon="pi pi-times-circle"> Delivery date is required </Message>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-600">{{ selectedItems.length }} item(s) selected</div>
+
+                    <div class="flex gap-3">
+                        <Button label="Cancel" icon="pi pi-times" outlined @click="closeModal" />
+                        <Button :label="`Add Items (${selectedItems.length})`" icon="pi pi-check" @click="addSelectedItems" />
+                    </div>
                 </div>
             </div>
         </template>
