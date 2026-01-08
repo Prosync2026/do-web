@@ -70,7 +70,7 @@ export default defineComponent({
         const onSubElementClick = () => {
             if (!selectedElement.value) {
                 toast.add({ severity: 'warn', summary: 'Attention', detail: 'Please select an Element first.', life: 3000 });
-                return false; // prevent dropdown from opening if needed
+                return false;
             }
             return true;
         };
@@ -188,9 +188,12 @@ export default defineComponent({
                 itemCode: item.itemCode,
                 itemType: item.itemType,
                 description: item.description,
-                location: item.location,
                 uom: item.uom,
                 qty: item.qty,
+                rate: item.rate,
+                location: item.location,
+                location1: item.location1,
+                location2: item.location2,
                 price: item.price,
                 deliveryDate: deliveryDate.value,
                 isBudgeted: true
@@ -226,7 +229,10 @@ export default defineComponent({
             if (val) {
                 const loc2 = await budgetFilterService.getLocation2(val);
                 location2Options.value = loc2.map((l) => ({ label: l, value: l }));
-            } else location2Options.value = [];
+            } else {
+                location2Options.value = [];
+                selectedLocation2.value = null;
+            }
         });
 
         watch(selectedElement, async (val) => {
@@ -234,9 +240,13 @@ export default defineComponent({
                 const subs = await budgetFilterService.getSubElements(val);
                 subElementOptions.value = subs.map((s) => ({ label: s, value: s }));
                 subSubElementOptions.value = [];
+                selectedSubElement.value = null;
+                selectedSubSubElement.value = null;
             } else {
                 subElementOptions.value = [];
                 subSubElementOptions.value = [];
+                selectedSubElement.value = null;
+                selectedSubSubElement.value = null;
             }
         });
 
@@ -244,15 +254,10 @@ export default defineComponent({
             if (val && selectedElement.value) {
                 const subsSub = await budgetFilterService.getSubSubElements(selectedElement.value, val);
                 subSubElementOptions.value = subsSub.map((s) => ({ label: s, value: s }));
-            } else subSubElementOptions.value = [];
-        });
-
-        watch([selectedElement, selectedSubElement], async ([element, subElement]) => {
-            if (element && subElement) {
-                const subsSub = await budgetFilterService.getSubSubElements(element, subElement);
-                subSubElementOptions.value = subsSub.map((s) => ({ label: s, value: s }));
+                selectedSubSubElement.value = null;
             } else {
                 subSubElementOptions.value = [];
+                selectedSubSubElement.value = null;
             }
         });
 
@@ -285,6 +290,7 @@ export default defineComponent({
         const handlePageChange = async (page: number) => {
             await fetchBudgetItems(page, budgetStore.pagination.pageSize);
         };
+
         const handlePageSizeChange = async (pageSize: number) => {
             budgetStore.pagination.pageSize = pageSize;
             await fetchBudgetItems(1, pageSize);
@@ -294,18 +300,21 @@ export default defineComponent({
             return selectedItems.value.reduce((sum, item) => sum + Number(item.rate ?? 0) * Number(item.qty ?? 0), 0);
         });
 
+        // return the store data directly
         const paginatedItems = computed(() => {
-            return budgetStore.budgetItems.map((item, index) => ({
-                ...item,
-                rowIndex: (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1
-            }));
+            const items = budgetStore.budgetItems || [];
+            // Add rowIndex directly to the data if it doesn't exist
+            items.forEach((item: any, index) => {
+                item.rowIndex = (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1;
+            });
+            return items;
         });
 
         const columns: TableColumn[] = [
             { field: 'rowIndex', header: '#', sortable: false },
             { field: 'itemCode', header: 'Item Code', sortable: true },
             { field: 'description', header: 'Description', sortable: true },
-            { field: 'location1', header: 'Location', sortable: false },
+            { field: 'location1', header: 'Location 1', sortable: false },
             { field: 'location2', header: 'Location 2', sortable: false },
             { field: 'category', header: 'Category', sortable: true },
             { field: 'elementCode', header: 'Element', sortable: true },
