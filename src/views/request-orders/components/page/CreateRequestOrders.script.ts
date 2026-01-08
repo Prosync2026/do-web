@@ -521,7 +521,6 @@ export default defineComponent({
                         showRemark: false,
                         isBudgeted: false
                     });
-                    console.log('Adding stock item to items:', newUniqueItems);
                     const existingOption = itemOptions.value.find((opt) => opt.value === stockItem.itemCode);
 
                     if (!existingOption) {
