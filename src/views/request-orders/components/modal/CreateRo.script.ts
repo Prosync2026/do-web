@@ -181,9 +181,19 @@ export default defineComponent({
             }
 
             const itemsWithDeliveryDate = selectedItems.value.map((item) => ({
-                ...item,
-                deliveryDate: deliveryDate.value
+                id: item.id,
+                itemCode: item.itemCode,
+                itemType: item.itemType,
+                description: item.description,
+                location: item.location,
+                uom: item.uom,
+                qty: item.qty,
+                price: item.price,
+                deliveryDate: deliveryDate.value,
+                isBudgeted: true
             }));
+
+            selectedItems.value = [];
 
             emit('items-selected', itemsWithDeliveryDate);
             closeModal();
@@ -288,10 +298,10 @@ export default defineComponent({
         });
 
         const paginatedItems = computed(() => {
-            budgetStore.budgetItems.forEach((item, index) => {
-                (item as any).rowIndex = (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1;
-            });
-            return budgetStore.budgetItems;
+            return budgetStore.budgetItems.map((item, index) => ({
+                ...item,
+                rowIndex: (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1
+            }));
         });
 
         const columns: TableColumn[] = [
