@@ -225,39 +225,58 @@ export default defineComponent({
             const bcrId = Number(route.params.budgetChangeRequestId);
 
             if (!currentUserRole.value || !ROLE_ORDER.includes(currentUserRole.value)) {
+                console.log('HERE');
                 canRecommend.value = false;
             } else if (CREATOR_ROLES.includes(currentUserRole.value)) {
-                console.log('checking ');
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(bcrId);
             } else {
+                console.log('testing to here');
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanReviewRecommendation(bcrId);
             }
-
-            const canEditItem = (item: DiscussionItem) => {
-                if (!props.editMode) return false;
-                if (!item.id) return false;
-                if (!currentUserRole.value) return false;
-                return currentUserRole.value === item.role;
-            };
+            console.log('canrecommend', canRecommend.value);
         };
 
         onMounted(init);
 
-        // ==================== Step helpers ====================
-        const firstPendingIndex = () => discussions.value.findIndex((d) => !d.id);
+        const firstPendingIndex = () => {
+            for (let i = 0; i < 3; i++) {
+                if (!discussions.value[i].id) return i;
+            }
+            return -1;
+        };
+
+        const isFinalStepCompleted = () => {
+            const pdIndex = ROLE_ORDER.indexOf('PD');
+            const mgmIndex = ROLE_ORDER.indexOf('MGM');
+
+            return discussions.value[pdIndex].id || discussions.value[mgmIndex].id;
+        };
 
         const getStepStatusText = (item: DiscussionItem, index: number) => {
             if (item.RecommendationType) return item.RecommendationType;
-            const firstPending = firstPendingIndex();
-            if (index === firstPending) return 'Pending';
+
+            if (index < 3) {
+                const firstPending = firstPendingIndex();
+                if (firstPending === -1) return 'Waiting';
+                if (index === firstPending) return 'Pending';
+                return 'Waiting';
+            }
+            if (!item.id && !isFinalStepCompleted()) return 'Pending';
             return 'Waiting';
         };
 
         const getStepSeverity = (item: DiscussionItem, index: number) => {
             if (item.RecommendationType === 'Reject') return 'danger';
             if (item.RecommendationType) return 'success';
-            const firstPending = firstPendingIndex();
-            if (index === firstPending) return 'warn';
+
+            if (index < 3) {
+                const firstPending = firstPendingIndex();
+                if (firstPending === -1) return 'secondary';
+                if (index === firstPending) return 'warn';
+                return 'secondary';
+            }
+
+            if (!item.id && !isFinalStepCompleted()) return 'warn';
             return 'secondary';
         };
 
@@ -278,12 +297,13 @@ export default defineComponent({
             window.open(url, '_blank');
         };
 
-        // ==================== New: Check edit permission ====================
         const canEditItem = (item: DiscussionItem) => {
             if (!props.editMode) return false;
-            if (!item.id) return false;
+            if (!item || !item.id) return false;
             if (!currentUserRole.value) return false;
-            return currentUserRole.value === item.role;
+            if (!CREATOR_ROLES.includes(currentUserRole.value)) return false;
+            if (currentUserRole.value !== item.role) return false;
+            return true;
         };
 
         return {
