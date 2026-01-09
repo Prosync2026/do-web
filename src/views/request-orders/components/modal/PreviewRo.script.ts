@@ -1,4 +1,5 @@
 import { PreviewSummary } from '@/types/request-order.type';
+import { formatDateToAPI } from '@/utils/dateHelper';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
@@ -97,7 +98,8 @@ export default defineComponent({
             formatCurrency,
             formatDate,
             isOverdue,
-            localVisible
+            localVisible,
+            formatDateToAPI
         };
     }
 });
