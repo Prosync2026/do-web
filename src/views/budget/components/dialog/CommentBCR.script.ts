@@ -132,8 +132,8 @@ export default defineComponent({
 
             if (selection.value === BcrRecommendationEnum.Specific_Quantity) {
                 payload.ReviewedItems = adjustments.value.map((a) => ({
-                    BudgetChangeItemId: String(a.id),
-                    ApprovedQty: String(a.value)
+                    BudgetChangeItemId: Number(a.id),
+                    ApprovedQty: Number(a.value)
                 }));
             }
 

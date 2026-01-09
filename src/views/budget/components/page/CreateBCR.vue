@@ -46,7 +46,11 @@
             <div class="card p-4 mb-6 border">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold">Materials Section</h2>
-                    <Button label="+ Add Material" @click="openMeterial" />
+                    <div class="flex gap-2">
+                        <Button label="＋ Add from Budget List" class="bg-blue-500 text-white hover:bg-blue-600" @click="openMeterial" />
+
+                        <Button label="＋ Add Manually Budget Item" class="bg-green-500 text-white hover:bg-green-600" @click="openSingleBudgetItem" />
+                    </div>
                 </div>
 
                 <div v-if="items.length === 0" class="flex justify-center items-center py-10 text-gray-500">
@@ -206,7 +210,8 @@
                     <Button label="Submit Request" @click="submitRequest" />
                 </div>
             </div>
-            <MeterialModal v-model:visible="showBulkItemModal" @items-selected="handleBulkItems" />
+            <MeterialModal v-model:visible="showBulkItemModal" @bcr-items-selected="handleBulkItems" :unRequiredDelivery="true" />
+            <SingleBudgetModal v-model:visible="showSingleItemModal" @items-value="handleAddItems" />
         </div>
     </Motion>
 </template>

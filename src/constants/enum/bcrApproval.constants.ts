@@ -48,7 +48,7 @@ export const BCR_ROLE_CONFIG: Record<BcrRoleEnum, BcrRoleConfig> = {
             { value: BcrRecommendationEnum.Specific_Quantity, label: 'Please change Budget Qty to' }
         ]
     },
-    MNGM: {
+    MGM: {
         recommendations: [
             { value: BcrRecommendationEnum.APPROVE_QS_CHANGE, label: 'Please change Budget Qty according to QS recommendation' },
             { value: BcrRecommendationEnum.APPROVE_SITE_CHANGE, label: 'Please change Budget Qty according to Site recommendation' },

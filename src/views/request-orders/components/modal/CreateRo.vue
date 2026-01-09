@@ -99,7 +99,7 @@
         <template #footer>
             <div class="flex flex-col gap-3 w-full">
                 <!-- Delivery Date -->
-                <div class="flex flex-col gap-1">
+                <div class="flex flex-col gap-1" v-if="!unRequiredDelivery">
                     <div class="flex items-center gap-3">
                         <label class="text-sm font-semibold w-32"> Delivery Date <span class="text-red-500">*</span> </label>
 

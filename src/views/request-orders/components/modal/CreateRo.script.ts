@@ -25,9 +25,10 @@ export default defineComponent({
     props: {
         visible: { type: Boolean, default: false },
         projectId: { type: Number, required: true },
-        version: { type: Number, required: true }
+        version: { type: Number, required: true },
+        unRequiredDelivery: { type: Boolean, required: false }
     },
-    emits: ['update:visible', 'items-selected'],
+    emits: ['update:visible', 'items-selected', 'bcr-items-selected'],
     setup(props, { emit }) {
         const localVisible = ref(props.visible);
         watch(
@@ -41,6 +42,7 @@ export default defineComponent({
         const toast = useToast();
         const modalTitle = ref('Add Bulk Items from Budget');
         const loading = ref(false);
+        const unRequiredDelivery = props.unRequiredDelivery ?? false;
 
         // Filter state
         const searchTerm = ref('');
@@ -172,7 +174,8 @@ export default defineComponent({
                 return;
             }
 
-            if (!deliveryDate.value) {
+            // Validate delivery date
+            if (!deliveryDate.value && !unRequiredDelivery) {
                 toast.add({
                     severity: 'warn',
                     summary: 'Delivery Date Required',
@@ -203,6 +206,7 @@ export default defineComponent({
             });
 
             // Clear and emit
+            emit('bcr-items-selected', selectedItems.value);
             const itemsToEmit = itemsWithDeliveryDate;
             selectedItems.value = [];
             deliveryDate.value = null;
@@ -376,7 +380,8 @@ export default defineComponent({
             selectedStatus,
             columns,
             deliveryDate,
-            showValidation
+            showValidation,
+            unRequiredDelivery
         };
     }
 });

@@ -132,7 +132,7 @@ export default defineComponent({
             emit('submit');
         }
         // Only QS or PM can upload attachments
-        const showAttachment = computed(() => user.value.role === BcrRoleEnum.QS || user.value.role === BcrRoleEnum.PM);
+        const showAttachment = computed(() => user.value.role === BcrRoleEnum.QS || user.value.role === BcrRoleEnum.SITE);
 
         return {
             user,

@@ -223,7 +223,7 @@ export interface DiscussionRowItem {
 }
 export interface BCRFinalDecisionPayload {
     ReviewType: string;
-    ReviewedItems?: { BudgetChangeItemId: string; ApprovedQty: string }[];
+    ReviewedItems?: { BudgetChangeItemId: number; ApprovedQty: number }[];
     Remark?: string;
 }
 

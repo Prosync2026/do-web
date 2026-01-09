@@ -3,6 +3,7 @@ import { useBudgetStore } from '@/stores/budget/budget.store';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRTableItem, BudgetChangeItemPayload, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
 import { getCurrentProjectName } from '@/utils/contextHelper';
+import SingleBudgetModal from '@/views/budget/components/dialog/CreateSingleBudgetItem.vue';
 import MeterialModal from '@/views/request-orders/components/modal/CreateRo.vue';
 import { Motion } from '@motionone/vue';
 import { useToast } from 'primevue';
@@ -11,7 +12,7 @@ import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'CreateBCR',
-    components: { Motion, MeterialModal },
+    components: { Motion, MeterialModal, SingleBudgetModal },
     setup() {
         const router = useRouter();
         const budgetCRStore = useBudgetChangeRequestStore();
@@ -101,10 +102,11 @@ export default defineComponent({
         // --- Modal ---
         const showBulkItemModal = ref(false);
         const openMeterial = () => (showBulkItemModal.value = true);
+
         const handleBulkItems = (selectedMaterials: any[]) => {
             selectedMaterials.forEach((mat) => {
                 const isDuplicate = items.value.some((i) => i.id === mat.id);
-
+                console.log('value checking', selectedMaterials);
                 if (isDuplicate) {
                     toast.add({
                         severity: 'warn',
@@ -128,6 +130,7 @@ export default defineComponent({
                     element: mat.elementCode,
                     subElement: mat.subElement,
                     subsubElement: mat.subsubElement,
+                    itemType: 'ExistingItem',
                     wastage: mat.wastage,
                     statistics: {
                         budgetQty: Number(mat.budgetQty || 0),
@@ -138,6 +141,40 @@ export default defineComponent({
             });
 
             showBulkItemModal.value = false;
+        };
+
+        const showSingleItemModal = ref(false);
+        const openSingleBudgetItem = () => (showSingleItemModal.value = true);
+        const handleAddItems = (item: any) => {
+            items.value.push({
+                budgetId: null,
+
+                itemCode: item.ItemCode,
+                description: item.Description,
+                remark: item.Description2 || '',
+
+                uom: item.Unit,
+                unitPrice: Number(item.Amount || 0),
+
+                location1: item.Location1 || '',
+                location2: item.Location2 || '',
+
+                category: item.Category,
+                element: item.Element,
+                subElement: item.SubElement,
+                subsubElement: item.SubSubElement,
+
+                itemType: 'NewItem',
+                wastage: Number(item.Wastage || 0),
+
+                statistics: {
+                    budgetQty: Number(item.Quantity || 0),
+                    totalOrderedQty: 0,
+                    totalRequestedQty: 0
+                }
+            });
+
+            showSingleItemModal.value = false;
         };
 
         // --- Calculations ---
@@ -202,7 +239,7 @@ export default defineComponent({
             const projectId = computed(() => selectedProject.value.ProjectId);
             const payload: BudgetChangeRequestPayload = {
                 ProjectId: projectId.value,
-                BudgetId: items.value[0]?.budgetId,
+                BudgetId: items.value[0]?.budgetId ?? currentVersion.value,
                 RequestDate: requestDate.value,
                 RequestedBy: requestBy.value,
                 Department: department.value,
@@ -212,8 +249,8 @@ export default defineComponent({
 
                 Type: 'BudgetChangeRequest',
                 Items: items.value.map<BudgetChangeItemPayload>((i) => ({
-                    BudgetItemId: i.id,
-                    ItemType: 'ExistingItem',
+                    BudgetItemId: i.id ?? null,
+                    ItemType: i.itemType,
                     ItemCode: i.itemCode,
                     Name: i.description,
                     Uom: i.uom,
@@ -226,7 +263,7 @@ export default defineComponent({
                     Location1: i.location1 || '',
                     Location2: i.location2 || '',
                     Element: i.element || '',
-                    SubEelement: i.subElement || '',
+                    SubElement: i.subElement || '',
                     SubSubElement: i.subsubElement || '',
                     Category: i.category || '',
                     Wastage: i.wastage,
@@ -253,8 +290,11 @@ export default defineComponent({
             fillItemDetails,
             getItemLabel,
             showBulkItemModal,
+            showSingleItemModal,
+            openSingleBudgetItem,
             openMeterial,
             handleBulkItems,
+            handleAddItems,
             calcExceedQty,
             calcExceedPercent,
             calcEstimatedExceed,

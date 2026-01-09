@@ -143,7 +143,7 @@ export default defineComponent({
         const discussions = ref<DiscussionItem[]>([]);
         const currentUserRole = ref<string | null>(null);
 
-        const ROLE_ORDER = ['QS', 'CM', 'SITE', 'PD', 'MNGM'];
+        const ROLE_ORDER = ['QS', 'CM', 'SITE', 'PD', 'MGM'];
         const CREATOR_ROLES = ['QS', 'SITE'];
 
         const fetchCombinedDiscussion = async () => {
