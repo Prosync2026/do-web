@@ -85,7 +85,13 @@ export const useBudgetStore = defineStore('budget', () => {
 
             const response = await budgetService.getBudgetItems(queryParams);
 
-            budgetItems.value = response.data.map((item: any) => ({
+            if (!response.success || !response.data) {
+                budgetItems.value = [];
+                return;
+            }
+
+            // Map response data to BudgetItem format
+            const mappedItems: any[] = response.data.map((item: any, index: number) => ({
                 id: item.Id,
                 budgetId: item.BudgetId,
                 itemCode: item.ItemCode,
@@ -116,11 +122,15 @@ export const useBudgetStore = defineStore('budget', () => {
                 updatedBy: item.UpdatedBy,
                 budgetQty: item.statistics?.budgetQty,
                 totalOrderedQty: item.statistics?.totalOrderedQty,
-                totalRequestedQty: item.statistics?.totalRequestedQty
+                totalRequestedQty: item.statistics?.totalRequestedQty,
+                // Add rowIndex here in the store to prevent computed mutation
+                rowIndex: ((queryParams.page ?? 1) - 1) * (queryParams.pageSize ?? 10) + index + 1
             }));
 
+            budgetItems.value = mappedItems;
             pagination.value = mapPagination(response.pagination);
         } catch (error) {
+            console.error('Budget items fetch error:', error);
             showError(error, 'Failed to fetch budget items.');
             budgetItems.value = [];
         } finally {

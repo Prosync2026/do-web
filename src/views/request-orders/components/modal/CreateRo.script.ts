@@ -184,36 +184,33 @@ export default defineComponent({
                 return;
             }
 
-            // Create a completely clean copy with no store references
-            const itemsWithDeliveryDate: any[] = [];
+            // Create plain objects with no store references
+            const itemsWithDeliveryDate = selectedItems.value.map((item) => {
+                const dateStr = deliveryDate.value instanceof Date ? deliveryDate.value.toISOString().split('T')[0] : String(deliveryDate.value);
 
-            for (const item of selectedItems.value) {
-                itemsWithDeliveryDate.push({
-                    id: Number(item.id),
-                    itemCode: String(item.itemCode),
-                    itemType: String(item.itemType || ''),
-                    description: String(item.description),
-                    location: String(item.location1 || ''),
-                    location1: String(item.location1 || ''),
-                    location2: String(item.location2 || ''),
-                    uom: String(item.uom),
-                    qty: Number(item.qty),
-                    price: Number(item.rate),
-                    deliveryDate: deliveryDate.value ? new Date(deliveryDate.value).toISOString().split('T')[0] : '',
+                return {
+                    id: item.id,
+                    itemCode: item.itemCode,
+                    itemType: item.itemType || '',
+                    description: item.description,
+                    location: item.location1 || '',
+                    location1: item.location1 || '',
+                    location2: item.location2 || '',
+                    uom: item.uom,
+                    qty: item.qty,
+                    price: item.rate,
+                    deliveryDate: dateStr,
                     isBudgeted: true
-                });
-            }
+                };
+            });
 
-            // Clear selected items immediately
+            // Clear and emit
+            const itemsToEmit = itemsWithDeliveryDate;
             selectedItems.value = [];
+            deliveryDate.value = null;
 
-            // Emit the clean data
-            emit('items-selected', itemsWithDeliveryDate);
-
-            // Close modal after a small delay to allow emit to complete
-            setTimeout(() => {
-                closeModal();
-            }, 0);
+            emit('items-selected', itemsToEmit);
+            emit('update:visible', false);
         };
 
         const getItemTypeSeverity = (itemType: string): string => {
