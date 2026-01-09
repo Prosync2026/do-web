@@ -94,11 +94,9 @@ watch(
 );
 
 const handleSelectionChange = (newSelection: TableRow[]) => {
-    localSelection.value = newSelection;
-    // Emit on next tick to avoid immediate recursion
-    setTimeout(() => {
+    if (newSelection !== props.selection) {
         emit('update:selection', newSelection);
-    }, 0);
+    }
 };
 
 function handleSearch() {
@@ -238,7 +236,7 @@ const displayEnd = computed(() => {
 
     <template v-else>
         <DataTable
-            :selection="localSelection"
+            :selection="props.selection"
             @update:selection="handleSelectionChange"
             :value="props.value"
             class="overflow-hidden dark:text-white"
