@@ -55,6 +55,7 @@ const props = defineProps<{
     // Checkbox support
     selectionMode?: 'checkbox' | 'radio' | undefined;
     selection?: TableRow[];
+    dataKey?: string | ((row: TableRow) => string);
 }>();
 
 // for hide unwanted column
@@ -74,6 +75,18 @@ const currentRow = ref<TableRow | null>(null);
 const menuItems = ref<any[]>([]);
 
 const isServerSidePagination = computed(() => props.pagination !== undefined);
+
+// Generate a unique key for each row
+const getRowKey = (row: TableRow): string => {
+    if (props.dataKey) {
+        if (typeof props.dataKey === 'function') {
+            return props.dataKey(row);
+        }
+        return String(row[props.dataKey] ?? '');
+    }
+    // Fallback: use id or a combination of fields
+    return String(row.id ?? row.Id ?? Math.random());
+};
 
 watch(
     () => props.value,
@@ -238,14 +251,7 @@ const displayEnd = computed(() => {
     </div>
 
     <template v-else>
-        <DataTable
-            v-model:selection="selectedRows"
-            :value="props.value"
-            class="overflow-hidden dark:text-white"
-            tableStyle="min-width: 50rem"
-            :selection-mode="props.selectionMode"
-            :data-key="(row) => `${row.id}-${row.Id}-${row.location1}-${row.location2}`"
-        >
+        <DataTable v-model:selection="selectedRows" :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem" :selection-mode="props.selectionMode" :data-key="getRowKey">
             <!-- Checkbox Column -->
             <Column v-if="props.selectionMode === 'checkbox'" selection-mode="multiple" style="width: 3rem" />
 
