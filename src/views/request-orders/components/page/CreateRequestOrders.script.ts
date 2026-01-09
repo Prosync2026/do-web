@@ -447,6 +447,8 @@ export default defineComponent({
                         itemType: budgetItem.itemType,
                         description: budgetItem.description,
                         location: budgetItem.location,
+                        location1: budgetItem.location1,
+                        location2: budgetItem.location2,
                         uom: budgetItem.uom,
                         budgetItemId: budgetItem.id,
                         qty: budgetItem.qty,
@@ -689,6 +691,8 @@ export default defineComponent({
                         price: item.price ?? 0,
                         deliveryDate: item.deliveryDate ? (item.deliveryDate instanceof Date ? item.deliveryDate : new Date(item.deliveryDate)) : null,
                         location: item.location,
+                        location1: item.location1,
+                        location2: item.location2,
                         notes: item.notes,
                         remark: item.remark,
                         qtyRequested: stats?.totalRequestedQty ?? 0,
@@ -800,6 +804,8 @@ export default defineComponent({
                             ItemCode: item.itemCode,
                             ItemType: item.itemType,
                             Quantity: item.qty,
+                            Location1: item.location1,
+                            Location2: item.location2,
                             OrgBgtQty: stats?.totalOrderedQty ?? 0,
                             BgtBalQty: stats?.totalBalance ?? 0,
                             TotalGrnQty: stats?.totalDeliveredQty ?? 0,
@@ -811,6 +817,7 @@ export default defineComponent({
                         };
                     })
                 };
+                // console.log('Submitting RO with payload:', payload);
                 const isDraft = !!route.query.draftId;
                 const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
 

@@ -29,14 +29,7 @@
                     <span class="text-gray-600 dark:text-gray-400">RO Date:</span>
                     <span class="ml-2 font-medium">{{ summaryData.roDate }}</span>
                 </div>
-                <div>
-                    <span class="text-gray-600 dark:text-gray-400">Delivery Date:</span>
-                    <span class="ml-2 font-medium">{{ summaryData.globalDeliveryDate }}</span>
-                </div>
-                <!-- <div>
-                    <span class="text-gray-600 dark:text-gray-400">RO Number:</span>
-                    <span class="ml-2 font-medium">{{ summaryData.roNumber }}</span>
-                </div> -->
+
                 <div>
                     <span class="text-gray-600 dark:text-gray-400">Requested By:</span>
                     <span class="ml-2 font-medium">{{ summaryData.requestedBy }}</span>
@@ -112,12 +105,6 @@
                     </template>
                 </Column>
 
-                <Column field="deliveryDate" header="Del. Date" style="min-width: 100px; text-align: center">
-                    <template #body="{ data }">
-                        {{ data.deliveryDate || '' }}
-                    </template>
-                </Column>
-
                 <Column field="price" header="APPLY" style="min-width: 120px; text-align: right; display: none">
                     <template #body="{ data }">
                         <div>
@@ -127,11 +114,9 @@
                     </template>
                 </Column>
 
-                <Column field="deliveryDate" header="Del. Date" style="min-width: 110px; display: none">
+                <Column header="Del. Date" style="min-width: 100px; text-align: center">
                     <template #body="{ data }">
-                        <span :class="{ 'font-bold text-red-600': isOverdue(data.deliveryDate) }">
-                            {{ formatDate(data.deliveryDate) }}
-                        </span>
+                        {{ formatDate(data.deliveryDate) }}
                     </template>
                 </Column>
             </DataTable>
