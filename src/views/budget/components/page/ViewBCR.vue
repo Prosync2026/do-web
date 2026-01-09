@@ -52,19 +52,19 @@
 
                                     <Column field="Uom" header="Units" />
 
-                                    <Column field="UnitPrice" header="Unit Price">
+                                    <Column field="UnitPrice" header="Unit Price" v-if="canViewPricing">
                                         <template #body="{ data }">
                                             {{ formatCurrency(data.UnitPrice) }}
                                         </template>
                                     </Column>
 
-                                    <Column field="OrderedQty" header="Ordered Qty">
+                                    <Column field="OrderedQty" header="Ordered Qty" >
                                         <template #body="{ data }">
                                             {{ formatNumber(data.OrderedQty) }}
                                         </template>
                                     </Column>
 
-                                    <Column field="NewOrder" header="Request Qty">
+                                    <Column field="NewOrder" header="Request Qty" v>
                                         <template #body="{ data }">
                                             {{ formatNumber(data.NewOrder) }}
                                         </template>
@@ -76,13 +76,13 @@
                                         </template>
                                     </Column>
 
-                                    <Column field="ExceededPercent" header="% Exceed">
+                                    <Column field="ExceededPercent" header="% Exceed" v-if="canViewPricing">
                                         <template #body="{ data }">
                                             {{ formatPercent(data.ExceededPercent) }}
                                         </template>
                                     </Column>
 
-                                    <Column field="EstimatedExceed" header="Estimated Exceed">
+                                    <Column field="EstimatedExceed" header="Estimated Exceed" v-if="canViewPricing">
                                         <template #body="{ data }">
                                             {{ formatCurrency(data.EstimatedExceed) }}
                                         </template>
@@ -94,7 +94,7 @@
                                         </template>
                                     </Column>
 
-                                    <Column field="VarianceAmount" header="Variance Amount">
+                                    <Column field="VarianceAmount" header="Variance Amount" v-if="canViewPricing">
                                         <template #body="{ data }">
                                             {{ formatCurrency(data.VarianceAmount) }}
                                         </template>
@@ -104,7 +104,7 @@
                                 </DataTable>
                             </div>
 
-                            <div class="text-right mt-4 font-semibold">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
+                            <div class="text-right mt-4 font-semibold" v-if="canViewPricing">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
                         </div>
 
                         <DiscussionThread />

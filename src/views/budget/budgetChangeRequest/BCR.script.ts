@@ -13,6 +13,12 @@ export default defineComponent({
     name: 'BudgetChangeRequest',
     components: { ReusableTable, Badge },
     setup() {
+        const { hasPermission } = usePermission();
+
+        const canCreateBCR = hasPermission(PermissionCodes.CREATE_BCR);
+        const canEditBCR = hasPermission(PermissionCodes.EDIT_BCR);
+        const canViewPricing = hasPermission(PermissionCodes.VIEW_PRICING);
+
         const BudgetChangeRequestSummaryData = computed<CardItem[]>(() => {
             const reviewCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Under Review').length;
             const pendingReviewCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Pending Review').length;
@@ -22,23 +28,32 @@ export default defineComponent({
             const totalApprovedValue = approvedItems.reduce((sum, item) => sum + (item.TotalAmount || 0), 0);
             const formattedTotal = totalApprovedValue.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
-            return [
+            const cards: CardItem[] = [
                 { title: 'Under Review', value: reviewCount.toString(), description: 'Review in progress', icon: 'pi pi-exclamation-triangle', color: 'red' },
                 { title: 'Pending Review', value: pendingReviewCount.toString(), description: 'Ready for review', icon: 'pi pi-comment', color: 'orange' },
-                { title: 'Approved', value: approvedCount.toString(), description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' },
-                { title: 'Total Value', value: `$ ${formattedTotal}`, description: 'Estimated budget impact', icon: 'pi pi-chart-line', color: 'blue' }
+                { title: 'Approved', value: approvedCount.toString(), description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' }
             ];
+
+            if (canViewPricing.value) {
+                cards.push({
+                    title: 'Total Value',
+                    value: `$ ${formattedTotal}`,
+                    description: 'Estimated budget impact',
+                    icon: 'pi pi-chart-line',
+                    color: 'blue'
+                });
+            }
+
+            return cards;
         });
+
+        const bcrSummaryCol = computed(() => (canViewPricing.value ? 4 : 3));
+
         const budgetCRStore = useBudgetChangeRequestStore();
         onMounted(async () => {
             await budgetCRStore.fetchBudgetChangesRequestList();
         });
 
-        const { hasPermission } = usePermission();
-
-        const canCreateBCR = hasPermission(PermissionCodes.CREATE_BCR);
-        const canEditBCR = hasPermission(PermissionCodes.EDIT_BCR);
-        const canViewPricing = hasPermission(PermissionCodes.VIEW_PRICING);
         const budgetChangeRequestData = computed(() => {
             return budgetCRStore.budgetChangeRequestList.map((item) => {
                 const actions = ['view'];
@@ -188,7 +203,8 @@ export default defineComponent({
             handleFilterChange,
             handleActionClick,
             handlePageChange,
-            handlePageSizeChange
+            handlePageSizeChange,
+            bcrSummaryCol
         };
     }
 });

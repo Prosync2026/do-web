@@ -1,3 +1,4 @@
+import { usePermission } from '@/permissions/budgetChangeRequest.permission';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import { formatCurrency, formatNumber as formatNum, formatPercent as formatPct } from '@/utils/format.utils';
@@ -7,6 +8,7 @@ import { Motion } from '@motionone/vue';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+import { PermissionCodes } from '@/permissions/permission.codes';
 export default defineComponent({
     name: 'ViewBCR',
     components: { Motion, ActivitiesLog, DiscussionThread },
@@ -32,6 +34,9 @@ export default defineComponent({
                 }
             }
         });
+
+        const { hasPermission } = usePermission();
+        const canViewPricing = hasPermission(PermissionCodes.VIEW_PRICING);
 
         const requestBy = computed(() => singleBudgetChangeRequest.value?.RequestedBy || '');
         const reason = computed(() => singleBudgetChangeRequest.value?.Reason || '');
@@ -108,7 +113,8 @@ export default defineComponent({
             formatNumber,
             formatPercent,
             formatCurrency,
-            singleBudgetChangeRequest
+            singleBudgetChangeRequest,
+            canViewPricing
         };
     }
 });
