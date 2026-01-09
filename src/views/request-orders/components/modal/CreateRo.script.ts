@@ -137,8 +137,6 @@ export default defineComponent({
         const closeModal = () => {
             // Reset all state when closing
             selectedItems.value = [];
-            deliveryDate.value = null;
-            showValidation.value = false;
             emit('update:visible', false);
         };
 
