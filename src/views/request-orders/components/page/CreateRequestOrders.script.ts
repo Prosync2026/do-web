@@ -638,7 +638,6 @@ export default defineComponent({
                 if (budgetItemIds.length > 0) {
                     await fetchItemStatistics(budgetItemIds);
                 } else {
-                    console.log('No budgeted items found, clearing stats');
                     itemStats.value = {};
                 }
             },
