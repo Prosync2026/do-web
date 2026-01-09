@@ -6,6 +6,9 @@ import { storeToRefs } from 'pinia';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+import { usePermission } from '@/permissions/budgetChangeRequest.permission';
+import { PermissionCodes } from '@/permissions/permission.codes';
+
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import Column from 'primevue/column';
@@ -22,6 +25,9 @@ export default defineComponent({
 
         const budgetCRStore = useBudgetChangeRequestStore();
         const { singleBudgetChangeRequest, loading } = storeToRefs(budgetCRStore);
+
+        const { hasPermission } = usePermission();
+        const canViewPricing = hasPermission(PermissionCodes.VIEW_PRICING);
 
         const budgetStore = useBudgetStore();
 
@@ -108,6 +114,7 @@ export default defineComponent({
                 item.BudgetQty = opt.budgetQty;
                 item.OrderedQty = opt.totalOrderedQty ?? '';
                 item.NewOrder = opt.totalRequestedQty ?? '';
+                item.BudgetItemId = opt.id;
             }
         };
 
@@ -180,7 +187,8 @@ export default defineComponent({
             calcEstimatedExceed,
             getColorClass,
             submitRequest,
-            goBack: () => router.push('/bcr')
+            goBack: () => router.push('/bcr'),
+            canViewPricing
         };
     }
 });

@@ -60,7 +60,7 @@
                     </template>
                 </Column>
 
-                <Column field="UnitPrice" header="Unit Price" style="min-width: 120px">
+                <Column field="UnitPrice" header="Unit Price" style="min-width: 120px" v-if="canViewPricing">
                     <template #body="{ data }">
                         <InputText v-model="data.UnitPrice" type="number" class="w-full" />
                     </template>
@@ -86,13 +86,13 @@
                     </template>
                 </Column>
 
-                <Column header="Exceeded %" style="min-width: 120px">
+                <Column header="Exceeded %" style="min-width: 120px" v-if="canViewPricing">
                     <template #body="{ data }">
                         <span :class="getColorClass(calcExceedQty(data))"> {{ calcExceedPercent(data).toFixed(1) }}% </span>
                     </template>
                 </Column>
 
-                <Column header="Estimated $ Exceed" style="min-width: 150px">
+                <Column header="Estimated $ Exceed" style="min-width: 150px" v-if="canViewPricing">
                     <template #body="{ data }">
                         <span :class="getColorClass(calcExceedQty(data))">
                             {{ calcEstimatedExceed(data).toFixed(2) }}
@@ -108,7 +108,7 @@
             </DataTable>
         </div>
 
-        <div class="text-right font-semibold mt-4">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
+        <div class="text-right font-semibold mt-4" v-if="canViewPricing">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
 
         <div class="flex justify-end mb-6 mt-6">
             <div class="flex gap-2">
