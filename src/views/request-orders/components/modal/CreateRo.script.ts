@@ -306,15 +306,7 @@ export default defineComponent({
             return selectedItems.value.reduce((sum, item) => sum + Number(item.rate ?? 0) * Number(item.qty ?? 0), 0);
         });
 
-        // return the store data directly
-        const paginatedItems = computed(() => {
-            const items = budgetStore.budgetItems || [];
-            // create new objects
-            items.forEach((item: any, index) => {
-                item.rowIndex = (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1;
-            });
-            return items;
-        });
+        const paginatedItems = computed(() => budgetStore.budgetItems);
 
         const columns: TableColumn[] = [
             { field: 'rowIndex', header: '#', sortable: false },
