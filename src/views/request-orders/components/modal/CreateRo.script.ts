@@ -312,10 +312,10 @@ export default defineComponent({
         const paginatedItems = computed(() => {
             const items = budgetStore.budgetItems || [];
             // create new objects
-            return items.map((item: any, index) => ({
-                ...item,
-                rowIndex: (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1
-            }));
+            items.forEach((item: any, index) => {
+                item.rowIndex = (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1;
+            });
+            return items;
         });
 
         const columns: TableColumn[] = [

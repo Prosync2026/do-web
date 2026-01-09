@@ -95,7 +95,10 @@ watch(
 
 const handleSelectionChange = (newSelection: TableRow[]) => {
     localSelection.value = newSelection;
-    emit('update:selection', newSelection);
+    // Emit on next tick to avoid immediate recursion
+    setTimeout(() => {
+        emit('update:selection', newSelection);
+    }, 0);
 };
 
 function handleSearch() {
