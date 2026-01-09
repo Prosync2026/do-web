@@ -62,9 +62,11 @@ export default defineComponent({
         const categoryOptions = ref<FilterOption[]>([]);
         const statusOptions = ref<FilterOption[]>([]);
 
+        // delivery date
         const deliveryDate = ref<Date | null>(null);
         const showValidation = ref(false);
 
+        // handler
         const onSubElementClick = () => {
             if (!selectedElement.value) {
                 toast.add({ severity: 'warn', summary: 'Attention', detail: 'Please select an Element first.', life: 3000 });
@@ -89,11 +91,14 @@ export default defineComponent({
             return true;
         };
 
+        // Selection
         const selectedItems = ref<BudgetItem[]>([]);
 
+        // Budget store
         const budgetStore = useBudgetStore();
         const currentVersion = ref<number | null>(props.version || Number(localStorage.getItem('latestBudgetVersion')));
 
+        // Fetch budget items with server-side filters
         const fetchBudgetItems = async (page: number = 1, pageSize: number = budgetStore.pagination.pageSize) => {
             if (!currentVersion.value) return;
 
@@ -116,6 +121,7 @@ export default defineComponent({
         const pagination = computed(() => budgetStore.pagination);
         const allBudgetItems = computed(() => budgetStore.budgetItems);
 
+        // Category and Status still computed from current items
         watch(allBudgetItems, (items) => {
             const cats = [...new Set(items.map((i) => i.category))];
             categoryOptions.value = cats.map((c) => ({ label: c, value: c }));
@@ -178,30 +184,36 @@ export default defineComponent({
                 return;
             }
 
-            // Create a copy of selected items before clearing
-            const itemsToCopy = [...selectedItems.value];
+            // Create a completely clean copy with no store references
+            const itemsWithDeliveryDate: any[] = [];
 
-            // Clear immediately to prevent reactivity issues
+            for (const item of selectedItems.value) {
+                itemsWithDeliveryDate.push({
+                    id: Number(item.id),
+                    itemCode: String(item.itemCode),
+                    itemType: String(item.itemType || ''),
+                    description: String(item.description),
+                    location: String(item.location1 || ''),
+                    location1: String(item.location1 || ''),
+                    location2: String(item.location2 || ''),
+                    uom: String(item.uom),
+                    qty: Number(item.qty),
+                    price: Number(item.rate),
+                    deliveryDate: deliveryDate.value ? new Date(deliveryDate.value).toISOString().split('T')[0] : '',
+                    isBudgeted: true
+                });
+            }
+
+            // Clear selected items immediately
             selectedItems.value = [];
 
-            // Build the items with delivery date
-            const itemsWithDeliveryDate = itemsToCopy.map((item) => ({
-                id: item.id,
-                itemCode: item.itemCode,
-                itemType: item.itemType,
-                description: item.description,
-                location: item.location,
-                location1: item.location1,
-                location2: item.location2,
-                uom: item.uom,
-                qty: item.qty,
-                price: item.rate,
-                deliveryDate: deliveryDate.value ? new Date(deliveryDate.value) : null,
-                isBudgeted: true
-            }));
-
+            // Emit the clean data
             emit('items-selected', itemsWithDeliveryDate);
-            closeModal();
+
+            // Close modal after a small delay to allow emit to complete
+            setTimeout(() => {
+                closeModal();
+            }, 0);
         };
 
         const getItemTypeSeverity = (itemType: string): string => {
@@ -214,6 +226,7 @@ export default defineComponent({
             return severityMap[itemType] || 'info';
         };
 
+        // Load filter options from backend
         const loadFilterOptions = async () => {
             const loc1 = await budgetFilterService.getLocation1();
             location1Options.value = loc1.map((l) => ({ label: l, value: l }));
@@ -222,6 +235,7 @@ export default defineComponent({
             elementOptions.value = els.map((e) => ({ label: e, value: e }));
         };
 
+        // Dependent dropdowns
         watch(selectedLocation1, async (val) => {
             if (val) {
                 const loc2 = await budgetFilterService.getLocation2(val);
@@ -258,6 +272,7 @@ export default defineComponent({
             }
         });
 
+        // Watch for modal visibility
         watch(localVisible, async (visible) => {
             if (visible) {
                 if (!currentVersion.value) currentVersion.value = Number(localStorage.getItem('latestBudgetVersion'));
@@ -268,6 +283,7 @@ export default defineComponent({
             }
         });
 
+        // Watch for filter changes - debounced
         let filterTimeout: ReturnType<typeof setTimeout>;
         const debouncedFetchOnFilter = () => {
             clearTimeout(filterTimeout);
