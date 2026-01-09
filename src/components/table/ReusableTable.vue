@@ -48,17 +48,14 @@ const props = defineProps<{
     emptyTitle?: string;
     extraFilters?: FilterOption[];
     onFilterChange?: (filters: Record<string, any>) => void;
-    // Server-side pagination props
     pagination?: PaginationConfig;
     onPageChange?: (page: number) => void;
     onPageSizeChange?: (pageSize: number) => void;
-    // Checkbox support
     selectionMode?: 'checkbox' | 'radio' | undefined;
     selection?: TableRow[];
-    dataKey?: string | ((row: TableRow) => string);
+    dataKey?: string;
 }>();
 
-// for hide unwanted column
 const visibleColumns = computed(() => props.columns.filter((c) => c.visible !== false));
 
 const emit = defineEmits<{
@@ -68,25 +65,13 @@ const emit = defineEmits<{
 const search = ref('');
 const activeFilters = ref<Record<string, any>>({});
 const hasLoadedOnce = ref(false);
-const selectedRows = ref<TableRow[]>(props.selection || []);
+const localSelection = ref<TableRow[]>([]);
 
 const menu = ref();
 const currentRow = ref<TableRow | null>(null);
 const menuItems = ref<any[]>([]);
 
 const isServerSidePagination = computed(() => props.pagination !== undefined);
-
-// Generate a unique key for each row
-const getRowKey = (row: TableRow): string => {
-    if (props.dataKey) {
-        if (typeof props.dataKey === 'function') {
-            return props.dataKey(row);
-        }
-        return String(row[props.dataKey] ?? '');
-    }
-    // Fallback: use id or a combination of fields
-    return String(row.id ?? row.Id ?? Math.random());
-};
 
 watch(
     () => props.value,
@@ -102,18 +87,16 @@ watch(
     () => props.selection,
     (val) => {
         if (val) {
-            selectedRows.value = val;
+            localSelection.value = val;
         }
-    }
+    },
+    { immediate: true }
 );
 
-watch(
-    selectedRows,
-    (val) => {
-        emit('update:selection', val);
-    },
-    { deep: true }
-);
+const handleSelectionChange = (newSelection: TableRow[]) => {
+    localSelection.value = newSelection;
+    emit('update:selection', newSelection);
+};
 
 function handleSearch() {
     props.onSearch?.(search.value);
@@ -251,7 +234,15 @@ const displayEnd = computed(() => {
     </div>
 
     <template v-else>
-        <DataTable v-model:selection="selectedRows" :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem" :selection-mode="props.selectionMode" :data-key="getRowKey">
+        <DataTable
+            :selection="localSelection"
+            @update:selection="handleSelectionChange"
+            :value="props.value"
+            class="overflow-hidden dark:text-white"
+            tableStyle="min-width: 50rem"
+            :selection-mode="props.selectionMode"
+            :data-key="props.dataKey || 'id'"
+        >
             <!-- Checkbox Column -->
             <Column v-if="props.selectionMode === 'checkbox'" selection-mode="multiple" style="width: 3rem" />
 
@@ -261,7 +252,7 @@ const displayEnd = computed(() => {
                     <slot :name="col.bodySlot" :data="slotProps.data" />
                 </template>
 
-                <!-- 2. NEW: Custom formatter -->
+                <!-- 2. Custom formatter -->
                 <template v-else-if="col.body" #body="slotProps">
                     {{ col.body?.(slotProps.data) }}
                 </template>
