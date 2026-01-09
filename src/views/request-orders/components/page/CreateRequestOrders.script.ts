@@ -432,6 +432,8 @@ export default defineComponent({
             showStockItemModal.value = true;
         };
 
+        const showCreateROModal = ref(false);
+
         const handleSelectedItems = (selectedBudgetItems: BudgetItem[]) => {
             const duplicates: string[] = [];
             const newUniqueItems: Item[] = [];
@@ -460,7 +462,6 @@ export default defineComponent({
                         showRemark: false,
                         isBudgeted: true
                     });
-                    // Add to itemOptions if not exist
                     const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode);
                     if (!existingOption) {
                         itemOptions.value.push({
@@ -474,7 +475,6 @@ export default defineComponent({
                 }
             });
 
-            // Add only unique items
             if (newUniqueItems.length > 0) {
                 items.value.push(...newUniqueItems);
                 toast.add({
@@ -485,7 +485,6 @@ export default defineComponent({
                 });
             }
 
-            // Show duplicate message
             if (duplicates.length > 0) {
                 toast.add({
                     severity: 'warn',
@@ -494,6 +493,9 @@ export default defineComponent({
                     life: 9000
                 });
             }
+
+            // Close modal AFTER processing items
+            showCreateROModal.value = false;
         };
 
         const handleStockItemsSelected = (selectedStockItems: StockItem[]) => {
