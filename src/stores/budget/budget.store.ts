@@ -100,5 +100,31 @@ export const useBudgetStore = defineStore('budget', () => {
         }
     }
 
-    return { budgets, budgetItems, pagination, loading, fetchBudgets, fetchBudgetItems, fetchBudgetVersion };
+    async function fetchHierarchyBudgetItems(budgetId: number, page = pagination.value.page, pageSize = pagination.value.pageSize) {
+        loading.value = true;
+        try {
+            const response = await budgetService.getHierarchyBudgetItem({ budgetId, page, pageSize });
+
+            return response;
+        } catch (error) {
+            showError(error, 'Failed to fetch hierarchy budget items.');
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    async function fetchHierarchyBudgetLocation(budgetId: number, page = pagination.value.page, pageSize = pagination.value.pageSize) {
+        loading.value = true;
+        try {
+            const response = await budgetService.getHierarchyBudgetLocation({ budgetId, page, pageSize });
+
+            return response;
+        } catch (error) {
+            showError(error, 'Failed to fetch hierarchy budget items.');
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    return { budgets, budgetItems, pagination, loading, fetchBudgets, fetchBudgetItems, fetchBudgetVersion, fetchHierarchyBudgetItems, fetchHierarchyBudgetLocation };
 });

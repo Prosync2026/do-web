@@ -41,8 +41,10 @@ declare module 'vue' {
     ProgressBar: typeof import('primevue/progressbar')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     RadioButton: typeof import('primevue/radiobutton')['default']
+    RemoveTreeTable: typeof import('./src/components/table/removeTreeTable.vue')['default']
     ResultNotFound: typeof import('./src/components/resulNotFound/ResultNotFound.vue')['default']
     ReusableTable: typeof import('./src/components/table/ReusableTable.vue')['default']
+    ReusableTreeTable: typeof import('./src/components/table/ReusableTreeTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Select: typeof import('primevue/select')['default']
@@ -57,7 +59,7 @@ declare module 'vue' {
     Tag: typeof import('primevue/tag')['default']
     Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']
-    TreeTable: typeof import('./src/components/table/TreeTable.vue')['default']
+    TreeTable: typeof import('primevue/treetable')['default']
   }
   export interface ComponentCustomProperties {
     Tooltip: typeof import('primevue/tooltip')['default']

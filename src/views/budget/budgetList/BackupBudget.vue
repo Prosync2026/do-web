@@ -1,3 +1,4 @@
+<script lang="ts">
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { FilterVersion } from '@/types/budget.type';
 import type { TableColumn } from '@/types/table.type';
@@ -298,3 +299,120 @@ export default defineComponent({
         };
     }
 });
+</script>
+
+<template>
+    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
+        <div class="p-6 card mb-6">
+            <BreadcrumbList />
+
+            <!-- HEADER -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold dark:text-white">Budget Management</h1>
+                    <p class="text-gray-500 dark:text-white">Interactive charts showing budget distribution.</p>
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <Dropdown v-model="selectedVersion" :options="versions" optionLabel="label" optionValue="value" class="w-full md:w-64 h-10 rounded-lg" placeholder="Select Version">
+                        <template #option="slotProps">
+                            <div class="flex items-center">
+                                <span>{{ slotProps.option.label }}</span>
+                                <Badge v-if="slotProps.option.latest" value="Latest" severity="primary" class="ml-2" />
+                            </div>
+                        </template>
+                        <template #value="slotProps">
+                            <div class="flex items-center" v-if="slotProps.value">
+                                <span>{{ versions.find((v) => v.value === slotProps.value)?.label }}</span>
+                                <Badge v-if="versions.find((v) => v.value === slotProps.value)?.latest" value="Latest" severity="primary" class="ml-2" />
+                            </div>
+                            <span v-else class="text-gray-400">Select Version</span>
+                        </template>
+                    </Dropdown>
+                </div>
+            </div>
+
+            <!-- VIEW MODE SELECT -->
+            <SelectButton v-model="viewMode" :options="viewOptions" optionLabel="label" optionValue="value" class="h-10 rounded-lg" />
+
+            <!-- DETAIL SUB-VIEW BUTTONS -->
+            <div v-if="viewMode === 'detail'" class="flex gap-2 mt-2 mb-4">
+                <Button label="List View" icon="pi pi-list" :outlined="detailViewMode !== 'list'" @click="detailViewMode = 'list'" />
+                <Button label="Tree View" icon="pi pi-sitemap" :outlined="detailViewMode !== 'tree'" @click="detailViewMode = 'tree'" />
+                <Button label="Tree Location View" icon="pi pi-map" :outlined="detailViewMode !== 'treeLocation'" @click="detailViewMode = 'treeLocation'" />
+            </div>
+
+            <!-- OVERVIEW -->
+            <div v-if="viewMode === 'overview'">
+                <Overview class="col-span-12" />
+            </div>
+
+            <!-- DETAIL LIST VIEW -->
+            <div v-else-if="detailViewMode === 'list'">
+                <ReusableTable
+                    :value="filteredItems"
+                    :columns="columns"
+                    emptyTitle="Budget List Data"
+                    :pagination="pagination"
+                    :onPageChange="handlePageChange"
+                    :onPageSizeChange="handlePageSizeChange"
+                    :filters="filters"
+                    :search="search"
+                    @search="onSearchWrapper"
+                    :showImportFile="showImportFile"
+                    :onImportFile="handleImportClick"
+                >
+                    <template #rate="{ data }"> RM {{ formatCurrency(data.rate) }} </template>
+                    <template #amount="{ data }"> RM {{ formatCurrency(data.amount) }} </template>
+                </ReusableTable>
+            </div>
+
+            <!-- DETAIL TREE VIEW -->
+            <div v-else-if="detailViewMode === 'tree'">
+                <BaseTreeTable :nodes="treeNodes" :pagination="pagination">
+                    <Column field="label" header="Item / Description" :expander="true" />
+                    <Column field="rowIndex" header="#" />
+                    <Column field="itemCode" header="Item Code" />
+                    <Column field="description" header="Description" />
+                    <Column field="location1" header="Location 1" />
+                    <Column field="location2" header="Location 2" />
+                    <Column field="elementCode" header="Element" />
+                    <Column field="subElement" header="1st Sub Element" />
+                    <Column field="subSubElement" header="2nd Sub Element" />
+                    <Column field="unit" header="UOM" />
+                    <Column header="Qty">
+                        <template #body="{ node }">{{ node.data?.qty }}</template>
+                    </Column>
+                    <Column header="Rate">
+                        <template #body="{ node }">RM {{ formatCurrency(node.data?.rate) }}</template>
+                    </Column>
+                    <Column header="Amount">
+                        <template #body="{ node }">RM {{ formatCurrency(node.data?.amount) }}</template>
+                    </Column>
+                </BaseTreeTable>
+            </div>
+
+            <!-- DETAIL TREE LOCATION VIEW -->
+            <div v-else-if="detailViewMode === 'treeLocation'">
+                <BaseTreeTable :nodes="treeLocationNodes" :pagination="pagination">
+                    <Column field="label" header="Location / Element / Sub Element / Sub Sub Element" :expander="true" />
+                    <Column field="rowIndex" header="#" />
+                    <Column field="itemCode" header="Item Code" />
+                    <Column field="description" header="Description" />
+                    <Column field="unit" header="UOM" />
+                    <Column header="Qty">
+                        <template #body="{ node }">{{ node.data?.qty }}</template>
+                    </Column>
+                    <Column header="Rate">
+                        <template #body="{ node }">RM {{ formatCurrency(node.data?.rate) }}</template>
+                    </Column>
+                    <Column header="Amount">
+                        <template #body="{ node }">RM {{ formatCurrency(node.data?.amount) }}</template>
+                    </Column>
+                </BaseTreeTable>
+            </div>
+
+            <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" @success="handleImportSuccess" />
+            <ConfirmPopup />
+        </div>
+    </Motion>
+</template>
