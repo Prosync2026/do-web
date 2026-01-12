@@ -52,7 +52,7 @@ export default defineComponent({
         function buildTree(apiData: any[]): any[] {
             return (apiData || []).map((item: any, i: number) => ({
                 key: `item-${i}`,
-                data: { name: item.itemCode },
+                data: { name: item.itemCode, amount: item.totalAmount },
                 children: (item.descriptions || []).map((desc: any, d: number) => ({
                     key: `desc-${i}-${d}`,
                     data: { name: desc.description },

@@ -57,7 +57,11 @@ export default defineComponent({
         const fetchBudgetList = async (budgetId: number) => {
             if (!budgetId) return;
 
-            await budgetStore.fetchBudgetItems(budgetId, pagination.value.page, pagination.value.pageSize);
+            await budgetStore.fetchBudgetItems({
+                budgetId: budgetId,
+                page: pagination.value.page,
+                pageSize: pagination.value.pageSize
+            });
 
             budgetItems.value = budgetStore.budgetItems.map((item, index) => ({
                 ...item,
@@ -68,11 +72,9 @@ export default defineComponent({
             pagination.value.totalPages = budgetStore.pagination.totalPages;
         };
 
-        // ---------------- WATCH budgetId ----------------
         watch(
             () => props.budgetId,
             async (newId) => {
-                console.log('BudgetList received budgetId:', newId);
                 if (newId) {
                     await fetchBudgetList(newId);
                 }
@@ -80,7 +82,6 @@ export default defineComponent({
             { immediate: true }
         );
 
-        // ---------------- COMPUTED ----------------
         const filteredItems = computed(() => {
             if (!search.value) return budgetItems.value;
             const keyword = search.value.toLowerCase();
@@ -98,7 +99,6 @@ export default defineComponent({
             }
         });
 
-        // ---------------- HANDLERS ----------------
         function handleSearch(value: string) {
             search.value = value;
             filters.value.global = { value };
