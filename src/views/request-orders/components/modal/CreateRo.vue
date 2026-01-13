@@ -75,6 +75,7 @@
         <Message v-if="showValidation && selectedItems.length === 0" severity="error" icon="pi pi-times-circle"> At least one item must be selected </Message>
 
         <!-- Table -->
+        <!-- Table -->
         <ReusableTable
             :value="paginatedItems"
             dataKey="id"
@@ -99,7 +100,7 @@
         <template #footer>
             <div class="flex flex-col gap-3 w-full">
                 <!-- Delivery Date -->
-                <div class="flex flex-col gap-1">
+                <div class="flex flex-col gap-1" v-if="!unRequiredDelivery">
                     <div class="flex items-center gap-3">
                         <label class="text-sm font-semibold w-32"> Delivery Date <span class="text-red-500">*</span> </label>
 

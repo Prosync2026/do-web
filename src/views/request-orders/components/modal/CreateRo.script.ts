@@ -3,7 +3,7 @@ import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
-import { computed, defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, toRaw, watch } from 'vue';
 
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import { budgetFilterService } from '@/services/budgetFilter.service';
@@ -25,9 +25,10 @@ export default defineComponent({
     props: {
         visible: { type: Boolean, default: false },
         projectId: { type: Number, required: true },
-        version: { type: Number, required: true }
+        version: { type: Number, required: true },
+        unRequiredDelivery: { type: Boolean, required: false }
     },
-    emits: ['update:visible', 'items-selected'],
+    emits: ['update:visible', 'items-selected', 'bcr-items-selected'],
     setup(props, { emit }) {
         const localVisible = ref(props.visible);
         watch(
@@ -172,7 +173,8 @@ export default defineComponent({
                 return;
             }
 
-            if (!deliveryDate.value) {
+            // Validate delivery date
+            if (!deliveryDate.value && !props.unRequiredDelivery) {
                 toast.add({
                     severity: 'warn',
                     summary: 'Delivery Date Required',
@@ -182,10 +184,18 @@ export default defineComponent({
                 return;
             }
 
-            // Create plain objects with no store references
-            const itemsWithDeliveryDate = selectedItems.value.map((item) => {
-                const dateStr = deliveryDate.value instanceof Date ? deliveryDate.value.toISOString().split('T')[0] : String(deliveryDate.value);
+            // Capture values and strip reactivity immediately
+            const rawItems = toRaw(selectedItems.value);
+            const rawDate = toRaw(deliveryDate.value);
 
+            // Deep clone to ensure no references remain
+            const items = JSON.parse(JSON.stringify(rawItems));
+            
+            const dateStr = rawDate instanceof Date 
+                ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}`
+                : (rawDate ? String(rawDate) : '');
+
+            const itemsWithDeliveryDate = items.map((item: any) => {
                 return {
                     id: item.id,
                     itemCode: item.itemCode,
@@ -202,13 +212,16 @@ export default defineComponent({
                 };
             });
 
-            // Clear and emit
-            const itemsToEmit = itemsWithDeliveryDate;
-            selectedItems.value = [];
-            deliveryDate.value = null;
+            // Emit the processed non-reactive data
+            emit('bcr-items-selected', items);
+            emit('items-selected', itemsWithDeliveryDate);
 
-            emit('items-selected', itemsToEmit);
-            emit('update:visible', false);
+            // Reset state in next tick
+            setTimeout(() => {
+                selectedItems.value = [];
+                deliveryDate.value = null;
+                emit('update:visible', false);
+            }, 0);
         };
 
         const getItemTypeSeverity = (itemType: string): string => {
@@ -324,6 +337,35 @@ export default defineComponent({
             { field: 'amount', header: 'Amount', bodySlot: 'amountSlot', visible: false }
         ];
 
+        // const visibleColumns = computed(() => columns.filter((c) => c.visible !== false));
+
+        // const getPaginationNumbers = (): number[] => {
+        //     const totalPages = pagination.value.totalPages || 1;
+        //     const currentPage = pagination.value.page;
+        //     const maxVisible = 5;
+        //     const numbers: number[] = [];
+
+        //     let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        //     const endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+        //     if (endPage - startPage + 1 < maxVisible) {
+        //         startPage = Math.max(1, endPage - maxVisible + 1);
+        //     }
+
+        //     for (let i = startPage; i <= endPage; i++) {
+        //         numbers.push(i);
+        //     }
+        //     return numbers;
+        // };
+
+        // const displayStart = computed(() => {
+        //     return (pagination.value.page - 1) * pagination.value.pageSize + 1;
+        // });
+
+        // const displayEnd = computed(() => {
+        //     return Math.min(pagination.value.page * pagination.value.pageSize, pagination.value.total);
+        // });
+
         onMounted(async () => {
             if (currentVersion.value) {
                 await budgetStore.fetchBudgets(currentVersion.value);
@@ -368,7 +410,8 @@ export default defineComponent({
             selectedStatus,
             columns,
             deliveryDate,
-            showValidation
+            showValidation,
+
         };
     }
 });

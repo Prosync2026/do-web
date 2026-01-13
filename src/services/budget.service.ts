@@ -48,6 +48,34 @@ const getBudgetItems = async (params?: GetBudgetsParams): Promise<GetBudgetsResp
     }
 };
 
+const getHierarchyBudgetItem = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
+    try {
+        const response = await axiosInstance.get('budget/items/hierarchy-with-stats', { params: cleanParams(params) });
+        return {
+            success: response.data.success,
+            data: response.data.data || [],
+            pagination: mapPagination(response.data.pagination)
+        };
+    } catch (error: any) {
+        showError(error, 'Failed to fetch budget items.');
+        return { success: false, data: [], pagination: { total: 0, totalPages: 0, page: 1, pageSize: 10 } };
+    }
+};
+
+const getHierarchyBudgetLocation = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
+    try {
+        const response = await axiosInstance.get('budget/locations/hierarchy-with-stats', { params: cleanParams(params) });
+        return {
+            success: response.data.success,
+            data: response.data.data || [],
+            pagination: mapPagination(response.data.pagination)
+        };
+    } catch (error: any) {
+        showError(error, 'Failed to fetch budget items.');
+        return { success: false, data: [], pagination: { total: 0, totalPages: 0, page: 1, pageSize: 10 } };
+    }
+};
+
 const getBudgetVersion = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
     try {
         const response = await axiosInstance.get<GetBudgetsResponse>('/budgets', { params });
@@ -77,6 +105,7 @@ const createBudget = async (formData: FormData) => {
 const budgetStatistics = async (budgetId: number) => {
     try {
         const response = await axiosInstance.get(`/budget/item/${budgetId}/statistics`);
+     
         return response.data;
     } catch (error) {
         showError(error, 'Failed to fetch budget statistics.');
@@ -84,4 +113,4 @@ const budgetStatistics = async (budgetId: number) => {
     }
 };
 
-export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget, budgetStatistics };
+export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget, budgetStatistics, getHierarchyBudgetItem, getHierarchyBudgetLocation };

@@ -39,14 +39,12 @@
         <div class="card p-4 shadow overflow-auto">
             <div class="flex justify-between mb-4">
                 <h3 class="text-lg font-semibold">Materials</h3>
-                <!-- Enhancement : In the API haven't doing can create or delete budget item -->
-                <!-- <Button label="Add Item" icon="pi pi-plus" @click="addItem" outlined /> -->
             </div>
 
             <DataTable :value="items" class="text-sm" style="min-width: 2000px">
                 <Column field="ItemCode" header="Item Code" style="min-width: 150px">
                     <template #body="{ data }">
-                        <Dropdown v-model="data.ItemCode" :options="filteredItems.map((b) => ({ label: b.itemCode, value: b.itemCode }))" optionLabel="label" optionValue="value" @change="() => fillSelectedItem(data)" class="w-full" />
+                        <Dropdown v-model="data.ItemCode" :options="allBudgetItems.map((b) => ({ label: b.itemCode, value: b.itemCode }))" optionLabel="label" optionValue="value" @change="() => fillSelectedItem(data)" class="w-full" />
                     </template>
                 </Column>
 
@@ -62,7 +60,7 @@
                     </template>
                 </Column>
 
-                <Column field="UnitPrice" header="Unit Price" style="min-width: 120px">
+                <Column field="UnitPrice" header="Unit Price" style="min-width: 120px" v-if="canViewPricing">
                     <template #body="{ data }">
                         <InputText v-model="data.UnitPrice" type="number" class="w-full" />
                     </template>
@@ -88,13 +86,13 @@
                     </template>
                 </Column>
 
-                <Column header="Exceeded %" style="min-width: 120px">
+                <Column header="Exceeded %" style="min-width: 120px" v-if="canViewPricing">
                     <template #body="{ data }">
                         <span :class="getColorClass(calcExceedQty(data))"> {{ calcExceedPercent(data).toFixed(1) }}% </span>
                     </template>
                 </Column>
 
-                <Column header="Estimated $ Exceed" style="min-width: 150px">
+                <Column header="Estimated $ Exceed" style="min-width: 150px" v-if="canViewPricing">
                     <template #body="{ data }">
                         <span :class="getColorClass(calcExceedQty(data))">
                             {{ calcEstimatedExceed(data).toFixed(2) }}
@@ -107,17 +105,10 @@
                         <InputText v-model="data.Remark" class="w-full" />
                     </template>
                 </Column>
-
-                <!-- Enhancement : In the API haven't doing can create or delete budget item -->
-                <!-- <Column header="Action" style="min-width: 80px">
-                    <template #body="{ index }">
-                        <Button icon="pi pi-trash" severity="danger" text @click="removeItem(index)" />
-                    </template>
-                </Column> -->
             </DataTable>
         </div>
 
-        <div class="text-right font-semibold mt-4">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
+        <div class="text-right font-semibold mt-4" v-if="canViewPricing">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
 
         <div class="flex justify-end mb-6 mt-6">
             <div class="flex gap-2">

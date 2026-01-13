@@ -1,16 +1,18 @@
 // CreateBCR.script.ts
+import { useBudgetStore } from '@/stores/budget/budget.store';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRTableItem, BudgetChangeItemPayload, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
 import { getCurrentProjectName } from '@/utils/contextHelper';
+import SingleBudgetModal from '@/views/budget/components/dialog/CreateSingleBudgetItem.vue';
 import MeterialModal from '@/views/request-orders/components/modal/CreateRo.vue';
 import { Motion } from '@motionone/vue';
 import { useToast } from 'primevue';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'CreateBCR',
-    components: { Motion, MeterialModal },
+    components: { Motion, MeterialModal, SingleBudgetModal },
     setup() {
         const router = useRouter();
         const budgetCRStore = useBudgetChangeRequestStore();
@@ -35,29 +37,76 @@ export default defineComponent({
             { label: 'Others', value: 'Others' }
         ]);
 
-        // --- Items Table ---
-        const items = ref<BCRTableItem[]>([]);
+        const budgetStore = useBudgetStore();
 
-        const fillItemDetails = (item: BCRTableItem) => {
-            const selected = items.value.find((o) => o.itemCode === item.itemCode);
-            if (selected) {
-                item.description = selected.description ?? '';
-                item.uom = selected.uom ?? '';
-            }
+        // --- Current Budget Version ---
+        let latestVersionStr = localStorage.getItem('latestBudgetVersion');
+        const currentVersion = ref<number | null>(latestVersionStr !== null && !isNaN(Number(latestVersionStr)) ? Number(latestVersionStr) : null);
+
+        // --- Budget Items from Store ---
+
+        const budgetItems = ref<any[]>([]);
+
+        const fetchBudgetItems = async () => {
+            if (!currentVersion.value) return;
+
+            await budgetStore.fetchBudgetItems({
+                budgetId: currentVersion.value,
+                page: 1,
+                pageSize: 1000
+            });
+
+            budgetItems.value = budgetStore.budgetItems.map((item: any) => ({
+                ...item,
+                value: item.itemCode,
+                label: `${item.itemCode} - ${item.description}`
+            }));
         };
+
+        onMounted(() => {
+            fetchBudgetItems();
+        });
+
+        // --- BCR Items Table ---
+        const items = ref<any[]>([]);
+
+        const fillItemDetails = (row: BCRTableItem) => {
+            const selected = budgetItems.value.find((b) => b.value === row.itemCode);
+            if (!selected) return;
+
+            row.budgetId = selected.budgetId;
+            row.description = selected.description;
+            row.uom = selected.uom;
+            row.unitPrice = selected.unitPrice;
+            row.remark = selected.remark;
+            row.location1 = selected.location1;
+            row.location2 = selected.location2;
+            row.category = selected.category;
+            row.element = selected.element;
+            row.subElement = selected.subElement;
+            row.subsubElement = selected.subsubElement;
+            row.wastage = selected.wastage;
+
+            row.statistics = {
+                budgetQty: selected.budgetQty || 0,
+                totalOrderedQty: selected.totalOrderedQty || 0,
+                totalRequestedQty: selected.totalRequestedQty || 0
+            };
+        };
+
         const getItemLabel = (itemCode: string) => {
-            const found = items.value.find((o) => o.itemCode === itemCode);
-            return found ? found.description : itemCode;
+            const found = budgetItems.value.find((b) => b.value === itemCode);
+            return found ? found.label : itemCode;
         };
 
         // --- Modal ---
         const showBulkItemModal = ref(false);
         const openMeterial = () => (showBulkItemModal.value = true);
+
         const handleBulkItems = (selectedMaterials: any[]) => {
-            console.log('selectedMaterials', selectedMaterials);
             selectedMaterials.forEach((mat) => {
                 const isDuplicate = items.value.some((i) => i.id === mat.id);
-
+                console.log('value checking', selectedMaterials);
                 if (isDuplicate) {
                     toast.add({
                         severity: 'warn',
@@ -81,6 +130,7 @@ export default defineComponent({
                     element: mat.elementCode,
                     subElement: mat.subElement,
                     subsubElement: mat.subsubElement,
+                    itemType: 'ExistingItem',
                     wastage: mat.wastage,
                     statistics: {
                         budgetQty: Number(mat.budgetQty || 0),
@@ -91,6 +141,40 @@ export default defineComponent({
             });
 
             showBulkItemModal.value = false;
+        };
+
+        const showSingleItemModal = ref(false);
+        const openSingleBudgetItem = () => (showSingleItemModal.value = true);
+        const handleAddItems = (item: any) => {
+            items.value.push({
+                budgetId: null,
+
+                itemCode: item.ItemCode,
+                description: item.Description,
+                remark: item.Description2 || '',
+
+                uom: item.Unit,
+                unitPrice: Number(item.Amount || 0),
+
+                location1: item.Location1 || '',
+                location2: item.Location2 || '',
+
+                category: item.Category,
+                element: item.Element,
+                subElement: item.SubElement,
+                subsubElement: item.SubSubElement,
+
+                itemType: 'NewItem',
+                wastage: Number(item.Wastage || 0),
+
+                statistics: {
+                    budgetQty: Number(item.Quantity || 0),
+                    totalOrderedQty: 0,
+                    totalRequestedQty: 0
+                }
+            });
+
+            showSingleItemModal.value = false;
         };
 
         // --- Calculations ---
@@ -151,9 +235,11 @@ export default defineComponent({
                 }
                 return;
             }
-
+            const selectedProject = ref(JSON.parse(localStorage.getItem('selectedProject') || '{}'));
+            const projectId = computed(() => selectedProject.value.ProjectId);
             const payload: BudgetChangeRequestPayload = {
-                BudgetId: items.value[0]?.budgetId,
+                ProjectId: projectId.value,
+                BudgetId: items.value[0]?.budgetId ?? currentVersion.value,
                 RequestDate: requestDate.value,
                 RequestedBy: requestBy.value,
                 Department: department.value,
@@ -163,8 +249,8 @@ export default defineComponent({
 
                 Type: 'BudgetChangeRequest',
                 Items: items.value.map<BudgetChangeItemPayload>((i) => ({
-                    BudgetItemId: i.id,
-                    ItemType: 'ExistingItem',
+                    BudgetItemId: i.id ?? null,
+                    ItemType: i.itemType,
                     ItemCode: i.itemCode,
                     Name: i.description,
                     Uom: i.uom,
@@ -177,7 +263,7 @@ export default defineComponent({
                     Location1: i.location1 || '',
                     Location2: i.location2 || '',
                     Element: i.element || '',
-                    SubEelement: i.subElement || '',
+                    SubElement: i.subElement || '',
                     SubSubElement: i.subsubElement || '',
                     Category: i.category || '',
                     Wastage: i.wastage,
@@ -204,8 +290,11 @@ export default defineComponent({
             fillItemDetails,
             getItemLabel,
             showBulkItemModal,
+            showSingleItemModal,
+            openSingleBudgetItem,
             openMeterial,
             handleBulkItems,
+            handleAddItems,
             calcExceedQty,
             calcExceedPercent,
             calcEstimatedExceed,
@@ -215,7 +304,8 @@ export default defineComponent({
             submitRequest,
             goBack,
             projectName,
-            showValidation
+            showValidation,
+            budgetItems
         };
     }
 });

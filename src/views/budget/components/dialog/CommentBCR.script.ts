@@ -98,16 +98,6 @@ export default defineComponent({
         });
 
         function handleSubmit() {
-            if (!remark.value.trim()) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Remark Required',
-                    detail: 'Please enter your remark before submitting.',
-                    life: 3000
-                });
-                return;
-            }
-
             const payload: BCRRecommendationPayload = {
                 RecommendationType: selection.value,
                 Remark: remark.value,
@@ -142,8 +132,8 @@ export default defineComponent({
 
             if (selection.value === BcrRecommendationEnum.Specific_Quantity) {
                 payload.ReviewedItems = adjustments.value.map((a) => ({
-                    BudgetChangeItemId: String(a.id),
-                    ApprovedQty: String(a.value)
+                    BudgetChangeItemId: Number(a.id),
+                    ApprovedQty: Number(a.value)
                 }));
             }
 

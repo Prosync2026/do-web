@@ -18,6 +18,8 @@ interface State {
     filters: {
         search: string;
         status: string;
+        startDate: string;
+        endDate: string;
     };
 }
 
@@ -36,50 +38,70 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
 
         filters: {
             search: '',
-            status: ''
+            status: '',
+            startDate: '',
+            endDate: ''
         }
     }),
 
     actions: {
         setPage(page: number) {
             this.pagination.page = page;
+            this.fetchBudgetChangesRequestList();
         },
 
         setPageSize(size: number) {
             this.pagination.pageSize = size;
             this.pagination.page = 1;
+            this.fetchBudgetChangesRequestList();
         },
 
         handleSearch(value: string) {
             this.filters.search = value;
             this.pagination.page = 1;
+            this.fetchBudgetChangesRequestList();
         },
 
         handleFilterChange(value: Record<string, any>) {
             this.filters.status = value.status ?? '';
+            this.filters.startDate = value.startDate ?? '';
+            this.filters.endDate = value.endDate ?? '';
             this.pagination.page = 1;
+            this.fetchBudgetChangesRequestList();
         },
+
         async fetchBudgetChangesRequestList() {
             this.loading = true;
-            this.budgetChangeRequestList = [];
-
             try {
-                const response = await budgetChangeRequestService.getBudgetChangeRequests();
+                const params = {
+                    page: this.pagination.page,
+                    pageSize: this.pagination.pageSize,
+                    status: this.filters.status || undefined,
+                    search: this.filters.search || undefined,
+                    startDate: this.filters.startDate || undefined,
+                    endDate: this.filters.endDate || undefined
+                };
+
+                const response = await budgetChangeRequestService.getBudgetChangeRequests(params);
+
                 if (!response.success) {
                     showError(response.message || 'Failed to fetch budget change requests.');
-                    return [];
+                    return;
                 }
 
                 this.budgetChangeRequestList = response.data || [];
 
-                // FE pagination (simulate total count)
-                this.pagination.total = this.budgetChangeRequestList.length;
-                this.pagination.totalPages = Math.ceil(this.pagination.total / this.pagination.pageSize);
-
-                return this.budgetChangeRequestList;
+                if (response.pagination) {
+                    this.pagination.page = response.pagination.page;
+                    this.pagination.pageSize = response.pagination.pageSize;
+                    this.pagination.total = response.pagination.total;
+                    this.pagination.totalPages = response.pagination.totalPages;
+                } else {
+                    this.pagination.total = this.budgetChangeRequestList.length;
+                    this.pagination.totalPages = Math.ceil(this.pagination.total / this.pagination.pageSize);
+                }
             } catch (error: any) {
                 showError(error?.message || 'Failed to fetch budget change requests.');
-                return [];
             } finally {
                 this.loading = false;
             }
@@ -164,6 +186,7 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
                 this.loading = false;
             }
         },
+
         // RECOMMENDATION API
         async fetchRecommendationList(bcrId: number) {
             this.loading = true;

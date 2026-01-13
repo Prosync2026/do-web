@@ -115,16 +115,6 @@ export default defineComponent({
             { immediate: true }
         );
         async function handleSubmit() {
-            if (!remark.value.trim()) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Remark Required',
-                    detail: 'Please enter your remark before submitting.',
-                    life: 3000
-                });
-                return;
-            }
-
             const payload = {
                 RecommendationType: selection.value,
                 Remark: remark.value,
@@ -142,7 +132,7 @@ export default defineComponent({
             emit('submit');
         }
         // Only QS or PM can upload attachments
-        const showAttachment = computed(() => user.value.role === BcrRoleEnum.QS || user.value.role === BcrRoleEnum.PM);
+        const showAttachment = computed(() => user.value.role === BcrRoleEnum.QS || user.value.role === BcrRoleEnum.SITE);
 
         return {
             user,

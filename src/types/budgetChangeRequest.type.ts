@@ -31,14 +31,15 @@ export interface BudgetChangeItem {
     Id: number;
     BudgetChangeId: number;
     BudgetItemId: number;
+    BudgetQty?: string;
     ItemCode: string;
     Uom: string | null;
-    UnitPrice: string;
+    UnitPrice: string | number;
     OrderedQty: string;
     NewOrder: string;
     ExceededQty: string;
     Description: string;
-    Remark: string;
+    Remark?: string;
     CreatedAt: string;
     CreatedBy: string | null;
     UpdatedAt: string;
@@ -66,10 +67,18 @@ export interface BudgetChangeRequest {
     budget_change_items: BudgetChangeItem[];
 }
 
+export interface PaginationMeta {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+}
+
 export interface BudgetChangeRequestResponse {
     success: boolean;
     message?: string;
     data?: BudgetChangeRequest[];
+    pagination?: PaginationMeta;
 }
 
 export interface SingleBudgetChangeRequestResponse {
@@ -97,6 +106,7 @@ export interface BudgetChangeItemPayload {
 }
 
 export interface BudgetChangeRequestPayload {
+    ProjectId: string | number | undefined;
     RequestDate: string;
     RequestedBy: string;
     Department: string;
@@ -221,7 +231,7 @@ export interface DiscussionRowItem {
 }
 export interface BCRFinalDecisionPayload {
     ReviewType: string;
-    ReviewedItems?: { BudgetChangeItemId: string; ApprovedQty: string }[];
+    ReviewedItems?: { BudgetChangeItemId: number; ApprovedQty: number }[];
     Remark?: string;
 }
 

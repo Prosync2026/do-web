@@ -3,7 +3,7 @@ export enum BcrRoleEnum {
     CM = 'CM',
     SITE = 'SITE',
     PD = 'PD',
-    MNGM = 'MNGM'
+    MGM = 'MGM'
 }
 
 export enum BcrReasonEnum {

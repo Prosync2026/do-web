@@ -23,19 +23,11 @@ export default defineComponent({
         highcharts: Chart
     },
     setup() {
-        /* =======================
-           STATE
-        ======================= */
-
         const BudgetSummaryDataList = ref<CardItem[]>([]);
         const isLoadingSummary = ref(false);
 
         const pieData = ref<any>(null);
         const pieOptions = ref<any>(null);
-
-        /* =======================
-           CHART MOCK DATA
-        ======================= */
 
         const dataMap: Record<string, ChartData> = {
             root: {
@@ -57,36 +49,32 @@ export default defineComponent({
             series: [{ data: dataMap.root.series }]
         });
 
-        /* =======================
-           COMPUTED
-        ======================= */
-
         const breadcrumbTitle = computed(() => (path.value.length ? `Budget by (${path.value.at(-1)})` : 'Budget by Cost Centre (Material)'));
 
-        /* =======================
-           METHODS
-        ======================= */
+        function mapStatisticsToCards(data: Partial<BudgetStatisticsResponse>): CardItem[] {
+            const totalBudget = data.totalBudget ?? 0;
+            const totalRequested = data.totalRequested ?? 0;
+            const totalBalance = data.totalBalance ?? 0;
 
-        function mapStatisticsToCards(data: BudgetStatisticsResponse): CardItem[] {
             return [
                 {
                     title: 'Total Budget',
-                    value: `$${data.totalBudget.toLocaleString()}`,
+                    value: `RM ${totalBudget.toLocaleString()}`,
                     description: 'Total approved budget',
                     icon: 'pi pi-dollar',
                     color: 'orange'
                 },
                 {
                     title: 'Total Requested',
-                    value: `$${data.totalRequested.toLocaleString()}`,
-                    description: `Total requested budget`,
+                    value: `RM ${totalRequested.toLocaleString()}`,
+                    description: 'Total requested budget',
                     icon: 'pi pi-database',
                     color: 'green'
                 },
                 {
                     title: 'Total Balance',
-                    value: `$${data.totalBalance.toLocaleString()}`,
-                    description: `Remaining budget balance`,
+                    value: `RM ${totalBalance.toLocaleString()}`,
+                    description: 'Remaining budget balance',
                     icon: 'pi pi-building',
                     color: 'blue'
                 }
@@ -98,13 +86,7 @@ export default defineComponent({
             pieOptions.value = {};
         }
 
-        /* =======================
-           LIFECYCLE
-        ======================= */
-
         onMounted(async () => {
-            console.log('🚀 Overview mounted');
-
             setColorOptions();
             isLoadingSummary.value = true;
 
@@ -116,11 +98,7 @@ export default defineComponent({
 
                 const cards = mapStatisticsToCards(getStatisticsData);
 
-                console.log('🧩 Mapped cards:', cards);
-
                 BudgetSummaryDataList.value = cards;
-
-                console.log('✅ Final BudgetSummaryDataList:', BudgetSummaryDataList.value);
             } catch (error) {
                 console.error('❌ Failed to load summary', error);
             } finally {
