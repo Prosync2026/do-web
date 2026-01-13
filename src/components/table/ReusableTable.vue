@@ -232,7 +232,7 @@ const onSelectionChange = (newSelection: TableRow[]) => {
             :value="props.value"
             class="overflow-hidden dark:text-white"
             tableStyle="min-width: 50rem"
-            :selection-mode="props.selectionMode"
+            :selection-mode="props.selectionMode === 'checkbox' ? undefined : props.selectionMode"
             :data-key="props.dataKey || 'id'"
         >
             <!-- Checkbox Column -->

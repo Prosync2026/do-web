@@ -41,8 +41,8 @@ export default defineComponent({
         );
         const toast = useToast();
         const modalTitle = ref('Add Bulk Items from Budget');
-        const loading = ref(false);
-        const unRequiredDelivery = props.unRequiredDelivery ?? false;
+        const budgetStore = useBudgetStore();
+        const loading = computed(() => budgetStore.loading);
 
         // Filter state
         const searchTerm = ref('');
@@ -97,7 +97,6 @@ export default defineComponent({
         const selectedItems = ref<BudgetItem[]>([]);
 
         // Budget store
-        const budgetStore = useBudgetStore();
         const currentVersion = ref<number | null>(props.version || Number(localStorage.getItem('latestBudgetVersion')));
 
         // Fetch budget items with server-side filters
