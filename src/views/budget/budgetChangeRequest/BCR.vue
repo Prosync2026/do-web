@@ -18,7 +18,7 @@
             </div>
 
             <ReusableTable
-                :value="numberedRequests"
+                :value="budgetChangeRequestData"
                 :columns="tableColumns"
                 :loading="budgetCRStore.loading"
                 :pagination="budgetCRStore.pagination"

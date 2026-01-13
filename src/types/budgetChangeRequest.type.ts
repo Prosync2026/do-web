@@ -67,10 +67,18 @@ export interface BudgetChangeRequest {
     budget_change_items: BudgetChangeItem[];
 }
 
+export interface PaginationMeta {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+}
+
 export interface BudgetChangeRequestResponse {
     success: boolean;
     message?: string;
     data?: BudgetChangeRequest[];
+    pagination?: PaginationMeta;
 }
 
 export interface SingleBudgetChangeRequestResponse {

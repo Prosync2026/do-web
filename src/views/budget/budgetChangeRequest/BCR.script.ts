@@ -55,7 +55,9 @@ export default defineComponent({
         });
 
         const budgetChangeRequestData = computed(() => {
-            return budgetCRStore.budgetChangeRequestList.map((item) => {
+            const startIndex = (budgetCRStore.pagination.page - 1) * budgetCRStore.pagination.pageSize;
+
+            return budgetCRStore.budgetChangeRequestList.map((item, index) => {
                 const actions = ['view'];
 
                 if (canEditBCR.value && item.Status !== 'Approved') {
@@ -64,6 +66,7 @@ export default defineComponent({
 
                 return {
                     ...item,
+                    rowIndex: startIndex + index + 1,
                     actions
                 };
             });
