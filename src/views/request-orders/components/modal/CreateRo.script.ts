@@ -187,8 +187,9 @@ export default defineComponent({
                 return;
             }
 
-            // Create plain objects with no store references
-            const itemsWithDeliveryDate = selectedItems.value.map((item) => {
+            // Create plain objects with no store references and deep clone to break reactivity
+            const items = JSON.parse(JSON.stringify(selectedItems.value));
+            const itemsWithDeliveryDate = items.map((item: any) => {
                 const dateStr = deliveryDate.value instanceof Date ? deliveryDate.value.toISOString().split('T')[0] : String(deliveryDate.value);
 
                 return {
@@ -207,14 +208,16 @@ export default defineComponent({
                 };
             });
 
-            // Clear and emit
-            emit('bcr-items-selected', selectedItems.value);
-            const itemsToEmit = itemsWithDeliveryDate;
-            selectedItems.value = [];
-            deliveryDate.value = null;
+            // Emit deep copied data and handle state reset asynchronously to avoid recursive updates
+            emit('bcr-items-selected', items);
+            emit('items-selected', itemsWithDeliveryDate);
 
-            emit('items-selected', itemsToEmit);
-            emit('update:visible', false);
+            // Defer closing and clearing to break the update cycle
+            setTimeout(() => {
+                selectedItems.value = [];
+                deliveryDate.value = null;
+                emit('update:visible', false);
+            }, 0);
         };
 
         const getItemTypeSeverity = (itemType: string): string => {
