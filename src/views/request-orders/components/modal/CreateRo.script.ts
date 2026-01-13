@@ -5,7 +5,7 @@ import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
-import { computed, defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, toRaw, watch } from 'vue';
 
 
 import { budgetFilterService } from '@/services/budgetFilter.service';
@@ -187,11 +187,16 @@ export default defineComponent({
             //     return;
             // }
 
-            // Create plain objects with no store references and deep clone to break reactivity
-            const items = JSON.parse(JSON.stringify(selectedItems.value));
-            const itemsWithDeliveryDate = items.map((item: any) => {
-                const dateStr = deliveryDate.value instanceof Date ? deliveryDate.value.toISOString().split('T')[0] : String(deliveryDate.value);
+            // Capture values and strip reactivity immediately
+            const rawItems = toRaw(selectedItems.value);
+            const rawDate = toRaw(deliveryDate.value);
 
+            // Deep clone to ensure no references remain
+            const items = JSON.parse(JSON.stringify(rawItems));
+            
+            const dateStr = rawDate instanceof Date ? rawDate.toISOString().split('T')[0] : (rawDate ? String(rawDate) : '');
+
+            const itemsWithDeliveryDate = items.map((item: any) => {
                 return {
                     id: item.id,
                     itemCode: item.itemCode,
@@ -208,11 +213,11 @@ export default defineComponent({
                 };
             });
 
-            // Emit deep copied data and handle state reset asynchronously to avoid recursive updates
+            // Emit the processed non-reactive data
             emit('bcr-items-selected', items);
             emit('items-selected', itemsWithDeliveryDate);
 
-            // Defer closing and clearing to break the update cycle
+            // Reset state in next tick
             setTimeout(() => {
                 selectedItems.value = [];
                 deliveryDate.value = null;
