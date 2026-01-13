@@ -218,7 +218,7 @@
         </div>
 
         <!-- Modals -->
-        <CreateROModal v-model:visible="showBulkItemModal" @items-selected="handleSelectedItems" />
+        <CreateROModal v-model:visible="showBulkItemModal" :projectId="projectId" :version="0" @items-selected="handleSelectedItems" />
         <CreateStockItem v-model:visible="showStockItemModal" @items-selected="handleStockItemsSelected" />
 
         <PreviewRo v-model:visible="showPreviewModal" :summaryData="previewSummary" @submit="submitRequestOrder" />

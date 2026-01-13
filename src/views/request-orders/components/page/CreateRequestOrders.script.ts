@@ -70,6 +70,7 @@ export default defineComponent({
         const confirm = useConfirm();
         const budgetSwitching = ref(false);
         const currentProject = getCurrentProjectName();
+        const projectId = getCurrentProjectId();
         const globalDeliveryDate = ref<Date | null>(null);
 
         onMounted(async () => {
@@ -438,7 +439,9 @@ export default defineComponent({
             const duplicates: string[] = [];
             const newUniqueItems: Item[] = [];
 
-            selectedBudgetItems.forEach((budgetItem) => {
+            // Defer processing to next tick to avoid recursive updates from immediate state changes
+            setTimeout(() => {
+                selectedBudgetItems.forEach((budgetItem) => {
                 const exists = items.value.some((i) => i.itemCode === budgetItem.itemCode);
 
                 if (exists) {
@@ -494,8 +497,9 @@ export default defineComponent({
                 });
             }
 
-            // Close modal AFTER processing items
-            showCreateROModal.value = false;
+                // Close modal AFTER processing items
+                showCreateROModal.value = false;
+            }, 0);
         };
 
         const handleStockItemsSelected = (selectedStockItems: StockItem[]) => {
@@ -1020,12 +1024,14 @@ export default defineComponent({
             handleNoteInput,
             currentProject,
             formatDateToAPI,
-            globalDeliveryDate,
+
             openStockItemModal,
             showStockItemModal,
             handleStockItemsSelected,
             reasonOptions,
-            selectedReason
+            selectedReason,
+            projectId,
+            globalDeliveryDate,
         };
     }
 });
