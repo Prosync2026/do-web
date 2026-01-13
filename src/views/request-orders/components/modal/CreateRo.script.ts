@@ -174,7 +174,7 @@ export default defineComponent({
             }
 
             // Validate delivery date
-            if (!deliveryDate.value && !unRequiredDelivery) {
+            if (!deliveryDate.value && !props.unRequiredDelivery) {
                 toast.add({
                     severity: 'warn',
                     summary: 'Delivery Date Required',
@@ -372,7 +372,7 @@ export default defineComponent({
             columns,
             deliveryDate,
             showValidation,
-            unRequiredDelivery
+
         };
     }
 });
