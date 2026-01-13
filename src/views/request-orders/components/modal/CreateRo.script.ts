@@ -1,13 +1,11 @@
 import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref, toRaw, watch } from 'vue';
 
-
+import ReusableTable from '@/components/table/ReusableTable.vue';
 import { budgetFilterService } from '@/services/budgetFilter.service';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { TableColumn } from '@/types/table.type';
@@ -18,8 +16,7 @@ export default defineComponent({
     name: 'CreateROModal',
     components: {
         Dialog,
-        DataTable,
-        Column,
+        ReusableTable,
         Button,
         InputText,
         Dropdown,
@@ -166,26 +163,26 @@ export default defineComponent({
         const addSelectedItems = () => {
             showValidation.value = true;
 
-            // if (selectedItems.value.length === 0) {
-            //     toast.add({
-            //         severity: 'warn',
-            //         summary: 'No Items Selected',
-            //         detail: 'Please select at least one item.',
-            //         life: 3000
-            //     });
-            //     return;
-            // }
+            if (selectedItems.value.length === 0) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'No Items Selected',
+                    detail: 'Please select at least one item.',
+                    life: 3000
+                });
+                return;
+            }
 
-            // // Validate delivery date
-            // if (!deliveryDate.value && !props.unRequiredDelivery) {
-            //     toast.add({
-            //         severity: 'warn',
-            //         summary: 'Delivery Date Required',
-            //         detail: 'Please select a delivery date before adding items.',
-            //         life: 3000
-            //     });
-            //     return;
-            // }
+            // Validate delivery date
+            if (!deliveryDate.value && !props.unRequiredDelivery) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Delivery Date Required',
+                    detail: 'Please select a delivery date before adding items.',
+                    life: 3000
+                });
+                return;
+            }
 
             // Capture values and strip reactivity immediately
             const rawItems = toRaw(selectedItems.value);
@@ -340,34 +337,34 @@ export default defineComponent({
             { field: 'amount', header: 'Amount', bodySlot: 'amountSlot', visible: false }
         ];
 
-        const visibleColumns = computed(() => columns.filter((c) => c.visible !== false));
+        // const visibleColumns = computed(() => columns.filter((c) => c.visible !== false));
 
-        const getPaginationNumbers = (): number[] => {
-            const totalPages = pagination.value.totalPages || 1;
-            const currentPage = pagination.value.page;
-            const maxVisible = 5;
-            const numbers: number[] = [];
+        // const getPaginationNumbers = (): number[] => {
+        //     const totalPages = pagination.value.totalPages || 1;
+        //     const currentPage = pagination.value.page;
+        //     const maxVisible = 5;
+        //     const numbers: number[] = [];
 
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-            const endPage = Math.min(totalPages, startPage + maxVisible - 1);
+        //     let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        //     const endPage = Math.min(totalPages, startPage + maxVisible - 1);
 
-            if (endPage - startPage + 1 < maxVisible) {
-                startPage = Math.max(1, endPage - maxVisible + 1);
-            }
+        //     if (endPage - startPage + 1 < maxVisible) {
+        //         startPage = Math.max(1, endPage - maxVisible + 1);
+        //     }
 
-            for (let i = startPage; i <= endPage; i++) {
-                numbers.push(i);
-            }
-            return numbers;
-        };
+        //     for (let i = startPage; i <= endPage; i++) {
+        //         numbers.push(i);
+        //     }
+        //     return numbers;
+        // };
 
-        const displayStart = computed(() => {
-            return (pagination.value.page - 1) * pagination.value.pageSize + 1;
-        });
+        // const displayStart = computed(() => {
+        //     return (pagination.value.page - 1) * pagination.value.pageSize + 1;
+        // });
 
-        const displayEnd = computed(() => {
-            return Math.min(pagination.value.page * pagination.value.pageSize, pagination.value.total);
-        });
+        // const displayEnd = computed(() => {
+        //     return Math.min(pagination.value.page * pagination.value.pageSize, pagination.value.total);
+        // });
 
         onMounted(async () => {
             if (currentVersion.value) {
@@ -412,10 +409,6 @@ export default defineComponent({
             selectedItemCode,
             selectedStatus,
             columns,
-            visibleColumns,
-            getPaginationNumbers,
-            displayStart,
-            displayEnd,
             deliveryDate,
             showValidation,
 
