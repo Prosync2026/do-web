@@ -194,7 +194,9 @@ export default defineComponent({
             // Deep clone to ensure no references remain
             const items = JSON.parse(JSON.stringify(rawItems));
             
-            const dateStr = rawDate instanceof Date ? rawDate.toISOString().split('T')[0] : (rawDate ? String(rawDate) : '');
+            const dateStr = rawDate instanceof Date 
+                ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}`
+                : (rawDate ? String(rawDate) : '');
 
             const itemsWithDeliveryDate = items.map((item: any) => {
                 return {

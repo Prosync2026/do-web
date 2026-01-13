@@ -457,7 +457,7 @@ export default defineComponent({
                         uom: budgetItem.uom,
                         budgetItemId: budgetItem.id,
                         qty: budgetItem.qty,
-                        deliveryDate: formatDateToAPI(budgetItem.deliveryDate ?? null),
+                        deliveryDate: budgetItem.deliveryDate ? new Date(budgetItem.deliveryDate) : null,
                         notes: '',
                         remark: '',
                         price: budgetItem.price,
