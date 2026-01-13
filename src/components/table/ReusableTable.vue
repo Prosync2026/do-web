@@ -65,7 +65,7 @@ const emit = defineEmits<{
 const search = ref('');
 const activeFilters = ref<Record<string, any>>({});
 const hasLoadedOnce = ref(false);
-const internalSelection = ref<TableRow[]>([]);
+
 
 const menu = ref();
 const currentRow = ref<TableRow | null>(null);
@@ -176,10 +176,10 @@ const displayEnd = computed(() => {
 });
 
 // Handle selection update from DataTable
-const onSelectionChange = (newSelection: TableRow[]) => {
-    internalSelection.value = newSelection;
-    emit('update:selection', newSelection);
-};
+const selectionProxy = computed({
+    get: () => props.selection || [],
+    set: (val) => emit('update:selection', val)
+});
 </script>
 
 <template>
@@ -227,8 +227,7 @@ const onSelectionChange = (newSelection: TableRow[]) => {
     <template v-else>
         <DataTable
             v-if="props.selectionMode"
-            :selection="selection || []"
-            @update:selection="onSelectionChange"
+            v-model:selection="selectionProxy"
             :value="props.value"
             class="overflow-hidden dark:text-white"
             tableStyle="min-width: 50rem"
@@ -238,7 +237,7 @@ const onSelectionChange = (newSelection: TableRow[]) => {
             <!-- Checkbox Column -->
             <Column v-if="props.selectionMode === 'checkbox'" selection-mode="multiple" style="width: 3rem" />
 
-            <Column v-for="(col, idx) in visibleColumns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
+            <Column v-for="(col, idx) in visibleColumns" :key="col.field || idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
                     <slot :name="col.bodySlot" :data="slotProps.data" />
                 </template>
@@ -260,7 +259,7 @@ const onSelectionChange = (newSelection: TableRow[]) => {
         </DataTable>
 
         <DataTable v-else :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem" :data-key="props.dataKey || 'id'">
-            <Column v-for="(col, idx) in visibleColumns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
+            <Column v-for="(col, idx) in visibleColumns" :key="col.field || idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
                     <slot :name="col.bodySlot" :data="slotProps.data" />
                 </template>
