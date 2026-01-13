@@ -1,11 +1,13 @@
 import Button from 'primevue/button';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
-import ReusableTable from '@/components/table/ReusableTable.vue';
+
 import { budgetFilterService } from '@/services/budgetFilter.service';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { TableColumn } from '@/types/table.type';
@@ -16,7 +18,8 @@ export default defineComponent({
     name: 'CreateROModal',
     components: {
         Dialog,
-        ReusableTable,
+        DataTable,
+        Column,
         Button,
         InputText,
         Dropdown,
@@ -327,6 +330,35 @@ export default defineComponent({
             { field: 'amount', header: 'Amount', bodySlot: 'amountSlot', visible: false }
         ];
 
+        const visibleColumns = computed(() => columns.filter((c) => c.visible !== false));
+
+        const getPaginationNumbers = (): number[] => {
+            const totalPages = pagination.value.totalPages || 1;
+            const currentPage = pagination.value.page;
+            const maxVisible = 5;
+            const numbers: number[] = [];
+
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            const endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+            if (endPage - startPage + 1 < maxVisible) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                numbers.push(i);
+            }
+            return numbers;
+        };
+
+        const displayStart = computed(() => {
+            return (pagination.value.page - 1) * pagination.value.pageSize + 1;
+        });
+
+        const displayEnd = computed(() => {
+            return Math.min(pagination.value.page * pagination.value.pageSize, pagination.value.total);
+        });
+
         onMounted(async () => {
             if (currentVersion.value) {
                 await budgetStore.fetchBudgets(currentVersion.value);
@@ -370,6 +402,10 @@ export default defineComponent({
             selectedItemCode,
             selectedStatus,
             columns,
+            visibleColumns,
+            getPaginationNumbers,
+            displayStart,
+            displayEnd,
             deliveryDate,
             showValidation,
 

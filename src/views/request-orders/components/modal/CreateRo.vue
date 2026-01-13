@@ -75,25 +75,65 @@
         <Message v-if="showValidation && selectedItems.length === 0" severity="error" icon="pi pi-times-circle"> At least one item must be selected </Message>
 
         <!-- Table -->
-        <ReusableTable
-            :value="paginatedItems"
-            dataKey="id"
-            :columns="columns"
-            :selection-mode="'checkbox'"
-            v-model:selection="selectedItems"
-            :loading="loading"
-            :pagination="pagination"
-            :onPageChange="handlePageChange"
-            :onPageSizeChange="handlePageSizeChange"
-        >
-            <template #rateSlot="{ data }">
-                {{ Number(data.Rate || 0).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}
-            </template>
+        <div class="relative dark:text-white">
+            <DataTable
+                v-model:selection="selectedItems"
+                :value="paginatedItems"
+                dataKey="id"
+                class="p-datatable-sm"
+                :loading="loading"
+                scrollable
+                scrollHeight="400px"
+            >
+                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+                <Column v-for="col in visibleColumns" :key="col.field" :field="col.field" :header="col.header" :sortable="col.sortable">
+                    <template v-if="col.bodySlot" #body="{ data }">
+                         <span v-if="col.bodySlot === 'rateSlot'">
+                             {{ Number(data.Rate || 0).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}
+                         </span>
+                         <span v-else-if="col.bodySlot === 'amountSlot'">
+                             {{ Number(data.Amount || 0).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}
+                         </span>
+                         <span v-else>
+                            {{ data[col.field] }}
+                         </span>
+                    </template>
+                </Column>
+            </DataTable>
 
-            <template #amountSlot="{ data }">
-                {{ Number(data.Amount || 0).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}
-            </template>
-        </ReusableTable>
+            <!-- Custom Pagination -->
+            <div v-if="pagination" class="flex flex-col sm:flex-row items-center mt-4 px-4 py-3 border-t dark:border-gray-700 w-full">
+                <div class="w-full sm:w-1/3 text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">
+                    Showing {{ displayStart }} – {{ displayEnd }} of {{ pagination.total }}
+                </div>
+
+                <div class="w-full sm:w-1/3 flex justify-center items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">
+                    <Button icon="pi pi-angle-double-left" text :disabled="pagination.page === 1" @click="handlePageChange(1)" title="First Page" />
+                    <Button icon="pi pi-angle-left" text :disabled="pagination.page === 1" @click="handlePageChange(pagination.page - 1)" title="Previous Page" />
+
+                    <div class="flex gap-1">
+                        <Button
+                            v-for="pageNum in getPaginationNumbers()"
+                            :key="pageNum"
+                            :label="`${pageNum}`"
+                            :severity="pageNum === pagination.page ? 'primary' : 'secondary'"
+                            :text="pageNum !== pagination.page"
+                            @click="handlePageChange(pageNum)"
+                            rounded
+                            class="w-8 h-8 p-0 flex items-center justify-center text-xs"
+                        />
+                    </div>
+
+                    <Button icon="pi pi-angle-right" text :disabled="pagination.page >= (pagination.totalPages || 1)" @click="handlePageChange(pagination.page + 1)" title="Next Page" />
+                    <Button icon="pi pi-angle-double-right" text :disabled="pagination.page >= (pagination.totalPages || 1)" @click="handlePageChange(pagination.totalPages || 1)" title="Last Page" />
+                </div>
+
+                 <div class="w-full sm:w-1/3 flex justify-end mt-2 sm:mt-0 items-center gap-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Rows per page:</span>
+                    <Dropdown :modelValue="pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="[10, 25, 50, 100]" class="w-20" />
+                </div>
+            </div>
+        </div>
 
         <!-- Footer -->
         <template #footer>
