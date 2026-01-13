@@ -139,7 +139,7 @@
         <template #footer>
             <div class="flex flex-col gap-3 w-full">
                 <!-- Delivery Date -->
-                <div class="flex flex-col gap-1" v-if="!unRequiredDelivery">
+                <div class="flex flex-col gap-1">
                     <div class="flex items-center gap-3">
                         <label class="text-sm font-semibold w-32"> Delivery Date <span class="text-red-500">*</span> </label>
 
@@ -148,7 +148,7 @@
                         <span class="text-xs text-gray-500"> (Applied to selected items) </span>
                     </div>
 
-                    <Message v-if="showValidation && !deliveryDate" severity="error" icon="pi pi-times-circle"> Delivery date is required </Message>
+                    <!-- <Message v-if="showValidation && !deliveryDate" severity="error" icon="pi pi-times-circle"> Delivery date is required </Message> -->
                 </div>
 
                 <!-- Actions -->

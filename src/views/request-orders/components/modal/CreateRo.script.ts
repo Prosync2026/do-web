@@ -166,26 +166,26 @@ export default defineComponent({
         const addSelectedItems = () => {
             showValidation.value = true;
 
-            if (selectedItems.value.length === 0) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'No Items Selected',
-                    detail: 'Please select at least one item.',
-                    life: 3000
-                });
-                return;
-            }
+            // if (selectedItems.value.length === 0) {
+            //     toast.add({
+            //         severity: 'warn',
+            //         summary: 'No Items Selected',
+            //         detail: 'Please select at least one item.',
+            //         life: 3000
+            //     });
+            //     return;
+            // }
 
-            // Validate delivery date
-            if (!deliveryDate.value && !props.unRequiredDelivery) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Delivery Date Required',
-                    detail: 'Please select a delivery date before adding items.',
-                    life: 3000
-                });
-                return;
-            }
+            // // Validate delivery date
+            // if (!deliveryDate.value && !props.unRequiredDelivery) {
+            //     toast.add({
+            //         severity: 'warn',
+            //         summary: 'Delivery Date Required',
+            //         detail: 'Please select a delivery date before adding items.',
+            //         life: 3000
+            //     });
+            //     return;
+            // }
 
             // Create plain objects with no store references and deep clone to break reactivity
             const items = JSON.parse(JSON.stringify(selectedItems.value));
