@@ -10,7 +10,7 @@ export const mapPagination = (p: any): Pagination => ({
     total: p?.total ?? p?.totalBudgetItems ?? 0,
     totalPages: p?.totalPages ?? 1,
     page: p?.page ?? 1,
-    pageSize: p?.pageSize ?? 10
+    pageSize: 10 //set as default 10
 });
 
 export const useBudgetStore = defineStore('budget', () => {
