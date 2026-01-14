@@ -16,8 +16,17 @@ export const mapPagination = (p: any): Pagination => ({
 export const useBudgetStore = defineStore('budget', () => {
     const budgets = ref<Budget[]>([]);
     const budgetItems = ref<BudgetItem[]>([]);
-    const pagination = ref<Pagination>({ total: 0, totalPages: 0, page: 1, pageSize: 10 });
+    const pagination = ref<Pagination>({ total: 0, totalPages: 1, page: 1, pageSize: 10 });
     const loading = ref(false);
+
+    const applyPagination = (p: any) => {
+        const mapped = mapPagination(p);
+
+        pagination.value.total = mapped.total;
+        pagination.value.totalPages = mapped.totalPages;
+        pagination.value.page = mapped.page;
+        pagination.value.pageSize = mapped.pageSize;
+    };
 
     async function fetchBudgetVersion(): Promise<BudgetVersion[]> {
         loading.value = true;
@@ -41,7 +50,13 @@ export const useBudgetStore = defineStore('budget', () => {
     async function fetchBudgets(version = 1, page = pagination.value.page, pageSize = pagination.value.pageSize) {
         loading.value = true;
         try {
-            const response = await budgetService.getBudgets({ projectId: getCurrentProjectId(), version, page, pageSize });
+            const response = await budgetService.getBudgets({
+                projectId: getCurrentProjectId(),
+                version,
+                page,
+                pageSize
+            });
+
             budgets.value = response.data.map((b: any) => ({
                 id: b.Id,
                 name: b.BudgetName,
@@ -53,7 +68,8 @@ export const useBudgetStore = defineStore('budget', () => {
                 createdAt: formatDate(b.CreatedAt),
                 items: b.budgetitems || []
             }));
-            pagination.value = mapPagination(response.pagination);
+
+            applyPagination(response.pagination);
         } catch (error) {
             showError(error, 'Failed to fetch budgets.');
         } finally {
@@ -69,8 +85,8 @@ export const useBudgetStore = defineStore('budget', () => {
             const queryParams: GetBudgetItemsParams = {
                 projectId: getCurrentProjectId(),
                 budgetId: filters.budgetId,
-                page: filters.page || 1,
-                pageSize: filters.pageSize || 10
+                page: filters.page ?? pagination.value.page,
+                pageSize: filters.pageSize ?? 10
             };
 
             // Add optional filters only if they have values
@@ -129,7 +145,7 @@ export const useBudgetStore = defineStore('budget', () => {
             }));
 
             budgetItems.value = mappedItems;
-            pagination.value = mapPagination(response.pagination);
+            applyPagination(response.pagination);
         } catch (error) {
             console.error('Budget items fetch error:', error);
             showError(error, 'Failed to fetch budget items.');
