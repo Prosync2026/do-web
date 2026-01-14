@@ -66,6 +66,7 @@ export default defineComponent({
         const newAttachments = ref<File[]>([]);
         const existingAttachments = ref<AttachmentItem[]>([]);
         const isAttachmentValid = ref(true);
+
         const showValidation = ref(false);
         const confirm = useConfirm();
         const budgetSwitching = ref(false);
@@ -442,60 +443,60 @@ export default defineComponent({
             // Defer processing to next tick to avoid recursive updates from immediate state changes
             setTimeout(() => {
                 selectedBudgetItems.forEach((budgetItem) => {
-                const exists = items.value.some((i) => i.itemCode === budgetItem.itemCode);
+                    const exists = items.value.some((i) => i.itemCode === budgetItem.itemCode);
 
-                if (exists) {
-                    duplicates.push(budgetItem.itemCode);
-                } else {
-                    newUniqueItems.push({
-                        itemCode: budgetItem.itemCode,
-                        itemType: budgetItem.itemType,
-                        description: budgetItem.description,
-                        location: budgetItem.location,
-                        location1: budgetItem.location1,
-                        location2: budgetItem.location2,
-                        uom: budgetItem.uom,
-                        budgetItemId: budgetItem.id,
-                        qty: budgetItem.qty,
-                        deliveryDate: budgetItem.deliveryDate ? new Date(budgetItem.deliveryDate) : null,
-                        notes: '',
-                        remark: '',
-                        price: budgetItem.price,
-                        showNotes: false,
-                        showRemark: false,
-                        isBudgeted: true
-                    });
-                    const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode);
-                    if (!existingOption) {
-                        itemOptions.value.push({
-                            label: budgetItem.itemCode,
-                            value: budgetItem.itemCode,
+                    if (exists) {
+                        duplicates.push(budgetItem.itemCode);
+                    } else {
+                        newUniqueItems.push({
+                            itemCode: budgetItem.itemCode,
+                            itemType: budgetItem.itemType,
                             description: budgetItem.description,
                             location: budgetItem.location,
-                            uom: budgetItem.uom
+                            location1: budgetItem.location1,
+                            location2: budgetItem.location2,
+                            uom: budgetItem.uom,
+                            budgetItemId: budgetItem.id,
+                            qty: budgetItem.qty,
+                            deliveryDate: budgetItem.deliveryDate ? new Date(budgetItem.deliveryDate) : null,
+                            notes: '',
+                            remark: '',
+                            price: budgetItem.price,
+                            showNotes: false,
+                            showRemark: false,
+                            isBudgeted: true
                         });
+                        const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode);
+                        if (!existingOption) {
+                            itemOptions.value.push({
+                                label: budgetItem.itemCode,
+                                value: budgetItem.itemCode,
+                                description: budgetItem.description,
+                                location: budgetItem.location,
+                                uom: budgetItem.uom
+                            });
+                        }
                     }
+                });
+
+                if (newUniqueItems.length > 0) {
+                    items.value.push(...newUniqueItems);
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Items Added',
+                        detail: `${newUniqueItems.length} item(s) added from budget`,
+                        life: 2500
+                    });
                 }
-            });
 
-            if (newUniqueItems.length > 0) {
-                items.value.push(...newUniqueItems);
-                toast.add({
-                    severity: 'success',
-                    summary: 'Items Added',
-                    detail: `${newUniqueItems.length} item(s) added from budget`,
-                    life: 2500
-                });
-            }
-
-            if (duplicates.length > 0) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Duplicate Items',
-                    detail: `These items were already added: ${duplicates.join(', ')}. Only new items were added.`,
-                    life: 9000
-                });
-            }
+                if (duplicates.length > 0) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Duplicate Items',
+                        detail: `These items were already added: ${duplicates.join(', ')}. Only new items were added.`,
+                        life: 9000
+                    });
+                }
 
                 // Close modal AFTER processing items
                 showCreateROModal.value = false;
@@ -1031,7 +1032,7 @@ export default defineComponent({
             reasonOptions,
             selectedReason,
             projectId,
-            globalDeliveryDate,
+            globalDeliveryDate
         };
     }
 });

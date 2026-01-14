@@ -1,7 +1,7 @@
 // CreateBCR.script.ts
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BCRTableItem, BudgetChangeItemPayload, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
+import type { AttachmentItem, BCRTableItem, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
 import { getCurrentProjectName } from '@/utils/contextHelper';
 import SingleBudgetModal from '@/views/budget/components/dialog/CreateSingleBudgetItem.vue';
 import MeterialModal from '@/views/request-orders/components/modal/CreateRo.vue';
@@ -28,6 +28,79 @@ export default defineComponent({
         const projectName = getCurrentProjectName();
         const showValidation = ref(false);
         const toast = useToast();
+
+        // File upload states
+        const totalSize = ref(0);
+        const totalSizePercent = ref(0);
+        const files = ref<File[]>([]);
+        const overallRemark = ref('');
+        const MAX_FILE_SIZE = 1_000_000;
+        const attachments = ref<File[]>([]); // for payload
+        const newAttachments = ref<File[]>([]); // for UI display
+        const existingAttachments = ref<any[]>([]);
+        const isAttachmentValid = ref(true);
+        const fileupload = ref<any>(null);
+
+        const formatBytes = (bytes: number) => {
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            if (bytes === 0) return '0 B';
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+        };
+
+        const createObjectURL = (file: File) => URL.createObjectURL(file);
+
+        const onSelectedFiles = (event: { files: File[] }) => {
+            // Store files for payload
+            attachments.value = Array.from(event.files);
+
+            let totalSizeTemp = 0;
+            let valid = true;
+
+            attachments.value.forEach((file: File) => {
+                const size = file.size || 0;
+                totalSizeTemp += size;
+                if (size > MAX_FILE_SIZE) valid = false;
+            });
+
+            totalSize.value = totalSizeTemp;
+            totalSizePercent.value = (totalSize.value / MAX_FILE_SIZE) * 100;
+
+            isAttachmentValid.value = valid && totalSize.value <= MAX_FILE_SIZE;
+
+            if (!isAttachmentValid.value) {
+                toast.add({
+                    severity: 'error',
+                    summary: 'File too large',
+                    detail: `Each file must not exceed ${formatBytes(MAX_FILE_SIZE)}.`,
+                    life: 5000
+                });
+            }
+        };
+
+        const removeAttachment = (index: number) => {
+            newAttachments.value.splice(index, 1);
+            attachments.value.splice(index, 1);
+
+            // Recalculate total size
+            totalSize.value = newAttachments.value.reduce((sum, file) => sum + (file.size || 0), 0);
+            totalSizePercent.value = (totalSize.value / MAX_FILE_SIZE) * 100;
+        };
+
+        const formatSize = (bytes: number) => {
+            if (!bytes) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        };
+
+        const previewAttachment = (file: AttachmentItem) => {
+            if (file.path) {
+                window.open(file.path, '_blank');
+            }
+        };
+
         // --- Reason Options ---
         const reasonOptions = ref([
             { label: 'Exceed Budget', value: 'Exceed Budget' },
@@ -40,7 +113,7 @@ export default defineComponent({
         const budgetStore = useBudgetStore();
 
         // --- Current Budget Version ---
-        let latestVersionStr = localStorage.getItem('latestBudgetVersion');
+        const latestVersionStr = localStorage.getItem('latestBudgetVersion');
         const currentVersion = ref<number | null>(latestVersionStr !== null && !isNaN(Number(latestVersionStr)) ? Number(latestVersionStr) : null);
 
         // --- Budget Items from Store ---
@@ -190,7 +263,6 @@ export default defineComponent({
 
         const totalVarianceAmount = computed(() => items.value.reduce((acc, it) => acc + calcEstimatedExceed(it), 0));
 
-        const isAttachmentValid = ref(true);
         const handleExport = () => {
             const headers = ['Item Code', 'Description', 'UOM', 'Unit Price', 'Budget Qty', 'Ordered Qty', 'New Order', 'Remark'];
 
@@ -212,7 +284,6 @@ export default defineComponent({
         const submitRequest = async () => {
             showValidation.value = true;
 
-            // validation
             const reasonValid = !!selectedReason.value;
             const itemsValid = items.value.length > 0;
 
@@ -235,8 +306,10 @@ export default defineComponent({
                 }
                 return;
             }
+
             const selectedProject = ref(JSON.parse(localStorage.getItem('selectedProject') || '{}'));
             const projectId = computed(() => selectedProject.value.ProjectId);
+
             const payload: BudgetChangeRequestPayload = {
                 ProjectId: projectId.value,
                 BudgetId: items.value[0]?.budgetId ?? currentVersion.value,
@@ -246,9 +319,8 @@ export default defineComponent({
                 Reason: selectedReason.value || '',
                 Remark: remarks.value,
                 TotalAmount: totalVarianceAmount.value,
-
                 Type: 'BudgetChangeRequest',
-                Items: items.value.map<BudgetChangeItemPayload>((i) => ({
+                Items: items.value.map((i) => ({
                     BudgetItemId: i.id ?? null,
                     ItemType: i.itemType,
                     ItemCode: i.itemCode,
@@ -270,8 +342,10 @@ export default defineComponent({
                     ExceededQty: calcExceedQty(i)
                 }))
             };
-            console.log('Submitting BCR Payload', payload);
-            const result = await budgetCRStore.createBudgetChangeRequest(payload);
+            const attachmentsToSend = attachments.value && attachments.value.length > 0 ? attachments.value : undefined;
+
+            const result = await budgetCRStore.createBudgetChangeRequest(payload, attachmentsToSend);
+
             if (result) {
                 router.push({ name: 'budgetChangeRequest' });
             }
@@ -305,7 +379,19 @@ export default defineComponent({
             goBack,
             projectName,
             showValidation,
-            budgetItems
+            budgetItems,
+            existingAttachments,
+            newAttachments,
+            removeAttachment,
+            previewAttachment,
+            formatSize,
+            files,
+            overallRemark,
+            totalSize,
+            totalSizePercent,
+            fileupload,
+            onSelectedFiles,
+            createObjectURL
         };
     }
 });

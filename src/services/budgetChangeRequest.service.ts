@@ -40,6 +40,7 @@ const getBudgetChangeRequests = async (params?: GetBudgetParams): Promise<Budget
 const createBudgetChangeRequest = async (payload: BudgetChangeRequestPayload, attachments?: File[]): Promise<BudgetChangeRequestResponse> => {
     try {
         const formData = new FormData();
+
         formData.append('data', JSON.stringify(payload));
 
         if (attachments && attachments.length > 0) {

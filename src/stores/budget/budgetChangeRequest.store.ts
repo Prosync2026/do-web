@@ -107,10 +107,10 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
             }
         },
 
-        async createBudgetChangeRequest(payload: BudgetChangeRequestPayload) {
+        async createBudgetChangeRequest(payload: BudgetChangeRequestPayload, attachments?: File[]) {
             this.loading = true;
             try {
-                const response = await budgetChangeRequestService.createBudgetChangeRequest(payload);
+                const response = await budgetChangeRequestService.createBudgetChangeRequest(payload, attachments);
 
                 if (!response.success) {
                     showError(response.message || 'Failed to create Budget Change Request.');
@@ -128,7 +128,6 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
                 this.loading = false;
             }
         },
-
         async getSingleBudgetChange(bcrId: number) {
             this.loading = true;
             try {

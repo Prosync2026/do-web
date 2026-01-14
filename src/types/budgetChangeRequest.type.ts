@@ -254,3 +254,10 @@ export interface reviewItem {
     BudgetChangeItemId: number;
     RecommendedQty: string;
 }
+
+export interface AttachmentItem {
+    filename: string;
+    path: string;
+    size?: number;
+    type?: string;
+}
