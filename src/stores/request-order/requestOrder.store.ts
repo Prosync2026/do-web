@@ -197,6 +197,18 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         fetchOrders();
     }
 
+    function handleSearch(value: string) {
+        filters.search = value;
+        pagination.page = 1;
+        fetchOrders();
+    }
+
+    function handleStatusChange(status: string) {
+        filters.status = status;
+        pagination.page = 1;
+        fetchOrders();
+    }
+
     return {
         orders,
         selectedOrder,
@@ -209,6 +221,8 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         updateOrder,
         setPage,
         setPageSize,
-        totalCounts
+        totalCounts,
+        handleSearch,
+        handleStatusChange
     };
 });

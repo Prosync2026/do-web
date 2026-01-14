@@ -43,9 +43,10 @@
             </div>
 
             <!-- Materials Section -->
+            <label class="block text-sm text-gray-600 mb-1">Materials Section</label>
+
             <div class="card p-4 mb-6 border">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">Materials Section</h2>
                     <div class="flex gap-2">
                         <Button label="＋ Add from Budget List" class="bg-blue-500 text-white hover:bg-blue-600" @click="openMeterial" />
 
@@ -203,6 +204,38 @@
                         </div>
                     </Motion>
                 </div>
+            </div>
+            <!-- Attachments -->
+            <div class="mt-4">
+                <label class="block text-sm text-gray-600 mb-2">Attachments</label>
+                <div v-if="existingAttachments.length > 0" class="mb-4">
+                    <h4 class="text-sm font-semibold mb-2">Existing Attachments</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <div v-for="(file, index) in existingAttachments" :key="`existing-${index}`" class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+                            <i class="pi pi-file"></i>
+                            <span class="text-sm">{{ file.filename }}</span>
+                            <Button icon="pi pi-eye" text rounded severity="info" @click="previewAttachment(file)" />
+                            <Button icon="pi pi-times" text rounded severity="danger" @click="removeAttachment(index)" />
+                        </div>
+                    </div>
+                </div>
+
+                <FileUpload ref="fileupload" name="attachments" :multiple="true" accept="image/*" :maxFileSize="1000000" :auto="false" @select="onSelectedFiles" :showUploadButton="false" :showCancelButton="false">
+                    <template #content>
+                        <div v-if="attachments && attachments.length > 0" class="flex flex-wrap gap-4 mt-4">
+                            <div v-for="(file, index) of attachments" :key="`${file.name}-${index}`" class="relative w-24 h-24">
+                                <img :src="createObjectURL(file)" :alt="file.name" class="w-full h-full object-cover rounded-lg" />
+                                <Button icon="pi pi-times" rounded severity="danger" class="absolute -top-2 -right-2 w-8 h-8" @click="attachments.splice(index, 1)" />
+                            </div>
+                        </div>
+                    </template>
+                    <template #empty>
+                        <div class="flex items-center justify-center flex-col p-8">
+                            <i class="pi pi-cloud-upload text-4xl text-gray-400 mb-2" />
+                            <p class="text-sm text-gray-500">Drag and drop image files here or click to select</p>
+                        </div>
+                    </template>
+                </FileUpload>
             </div>
             <div class="flex justify-end mb-6">
                 <div class="flex gap-2">
