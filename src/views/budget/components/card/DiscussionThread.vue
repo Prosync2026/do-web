@@ -238,30 +238,42 @@ export default defineComponent({
 
         onMounted(init);
 
-        const firstPendingIndex = () => {
+        const isPreStepsCompleted = () => {
             for (let i = 0; i < 3; i++) {
-                if (!discussions.value[i].id) return i;
+                if (!discussions.value[i].id) return false;
+            }
+            return true;
+        };
+
+        const getCurrentPrePendingIndex = () => {
+            for (let i = 0; i < 3; i++) {
+                if (!discussions.value[i].RecommendationType) return i;
             }
             return -1;
         };
-
         const isFinalStepCompleted = () => {
             const pdIndex = ROLE_ORDER.indexOf('PD');
             const mgmIndex = ROLE_ORDER.indexOf('MGM');
-
-            return discussions.value[pdIndex].id || discussions.value[mgmIndex].id;
+            return !!(discussions.value[pdIndex].RecommendationType || discussions.value[mgmIndex].RecommendationType);
         };
 
         const getStepStatusText = (item: DiscussionItem, index: number) => {
             if (item.RecommendationType) return item.RecommendationType;
 
             if (index < 3) {
-                const firstPending = firstPendingIndex();
-                if (firstPending === -1) return 'Waiting';
-                if (index === firstPending) return 'Pending';
+                const pendingIndex = getCurrentPrePendingIndex();
+                if (index === pendingIndex) return 'Pending';
                 return 'Waiting';
             }
-            if (!item.id && !isFinalStepCompleted()) return 'Pending';
+
+            if (!isPreStepsCompleted()) {
+                return 'Waiting';
+            }
+
+            if (!isFinalStepCompleted()) {
+                return 'Pending';
+            }
+
             return 'Waiting';
         };
 
@@ -270,13 +282,19 @@ export default defineComponent({
             if (item.RecommendationType) return 'success';
 
             if (index < 3) {
-                const firstPending = firstPendingIndex();
-                if (firstPending === -1) return 'secondary';
-                if (index === firstPending) return 'warn';
+                const pendingIndex = getCurrentPrePendingIndex();
+                if (index === pendingIndex) return 'warn';
                 return 'secondary';
             }
 
-            if (!item.id && !isFinalStepCompleted()) return 'warn';
+            if (!isPreStepsCompleted()) {
+                return 'secondary';
+            }
+
+            if (!isFinalStepCompleted()) {
+                return 'warn';
+            }
+
             return 'secondary';
         };
 
