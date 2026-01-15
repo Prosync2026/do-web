@@ -137,6 +137,7 @@ export default defineComponent({
                 }));
             }
 
+            console.log('payload', payload);
             budgetChangeRequestService.rolesReviewRecommendation(budgetChangeRequestId, payload).then(() => {
                 selection.value = '';
                 reasonSelection.value = '';
