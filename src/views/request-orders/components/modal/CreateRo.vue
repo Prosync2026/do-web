@@ -75,7 +75,6 @@
         <Message v-if="showValidation && selectedItems.length === 0" severity="error" icon="pi pi-times-circle"> At least one item must be selected </Message>
 
         <!-- Table -->
-        <!-- Table -->
         <ReusableTable
             :value="paginatedItems"
             dataKey="id"

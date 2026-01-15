@@ -6,6 +6,7 @@ import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref, toRaw, watch } from 'vue';
 
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { budgetService } from '@/services/budget.service';
 import { budgetFilterService } from '@/services/budgetFilter.service';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { TableColumn } from '@/types/table.type';
@@ -67,6 +68,40 @@ export default defineComponent({
         // delivery date
         const deliveryDate = ref<Date | null>(null);
         const showValidation = ref(false);
+
+        // statistics
+        const itemStats = ref<Record<number, any>>({});
+
+        const fetchItemStatistics = async (budgetItemIds: number[]) => {
+            const stats: Record<number, any> = {};
+
+            await Promise.all(
+                budgetItemIds.map(async (id) => {
+                    try {
+                        const response = await budgetService.budgetStatistics(id);
+                        if (response.success) {
+                            stats[id] = response.data;
+                        }
+                    } catch (error) {
+                        console.error(`Failed to fetch stats for item ${id}`, error);
+                    }
+                })
+            );
+
+            itemStats.value = stats;
+        };
+
+        watch(
+            () => budgetStore.budgetItems,
+            async (items) => {
+                const ids = items.map((i) => i.id).filter((id): id is number => typeof id === 'number');
+
+                if (ids.length) {
+                    await fetchItemStatistics(ids);
+                }
+            },
+            { immediate: true }
+        );
 
         // handler
         const onSubElementClick = () => {
@@ -190,10 +225,8 @@ export default defineComponent({
 
             // Deep clone to ensure no references remain
             const items = JSON.parse(JSON.stringify(rawItems));
-            
-            const dateStr = rawDate instanceof Date 
-                ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}`
-                : (rawDate ? String(rawDate) : '');
+
+            const dateStr = rawDate instanceof Date ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}` : rawDate ? String(rawDate) : '';
 
             const itemsWithDeliveryDate = items.map((item: any) => {
                 return {
@@ -319,7 +352,18 @@ export default defineComponent({
             return selectedItems.value.reduce((sum, item) => sum + Number(item.rate ?? 0) * Number(item.qty ?? 0), 0);
         });
 
-        const paginatedItems = computed(() => budgetStore.budgetItems);
+        const paginatedItems = computed(() => {
+            return budgetStore.budgetItems.map((item) => {
+                const stats = itemStats.value[item.id];
+
+                return {
+                    ...item,
+                    budgetQty: stats?.budgetQty ?? 0,
+                    qtyOrdered: stats?.totalOrderedQty ?? 0,
+                    balanceQty: (stats?.budgetQty ?? 0) - (stats?.totalOrderedQty ?? 0) // New balance column
+                };
+            });
+        });
 
         const columns: TableColumn[] = [
             { field: 'rowIndex', header: '#', sortable: false },
@@ -332,6 +376,12 @@ export default defineComponent({
             { field: 'subElement', header: 'Sub Element', sortable: true },
             { field: 'subSubElement', header: 'Sub Sub Element', sortable: true },
             { field: 'uom', header: 'UOM', sortable: false },
+
+            // NEW columns
+            { field: 'budgetQty', header: 'Bgt Qty', sortable: false },
+            { field: 'qtyOrdered', header: 'Qty Ordered', sortable: false },
+            { field: 'balanceQty', header: 'Balance Qty', sortable: false },
+
             { field: 'qty', header: 'Quantity', sortable: true },
             { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rateSlot', visible: false },
             { field: 'amount', header: 'Amount', bodySlot: 'amountSlot', visible: false }
@@ -410,8 +460,7 @@ export default defineComponent({
             selectedStatus,
             columns,
             deliveryDate,
-            showValidation,
-
+            showValidation
         };
     }
 });
