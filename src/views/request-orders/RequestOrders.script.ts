@@ -111,11 +111,51 @@ export default defineComponent({
             return (store.pagination.page - 1) * store.pagination.pageSize;
         });
 
+        // const filteredOrders = computed(() =>
+        //     store.orders.map((order, i) => ({
+        //         ...order,
+        //         rowIndex: (store.pagination.page - 1) * store.pagination.pageSize + i + 1
+        //     }))
+        // );
         const filteredOrders = computed(() =>
-            store.orders.map((order, i) => ({
-                ...order,
-                rowIndex: (store.pagination.page - 1) * store.pagination.pageSize + i + 1
-            }))
+            store.orders.map((order, i) => {
+                const amount = Number(order.totalAmount);
+                const isHighValue = amount > 50000;
+
+                let approvalProgress: { level: string; status: string }[] = [];
+
+                const levels = isHighValue ? ['PM', 'PD', 'PURC'] : ['PM', 'PURC'];
+
+                if (order.status === 'Submitted') {
+                    // yellow for pending as default
+                    approvalProgress = levels.map((level) => ({
+                        level,
+                        status: 'Pending'
+                    }));
+                } else if (order.status === 'Processing') {
+                    approvalProgress = levels.map((level, index) => ({
+                        level,
+                        status: index === 0 ? 'Approved' : 'Pending'
+                    }));
+                } else if (order.status === 'Approved') {
+                    approvalProgress = levels.map((level) => ({
+                        level,
+                        status: 'Approved'
+                    }));
+                } else if (order.status === 'Rejected') {
+                    approvalProgress = levels.map((level, index) => ({
+                        level,
+                        status: index === 0 ? 'Approved' : 'Rejected'
+                    }));
+                }
+
+                return {
+                    ...order,
+                    approvalProgress,
+                    isHighValue,
+                    rowIndex: (store.pagination.page - 1) * store.pagination.pageSize + i + 1
+                };
+            })
         );
 
         // Table config
@@ -128,6 +168,12 @@ export default defineComponent({
                 { field: 'deliveryDate', header: 'Delivery Date', sortable: true },
                 { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
                 { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
+                {
+                    field: 'approvalProgress',
+                    header: 'Approval Status',
+                    bodySlot: 'approvalStatus'
+                },
+
                 { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
                 {
                     field: 'actions',
@@ -157,6 +203,17 @@ export default defineComponent({
                 }
             ];
         });
+
+        function getApprovalDotClass(status: string) {
+            switch (status) {
+                case 'Approved':
+                    return 'bg-green-500';
+                case 'Rejected':
+                    return 'bg-red-500';
+                default:
+                    return 'bg-yellow-400';
+            }
+        }
 
         const tableFilters = computed(() => [
             {
@@ -471,7 +528,8 @@ export default defineComponent({
             canEditRO,
             canApproveRO,
             canCreateRO,
-            canViewRO
+            canViewRO,
+            getApprovalDotClass
         };
     }
 });
