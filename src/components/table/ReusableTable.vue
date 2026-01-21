@@ -11,6 +11,7 @@ import { computed, ref, watch } from 'vue';
 
 import ResultNotFound from '@/components/resulNotFound/ResultNotFound.vue';
 import BaseSpinner from '@/components/spinner/BaseSpinner.vue';
+import type { DataTableSortEvent } from 'primevue/datatable';
 
 type ActionType = 'edit' | 'view' | 'delete' | 'comment' | 'approve' | 'reject';
 
@@ -54,6 +55,9 @@ const props = defineProps<{
     selectionMode?: 'checkbox' | 'radio' | undefined;
     selection?: TableRow[];
     dataKey?: string;
+    onSortChange?: (payload: { field: string; order: number }) => void;
+    sortField?: string;
+    sortOrder?: number;
 }>();
 
 const visibleColumns = computed(() => props.columns.filter((c) => c.visible !== false));
@@ -65,7 +69,6 @@ const emit = defineEmits<{
 const search = ref('');
 const activeFilters = ref<Record<string, any>>({});
 const hasLoadedOnce = ref(false);
-
 
 const menu = ref();
 const currentRow = ref<TableRow | null>(null);
@@ -83,13 +86,14 @@ watch(
     { immediate: true }
 );
 
-function handleSearch() {
-    props.onSearch?.(search.value);
-}
+let searchTimeout: any;
 
-function handleFilterChange(field: string, value: any) {
-    activeFilters.value[field] = value;
-    props.onFilterChange?.(activeFilters.value);
+function handleSearch() {
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+        props.onSearch?.(search.value);
+    }, 400);
 }
 
 function handleExport() {
@@ -180,6 +184,51 @@ const selectionProxy = computed({
     get: () => props.selection || [],
     set: (val) => emit('update:selection', val)
 });
+
+// sorting
+function onSort(event: DataTableSortEvent) {
+    console.log('onSort event:', {
+        sortField: event.sortField,
+        sortOrder: event.sortOrder,
+        currentSortField: props.sortField,
+        currentSortOrder: props.sortOrder
+    });
+
+    if (typeof event.sortField !== 'string') return;
+
+    // Manual toggle logic for server-side sorting as PrimeVue dont only support client-side sorting
+    let newOrder: number;
+
+    if (event.sortField !== props.sortField) {
+        // New column clicked - start with ASC
+        newOrder = 1;
+    } else {
+        // Same column clicked - toggle
+        if (props.sortOrder === 1) {
+            newOrder = -1; // ASC → DESC
+        } else if (props.sortOrder === -1) {
+            // DESC → Reset
+            props.onSortChange?.({
+                field: '',
+                order: 0
+            });
+            return;
+        } else {
+            newOrder = 1; // Reset → ASC
+        }
+    }
+
+    props.onSortChange?.({
+        field: event.sortField,
+        order: newOrder
+    });
+}
+
+function handleFilterChange(field: string, value: any) {
+    activeFilters.value[field] = value;
+    props.onFilterChange?.(activeFilters.value);
+    props.onPageChange?.(1);
+}
 </script>
 
 <template>
@@ -233,6 +282,12 @@ const selectionProxy = computed({
             tableStyle="min-width: 50rem"
             :selection-mode="props.selectionMode === 'checkbox' ? undefined : props.selectionMode"
             :data-key="props.dataKey || 'id'"
+            :sortMode="'single'"
+            :lazy="true"
+            :removableSort="true"
+            @sort="onSort"
+            :sortField="props.sortField"
+            :sortOrder="props.sortOrder"
         >
             <!-- Checkbox Column -->
             <Column v-if="props.selectionMode === 'checkbox'" selection-mode="multiple" style="width: 3rem" />
@@ -258,7 +313,7 @@ const selectionProxy = computed({
             </Column>
         </DataTable>
 
-        <DataTable v-else :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem" :data-key="props.dataKey || 'id'">
+        <DataTable :sortMode="'single'" :lazy="true" @sort="onSort" :removableSort="true" v-else :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem" :data-key="props.dataKey || 'id'">
             <Column v-for="(col, idx) in visibleColumns" :key="col.field || idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
                     <slot :name="col.bodySlot" :data="slotProps.data" />
