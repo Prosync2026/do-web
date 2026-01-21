@@ -18,8 +18,7 @@ import { Button } from "@prosync/ui-kit";
                         <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2" />
                     </div>
                     <!-- <Button label="+ New Request Order" @click="$router.push('/request-orders/create')" /> -->
-                    <!-- <Button v-if="canCreateRO" label="+ New Request Order" @click="$router.push('/request-orders/create')" /> -->
-                    <ProButton variant="primary" label="Primary" :show-left-icon="true" :show-right-icon="true" left-icon="arrow-left" right-icon="arrow-right" />
+                    <Button v-if="canCreateRO" label="+ New Request Order" @click="$router.push('/request-orders/create')" />
                 </div>
             </div>
             <ViewDraftRo :visible="showDraftModal" @update:visible="showDraftModal = $event" @update:count="draftCount = $event" />
