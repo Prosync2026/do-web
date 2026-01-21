@@ -111,54 +111,6 @@ export default defineComponent({
             return (store.pagination.page - 1) * store.pagination.pageSize;
         });
 
-        // Search
-        const onSearchWrapper = (value: string) => {
-            store.handleSearch(value);
-        };
-
-        // handle sorting change
-        const handleSortChange = ({ field, order }: { field: string; order: number }) => {
-            console.log('handleSortChange:', { field, order });
-
-            // Handle reset (third click removes sort)
-            if (order === 0 || !field) {
-                console.log('Resetting to default sort');
-                store.setSorting('', '');
-                return;
-            }
-
-            const mapFieldToApi: Record<string, string> = {
-                roNumber: 'DocNo',
-                roDate: 'RequestOrderDate',
-                status: 'Status',
-                totalAmount: 'TotalAmount',
-                budgetType: 'PrType',
-                requestedAt: 'CreatedAt'
-            };
-
-            // trigger a server fetch with new sort params
-            store.setSorting(mapFieldToApi[field] || 'CreatedAt', order === 1 ? 'asc' : 'desc');
-        };
-
-        // Create computed properties to convert API field names back to display field names
-        const currentSortField = computed(() => {
-            const reverseMap: Record<string, string> = {
-                DocNo: 'roNumber',
-                RequestOrderDate: 'roDate',
-                Status: 'status',
-                TotalAmount: 'totalAmount',
-                PrType: 'budgetType',
-                CreatedAt: 'requestedAt'
-            };
-
-            return reverseMap[store.sortField] || '';
-        });
-
-        const currentSortOrder = computed(() => {
-            if (!store.sortField) return 0; // no sort
-            return store.sortOrder === 'asc' ? 1 : -1;
-        });
-
         // const filteredOrders = computed(() =>
         //     store.orders.map((order, i) => ({
         //         ...order,
@@ -526,6 +478,17 @@ export default defineComponent({
             store.fetchOrders();
         }
 
+        // Search
+        const filters = ref({
+            global: { value: null as string | null, matchMode: 'contains' }
+        });
+        const search = ref('');
+
+        const handleSearch = (value: string) => {
+            search.value = value;
+            filters.value.global.value = value;
+        };
+
         return {
             activeTab,
             tabItems,
@@ -558,17 +521,15 @@ export default defineComponent({
             startingIndex,
             totalCounts,
             useDashboard,
+            handleSearch,
+            onSearchWrapper: handleSearch,
             handleCloseModal,
             canDeleteRO,
             canEditRO,
             canApproveRO,
             canCreateRO,
             canViewRO,
-            getApprovalDotClass,
-            handleSortChange,
-            onSearchWrapper,
-            currentSortField,
-            currentSortOrder
+            getApprovalDotClass
         };
     }
 });

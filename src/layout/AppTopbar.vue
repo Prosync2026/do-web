@@ -10,7 +10,6 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Menu from 'primevue/menu';
 import type { MenuItemCommandEvent } from 'primevue/menuitem';
-import OverlayPanel from 'primevue/overlaypanel';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -32,7 +31,7 @@ const handleSignOut = () => {
 };
 
 const profileMenu = ref([
-    // { label: 'Notification', icon: 'pi pi-bell', command: (event: MenuItemCommandEvent) => router.push('/notifications') },
+    { label: 'Notification', icon: 'pi pi-bell', command: (event: MenuItemCommandEvent) => router.push('/notifications') },
     { label: 'Company', icon: 'pi pi-building', command: (event: MenuItemCommandEvent) => router.push('/companyList') },
     { separator: true },
     { label: computed(() => (isDarkTheme.value ? 'Light Mode' : 'Dark Mode')), icon: computed(() => (isDarkTheme.value ? 'pi pi-sun' : 'pi pi-moon')), command: () => toggleDarkMode() },
@@ -65,59 +64,6 @@ interface CompanyGroup {
     company: string;
     projects: Project[];
 }
-
-// mock email nottificcation data
-
-interface NotificationItem {
-    id: number;
-    roId: number;
-    roNo: string;
-    message: string;
-    status: 'Pending' | 'Approved' | 'Rejected';
-    level?: 'PM' | 'PURC' | 'PD';
-    unread: boolean;
-}
-const notifications = ref<NotificationItem[]>([
-    {
-        id: 1,
-        roId: 46,
-        roNo: 'RO2601-000011',
-        message: 'Waiting for Procurement approval',
-        status: 'Pending',
-        level: 'PURC',
-        unread: true
-    },
-    {
-        id: 2,
-        roId: 45,
-        roNo: 'RO2601-000010',
-        message: 'Waiting for Project Director approval',
-        status: 'Pending',
-        level: 'PD',
-        unread: true
-    },
-    {
-        id: 3,
-        roId: 44,
-        roNo: 'RO2601-000009',
-        message: 'Request Order approved',
-        status: 'Approved',
-        unread: false
-    }
-]);
-
-const unreadCount = computed(() => notifications.value.filter((n) => n.unread).length);
-
-const notificationPanel = ref();
-
-const toggleNotificationMenu = (event: Event) => {
-    notificationPanel.value.toggle(event);
-};
-
-const goToRO = (item: NotificationItem) => {
-    item.unread = false;
-    router.push({ name: 'requestOrderView', params: { id: item.roId } });
-};
 
 const projectStore = useProjectStore();
 const companyProjects = computed(() => projectStore.groupedProjects);
@@ -288,33 +234,6 @@ onMounted(async () => {
 
             <div class="ml-auto" style="padding-right: 3rem">
                 <div class="layout-topbar-actions flex items-center gap-3 relative border-l border-gray-200 dark:border-gray-700 pl-4">
-                    <div class="relative">
-                        <Button icon="pi pi-bell" class="p-button-text p-button-plain bell-btn" @click="toggleNotificationMenu" />
-                        <Badge v-if="unreadCount > 0" :value="unreadCount" severity="danger" class="notification-badge absolute -top-1 -right-1" />
-                    </div>
-
-                    <OverlayPanel ref="notificationPanel" class="w-96">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="font-semibold">Notifications</span>
-                            <Badge v-if="unreadCount > 0" :value="unreadCount" />
-                        </div>
-
-                        <div v-if="notifications.length === 0" class="text-sm text-gray-400 py-4 text-center">No notifications</div>
-
-                        <div v-else class="space-y-2">
-                            <div v-for="item in notifications" :key="item.id" class="p-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition" @click="goToRO(item)">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium">{{ item.roNo }}</span>
-                                    <Badge :severity="item.status === 'Approved' ? 'success' : item.status === 'Rejected' ? 'danger' : 'warning'" :value="item.status" />
-                                </div>
-
-                                <p class="text-xs text-gray-500 mt-1">
-                                    {{ item.message }}
-                                </p>
-                            </div>
-                        </div>
-                    </OverlayPanel>
-
                     <!-- Desktop: show avatar + username -->
                     <div class="hidden lg:flex items-center gap-2">
                         <Button class="p-button-text p-button-plain p-button-sm flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 transition" @click="toggleProfileMenu">
@@ -389,17 +308,3 @@ onMounted(async () => {
         </div>
     </div>
 </template>
-
-<style scoped>
-.notification-badge {
-    font-size: 9px;
-    padding: 0 4px;
-    min-width: 13px;
-    height: 13px;
-
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    line-height: 13px;
-}
-</style>

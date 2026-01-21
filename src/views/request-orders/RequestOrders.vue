@@ -60,13 +60,10 @@ import { Button } from "@prosync/ui-kit";
                                 :showCreate="false"
                                 :showImportFile="false"
                                 :onActionClick="handleActionClick"
+                                :onSearch="onSearchWrapper"
                                 :pagination="store.pagination"
                                 :onPageChange="handlePageChange"
                                 :onPageSizeChange="handlePageSizeChange"
-                                :onSortChange="handleSortChange"
-                                :sortField="currentSortField"
-                                :sortOrder="currentSortOrder"
-                                :onSearch="onSearchWrapper"
                                 emptyTitle="No request orders found"
                             >
                                 <!-- Numbering Slot - Use rowIndex instead of index -->

@@ -10,20 +10,12 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
     const selectedOrder = ref<Order | null>(null);
     const loading = ref(false);
 
-    const sortField = ref('CreatedAt');
-    const sortOrder = ref<'asc' | 'desc'>('desc');
-
     const filters = reactive({
         status: '',
         budgetType: '',
         search: '',
         startDate: '',
         endDate: ''
-    });
-
-    const sorting = reactive({
-        sortBy: 'CreatedAt',
-        sortOrder: 'desc' as 'asc' | 'desc'
     });
 
     const pagination = reactive({
@@ -50,9 +42,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 startDate: filters.startDate || undefined,
                 endDate: filters.endDate || undefined,
                 page: pagination.page,
-                pageSize: pagination.pageSize,
-                sortBy: sorting.sortBy,
-                sortOrder: sorting.sortOrder
+                pageSize: pagination.pageSize
             };
 
             const response: GetRequestOrdersResponse = await requestOrderService.getRequestOrders(params);
@@ -219,42 +209,20 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         fetchOrders();
     }
 
-    function setSorting(sortBy: string, order: 'desc' | 'asc' | '') {
-        // Handle reset - use default sorting
-        if (!sortBy || !order) {
-            sorting.sortBy = 'CreatedAt';
-            sorting.sortOrder = 'desc';
-            sortField.value = 'CreatedAt';
-            sortOrder.value = 'desc';
-        } else {
-            sorting.sortBy = sortBy;
-            sorting.sortOrder = order;
-            sortField.value = sortBy;
-            sortOrder.value = order;
-        }
-
-        pagination.page = 1;
-        fetchOrders();
-    }
-
     return {
         orders,
         selectedOrder,
         loading,
         filters,
         pagination,
-        totalCounts,
-        sorting,
         fetchOrders,
         fetchOrderById,
         clearFilters,
         updateOrder,
         setPage,
         setPageSize,
+        totalCounts,
         handleSearch,
-        handleStatusChange,
-        setSorting,
-        sortField,
-        sortOrder
+        handleStatusChange
     };
 });
