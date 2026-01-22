@@ -108,6 +108,9 @@ export interface Order {
     currency?: string;
     attachments?: AttachmentItem[];
     isUrgent?: boolean;
+    approvalProgress?: ApprovalProgress[];
+    approvalFlowType?: 'NORMAL' | 'HIGH_VALUE';
+    currentApprovalStage?: string;
 }
 
 export interface PreviewItem {
@@ -318,6 +321,9 @@ export interface RequestOrderResponse {
     Attachment?: string | null;
     RequestOrderItems?: RequestOrderItemResponse[];
     request_order_items?: RequestOrderItemResponse[];
+    approvalProgress?: ApprovalProgress[];
+    approvalFlowType?: 'NORMAL' | 'HIGH_VALUE';
+    CurrentApprovalStage?: string;
 }
 
 export interface UpdateRequestOrderPayload {
@@ -365,3 +371,11 @@ export interface RequestOrdersFilters {
 
 // action type
 export type ActionType = 'view' | 'edit' | 'delete' | 'approve' | 'reject';
+
+// approval type
+export interface ApprovalProgress {
+    code: string;
+    label: string;
+    order: number;
+    status: 'Pending' | 'Approved' | 'Rejected';
+}

@@ -70,6 +70,11 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                     budgetType: apiOutput.PrType,
                     status: apiOutput.Status,
                     requestedAt: formatDateTime(apiOutput.CreatedAt),
+
+                    approvalProgress: apiOutput.approvalProgress || [],
+                    approvalFlowType: apiOutput.approvalFlowType,
+                    currentApprovalStage: apiOutput.CurrentApprovalStage,
+
                     items: (apiOutput.RequestOrderItems || []).map(
                         (item): OrderItem => ({
                             code: String(item.BudgetItemId || item.NonBudgetItemId || ''),
