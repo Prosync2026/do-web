@@ -93,33 +93,25 @@ export default defineComponent({
         const showCommentModal = ref(false);
         const selectedRequestNo = ref<string | null>(null);
 
-        const filteredRequests = computed(() => {
-            return budgetChangeRequestData.value.filter((r) => {
-                const matchSearch = !budgetCRStore.filters.search || r.DocNo.toLowerCase().includes(budgetCRStore.filters.search.toLowerCase());
-
-                const statusFilter = budgetCRStore.filters.status;
-                const matchStatus = !statusFilter ? true : r.Status === statusFilter;
-
-                return matchSearch && matchStatus;
-            });
-        });
-
-        const paginatedRequests = computed(() => {
-            const start = (budgetCRStore.pagination.page - 1) * budgetCRStore.pagination.pageSize;
-            const end = start + budgetCRStore.pagination.pageSize;
-            return filteredRequests.value.slice(start, end);
-        });
         const tableColumns = computed<TableColumn[]>(() => {
             const columns: TableColumn[] = [
                 { field: 'rowIndex', header: '#' },
-                { field: 'DocNo', header: 'BCR No' },
-                { field: 'RequestedBy', header: 'Requested By' },
+                { field: 'DocNo', header: 'BCR No', sortable: true },
+                { field: 'RequestedBy', header: 'Requested By', sortable: true },
                 {
                     field: 'RequestDate',
                     header: 'Date Requested',
+                    sortable: true,
                     body: (rowData: BudgetChangeRequest) => formatDate(rowData.RequestDate)
                 },
-                { field: 'Status', header: 'Status', bodySlot: 'status', style: 'min-width: 120px; width: 120px' },
+                {
+                    field: 'Status',
+                    header: 'Status',
+                    sortable: true,
+                    bodySlot: 'status',
+                    style: 'min-width: 120px; width: 120px'
+                },
+
                 { field: 'Remark', header: 'Remark' }
             ];
 
@@ -127,12 +119,12 @@ export default defineComponent({
                 columns.push({
                     field: 'TotalAmount',
                     header: 'Variance Amount',
+                    sortable: true,
                     bodySlot: 'TotalAmount'
                 });
             }
 
             columns.push({ field: 'actions', header: 'Actions', action: true });
-
             return columns;
         });
 
@@ -149,20 +141,29 @@ export default defineComponent({
             }
         }
 
-        function handlePageChange(page: number) {
-            budgetCRStore.setPage(page);
+        function handlePageChange(page: number): void {
+            budgetCRStore.pagination.page = page;
+            budgetCRStore.fetchBudgetChangesRequestList();
         }
 
-        function handlePageSizeChange(size: number) {
-            budgetCRStore.setPageSize(size);
+        function handlePageSizeChange(pageSize: number): void {
+            budgetCRStore.pagination.pageSize = pageSize;
+            budgetCRStore.pagination.page = 1;
+            budgetCRStore.fetchBudgetChangesRequestList();
         }
 
-        function handleSearch(value: string) {
-            budgetCRStore.handleSearch(value);
+        function handleSearch(value: string): void {
+            budgetCRStore.filters.search = value;
+            budgetCRStore.pagination.page = 1;
+            budgetCRStore.fetchBudgetChangesRequestList();
         }
 
-        function handleFilterChange(filters: Record<string, any>) {
-            budgetCRStore.handleFilterChange(filters);
+        function handleFilterChange(filters: Record<string, any>): void {
+            budgetCRStore.filters.status = filters.status ?? '';
+            budgetCRStore.filters.startDate = filters.startDate ?? '';
+            budgetCRStore.filters.endDate = filters.endDate ?? '';
+            budgetCRStore.pagination.page = 1;
+            budgetCRStore.fetchBudgetChangesRequestList();
         }
 
         const router = useRouter();
@@ -175,20 +176,45 @@ export default defineComponent({
             }
         }
 
-        const startingIndex = computed(() => {
-            return (budgetCRStore.pagination.page - 1) * budgetCRStore.pagination.pageSize;
+        // handle sorting change
+        const handleSortChange = ({ field, order }: { field: string; order: number }) => {
+            // reset sorting
+            if (order === 0 || !field) {
+                budgetCRStore.setSorting('', '');
+                return;
+            }
+
+            const mapFieldToApi: Record<string, string> = {
+                DocNo: 'DocNo',
+                RequestedBy: 'RequestedBy',
+                RequestDate: 'RequestDate',
+                Status: 'Status',
+                TotalAmount: 'TotalAmount'
+            };
+
+            budgetCRStore.setSorting(mapFieldToApi[field] || 'RequestDate', order === 1 ? 'asc' : 'desc');
+        };
+
+        const currentSortField = computed(() => {
+            const reverseMap: Record<string, string> = {
+                DocNo: 'DocNo',
+                RequestDate: 'RequestDate',
+                Status: 'Status',
+                TotalAmount: 'TotalAmount',
+                RequestedBy: 'RequestedBy',
+                CreatedAt: 'CreatedAt'
+            };
+
+            return reverseMap[budgetCRStore.sortField] || '';
         });
 
-        const numberedRequests = computed(() => {
-            return paginatedRequests.value.map((item, index) => ({
-                ...item,
-                rowIndex: startingIndex.value + index + 1
-            }));
+        const currentSortOrder = computed(() => {
+            if (!budgetCRStore.sortField) return 0;
+            return budgetCRStore.sortOrder === 'asc' ? 1 : -1;
         });
 
         return {
             budgetChangeRequestData,
-            filteredRequests,
             searchTerm,
             activeFilters,
             extraFilters,
@@ -197,17 +223,18 @@ export default defineComponent({
             showCommentModal,
             selectedRequestNo,
             BudgetChangeRequestSummaryData,
-            paginatedRequests,
             pagination: budgetCRStore.pagination,
             budgetCRStore,
-            numberedRequests,
             getStatusSeverity,
             handleSearch,
             handleFilterChange,
             handleActionClick,
             handlePageChange,
             handlePageSizeChange,
-            bcrSummaryCol
+            bcrSummaryCol,
+            handleSortChange,
+            currentSortField,
+            currentSortOrder
         };
     }
 });

@@ -9,7 +9,8 @@ export default defineConfig(async () => {
         plugins: [
             vue(),
             Components({
-                resolvers: [PrimeVueResolver()]
+                resolvers: [PrimeVueResolver()],
+                dts: 'components.d.ts'
             })
         ],
         resolve: {

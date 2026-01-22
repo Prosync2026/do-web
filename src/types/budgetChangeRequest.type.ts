@@ -261,3 +261,32 @@ export interface AttachmentItem {
     size?: number;
     type?: string;
 }
+
+// for state
+export interface State {
+    loading: boolean;
+    budgetChangeRequestList: BudgetChangeRequest[];
+    singleBudgetChangeRequest: BudgetChangeRequest | null;
+    historyList: HistoryList[];
+    pagination: {
+        page: number;
+        pageSize: number;
+        total: number;
+        totalPages: number;
+    };
+
+    filters: {
+        search: string;
+        status: string;
+        startDate: string;
+        endDate: string;
+    };
+
+    sorting: {
+        sortBy: string;
+        sortOrder: 'asc' | 'desc';
+    };
+
+    sortField: string;
+    sortOrder: 'asc' | 'desc';
+}

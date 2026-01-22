@@ -1,27 +1,7 @@
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
-import type { BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload, HistoryList, RecommendationList } from '@/types/budgetChangeRequest.type';
+import type { BCRRecommendationPayload, BudgetChangeRequestPayload, RecommendationList, State } from '@/types/budgetChangeRequest.type';
 import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
-
-interface State {
-    loading: boolean;
-    budgetChangeRequestList: BudgetChangeRequest[];
-    singleBudgetChangeRequest: BudgetChangeRequest | null;
-    historyList: HistoryList[];
-    pagination: {
-        page: number;
-        pageSize: number;
-        total: number;
-        totalPages: number;
-    };
-
-    filters: {
-        search: string;
-        status: string;
-        startDate: string;
-        endDate: string;
-    };
-}
 
 export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
     state: (): State => ({
@@ -41,7 +21,15 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
             status: '',
             startDate: '',
             endDate: ''
-        }
+        },
+
+        sorting: {
+            sortBy: 'CreatedAt',
+            sortOrder: 'desc'
+        },
+
+        sortField: 'CreatedAt',
+        sortOrder: 'desc'
     }),
 
     actions: {
@@ -70,6 +58,25 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
             this.fetchBudgetChangesRequestList();
         },
 
+        // sorting
+        setSorting(sortBy: string, order: 'asc' | 'desc' | '') {
+            // Reset to default
+            if (!sortBy || !order) {
+                this.sorting.sortBy = 'CreatedAt';
+                this.sorting.sortOrder = 'desc';
+                this.sortField = 'CreatedAt';
+                this.sortOrder = 'desc';
+            } else {
+                this.sorting.sortBy = sortBy;
+                this.sorting.sortOrder = order;
+                this.sortField = sortBy;
+                this.sortOrder = order;
+            }
+
+            this.pagination.page = 1;
+            this.fetchBudgetChangesRequestList();
+        },
+
         async fetchBudgetChangesRequestList() {
             this.loading = true;
             try {
@@ -79,7 +86,9 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
                     status: this.filters.status || undefined,
                     search: this.filters.search || undefined,
                     startDate: this.filters.startDate || undefined,
-                    endDate: this.filters.endDate || undefined
+                    endDate: this.filters.endDate || undefined,
+                    sortBy: this.sorting.sortBy,
+                    sortOrder: this.sorting.sortOrder
                 };
 
                 const response = await budgetChangeRequestService.getBudgetChangeRequests(params);

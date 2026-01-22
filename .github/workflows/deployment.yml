@@ -27,17 +27,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
+
+      - name: Clean repo before pull
+        run: |
+          cd "$PROJECT_PATH"
+          git config --global --add safe.directory "$PROJECT_PATH"
+          git reset --hard
+          git clean -fd
 
       - name: Pull latest code (superproject)
         run: |
           cd "$PROJECT_PATH"
-          git config --global --add safe.directory "$PROJECT_PATH"
           git pull "https://${GIT_TOKEN}@github.com/Prosync2026/do-web.git" main
 
       - name: Install deps & build (needs devDeps)
         env:
-          npm_config_production: 'false'
+          npm_config_production: "false"
         run: |
           cd "$PROJECT_PATH"
           npm ci --legacy-peer-deps
@@ -68,7 +74,7 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_JOB_NAME: 'Deployment ended for branch ${{ github.ref_name }}'
+          GITHUB_JOB_NAME: "Deployment ended for branch ${{ github.ref_name }}"
           GITHUB_JOB_STATUS: ${{ job.status }}
 
   deploy-dev:
@@ -93,17 +99,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
+
+      - name: Clean repo before pull
+        run: |
+          cd "$PROJECT_PATH"
+          git config --global --add safe.directory "$PROJECT_PATH"
+          git reset --hard
+          git clean -fd
 
       - name: Pull latest code (superproject)
         run: |
           cd "$PROJECT_PATH"
-          git config --global --add safe.directory "$PROJECT_PATH"
           git pull "https://${GIT_TOKEN}@github.com/Prosync2026/do-web.git" development
 
       - name: Install deps & build (dev)
         env:
-          npm_config_production: 'false'
+          npm_config_production: "false"
         run: |
           cd "$PROJECT_PATH"
           npm ci --legacy-peer-deps
@@ -134,5 +146,5 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_JOB_NAME: 'Deployment ended for branch ${{ github.ref_name }}'
+          GITHUB_JOB_NAME: "Deployment ended for branch ${{ github.ref_name }}"
           GITHUB_JOB_STATUS: ${{ job.status }}
