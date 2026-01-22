@@ -66,6 +66,8 @@ import { Button } from "@prosync/ui-kit";
                                 :sortField="currentSortField"
                                 :sortOrder="currentSortOrder"
                                 :onSearch="onSearchWrapper"
+                                :extraFilters="tableFilters"
+                                :onFilterChange="handleFilterChange"
                                 emptyTitle="No request orders found"
                             >
                                 <!-- Numbering Slot - Use rowIndex instead of index -->

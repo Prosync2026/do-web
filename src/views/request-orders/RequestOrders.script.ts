@@ -49,6 +49,21 @@ export default defineComponent({
         const approvedCount = computed(() => totalCounts.value.approved);
         const totalValue = computed(() => totalCounts.value.totalValue);
 
+        // ref for  budget type and date range
+        const selectedBudgetType = ref('');
+        const startDate = ref('');
+        const endDate = ref('');
+
+        function applyFilters() {
+            handleFilterChange({
+                status: store.filters.status,
+                budgetType: selectedBudgetType.value,
+                startDate: startDate.value,
+                endDate: endDate.value,
+                search: store.filters.search
+            });
+        }
+
         // User role
         const user = localStorage.getItem('user');
         let userRole = '';
@@ -264,28 +279,39 @@ export default defineComponent({
         }
 
         const tableFilters = computed(() => [
-            {
-                type: 'select' as const,
-                field: 'status',
-                placeholder: 'Filter by Status',
-                options: [
-                    { label: 'All Statuses', value: '' },
-                    { label: 'Processing', value: 'Processing' },
-                    { label: 'Approved', value: 'Approved' },
-                    { label: 'Rejected', value: 'Rejected' }
-                ],
-                model: store.filters.status
-            },
+            // commneted as the space it limited
+            // {
+            //     type: 'select' as const,
+            //     field: 'status',
+            //     placeholder: 'Filter by Status',
+            //     options: [
+            //         { label: 'All Statuses', value: '' },
+            //         { label: 'Processing', value: 'Processing' },
+            //         { label: 'Approved', value: 'Approved' },
+            //         { label: 'Rejected', value: 'Rejected' }
+            //     ],
+            //     model: store.filters.status
+            // },
             {
                 type: 'select' as const,
                 field: 'budgetType',
-                placeholder: 'Filter by Budget Type',
+                placeholder: 'Budget Type',
                 options: [
                     { label: 'All Budget Types', value: '' },
                     { label: 'Budgeted', value: 'Budgeted' },
                     { label: 'Unbudgeted', value: 'Unbudgeted' }
                 ],
                 model: store.filters.budgetType
+            },
+            {
+                type: 'date',
+                field: 'startDate',
+                placeholder: 'Start Date'
+            },
+            {
+                type: 'date',
+                field: 'endDate',
+                placeholder: 'End Date'
             }
         ]);
 
@@ -568,7 +594,11 @@ export default defineComponent({
             handleSortChange,
             onSearchWrapper,
             currentSortField,
-            currentSortOrder
+            currentSortOrder,
+            applyFilters,
+            selectedBudgetType,
+            startDate,
+            endDate
         };
     }
 });
