@@ -88,15 +88,14 @@ import { Button } from "@prosync/ui-kit";
                                 </template>
                                 <template #approvalStatus="{ data }">
                                     <div class="flex flex-col gap-1 text-xs py-2">
-                                        <template v-for="(step, index) in data.approvalProgress" :key="index">
+                                        <template v-for="(step, index) in data.approvalProgress" :key="step.code">
                                             <div class="flex items-center gap-2">
-                                                <!-- Status Dot -->
                                                 <span class="w-3 h-3 rounded-full" :class="getApprovalDotClass(step.status)"></span>
-
-                                                <!-- Level -->
-                                                <span class="font-medium">{{ step.level }}</span>
+                                                <!-- Approval Code (PM / PD / PURC) -->
+                                                <span class="font-medium">
+                                                    {{ step.code }}
+                                                </span>
                                             </div>
-
                                             <!-- Connector line -->
                                             <div v-if="index < data.approvalProgress.length - 1" class="ml-[5px] h-3 border-l border-gray-300 dark:border-gray-600"></div>
                                         </template>

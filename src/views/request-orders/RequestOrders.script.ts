@@ -181,44 +181,14 @@ export default defineComponent({
         //     }))
         // );
         const filteredOrders = computed(() =>
-            store.orders.map((order, i) => {
-                const amount = Number(order.totalAmount);
-                const isHighValue = amount > 50000;
+            store.orders.map((order, i) => ({
+                ...order,
 
-                let approvalProgress: { level: string; status: string }[] = [];
+                approvalProgress: order.approvalProgress ?? [],
+                isHighValue: order.approvalFlowType === 'HIGH_VALUE',
 
-                const levels = isHighValue ? ['PM', 'PD', 'PURC'] : ['PM', 'PURC'];
-
-                if (order.status === 'Submitted') {
-                    // yellow for pending as default
-                    approvalProgress = levels.map((level) => ({
-                        level,
-                        status: 'Pending'
-                    }));
-                } else if (order.status === 'Processing') {
-                    approvalProgress = levels.map((level, index) => ({
-                        level,
-                        status: index === 0 ? 'Approved' : 'Pending'
-                    }));
-                } else if (order.status === 'Approved') {
-                    approvalProgress = levels.map((level) => ({
-                        level,
-                        status: 'Approved'
-                    }));
-                } else if (order.status === 'Rejected') {
-                    approvalProgress = levels.map((level, index) => ({
-                        level,
-                        status: index === 0 ? 'Approved' : 'Rejected'
-                    }));
-                }
-
-                return {
-                    ...order,
-                    approvalProgress,
-                    isHighValue,
-                    rowIndex: (store.pagination.page - 1) * store.pagination.pageSize + i + 1
-                };
-            })
+                rowIndex: (store.pagination.page - 1) * store.pagination.pageSize + i + 1
+            }))
         );
 
         // Table config
