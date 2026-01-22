@@ -28,6 +28,9 @@
                 :extraFilters="extraFilters"
                 :onFilterChange="handleFilterChange"
                 :onActionClick="handleActionClick"
+                :onSortChange="handleSortChange"
+                :sortField="currentSortField"
+                :sortOrder="currentSortOrder"
             >
                 <template #status="{ data }">
                     <Badge :value="data.Status" :severity="getStatusSeverity(data.Status)" />
