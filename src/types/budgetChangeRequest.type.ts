@@ -239,6 +239,7 @@ export interface ReviewList {
     Id: number;
     BudgetChangeId: number;
     ReviewerRole: string;
+    ApprovalLevel: string;
     ReviewerName: string;
     ReviewType: string;
     Remark: string | null;
