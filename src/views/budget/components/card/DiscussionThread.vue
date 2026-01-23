@@ -178,7 +178,8 @@ export default defineComponent({
                     } as DiscussionItem;
                 }
 
-                const rev = reviews.find((r) => r.ReviewerRole === role);
+                const rev = reviews.find((r) => r.ApprovalLevel === role);
+
                 if (rev) {
                     return {
                         id: rev.Id,
@@ -225,12 +226,10 @@ export default defineComponent({
             const bcrId = Number(route.params.budgetChangeRequestId);
 
             if (!currentUserRole.value || !ROLE_ORDER.includes(currentUserRole.value)) {
-                console.log('HERE');
                 canRecommend.value = false;
             } else if (CREATOR_ROLES.includes(currentUserRole.value)) {
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(bcrId);
             } else {
-                console.log('testing to here');
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanReviewRecommendation(bcrId);
             }
             console.log('canrecommend', canRecommend.value);
