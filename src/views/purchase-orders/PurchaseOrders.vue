@@ -37,7 +37,7 @@
                                     <template #no="{ data }">{{ data.no }}</template>
                                     <template #totalAmount="{ data }"> ${{ data.totalAmount }} </template>
                                     <template #status="{ data }">
-                                        <Tag :value="data.status" :severity="data.status === 'active' ? 'success' : data.status === 'partially delivered' ? 'warn' : 'danger'" />
+                                        <Tag :value="data.status === 'Created' ? 'Pending' : data.status" :severity="data.status === 'active' ? 'success' : data.status === 'partially delivered' ? 'warn' : 'danger'" />
                                     </template>
                                     <template #action="{ data }">
                                         <Button icon="pi pi-eye" class="p-button-text p-button-sm" @click="viewPO(data)" v-tooltip="'View PO'" />
