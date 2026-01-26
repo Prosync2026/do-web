@@ -116,7 +116,7 @@ const fetchRecommendationList = async (budgetChangeRequestId: number): Promise<R
 const checkingUserCanCreateRecommendation = async (budgetChangeRequestId: number): Promise<boolean> => {
     try {
         const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/recommendation/info`);
-        console.log('response', response.data.data);
+
         return response.data.data.canRecommend;
     } catch (error) {
         showError(error, 'Failed to fetch recommendation list.');
