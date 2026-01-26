@@ -1,6 +1,7 @@
 // src/services/requestOrder.service.ts
 import type { ApiErrorResponse } from '@/types/api.type';
 import type { ApiResponse, AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, GetRequestOrdersParams, GetRequestOrdersResponse } from '@/types/request-order.type';
+import { ApprovalRole, USER_ROLE_TO_APPROVAL_ROLE, UserRole } from '@/utils/approvalRole.util';
 import { showError } from '@/utils/showNotification.utils';
 import type { AxiosError } from 'axios';
 import { isRef, unref } from 'vue';
@@ -114,19 +115,45 @@ const deleteRequestOrder = async (id: number): Promise<void> => {
     }
 };
 
+// get status approval
+const getROApprovalStatus = async (id: number | string) => {
+    try {
+        const response = await axiosInstance.get(`/roApproval/${id}/status`);
+        return response.data.data;
+    } catch (error: unknown) {
+        const message = (error as AxiosError<{ message: string }>)?.response?.data?.message || 'Failed to fetch approval status';
+        showError(error, message);
+        throw error;
+    }
+};
+
 /**
  * Process RO approval (approve / reject)
  */
-const processROApproval = async (id: number | string, action: 'Approved' | 'Rejected', remark?: string): Promise<CreateRequestOrderResponse> => {
-    try {
-        const response = await axiosInstance.post(`/roApproval/${id}/process`, {
-            action,
-            remark
-        });
+type ApprovalAction = 'Approved' | 'Rejected';
 
-        if (response.data?.success === false) {
-            throw new Error(response.data.error || response.data.message);
+const processROApproval = async (id: number | string, action: ApprovalAction, userRole: UserRole, remark?: string) => {
+    try {
+        // check status first
+        const status = await getROApprovalStatus(id);
+
+        const approvalRole = USER_ROLE_TO_APPROVAL_ROLE[userRole];
+
+        if (status.currentStage !== approvalRole) {
+            throw new Error(`RO is currently pending ${status.currentStage} approval`);
         }
+
+        // resolve endpoint by role
+        const endpointMap: Record<ApprovalRole, string> = {
+            PM: 'pm',
+            PD: 'pd',
+            PURCH: 'purch'
+        };
+
+        const endpoint = endpointMap[approvalRole];
+
+        // call correct approval endpoint
+        const response = await axiosInstance.post(`/roApproval/${id}/${endpoint}`, { action, remark });
 
         return { success: true, data: response.data };
     } catch (error: unknown) {
@@ -257,5 +284,6 @@ export const requestOrderService = {
     getAttachmentUrl,
     downloadAttachment,
     previewAttachment,
-    getAttachmentsByROId
+    getAttachmentsByROId,
+    getROApprovalStatus
 };

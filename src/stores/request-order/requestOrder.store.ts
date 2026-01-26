@@ -40,6 +40,58 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         totalValue: 0
     });
 
+    type UIApprovalProgress = {
+        level: 'PM' | 'PD' | 'PURCH';
+        status: 'Approved' | 'Rejected' | 'Pending';
+    };
+
+    type ApprovalStage = 'PM' | 'PD' | 'PURCH';
+    type ApprovalStatus = 'Approved' | 'Rejected' | 'Pending';
+
+    type RawApprovalProgress = {
+        code?: string;
+        label?: string;
+        order?: number;
+        status?: string;
+
+        level?: string;
+        role?: string;
+        project_role_code?: string;
+    };
+
+    function normalizeApprovalProgress(raw: RawApprovalProgress[]): UIApprovalProgress[] {
+        if (!raw || !Array.isArray(raw)) {
+            console.warn('Invalid approval progress data:', raw);
+            return [];
+        }
+
+        return raw
+            .map((p) => {
+                let level = p.code || p.level || p.role || p.project_role_code;
+
+                if (level === 'PURCH' || level === 'PURCHASING') {
+                    level = 'PURC';
+                }
+
+                if (level !== 'PM' && level !== 'PD' && level !== 'PURC') {
+                    return null;
+                }
+
+                return {
+                    level: level as 'PM' | 'PD' | 'PURC',
+                    status: p.status === 'Approved' || p.status === 'Rejected' ? p.status : 'Pending'
+                };
+            })
+            .filter(Boolean) as UIApprovalProgress[];
+    }
+
+    function parseApprovalStage(stage?: string): ApprovalStage | undefined {
+        if (stage === 'PM' || stage === 'PD' || stage === 'PURCH') {
+            return stage;
+        }
+        return undefined;
+    }
+
     async function fetchOrders() {
         loading.value = true;
         try {
@@ -71,9 +123,11 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                     status: apiOutput.Status,
                     requestedAt: formatDateTime(apiOutput.CreatedAt),
 
-                    approvalProgress: apiOutput.approvalProgress || [],
+                    approvalProgress: normalizeApprovalProgress((apiOutput.approvalProgress || []) as RawApprovalProgress[]),
+
                     approvalFlowType: apiOutput.approvalFlowType,
-                    currentApprovalStage: apiOutput.CurrentApprovalStage,
+
+                    currentApprovalStage: parseApprovalStage(apiOutput.CurrentApprovalStage),
 
                     items: (apiOutput.RequestOrderItems || []).map(
                         (item): OrderItem => ({
