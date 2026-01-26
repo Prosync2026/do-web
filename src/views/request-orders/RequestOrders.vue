@@ -88,12 +88,11 @@ import { Button } from "@prosync/ui-kit";
                                 </template>
                                 <template #approvalStatus="{ data }">
                                     <div class="flex flex-col gap-1 text-xs py-2">
-                                        <template v-for="(step, index) in data.approvalProgress" :key="step.code">
+                                        <template v-for="(step, index) in data.approvalProgress" :key="step.level">
                                             <div class="flex items-center gap-2">
                                                 <span class="w-3 h-3 rounded-full" :class="getApprovalDotClass(step.status)"></span>
-                                                <!-- Approval Code (PM / PD / PURC) -->
                                                 <span class="font-medium">
-                                                    {{ step.code }}
+                                                    {{ step.level }}
                                                 </span>
                                             </div>
                                             <!-- Connector line -->
@@ -118,6 +117,9 @@ import { Button } from "@prosync/ui-kit";
 
             <!-- Edit Modal -->
             <EditRo :visible="showEditModal" :order="selectedOrder" @update:visible="showEditModal = $event" @save="handleSaveOrder" />
+
+            <!-- reject RO Modal -->
+            <RejectRo :visible="showRejectModal" :order-number="currentRejectOrder?.roNumber" @update:visible="showRejectModal = $event" @reject="onRejectConfirmed" />
         </div>
     </Motion>
 </template>

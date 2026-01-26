@@ -108,9 +108,13 @@ export interface Order {
     currency?: string;
     attachments?: AttachmentItem[];
     isUrgent?: boolean;
-    approvalProgress?: ApprovalProgress[];
-    approvalFlowType?: 'NORMAL' | 'HIGH_VALUE';
-    currentApprovalStage?: string;
+    // approval
+    currentApprovalStage?: 'PM' | 'PD' | 'PURC' | 'PURCH';
+    approvalFlowType?: 'HIGH_VALUE' | 'NORMAL';
+    approvalProgress?: {
+        level: 'PM' | 'PD' | 'PURC' | 'PURCH';
+        status: 'Approved' | 'Rejected' | 'Pending';
+    }[];
 }
 
 export interface PreviewItem {

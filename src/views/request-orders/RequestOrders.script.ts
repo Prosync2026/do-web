@@ -12,12 +12,15 @@ import { useToast } from 'primevue/usetoast';
 import { nextTick } from 'vue';
 
 import { useRequestOrderPermission } from '@/permissions';
+import { USER_ROLE_TO_APPROVAL_ROLE } from '@/utils/approvalRole.util';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import type { ActionType, Order, RequestOrdersFilters } from '../../types/request-order.type';
 import EditRo from './components/modal/EditRo.vue';
 import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
 import RoSummary from './components/summary/RoSummary.vue';
+// reject modal
+import RejectRo from './components/modal/RejectRo.vue';
 
 export default defineComponent({
     name: 'RequestOrders',
@@ -29,7 +32,8 @@ export default defineComponent({
         ViewRo,
         EditRo,
         Badge,
-        ViewDraftRo
+        ViewDraftRo,
+        RejectRo
     },
     setup() {
         const confirm = useConfirm();
@@ -65,20 +69,31 @@ export default defineComponent({
         }
 
         // User role
-        const user = localStorage.getItem('user');
-        let userRole = '';
-        if (user) {
+        type UserRole = 'PM' | 'PD' | 'PURC';
+        type MaybeUserRole = UserRole | null;
+
+        const getUserRole = (): MaybeUserRole => {
+            const user = localStorage.getItem('user');
+            if (!user) return null;
+
             try {
                 const parsed = JSON.parse(user);
-                userRole = parsed.user_project_role_code || '';
+                const role = parsed.user_project_role_code;
+
+                if (role === 'PM' || role === 'PD' || role === 'PURC') {
+                    return role;
+                }
+
+                return null;
             } catch {
-                userRole = '';
+                return null;
             }
-        }
+        };
+
+        const userRole = getUserRole();
 
         // permission
         const { canViewRO, canCreateRO, canEditRO, canApproveRO, canDeleteRO, canAccessROModule } = useRequestOrderPermission();
-
         const isPurchasingRole = userRole === 'PURC';
         const isPmPdRole = userRole === 'PM' || userRole === 'PD';
         // const activeTab = ref(isPurchasingRole ? 'all' : 'all');
@@ -92,7 +107,6 @@ export default defineComponent({
                 { label: 'Rejected', value: 'rejected' }
             ];
         });
-
         // Fetch orders on mount and whenever filters change
         const fetchOrders = async () => {
             await store.fetchOrders();
@@ -219,11 +233,11 @@ export default defineComponent({
                             actions.push('view');
                         }
 
-                        if (canEditRO.value && (row.status === 'Processing' || row.status === 'Submitted')) {
+                        if (canEditRO.value && isPurchasingRole && row.currentApprovalStage === 'PURCH') {
                             actions.push('edit');
                         }
 
-                        if (canApproveRO.value && (row.status === 'Processing' || row.status === 'Submitted')) {
+                        if (canApproveRow(row)) {
                             actions.push('approve', 'reject');
                         }
 
@@ -265,9 +279,9 @@ export default defineComponent({
             {
                 type: 'select' as const,
                 field: 'budgetType',
-                placeholder: 'Budget Type',
+                placeholder: 'Budget',
                 options: [
-                    { label: 'All Budget Types', value: '' },
+                    { label: 'All Type', value: '' },
                     { label: 'Budgeted', value: 'Budgeted' },
                     { label: 'Unbudgeted', value: 'Unbudgeted' }
                 ],
@@ -393,6 +407,19 @@ export default defineComponent({
             }
         }
 
+        // approve
+        function canApproveRow(row: Order) {
+            if (!canApproveRO.value) return false;
+            if (!row.currentApprovalStage) return false;
+            if (!userRole) return false;
+
+            const approvableStatuses: Array<Order['status']> = ['Submitted', 'Processing'];
+
+            const approvalRole = USER_ROLE_TO_APPROVAL_ROLE[userRole];
+
+            return approvableStatuses.includes(row.status) && row.currentApprovalStage === approvalRole;
+        }
+
         function approveOrder(order: Order) {
             confirm.require({
                 message: `Approve RO ${order.roNumber}?`,
@@ -403,18 +430,31 @@ export default defineComponent({
                 rejectLabel: 'Cancel',
                 accept: async () => {
                     try {
-                        await requestOrderService.processROApproval(order.id, 'Approved');
+                        if (!userRole) {
+                            toast.add({
+                                severity: 'warn',
+                                summary: 'No Role',
+                                detail: 'User role is not defined',
+                                life: 3000
+                            });
+                            return;
+                        }
+
+                        console.log('Approving order:', order.id, 'by user role:', userRole);
+
+                        await requestOrderService.processROApproval(order.id, 'Approved', userRole);
+
                         toast.add({
                             severity: 'success',
                             summary: 'Approved',
                             detail: 'Request order approved.',
                             life: 3000
                         });
+
                         await store.fetchOrders();
                         confirm.close();
                     } catch (err: any) {
                         const errorDetail = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to approve';
-                        console.log('Approval error:', errorDetail);
 
                         toast.add({
                             severity: 'warn',
@@ -436,49 +476,50 @@ export default defineComponent({
                 }
             });
         }
+        // Rejection modal state
+        const showRejectModal = ref(false);
+        const currentRejectOrder = ref<Order | null>(null);
 
         function rejectOrder(order: Order) {
-            confirm.require({
-                message: `Reject RO ${order.roNumber}?`,
-                header: 'Confirm Rejection',
-                icon: 'pi pi-times-circle',
-                acceptClass: 'p-button-danger',
-                acceptLabel: 'Yes, Reject',
-                rejectLabel: 'Cancel',
-                accept: async () => {
-                    try {
-                        await requestOrderService.processROApproval(order.id, 'Rejected');
-                        toast.add({
-                            severity: 'warn',
-                            summary: 'Rejected',
-                            detail: 'Request order rejected.',
-                            life: 3000
-                        });
-                        await store.fetchOrders();
-                        confirm.close();
-                    } catch (err: any) {
-                        confirm.close();
-                        const errorDetail = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to reject';
-                        console.log('Rejection error:', errorDetail);
+            currentRejectOrder.value = order;
+            showRejectModal.value = true;
+        }
 
-                        toast.add({
-                            severity: 'warn',
-                            summary: 'Cannot Reject',
-                            detail: errorDetail,
-                            life: 3000
-                        });
-                    }
-                },
-                reject: () => {
-                    confirm.close();
+        async function onRejectConfirmed(remark: string) {
+            if (!currentRejectOrder.value) return;
+
+            try {
+                if (!userRole) {
                     toast.add({
-                        severity: 'info',
-                        summary: 'Cancelled',
-                        detail: 'Reject cancelled.',
-                        life: 2500
+                        severity: 'warn',
+                        summary: 'No Role',
+                        detail: 'User role is not defined',
+                        life: 3000
                     });
+                    return;
                 }
-            });
+                await requestOrderService.processROApproval(currentRejectOrder.value.id, 'Rejected', userRole, remark);
+
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Rejected',
+                    detail: 'Request order rejected.',
+                    life: 3000
+                });
+
+                await store.fetchOrders();
+                showRejectModal.value = false;
+                currentRejectOrder.value = null;
+            } catch (err: any) {
+                const errorDetail = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to reject';
+
+                toast.add({
+                    severity: 'error',
+                    summary: 'Cannot Reject',
+                    detail: errorDetail,
+                    life: 3000
+                });
+            }
         }
 
         function handleActionClick(type: 'edit' | 'view' | 'delete' | 'approve' | 'reject', rowData: Order): void {
@@ -568,7 +609,10 @@ export default defineComponent({
             applyFilters,
             selectedBudgetType,
             startDate,
-            endDate
+            endDate,
+            showRejectModal,
+            onRejectConfirmed,
+            currentRejectOrder
         };
     }
 });
