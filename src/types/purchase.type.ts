@@ -22,6 +22,7 @@ export interface PurchaseOrderItem {
     description?: string;
     qty?: number;
     purchaseorderitems?: PurchaseOrderItem[];
+    status?: string;
 }
 
 export interface PurchaseOrder {
@@ -39,6 +40,7 @@ export interface PurchaseOrder {
     UpdatedBy?: string | null;
     PurchaseOrderItems: PurchaseOrderItem[];
     purchaseorderitems?: PurchaseOrderItem[];
+    purchase_order_items?: PurchaseOrderItem[];
 
     // Frontend-friendly aliases
     id?: number;

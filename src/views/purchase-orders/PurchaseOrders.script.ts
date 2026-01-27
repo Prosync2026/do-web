@@ -99,10 +99,10 @@ export default defineComponent({
                             const price = item.Price || 0;
                             return sum + quantity * price;
                         }, 0) || 0,
-                    status: po.Status || 'Pending'
+                    status: po.Status || 'Pending' || 'Created'
                 }));
 
-                pendingList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'pending');
+                pendingList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'pending' || po.status.toLowerCase() === 'created');
                 partiallyList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'partially delivered');
                 completedList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'completed');
 

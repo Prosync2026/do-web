@@ -1,5 +1,5 @@
 import { purchaseService } from '@/services/purchaseOrder.service';
-import type { CreatePurchaseOrderPayload, PurchaseOrder, PurchaseOrderItem, PurchaseOrderResponse, PurchaseOrderView } from '@/types/purchase.type';
+import type { CreatePurchaseOrderPayload, PurchaseOrder, PurchaseOrderResponse, PurchaseOrderView } from '@/types/purchase.type';
 import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
@@ -76,7 +76,9 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                         price: item.Price || 0,
                         amount: Number(item.Quantity) * (item.Price || 0),
                         deliveryDate: item.DeliveryDate || null,
-                        note: item.RoDocNo || ''
+                        note: item.RoDocNo || '',
+                        status: item.Status || 'Pending',
+                        totalAmount: item.TotalAmount || 0
                     }))
                 };
             });
@@ -102,12 +104,16 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         loading.value = true;
         try {
             const response = await purchaseService.getPurchaseOrderById(id);
-            if (!response) return null;
+            if (!response) {
+                showError('Invalid response from server');
+                return null;
+            }
 
-            const wrapped = response as any;
-            const o = wrapped.data as PurchaseOrder;
+            const wrappedResponse = response as any;
+            const o = wrappedResponse.data as PurchaseOrder;
 
-            const rawItems = (o.purchaseorderitems ?? o.PurchaseOrderItems ?? []) as PurchaseOrderItem[];
+            const rawItems = o.purchase_order_items ?? o.PurchaseOrderItems ?? o.purchaseorderitems ?? [];
+
             const mappedItems = rawItems.map((item: any) => ({
                 Id: item.Id,
                 PurchaseOrderId: item.PurchaseOrderId,
@@ -118,20 +124,19 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 Uom: item.Uom || '',
                 Quantity: item.Quantity,
                 Price: item.Price || 0,
-                Discount: item.Discount,
+                Discount: item.Discount ?? 0,
                 DeliveryDate: item.DeliveryDate,
                 CreatedAt: item.CreatedAt,
                 CreatedBy: item.CreatedBy,
                 UpdatedAt: item.UpdatedAt,
                 UpdatedBy: item.UpdatedBy,
 
-                // Frontend-friendly aliases
                 code: item.ItemCode,
                 description: item.Name,
                 uom: item.Uom || '',
                 qty: Number(item.Quantity),
-                price: item.Price || 0,
-                amount: Number(item.Quantity) * (item.Price || 0),
+                price: Number(item.Price) || 0,
+                amount: Number(item.Quantity) * (Number(item.Price) || 0),
                 deliveryDate: item.DeliveryDate || null,
                 note: item.RoDocNo || ''
             }));
@@ -142,8 +147,8 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 DocNo: o.DocNo,
                 Status: o.Status,
                 PoDate: o.PoDate,
-                TotalAmount: o.TotalAmount,
-                GstAmount: o.GstAmount,
+                TotalAmount: o.TotalAmount || 0,
+                GstAmount: o.GstAmount || 0,
                 Remark: o.Remark,
                 CreatedAt: o.CreatedAt,
                 CreatedBy: o.CreatedBy,
@@ -156,7 +161,6 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 items: mappedItems
             };
 
-            console.log('Mapped purchase order:', order);
             selectedPurchaseOrder.value = order;
             return order;
         } catch (error: unknown) {

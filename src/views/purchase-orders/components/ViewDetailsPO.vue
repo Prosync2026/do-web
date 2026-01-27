@@ -34,7 +34,7 @@
                     </div>
                     <div>
                         <p class="font-semibold">Status</p>
-                        <p><Tag :value="status" :severity="status === 'active' ? 'success' : 'danger'" /></p>
+                        <p><Tag :value="status === 'Created' ? 'Pending' : status" :severity="status === 'Completed' ? 'success' : status === 'Partially Delivered' ? 'warn' : 'info'" /></p>
                     </div>
                     <div>
                         <p class="font-semibold">Project</p>
@@ -45,8 +45,8 @@
                         <p>{{ deliveryDate }}</p>
                     </div>
                     <div>
-                        <p class="font-semibold">Items Remaining</p>
-                        <p>{{ itemsRemaining }}</p>
+                        <p class="font-semibold">Created By</p>
+                        <p>{{ createdBy }}</p>
                     </div>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                                 </template>
 
                                 <template #status="{ data }">
-                                    <Tag :value="data.status" :severity="data.status.toLowerCase() === 'completed' ? 'success' : 'warn'" />
+                                    <Tag :value="data.status === 'Created' ? 'Pending' : data.status" :severity="data.status.toLowerCase() === 'completed' ? 'success' : data.status.toLowerCase() === 'partially delivered' ? 'warn' : 'info'" />
                                 </template>
                             </ReusableTable>
                         </div>
@@ -75,7 +75,7 @@
                                 </template>
 
                                 <template #status="{ data }">
-                                    <Tag :value="data.status" :severity="data.status.toLowerCase() === 'completed' ? 'success' : 'warn'" />
+                                    <Tag :value="data.status === 'Created' ? 'Pending' : data.status" :severity="data.status.toLowerCase() === 'completed' ? 'success' : data.status.toLowerCase() === 'partially delivered' ? 'warn' : 'info'" />
                                 </template>
                             </ReusableTable>
                         </div>
