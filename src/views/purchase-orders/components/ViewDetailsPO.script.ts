@@ -20,46 +20,72 @@ export default defineComponent({
 
         const project = ref<{ company: string; name: string } | null>(JSON.parse(localStorage.getItem('selectedProject') || 'null'));
 
-        // --- Top section info ---
-        const poNumber = computed(() => purchaseOrder.value?.poNumber || '');
-        const supplier = computed(() => purchaseOrder.value?.SupplierId || '');
-        const totalAmount = computed(() => purchaseOrder.value?.TotalAmount ?? 0);
-        const date = computed(() => purchaseOrder.value?.poDate || '');
-        const status = computed(() => purchaseOrder.value?.Status || '');
-        const createdBy = computed(() => purchaseOrder.value?.CreatedBy || '');
-        const roNumber = computed(() => purchaseOrder.value?.items?.[0]?.RoDocNo || 'N/A');
+        const poNumber = computed(() => purchaseOrder.value?.poNumber ?? 'N/A');
+        const supplier = computed(() => purchaseOrder.value?.SupplierId?.toString() || 'N/A');
+        const totalAmount = computed(() => {
+            const amount = purchaseOrder.value?.TotalAmount;
+            if (!amount && purchaseOrder.value?.items) {
+                return purchaseOrder.value.items.reduce((sum, item) => sum + (item.amount || 0), 0);
+            }
+            return amount ?? 0;
+        });
 
-        const deliveryDate = computed(() => purchaseOrder.value?.items?.[0]?.DeliveryDate ?? 'N/A');
+        const date = computed(() => purchaseOrder.value?.poDate ?? 'N/A');
+        const status = computed(() => purchaseOrder.value?.Status ?? 'N/A');
+        const createdBy = computed(() => purchaseOrder.value?.CreatedBy || 'N/A');
+
+        const roNumber = computed(() => {
+            const items = purchaseOrder.value?.items;
+            if (!items || items.length === 0) return 'N/A';
+            return items[0]?.note || items[0]?.RoDocNo || 'N/A';
+        });
+
+        const deliveryDate = computed(() => {
+            const items = purchaseOrder.value?.items;
+            if (!items || items.length === 0) return 'N/A';
+            const date = items[0]?.deliveryDate || items[0]?.DeliveryDate;
+            if (!date) return 'N/A';
+            try {
+                return new Date(date).toLocaleDateString('en-GB', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            } catch {
+                return 'N/A';
+            }
+        });
 
         const itemsRemaining = computed(() => {
             if (!purchaseOrder.value?.items) return 0;
-            return purchaseOrder.value.items.reduce((acc, item) => {
-                const qty = Number(item.Quantity || 0);
+            const total = purchaseOrder.value.items.reduce((acc, item) => {
+                const qty = Number(item.qty || item.Quantity || 0);
                 const received = Math.floor(qty * 0.7);
                 const remaining = qty - received;
                 return acc + remaining;
             }, 0);
+            return parseFloat(total.toFixed(2));
         });
 
         const itemsList = computed(() => {
-            const po = purchaseOrder.value;
-            if (!po || !po.items) return [];
+            const items = purchaseOrder.value?.items;
+            if (!items || items.length === 0) return [];
 
-            return po.items.map((item: any) => {
-                const qty = Number(item.qty || 0);
-                const received = Math.floor(qty * 0.7);
-                const remaining = qty - received;
+            return items.map((item) => {
+                const qty = Number(item.qty || item.Quantity || 0);
+                const unitPrice = Number(item.price || item.Price || 0);
+                const amount = Number(item.amount || qty * unitPrice || 0);
+
                 return {
                     no: 0,
-                    code: item.code,
-                    description: item.description,
+                    code: item.code || item.ItemCode || '',
+                    description: item.description || item.Name || '',
                     ordered: qty,
-                    received,
-                    remaining,
-                    unitPrice: item.price,
-                    roNumber: item.note,
-                    deliveryDate: item.deliveryDate || 'N/A',
-                    status: received === qty ? 'Completed' : 'Partial'
+                    unitPrice,
+                    amount: parseFloat(amount.toFixed(2)),
+                    roNumber: item.note || item.RoDocNo || 'N/A',
+                    deliveryDate: item.deliveryDate || item.DeliveryDate || 'N/A',
+                    status: item.status || 'Pending'
                 };
             });
         });
@@ -71,8 +97,6 @@ export default defineComponent({
             { field: 'code', header: 'Item Code' },
             { field: 'description', header: 'Description' },
             { field: 'ordered', header: 'Ordered' },
-            { field: 'received', header: 'Received' },
-            { field: 'remaining', header: 'Remaining' },
             { field: 'unitPrice', header: 'Unit Price' },
             { field: 'amount', header: 'Amount' },
             { field: 'status', header: 'Status', bodySlot: 'status' }
@@ -87,7 +111,7 @@ export default defineComponent({
         onMounted(async () => {
             isLoading.value = true;
             try {
-                await store.fetchPurchaseOrderById(poId.value);
+                const result = await store.fetchPurchaseOrderById(poId.value);
             } catch (error) {
                 console.error('Failed to load purchase order details:', error);
             } finally {
