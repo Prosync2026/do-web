@@ -46,7 +46,7 @@ export default defineComponent({
         const showEditModal = ref(false);
         const selectedOrder = ref<Order | null>(null);
 
-        const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, totalValue: 0, totalApprovedValue: 0 });
+        const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, submitted: 0, totalValue: 0, totalApprovedValue: 0 });
 
         // badges and totals
         const pendingCount = computed(() => totalCounts.value.pending);
@@ -103,6 +103,7 @@ export default defineComponent({
         const tabItems = computed(() => {
             return [
                 { label: 'All Orders', value: 'all' },
+                { label: 'Submitted', value: 'submitted' },
                 { label: 'Processing', value: 'processing', badge: pendingCount.value },
                 { label: 'Approved', value: 'approved' },
                 { label: 'Rejected', value: 'rejected' }
@@ -120,6 +121,7 @@ export default defineComponent({
                 const orders = res.data;
 
                 totalCounts.value.pending = orders.filter((o) => o.Status === 'Processing').length;
+                totalCounts.value.submitted = orders.filter((o) => o.Status === 'Submitted').length;
                 totalCounts.value.approved = orders.filter((o) => o.Status === 'Approved').length;
                 totalCounts.value.rejected = orders.filter((o) => o.Status === 'Rejected').length;
 

@@ -257,6 +257,7 @@ export interface AttachmentItem {
 
 export interface RequestOrdersCounts {
     pending: number;
+    submitted: number;
     approved: number;
     rejected: number;
     totalValue: number;

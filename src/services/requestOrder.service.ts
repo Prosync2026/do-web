@@ -184,7 +184,7 @@ const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetReq
 
         const counts = {
             pending: orders.filter((o) => o['Status'] === 'Processing').length,
-            submit: orders.filter((o) => o['Status'] === 'Submitted').length,
+            submitted: orders.filter((o) => o['Status'] === 'Submitted').length,
             approved: orders.filter((o) => o['Status'] === 'Approved').length,
             rejected: orders.filter((o) => o['Status'] === 'Rejected').length,
             totalValue: orders.reduce((sum, o) => sum + Number(o['TotalAmount'] || 0), 0),
@@ -205,7 +205,7 @@ const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetReq
             success: false,
             data: [],
             pagination: { total: 0, totalPages: 0, page: 1, pageSize: 10 },
-            counts: { pending: 0, approved: 0, rejected: 0, totalValue: 0, totalApprovedValue: 0 }
+            counts: { pending: 0, approved: 0, rejected: 0, submitted: 0, totalValue: 0, totalApprovedValue: 0 }
         };
     }
 };

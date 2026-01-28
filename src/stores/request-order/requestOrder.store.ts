@@ -35,6 +35,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
 
     const totalCounts = ref({
         pending: 0,
+        submitted: 0,
         approved: 0,
         rejected: 0,
         totalValue: 0,
@@ -109,7 +110,6 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
             };
 
             const response: GetRequestOrdersResponse = await requestOrderService.getRequestOrders(params);
-            console.log('📥 Fetched Request Orders Response:', response);
 
             orders.value = response.data.map((output): Order => {
                 const apiOutput = output as unknown as RequestOrderResponse;
@@ -156,6 +156,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
 
             totalCounts.value = response.counts || {
                 pending: 0,
+                submitted: 0,
                 approved: 0,
                 rejected: 0,
                 totalValue: 0,

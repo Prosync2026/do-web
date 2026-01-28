@@ -34,7 +34,7 @@ defineProps<{
         <!-- Total Request Order Value -->
         <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-400/10 rounded-2xl shadow-sm border">
             <div>
-                <h3 class="font-semibold text-gray-800 dark:text-white">Total Request Order Value</h3>
+                <h3 class="font-semibold text-gray-800 dark:text-white">Total Approved Request Order</h3>
                 <p class="text-2xl font-bold text-gray-800 dark:text-white mt-2">RM {{ totalApprovedValue }}</p>
                 <p class="dark:text-white text-gray-500 text-sm">Total orders value</p>
             </div>
