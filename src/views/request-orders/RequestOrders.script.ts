@@ -46,12 +46,13 @@ export default defineComponent({
         const showEditModal = ref(false);
         const selectedOrder = ref<Order | null>(null);
 
-        const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, totalValue: 0 });
+        const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, submitted: 0, totalValue: 0, totalApprovedValue: 0 });
 
         // badges and totals
         const pendingCount = computed(() => totalCounts.value.pending);
         const approvedCount = computed(() => totalCounts.value.approved);
         const totalValue = computed(() => totalCounts.value.totalValue);
+        const totalApprovedValue = computed(() => totalCounts.value.totalApprovedValue);
 
         // ref for  budget type and date range
         const selectedBudgetType = ref('');
@@ -93,7 +94,7 @@ export default defineComponent({
         const userRole = getUserRole();
 
         // permission
-        const { canViewRO, canCreateRO, canEditRO, canApproveRO, canDeleteRO, canAccessROModule } = useRequestOrderPermission();
+        const { canViewRO, canCreateRO, canEditRO, canApproveRO, canDeleteRO, canViewPricing, canAccessROModule } = useRequestOrderPermission();
         const isPurchasingRole = userRole === 'PURC';
         const isPmPdRole = userRole === 'PM' || userRole === 'PD';
         // const activeTab = ref(isPurchasingRole ? 'all' : 'all');
@@ -102,6 +103,7 @@ export default defineComponent({
         const tabItems = computed(() => {
             return [
                 { label: 'All Orders', value: 'all' },
+                { label: 'Submitted', value: 'submitted' },
                 { label: 'Processing', value: 'processing', badge: pendingCount.value },
                 { label: 'Approved', value: 'approved' },
                 { label: 'Rejected', value: 'rejected' }
@@ -117,10 +119,15 @@ export default defineComponent({
             try {
                 const res = await requestOrderService.getRequestOrders({ page: 1, pageSize: 10000 });
                 const orders = res.data;
+
                 totalCounts.value.pending = orders.filter((o) => o.Status === 'Processing').length;
+                totalCounts.value.submitted = orders.filter((o) => o.Status === 'Submitted').length;
                 totalCounts.value.approved = orders.filter((o) => o.Status === 'Approved').length;
                 totalCounts.value.rejected = orders.filter((o) => o.Status === 'Rejected').length;
+
                 totalCounts.value.totalValue = orders.reduce((sum, o) => sum + Number(o.TotalAmount || 0), 0);
+
+                totalCounts.value.totalApprovedValue = res.totalApprovedValue || 0;
             } catch (err) {
                 console.error(err);
             }
@@ -205,22 +212,32 @@ export default defineComponent({
             }))
         );
 
-        // Table config
         const tableColumns = computed<TableColumn[]>(() => {
-            return [
+            const columns: TableColumn[] = [
                 { field: 'rowIndex', header: '#', sortable: true },
                 { field: 'roNumber', header: 'RO Number', sortable: true },
                 { field: 'requestedBy', header: 'Requested By', sortable: true },
                 { field: 'roDate', header: 'RO Date', sortable: true },
-                { field: 'deliveryDate', header: 'Delivery Date', sortable: true },
-                { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
+                { field: 'deliveryDate', header: 'Delivery Date', sortable: true }
+            ];
+
+            // only show pricing to dedicated users
+            if (canViewPricing.value) {
+                columns.push({
+                    field: 'totalAmount',
+                    header: 'Total Amount',
+                    sortable: true,
+                    bodySlot: 'totalAmount'
+                });
+            }
+
+            columns.push(
                 { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
                 {
                     field: 'approvalProgress',
                     header: 'Approval Status',
                     bodySlot: 'approvalStatus'
                 },
-
                 { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
                 {
                     field: 'actions',
@@ -229,9 +246,7 @@ export default defineComponent({
                     actions: (row: Order) => {
                         const actions: ActionType[] = [];
 
-                        if (canViewRO.value) {
-                            actions.push('view');
-                        }
+                        if (canViewRO.value) actions.push('view');
 
                         if (canEditRO.value && isPurchasingRole && row.currentApprovalStage === 'PURCH') {
                             actions.push('edit');
@@ -241,14 +256,14 @@ export default defineComponent({
                             actions.push('approve', 'reject');
                         }
 
-                        if (canDeleteRO.value) {
-                            actions.push('delete');
-                        }
+                        if (canDeleteRO.value) actions.push('delete');
 
                         return actions;
                     }
                 }
-            ];
+            );
+
+            return columns;
         });
 
         function getApprovalDotClass(status: string) {
@@ -263,19 +278,6 @@ export default defineComponent({
         }
 
         const tableFilters = computed(() => [
-            // commneted as the space it limited
-            // {
-            //     type: 'select' as const,
-            //     field: 'status',
-            //     placeholder: 'Filter by Status',
-            //     options: [
-            //         { label: 'All Statuses', value: '' },
-            //         { label: 'Processing', value: 'Processing' },
-            //         { label: 'Approved', value: 'Approved' },
-            //         { label: 'Rejected', value: 'Rejected' }
-            //     ],
-            //     model: store.filters.status
-            // },
             {
                 type: 'select' as const,
                 field: 'budgetType',
@@ -283,7 +285,7 @@ export default defineComponent({
                 options: [
                     { label: 'All Type', value: '' },
                     { label: 'Budgeted', value: 'Budgeted' },
-                    { label: 'Unbudgeted', value: 'Unbudgeted' }
+                    { label: 'NonBudgeted', value: 'NonBudgeted' }
                 ],
                 model: store.filters.budgetType
             },
@@ -612,7 +614,9 @@ export default defineComponent({
             endDate,
             showRejectModal,
             onRejectConfirmed,
-            currentRejectOrder
+            currentRejectOrder,
+            totalApprovedValue,
+            canViewPricing
         };
     }
 });

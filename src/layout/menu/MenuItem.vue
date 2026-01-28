@@ -76,7 +76,10 @@ function checkActiveRoute(item) {
             <i :class="item.icon" class="layout-menuitem-icon"></i>
             <span class="layout-menuitem-text flex justify-between items-center w-full">
                 <span>{{ item.label }}</span>
-                <Badge v-if="item.badge" :value="item.badge" severity="warn" class="absolute right-0" />
+                <!-- Replace Badge with icon -->
+                <i v-if="item.badgeIcon" :class="item.badgeIcon" style="color: #0b55f5; font-size: 14px"></i>
+                <!-- Keep Badge for pendingCount only -->
+                <Badge v-else-if="item.badge && typeof item.badge === 'number'" :value="item.badge" severity="warn" class="absolute right-0" />
             </span>
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
         </a>
@@ -85,7 +88,10 @@ function checkActiveRoute(item) {
             <i :class="item.icon" class="layout-menuitem-icon"></i>
             <span class="layout-menuitem-text flex justify-between items-center w-full">
                 <span>{{ item.label }}</span>
-                <Badge v-if="item.badge" :value="item.badge" severity="warn" class="absolute right-0" />
+                <!-- Replace Badge with icon -->
+                <i v-if="item.badgeIcon" :class="item.badgeIcon" style="color: #0b55f5; font-size: 14px"></i>
+                <!-- Keep Badge for pendingCount only -->
+                <Badge v-else-if="item.badge && typeof item.badge === 'number'" :value="item.badge" severity="warn" class="absolute right-0" />
             </span>
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
         </router-link>

@@ -183,17 +183,20 @@ const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetReq
         const orders: CreateRequestOrderPayload[] = response.data.data || [];
 
         const counts = {
-            pending: orders.filter((o) => o['Status'] === 'Pending').length,
+            pending: orders.filter((o) => o['Status'] === 'Processing').length,
+            submitted: orders.filter((o) => o['Status'] === 'Submitted').length,
             approved: orders.filter((o) => o['Status'] === 'Approved').length,
             rejected: orders.filter((o) => o['Status'] === 'Rejected').length,
-            totalValue: orders.reduce((sum, o) => sum + Number(o['TotalAmount'] || 0), 0)
+            totalValue: orders.reduce((sum, o) => sum + Number(o['TotalAmount'] || 0), 0),
+            totalApprovedValue: response.data.totalApprovedValue || 0
         };
 
         return {
             success: response.data.success,
             data: orders,
             pagination: response.data.pagination || { total: 0, totalPages: 0, page: 1, pageSize: 10 },
-            counts
+            counts,
+            totalApprovedValue: response.data.totalApprovedValue || 0
         };
     } catch (error: unknown) {
         const message = (error as AxiosError<{ message: string }>)?.response?.data?.message || 'Failed to fetch request orders';
@@ -202,7 +205,7 @@ const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetReq
             success: false,
             data: [],
             pagination: { total: 0, totalPages: 0, page: 1, pageSize: 10 },
-            counts: { pending: 0, approved: 0, rejected: 0, totalValue: 0 }
+            counts: { pending: 0, approved: 0, rejected: 0, submitted: 0, totalValue: 0, totalApprovedValue: 0 }
         };
     }
 };
