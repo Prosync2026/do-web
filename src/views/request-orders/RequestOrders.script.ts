@@ -290,7 +290,7 @@ export default defineComponent({
                 options: [
                     { label: 'All Type', value: '' },
                     { label: 'Budgeted', value: 'Budgeted' },
-                    { label: 'Unbudgeted', value: 'Unbudgeted' }
+                    { label: 'NonBudgeted', value: 'NonBudgeted' }
                 ],
                 model: store.filters.budgetType
             },
