@@ -65,13 +65,15 @@ export default defineComponent({
                         label: 'Purchase Orders',
                         icon: 'pi pi-fw pi-book',
                         to: '/purchase-orders',
-                        visible: canViewPO.value
+                        visible: canViewPO.value,
+                        badgeIcon: 'pi pi-fw pi-wrench'
                     },
                     {
                         label: 'Deliveries',
                         icon: 'pi pi-fw pi-car',
                         to: '/deliveries',
-                        visible: canViewDelivery.value
+                        visible: canViewDelivery.value,
+                        badgeIcon: 'pi pi-fw pi-wrench'
                     }
                 ]
             }
