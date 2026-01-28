@@ -23,7 +23,7 @@ import { Button } from "@prosync/ui-kit";
             </div>
             <ViewDraftRo :visible="showDraftModal" @update:visible="showDraftModal = $event" @update:count="draftCount = $event" />
 
-            <RoSummary :pendingCount="pendingCount" :approvedCount="approvedCount" :totalValue="totalValue" />
+            <RoSummary :pendingCount="pendingCount" :approvedCount="approvedCount" :totalApprovedValue="totalApprovedValue" :totalValue="totalValue" />
 
             <!-- Tabs -->
             <div class="card">

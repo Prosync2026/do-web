@@ -5,6 +5,7 @@ defineProps<{
     pendingCount: number;
     approvedCount: number;
     totalValue: number;
+    totalApprovedValue: number;
 }>();
 </script>
 
@@ -34,7 +35,7 @@ defineProps<{
         <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-400/10 rounded-2xl shadow-sm border">
             <div>
                 <h3 class="font-semibold text-gray-800 dark:text-white">Total Request Order Value</h3>
-                <p class="text-2xl font-bold text-gray-800 dark:text-white mt-2">RM {{ totalValue.toFixed(2) }}</p>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white mt-2">RM {{ totalApprovedValue }}</p>
                 <p class="dark:text-white text-gray-500 text-sm">Total orders value</p>
             </div>
             <DollarSign class="dark:text-white w-6 h-6 text-gray-500" />

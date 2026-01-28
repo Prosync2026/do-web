@@ -46,12 +46,13 @@ export default defineComponent({
         const showEditModal = ref(false);
         const selectedOrder = ref<Order | null>(null);
 
-        const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, totalValue: 0 });
+        const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, totalValue: 0, totalApprovedValue: 0 });
 
         // badges and totals
         const pendingCount = computed(() => totalCounts.value.pending);
         const approvedCount = computed(() => totalCounts.value.approved);
         const totalValue = computed(() => totalCounts.value.totalValue);
+        const totalApprovedValue = computed(() => totalCounts.value.totalApprovedValue);
 
         // ref for  budget type and date range
         const selectedBudgetType = ref('');
@@ -117,10 +118,14 @@ export default defineComponent({
             try {
                 const res = await requestOrderService.getRequestOrders({ page: 1, pageSize: 10000 });
                 const orders = res.data;
+
                 totalCounts.value.pending = orders.filter((o) => o.Status === 'Processing').length;
                 totalCounts.value.approved = orders.filter((o) => o.Status === 'Approved').length;
                 totalCounts.value.rejected = orders.filter((o) => o.Status === 'Rejected').length;
+
                 totalCounts.value.totalValue = orders.reduce((sum, o) => sum + Number(o.TotalAmount || 0), 0);
+
+                totalCounts.value.totalApprovedValue = res.totalApprovedValue || 0;
             } catch (err) {
                 console.error(err);
             }
@@ -612,7 +617,8 @@ export default defineComponent({
             endDate,
             showRejectModal,
             onRejectConfirmed,
-            currentRejectOrder
+            currentRejectOrder,
+            totalApprovedValue
         };
     }
 });

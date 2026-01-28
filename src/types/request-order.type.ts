@@ -115,6 +115,7 @@ export interface Order {
         level: 'PM' | 'PD' | 'PURC' | 'PURCH';
         status: 'Approved' | 'Rejected' | 'Pending';
     }[];
+    totalApprovedValue?: string | number;
 }
 
 export interface PreviewItem {
@@ -187,6 +188,7 @@ export interface CreateRequestOrderPayload {
     request_order_items?: RequestOrderItemResponse[];
     Location1?: string;
     Location2?: string;
+    totalApprovedValue?: string | number;
 }
 
 export interface ApiResponse<T> {
@@ -258,6 +260,7 @@ export interface RequestOrdersCounts {
     approved: number;
     rejected: number;
     totalValue: number;
+    totalApprovedValue: number;
 }
 
 export interface PaginationInfo {
@@ -272,6 +275,7 @@ export interface GetRequestOrdersResponse {
     data: CreateRequestOrderPayload[];
     pagination: PaginationInfo;
     counts?: RequestOrdersCounts;
+    totalApprovedValue?: number;
 }
 
 export interface GetRequestOrdersParams {
@@ -328,6 +332,7 @@ export interface RequestOrderResponse {
     approvalProgress?: ApprovalProgress[];
     approvalFlowType?: 'NORMAL' | 'HIGH_VALUE';
     CurrentApprovalStage?: string;
+    totalApprovedValue?: string | number;
 }
 
 export interface UpdateRequestOrderPayload {

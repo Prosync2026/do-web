@@ -37,7 +37,8 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         pending: 0,
         approved: 0,
         rejected: 0,
-        totalValue: 0
+        totalValue: 0,
+        totalApprovedValue: 0
     });
 
     type UIApprovalProgress = {
@@ -108,6 +109,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
             };
 
             const response: GetRequestOrdersResponse = await requestOrderService.getRequestOrders(params);
+            console.log('📥 Fetched Request Orders Response:', response);
 
             orders.value = response.data.map((output): Order => {
                 const apiOutput = output as unknown as RequestOrderResponse;
@@ -122,7 +124,6 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                     budgetType: apiOutput.PrType,
                     status: apiOutput.Status,
                     requestedAt: formatDateTime(apiOutput.CreatedAt),
-
                     approvalProgress: normalizeApprovalProgress((apiOutput.approvalProgress || []) as RawApprovalProgress[]),
 
                     approvalFlowType: apiOutput.approvalFlowType,
@@ -157,8 +158,13 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 pending: 0,
                 approved: 0,
                 rejected: 0,
-                totalValue: 0
+                totalValue: 0,
+                totalApprovedValue: 0
             };
+
+            if (response.totalApprovedValue !== undefined) {
+                totalCounts.value.totalApprovedValue = response.totalApprovedValue;
+            }
         } catch (error) {
             showError(error, 'Failed to fetch request orders');
         } finally {
