@@ -2,7 +2,7 @@
 
 <template>
     <div class="p-mb-5">
-        <div v-if="!poNumber" class="flex flex-col justify-center py-5 gap-4 w-full">
+        <div v-if="!isPoSelected" class="flex flex-col justify-center py-5 gap-4 w-full">
             <Message severity="warn" variant="outlined" :closable="false">
                 <i class="pi pi-exclamation-triangle mr-2"></i>
                 Please select a Purchase Order before proceeding.

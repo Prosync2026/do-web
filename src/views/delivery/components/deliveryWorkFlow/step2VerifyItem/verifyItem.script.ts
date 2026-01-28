@@ -12,7 +12,7 @@ import ProgressBar from 'primevue/progressbar';
 import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-import { defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
     name: 'VerifyItem',
@@ -47,35 +47,50 @@ export default defineComponent({
         const toast = useToast();
         const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 
+        const isPoSelected = computed(() => {
+            return poNumber.value !== null && poNumber.value !== '';
+        });
+
         // ---------------------------
         // 2. WATCHERS
         // ---------------------------
         watch(
             () => props.selectedPo,
             (newPo) => {
-                if (!newPo?.items?.length) {
+                if (!newPo) {
                     itemList.value = [];
                     poNumber.value = null;
                     return;
                 }
 
-                itemList.value = newPo.items.map((i: PurchaseOrderItem) => ({
-                    id: i.id ?? i.Id,
-                    purchaseOrderId: newPo.id ?? newPo.Id,
-                    requestOrderId: i.requestOrderId ?? 0,
-                    name: i.description ?? i.Name ?? 'Unnamed Item',
-                    order: i.code ?? i.ItemCode ?? '',
-                    status: 'Pending',
-                    location: '',
-                    category: '',
-                    type: '',
-                    delivered: 0,
-                    total: Number(i.qty ?? i.Quantity) || 0
-                }));
+                const items = newPo.purchase_order_items ?? newPo.items ?? newPo.PurchaseOrderItems ?? [];
+
+                if (!items || items.length === 0) {
+                    itemList.value = [];
+                    poNumber.value = null;
+                    return;
+                }
+
+                itemList.value = items.map((i: PurchaseOrderItem) => {
+                    const item = {
+                        id: i.id ?? i.Id,
+                        purchaseOrderId: newPo.id ?? newPo.Id,
+                        requestOrderId: i.requestOrderId ?? 0,
+                        name: i.description ?? i.Name ?? 'Unnamed Item',
+                        order: i.code ?? i.ItemCode ?? '',
+                        status: 'Pending',
+                        location: '',
+                        category: '',
+                        type: '',
+                        delivered: 0,
+                        total: Number(i.qty ?? i.Quantity) || 0
+                    };
+                    return item;
+                });
 
                 poNumber.value = newPo.poNumber ?? newPo.DocNo ?? null;
             },
-            { immediate: true }
+            { immediate: true, deep: true }
         );
 
         // ---------------------------
@@ -127,7 +142,8 @@ export default defineComponent({
             toastRef,
             onFormSubmit,
             goBack,
-            toggle
+            toggle,
+            isPoSelected
         };
     }
 });
