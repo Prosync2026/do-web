@@ -16,7 +16,6 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
     const singleDelivery = ref<DeliveryOrder | null>(null);
 
     const filters = reactive({
-        status: '',
         search: '',
         startDate: '',
         endDate: ''
@@ -35,35 +34,31 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
     async function fetchDeliveryOrders() {
         loading.value = true;
         try {
-            const projectData = localStorage.getItem('selectedProject');
-            const parsed = projectData ? JSON.parse(projectData) : null;
-            const currentProjectId = parsed?.ProjectId || null;
-
             const params = {
-                status: filters.status || undefined,
+                page: pagination.page,
+                pageSize: pagination.pageSize,
                 search: filters.search || search.value || undefined,
                 startDate: filters.startDate || undefined,
-                endDate: filters.endDate || undefined,
-                projectId: currentProjectId,
-                page: pagination.page,
-                pageSize: pagination.pageSize
+                endDate: filters.endDate || undefined
             };
 
-            const [incompletedRes, completedRes] = await Promise.all([deliveryOrderService.getDeliveryOrders({ ...params, status: 'Pending' }), deliveryOrderService.getDeliveryOrders({ ...params, status: 'Completed' })]);
+            const response = await deliveryOrderService.getDeliveryOrders(params);
 
-            if (!incompletedRes.success || !completedRes.success) {
+            if (!response.success) {
                 showError('Failed to fetch delivery orders.');
                 return;
             }
 
-            incompletedList.value = incompletedRes.data || [];
-            completedList.value = completedRes.data || [];
+            const allOrders = response.data || [];
+            // TODO: Switch to server-side filtering once API supports &status=Pending
+            incompletedList.value = allOrders.filter((order) => order.Status !== 'Completed');
+            completedList.value = allOrders.filter((order) => order.Status === 'Completed');
 
-            if (incompletedRes.pagination) {
-                pagination.total = incompletedRes.pagination.total;
-                pagination.totalPages = incompletedRes.pagination.totalPages;
-                pagination.page = incompletedRes.pagination.page;
-                pagination.pageSize = incompletedRes.pagination.pageSize;
+            if (response.pagination) {
+                pagination.total = response.pagination.total;
+                pagination.totalPages = response.pagination.totalPages;
+                pagination.page = response.pagination.page;
+                pagination.pageSize = response.pagination.pageSize;
             }
         } catch (error) {
             showError(error, 'Failed to fetch delivery orders.');
@@ -74,6 +69,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
 
     async function handleSearch(value: string) {
         search.value = value;
+        pagination.page = 1; //Reset to first page when searching
         await fetchDeliveryOrders();
     }
 
@@ -123,7 +119,6 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
     }
 
     function clearFilters() {
-        filters.status = '';
         filters.search = '';
         filters.startDate = '';
         filters.endDate = '';

@@ -39,7 +39,6 @@ export default defineComponent({
         // ---------------------------
         const handleStep1Update = (data: any) => {
             deliveryData.value.selectPO = data;
-
             activeStep.value = 2;
         };
 

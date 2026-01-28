@@ -90,10 +90,12 @@ export default defineComponent({
 
             if (!fullPO) return;
 
+            const items = fullPO.purchase_order_items ?? fullPO.PurchaseOrderItems ?? [];
+
             emit('update', {
                 id: fullPO.Id,
                 poNumber: fullPO.DocNo,
-                items: fullPO.PurchaseOrderItems
+                items: items
             });
 
             emit('next-step');
