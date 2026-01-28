@@ -29,8 +29,8 @@ export default defineComponent({
             const formattedTotal = totalApprovedValue.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
             const cards: CardItem[] = [
-                { title: 'Under Review', value: reviewCount.toString(), description: 'Review in progress', icon: 'pi pi-exclamation-triangle', color: 'red' },
-                { title: 'Pending Review', value: pendingReviewCount.toString(), description: 'Ready for review', icon: 'pi pi-comment', color: 'orange' },
+                { title: 'Under Review', value: reviewCount.toString(), description: 'Waiting CM Review', icon: 'pi pi-exclamation-triangle', color: 'red' },
+                { title: 'Pending Review', value: pendingReviewCount.toString(), description: 'CM review done. Ready for PM/PD/Manager.', icon: 'pi pi-comment', color: 'orange' },
                 { title: 'Approved', value: approvedCount.toString(), description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' }
             ];
 
