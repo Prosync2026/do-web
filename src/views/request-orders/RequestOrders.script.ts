@@ -94,7 +94,7 @@ export default defineComponent({
         const userRole = getUserRole();
 
         // permission
-        const { canViewRO, canCreateRO, canEditRO, canApproveRO, canDeleteRO, canAccessROModule } = useRequestOrderPermission();
+        const { canViewRO, canCreateRO, canEditRO, canApproveRO, canDeleteRO, canViewPricing, canAccessROModule } = useRequestOrderPermission();
         const isPurchasingRole = userRole === 'PURC';
         const isPmPdRole = userRole === 'PM' || userRole === 'PD';
         // const activeTab = ref(isPurchasingRole ? 'all' : 'all');
@@ -212,22 +212,32 @@ export default defineComponent({
             }))
         );
 
-        // Table config
         const tableColumns = computed<TableColumn[]>(() => {
-            return [
+            const columns: TableColumn[] = [
                 { field: 'rowIndex', header: '#', sortable: true },
                 { field: 'roNumber', header: 'RO Number', sortable: true },
                 { field: 'requestedBy', header: 'Requested By', sortable: true },
                 { field: 'roDate', header: 'RO Date', sortable: true },
-                { field: 'deliveryDate', header: 'Delivery Date', sortable: true },
-                { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
+                { field: 'deliveryDate', header: 'Delivery Date', sortable: true }
+            ];
+
+            // only show pricing to dedicated users
+            if (canViewPricing.value) {
+                columns.push({
+                    field: 'totalAmount',
+                    header: 'Total Amount',
+                    sortable: true,
+                    bodySlot: 'totalAmount'
+                });
+            }
+
+            columns.push(
                 { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
                 {
                     field: 'approvalProgress',
                     header: 'Approval Status',
                     bodySlot: 'approvalStatus'
                 },
-
                 { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
                 {
                     field: 'actions',
@@ -236,9 +246,7 @@ export default defineComponent({
                     actions: (row: Order) => {
                         const actions: ActionType[] = [];
 
-                        if (canViewRO.value) {
-                            actions.push('view');
-                        }
+                        if (canViewRO.value) actions.push('view');
 
                         if (canEditRO.value && isPurchasingRole && row.currentApprovalStage === 'PURCH') {
                             actions.push('edit');
@@ -248,14 +256,14 @@ export default defineComponent({
                             actions.push('approve', 'reject');
                         }
 
-                        if (canDeleteRO.value) {
-                            actions.push('delete');
-                        }
+                        if (canDeleteRO.value) actions.push('delete');
 
                         return actions;
                     }
                 }
-            ];
+            );
+
+            return columns;
         });
 
         function getApprovalDotClass(status: string) {
@@ -270,19 +278,6 @@ export default defineComponent({
         }
 
         const tableFilters = computed(() => [
-            // commneted as the space it limited
-            // {
-            //     type: 'select' as const,
-            //     field: 'status',
-            //     placeholder: 'Filter by Status',
-            //     options: [
-            //         { label: 'All Statuses', value: '' },
-            //         { label: 'Processing', value: 'Processing' },
-            //         { label: 'Approved', value: 'Approved' },
-            //         { label: 'Rejected', value: 'Rejected' }
-            //     ],
-            //     model: store.filters.status
-            // },
             {
                 type: 'select' as const,
                 field: 'budgetType',
@@ -620,7 +615,8 @@ export default defineComponent({
             showRejectModal,
             onRejectConfirmed,
             currentRejectOrder,
-            totalApprovedValue
+            totalApprovedValue,
+            canViewPricing
         };
     }
 });

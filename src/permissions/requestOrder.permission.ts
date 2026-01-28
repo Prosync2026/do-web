@@ -17,12 +17,14 @@ export function useRequestOrderPermission() {
 
     const canAccessROModule = computed(() => canViewRO.value || canCreateRO.value || canEditRO.value || canApproveRO.value || canDeleteRO.value);
 
+    const canViewPricing = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_PRICING));
     return {
         canViewRO,
         canCreateRO,
         canEditRO,
         canApproveRO,
         canDeleteRO,
-        canAccessROModule
+        canAccessROModule,
+        canViewPricing
     };
 }
