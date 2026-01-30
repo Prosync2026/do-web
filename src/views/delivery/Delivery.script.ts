@@ -1,10 +1,10 @@
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { TableColumn } from '@/types/table.type';
-import { defineComponent, ref, computed, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
 import Tag from 'primevue/tag';
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
+import { computed, defineComponent, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'Deliveries',
@@ -22,6 +22,11 @@ export default defineComponent({
         ];
         const activeTab = ref('0');
 
+        const handleTabChange = (newTab: string) => {
+            activeTab.value = newTab;
+            loadData();
+        };
+
         // Pagination
         const startingIndex = computed(() => {
             return (deliveryStore.pagination.page - 1) * deliveryStore.pagination.pageSize;
@@ -37,6 +42,22 @@ export default defineComponent({
             }));
         });
 
+        // Sorting state
+        const currentSortField = computed(() => {
+            const reverseMap: Record<string, string> = {
+                DocNo: 'DocNo',
+                PlateNo: 'PlateNo',
+                Status: 'Status',
+                CreatedAt: 'CreatedAt'
+            };
+            return reverseMap[deliveryStore.sorting.sortBy] || '';
+        });
+
+        const currentSortOrder = computed(() => {
+            if (!deliveryStore.sorting.sortBy) return 0;
+            return deliveryStore.sorting.sortOrder === 'asc' ? 1 : -1;
+        });
+
         // Columns
         const deliveryListColumn: TableColumn[] = [
             { field: 'rowIndex', header: '#', sortable: false },
@@ -47,41 +68,61 @@ export default defineComponent({
             { header: 'Action', action: true, actions: ['view'] }
         ];
 
+        const loadData = async () => {
+            try {
+                await deliveryStore.fetchDeliveryOrders();
+            } catch (error) {
+                console.error('Failed to load delivery orders:', error);
+            }
+        };
+
+        const handleSearch = (value: string) => {
+            deliveryStore.handleSearch(value);
+            loadData();
+        };
+
+        const handleSortChange = ({ field, order }: { field: string; order: number }) => {
+            if (!field || order === 0) {
+                // Reset sorting
+                deliveryStore.setSorting('', '');
+                loadData();
+                return;
+            }
+
+            const mapFieldToApi: Record<string, string> = {
+                DocNo: 'DocNo',
+                PlateNo: 'PlateNo',
+                Status: 'Status'
+            };
+
+            const sortOrder = order === 1 ? 'asc' : 'desc';
+            deliveryStore.setSorting(mapFieldToApi[field] || 'CreatedAt', sortOrder);
+            loadData();
+        };
+
         // Pagination & filter handlers
         function handlePageChange(page: number): void {
-            deliveryStore.pagination.page = page;
-            deliveryStore.fetchDeliveryOrders();
+            deliveryStore.setPage(page);
         }
 
         function handlePageSizeChange(pageSize: number): void {
-            deliveryStore.pagination.pageSize = pageSize;
-            deliveryStore.pagination.page = 1;
-            deliveryStore.fetchDeliveryOrders();
+            deliveryStore.setPageSize(pageSize);
         }
 
         function handleFilterChange(filters: Record<string, any>): void {
             deliveryStore.filters.search = filters.search ?? '';
             deliveryStore.pagination.page = 1;
-            deliveryStore.fetchDeliveryOrders();
+            loadData();
         }
 
-        // Action handler
         function handleAction(type: 'view', row: any) {
             if (type === 'view') {
                 router.push(`/deliveries/viewDelivery/${row.Id}`);
             }
         }
 
-        async function handleSearch(value: string) {
-            await deliveryStore.handleSearch(value);
-        }
-
         onMounted(() => {
-            deliveryStore.fetchDeliveryOrders();
-        });
-
-        watch(activeTab, () => {
-            deliveryStore.fetchDeliveryOrders();
+            loadData();
         });
 
         return {
@@ -91,10 +132,14 @@ export default defineComponent({
             deliveryListColumn,
             handleAction,
             handleSearch,
+            handleSortChange,
+            handleTabChange,
             deliveryStore,
             handlePageChange,
             handlePageSizeChange,
-            handleFilterChange
+            handleFilterChange,
+            currentSortField,
+            currentSortOrder
         };
     }
 });
