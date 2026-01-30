@@ -23,6 +23,14 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         totalPages: 0
     });
 
+    const sortField = ref('CreatedAt');
+    const sortOrder = ref<'asc' | 'desc'>('desc');
+
+    const sorting = reactive({
+        sortBy: 'CreatedAt',
+        sortOrder: 'desc' as 'asc' | 'desc'
+    });
+
     const formatDate = (dateString: string | null): string => {
         if (!dateString || dateString === '1970-01-01T00:00:00.000Z') {
             return 'N/A';
@@ -47,7 +55,9 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 startDate: filters.startDate || undefined,
                 endDate: filters.endDate || undefined,
                 page: pagination.page,
-                pageSize: pagination.pageSize
+                pageSize: pagination.pageSize,
+                sortBy: sorting.sortBy,
+                sortOrder: sorting.sortOrder
             };
 
             const response: PurchaseOrderResponse = await purchaseService.getPurchaseOrders(params);
@@ -197,6 +207,12 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         filters.search = '';
         filters.startDate = '';
         filters.endDate = '';
+
+        sorting.sortBy = 'CreatedAt';
+        sorting.sortOrder = 'desc';
+        sortField.value = 'CreatedAt';
+        sortOrder.value = 'desc';
+
         pagination.page = 1;
         fetchPurchaseOrders();
     }
@@ -212,17 +228,51 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         fetchPurchaseOrders();
     }
 
+    function handleSearch(value: string) {
+        filters.search = value;
+        pagination.page = 1;
+    }
+
+    function handleStatusChange(status: string) {
+        filters.status = status;
+        pagination.page = 1;
+    }
+
+    function setSorting(sortBy: string, order: 'asc' | 'desc' | '') {
+        if (!sortBy || !order) {
+            sorting.sortBy = 'CreatedAt';
+            sorting.sortOrder = 'desc';
+            sortField.value = 'CreatedAt';
+            sortOrder.value = 'desc';
+        } else {
+            sorting.sortBy = sortBy;
+            sorting.sortOrder = order;
+            sortField.value = sortBy;
+            sortOrder.value = order;
+        }
+
+        pagination.page = 1;
+    }
+
     return {
         purchaseOrders,
         selectedPurchaseOrder,
         loading,
         filters,
         pagination,
+        sorting,
+        sortField,
+        sortOrder,
+
         fetchPurchaseOrders,
         fetchPurchaseOrderById,
         updatePurchaseOrder,
+
         clearFilters,
         setPage,
-        setPageSize
+        setPageSize,
+        handleSearch,
+        handleStatusChange,
+        setSorting
     };
 });
