@@ -39,6 +39,7 @@ export interface DeliveryOrder {
 
     // optional: keep both casing for safety
     DeliveryOrderItems?: DeliveryOrderItem[];
+    delivery_order_items?: DeliveryOrderItem[];
 }
 
 export interface Pagination {

@@ -31,7 +31,7 @@ export default defineComponent({
         ]);
 
         const formattedItems = computed(() =>
-            (singleDelivery.value?.deliveryorderitems || []).map((item, index) => ({
+            (singleDelivery.value?.delivery_order_items || []).map((item, index) => ({
                 no: index + 1,
                 ...item,
                 status: Number(item.Quantity) > 0 ? 'Pending' : 'Completed'
