@@ -28,6 +28,7 @@ export interface DeliveryOrder {
     PlateNo?: string | null;
     Remark?: string | null;
     Attachment?: string | null;
+    Attachment2?: string | null;
     Status: 'Pending' | 'Completed' | string;
     CreatedAt: string;
     CreatedBy: string;
@@ -107,6 +108,7 @@ export interface Step3DeliveryInfo {
     Date: string;
     Remarks?: string;
     attachments?: File[];
+    attachments2?: File[];
 }
 
 export interface DeliveryFlow {

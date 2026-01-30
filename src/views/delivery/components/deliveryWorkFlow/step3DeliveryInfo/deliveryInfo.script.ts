@@ -166,19 +166,22 @@ export default defineComponent({
                 return;
             }
 
+            //  SEPARATED: attachments and attachments2
             const dataToEmit = {
                 PlateNo: values.driverPlate,
                 Date: values.deliveryDate?.toISOString().slice(0, 10) || '',
                 Remarks: values.remarks || '',
-                attachments: [...deliveryAttachments.value.map((f) => f.raw), ...evidenceFiles.value.map((f) => f.raw)]
+                attachments: deliveryAttachments.value.map((f) => f.raw), // Delivery documents
+                attachments2: evidenceFiles.value.map((f) => f.raw) // Evidence/photos sent as attachments2
             };
 
             emit('update', dataToEmit);
 
+            const totalFiles = dataToEmit.attachments.length + dataToEmit.attachments2.length;
             toast.add({
                 severity: 'success',
                 summary: 'Data Ready',
-                detail: `Uploaded ${dataToEmit.attachments.length} total file(s).`,
+                detail: `Uploaded ${totalFiles} total file(s).`,
                 life: 2500
             });
         };

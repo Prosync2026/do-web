@@ -35,6 +35,38 @@
                         <Tag :value="singleDelivery.Status" :severity="singleDelivery.Status === 'Pending' ? 'danger' : 'success'" />
                     </div>
                 </div>
+
+                <!-- Attachments (Delivery Documents) -->
+                <div class="mt-4">
+                    <div v-if="parsedAttachments.length > 0" class="mb-4">
+                        <h4 class="text-sm font-semibold mb-2">Delivery Document</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <div v-for="(file, index) in parsedAttachments" :key="`attachment-${index}`" class="flex items-center gap-2 px-3 py-2 rounded-lg border">
+                                <i class="pi pi-file text-blue-500"></i>
+                                <span class="text-sm">{{ file.filename }}</span>
+                                <span v-if="file.size" class="text-xs text-gray-500">({{ formatSize(file.size) }})</span>
+                                <Button icon="pi pi-eye" text rounded severity="info" @click="previewAttachment(file)" v-tooltip="'Preview Attachment'" />
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else class="text-gray-500 italic text-sm">No delivery documents available.</div>
+                </div>
+
+                <!--  Attachment2 (Evidence Photos) -->
+                <div class="mt-4">
+                    <div v-if="parsedAttachment2.length > 0" class="mb-4">
+                        <h4 class="text-sm font-semibold mb-2">Evidence Photos</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <div v-for="(file, index) in parsedAttachment2" :key="`attachment2-${index}`" class="flex items-center gap-2 px-3 py-2 rounded-lg border">
+                                <i class="pi pi-image text-green-500"></i>
+                                <span class="text-sm">{{ file.filename }}</span>
+                                <span v-if="file.size" class="text-xs text-gray-500">({{ formatSize(file.size) }})</span>
+                                <Button icon="pi pi-eye" text rounded severity="success" @click="previewAttachment(file)" v-tooltip="'Preview Photo'" />
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else class="text-gray-500 italic text-sm">No evidence photos available.</div>
+                </div>
             </div>
 
             <!-- Table -->
