@@ -6,6 +6,7 @@ export function usePurchaseOrderPermission() {
     const permissionStore = usePermissionStore();
 
     const canViewPurchaseOrder = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_PURCHASE_ORDER));
+    const canViewPricing = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_PRICING));
 
-    return { canViewPurchaseOrder };
+    return { canViewPurchaseOrder, canViewPricing, permissionStore };
 }

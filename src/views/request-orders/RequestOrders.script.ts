@@ -195,12 +195,6 @@ export default defineComponent({
             return store.sortOrder === 'asc' ? 1 : -1;
         });
 
-        // const filteredOrders = computed(() =>
-        //     store.orders.map((order, i) => ({
-        //         ...order,
-        //         rowIndex: (store.pagination.page - 1) * store.pagination.pageSize + i + 1
-        //     }))
-        // );
         const filteredOrders = computed(() =>
             store.orders.map((order, i) => ({
                 ...order,
@@ -266,17 +260,6 @@ export default defineComponent({
             return columns;
         });
 
-        function getApprovalDotClass(status: string) {
-            switch (status) {
-                case 'Approved':
-                    return 'bg-green-500';
-                case 'Rejected':
-                    return 'bg-red-500';
-                default:
-                    return 'bg-yellow-400';
-            }
-        }
-
         const tableFilters = computed(() => [
             {
                 type: 'select' as const,
@@ -300,6 +283,17 @@ export default defineComponent({
                 placeholder: 'End Date'
             }
         ]);
+
+        function getApprovalDotClass(status: string) {
+            switch (status) {
+                case 'Approved':
+                    return 'bg-green-500';
+                case 'Rejected':
+                    return 'bg-red-500';
+                default:
+                    return 'bg-yellow-400';
+            }
+        }
 
         function getStatusSeverity(status: string): string {
             switch (status) {
