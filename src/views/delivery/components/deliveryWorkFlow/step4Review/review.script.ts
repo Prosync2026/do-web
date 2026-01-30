@@ -128,8 +128,14 @@ export default defineComponent({
                 }
             });
 
+            // Handle attachment
             if (deliveryInfo.value.attachments?.length) {
                 deliveryInfo.value.attachments.forEach((file) => formData.append('attachments', file));
+            }
+
+            // Handle attachments2
+            if (deliveryInfo.value.attachments2?.length) {
+                deliveryInfo.value.attachments2.forEach((file) => formData.append('attachments2', file));
             }
 
             try {

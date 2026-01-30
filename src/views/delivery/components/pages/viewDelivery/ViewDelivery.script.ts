@@ -30,8 +30,32 @@ export default defineComponent({
             { field: 'status', header: 'Status', bodySlot: 'status' }
         ]);
 
+        // Parse attachment JSON string
+        const parsedAttachments = computed(() => {
+            try {
+                if (!singleDelivery.value?.Attachment) return [];
+                const parsed = JSON.parse(singleDelivery.value.Attachment);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                console.error('Error parsing Attachment:', e);
+                return [];
+            }
+        });
+
+        // Parse attachment2 JSON string
+        const parsedAttachment2 = computed(() => {
+            try {
+                if (!singleDelivery.value?.Attachment2) return [];
+                const parsed = JSON.parse(singleDelivery.value.Attachment2);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                console.error('Error parsing Attachment2:', e);
+                return [];
+            }
+        });
+
         const formattedItems = computed(() =>
-            (singleDelivery.value?.deliveryorderitems || []).map((item, index) => ({
+            (singleDelivery.value?.delivery_order_items || []).map((item, index) => ({
                 no: index + 1,
                 ...item,
                 status: Number(item.Quantity) > 0 ? 'Pending' : 'Completed'
@@ -48,6 +72,17 @@ export default defineComponent({
             items.value = formattedItems.value.filter((i) => i.ItemCode.toLowerCase().includes(search.value) || i.Name.toLowerCase().includes(search.value));
         }
 
+        function previewAttachment(file: any) {
+            window.open(file.path, '_blank');
+        }
+
+        function formatSize(size: number): string {
+            if (!size) return '';
+            const i = Math.floor(Math.log(size) / Math.log(1024));
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            return (size / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+        }
+
         watch(singleDelivery, () => {
             items.value = formattedItems.value;
         });
@@ -59,6 +94,7 @@ export default defineComponent({
             }
 
             await deliveryStore.getSingleDeliveryOrder(deliveryId);
+            console.log('singleDelivery', singleDelivery.value);
 
             if (!singleDelivery.value) {
                 showError('Failed to load delivery order details.');
@@ -74,7 +110,11 @@ export default defineComponent({
             loading,
             items,
             itemsColumns,
-            onSearchWrapper: handleSearch
+            onSearchWrapper: handleSearch,
+            parsedAttachments,
+            parsedAttachment2,
+            formatSize,
+            previewAttachment
         };
     }
 });

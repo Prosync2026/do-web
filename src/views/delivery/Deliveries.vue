@@ -8,7 +8,7 @@
                 <Button @click="$router.push('/deliveries/createDelivery')"> + New Delivery Verification </Button>
             </div>
 
-            <BaseTab v-model="activeTab" :tabs="tabItems">
+            <BaseTab v-model="activeTab" :tabs="tabItems" @update:modelValue="handleTabChange">
                 <template #default="{ activeTab }">
                     <!-- Pending Deliveries -->
                     <template v-if="activeTab === '0'">
@@ -17,9 +17,13 @@
                             :columns="deliveryListColumn"
                             :loading="deliveryStore.loading"
                             :pagination="deliveryStore.pagination"
+                            :sortField="currentSortField"
+                            :sortOrder="currentSortOrder"
                             :onPageChange="handlePageChange"
                             :onPageSizeChange="handlePageSizeChange"
                             :onFilterChange="handleFilterChange"
+                            :onSearch="handleSearch"
+                            :onSortChange="handleSortChange"
                             :onActionClick="handleAction"
                             emptyTitle="No pending deliveries found"
                         >
@@ -42,9 +46,13 @@
                             :columns="deliveryListColumn"
                             :loading="deliveryStore.loading"
                             :pagination="deliveryStore.pagination"
+                            :sortField="currentSortField"
+                            :sortOrder="currentSortOrder"
                             :onPageChange="handlePageChange"
                             :onPageSizeChange="handlePageSizeChange"
                             :onFilterChange="handleFilterChange"
+                            :onSearch="handleSearch"
+                            :onSortChange="handleSortChange"
                             :onActionClick="handleAction"
                             emptyTitle="No completed deliveries found"
                         >

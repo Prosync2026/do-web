@@ -75,7 +75,7 @@
 
         <template #footer>
             <div class="flex justify-end gap-2">
-                <template v-if="isPurchasingRole && localOrder?.status === 'Pending'">
+                <template v-if="isPurchasingRole && localOrder?.status === 'Submitted'">
                     <Button label="Reject Request" severity="danger" outlined icon="pi pi-times" @click="handleReject" />
                     <Button label="Approve Request" severity="success" icon="pi pi-check" @click="handleApprove" />
                 </template>

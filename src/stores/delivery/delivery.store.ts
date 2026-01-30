@@ -28,6 +28,11 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         totalPages: 0
     });
 
+    const sorting = reactive({
+        sortBy: 'CreatedAt',
+        sortOrder: 'desc' as 'asc' | 'desc'
+    });
+
     // ------------------------------
     // ACTIONS
     // ------------------------------
@@ -39,7 +44,9 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
                 pageSize: pagination.pageSize,
                 search: filters.search || search.value || undefined,
                 startDate: filters.startDate || undefined,
-                endDate: filters.endDate || undefined
+                endDate: filters.endDate || undefined,
+                sortBy: sorting.sortBy || undefined,
+                sortOrder: sorting.sortOrder || undefined
             };
 
             const response = await deliveryOrderService.getDeliveryOrders(params);
@@ -69,8 +76,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
 
     async function handleSearch(value: string) {
         search.value = value;
-        pagination.page = 1; //Reset to first page when searching
-        await fetchDeliveryOrders();
+        pagination.page = 1; // Reset to first page when searching
     }
 
     async function createDeliveryOrder(formData: FormData) {
@@ -122,6 +128,8 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         filters.search = '';
         filters.startDate = '';
         filters.endDate = '';
+        sorting.sortBy = 'CreatedAt';
+        sorting.sortOrder = 'desc';
         pagination.page = 1;
         fetchDeliveryOrders();
     }
@@ -137,6 +145,17 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         fetchDeliveryOrders();
     }
 
+    function setSorting(sortBy: string, order: 'asc' | 'desc' | '') {
+        if (!sortBy || !order) {
+            sorting.sortBy = 'CreatedAt';
+            sorting.sortOrder = 'desc';
+        } else {
+            sorting.sortBy = sortBy;
+            sorting.sortOrder = order;
+        }
+        pagination.page = 1;
+    }
+
     // ------------------------------
     // RETURN
     // ------------------------------
@@ -150,6 +169,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         singleDelivery,
         filters,
         pagination,
+        sorting,
         // actions
         fetchDeliveryOrders,
         handleSearch,
@@ -157,6 +177,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         getSingleDeliveryOrder,
         clearFilters,
         setPage,
-        setPageSize
+        setPageSize,
+        setSorting
     };
 });

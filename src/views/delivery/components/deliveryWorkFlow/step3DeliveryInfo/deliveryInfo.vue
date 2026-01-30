@@ -36,12 +36,13 @@
                         </div>
                     </div>
 
+                    <!-- ATTACHMENTS (Delivery Documents) -->
                     <div class="grid grid-cols-1 gap-4 p-3">
                         <Toast ref="toastRef" />
                         <div>
                             <label class="font-semibold text-gray-800 flex items-center">
-                                <i class="pi pi-camera mr-2"></i>
-                                Attachments (optional, max 10 files)
+                                <i class="pi pi-file mr-2"></i>
+                                Attachments (Delivery Documents - optional, max 10 files)
                             </label>
                         </div>
                         <FileUpload name="attachments" url="#" :multiple="true" :maxFileSize="10_000_000" accept="image/*" @select="onSelectedFiles">
@@ -71,12 +72,12 @@
                         <ProgressBar :value="totalSizePercent" :showValue="false" class="w-full h-1 mt-2" />
                     </div>
 
-                    <!-- Delivery Evidence Photos -->
+                    <!--  EVIDENCE FILES (Photos) → sent as attachment2 -->
                     <div class="grid grid-cols-1 gap-4 p-3 mt-4">
                         <div>
                             <label class="font-semibold text-gray-800 flex items-center">
-                                <i class="pi pi-image mr-2"></i>
-                                Delivery Evidence Photos (optional)
+                                <i class="pi pi-camera mr-2"></i>
+                                Delivery Evidence Photos (optional, max 10 files)
                             </label>
                         </div>
 
@@ -103,6 +104,8 @@
                                 </div>
                             </template>
                         </FileUpload>
+
+                        <ProgressBar :value="evidenceTotalSizePercent" :showValue="false" class="w-full h-1 mt-2" />
                     </div>
 
                     <div class="flex justify-end mt-4">
