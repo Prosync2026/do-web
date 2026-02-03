@@ -154,11 +154,8 @@ export default defineComponent({
 
         // handle sorting change
         const handleSortChange = ({ field, order }: { field: string; order: number }) => {
-            console.log('handleSortChange:', { field, order });
-
             // Handle reset (third click removes sort)
             if (order === 0 || !field) {
-                console.log('Resetting to default sort');
                 store.setSorting('', '');
                 return;
             }
