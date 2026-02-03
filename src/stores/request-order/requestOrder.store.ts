@@ -119,7 +119,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                     roNumber: apiOutput.DocNo,
                     requestedBy: apiOutput.CreatedBy,
                     roDate: formatDate(apiOutput.RequestOrderDate),
-                    deliveryDate: formatDate(apiOutput.RequestOrderItems?.[0]?.DeliveryDate || ''),
+                    deliveryDate: formatDate(apiOutput.request_order_items?.[0]?.DeliveryDate || apiOutput.RequestOrderItems?.[0]?.DeliveryDate || null),
                     totalAmount: String(apiOutput.TotalAmount),
                     budgetType: apiOutput.PrType,
                     status: apiOutput.Status,
