@@ -1,6 +1,7 @@
 // src/services/deliveryOrder.service.ts
 import axiosInstance from '@/services/backendAxiosInstance';
 import type { DeliveryOrderResponse, SingleDeliveryOrderResponse } from '@/types/delivery.type';
+import type { AttachmentItem } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
 
 export interface GetDeliveryOrderParams {
@@ -45,8 +46,19 @@ const getSingleDeliveryOrder = async (deliveryId: number): Promise<SingleDeliver
     }
 };
 
+const getAttachmentsByDeliveryId = async (deliveryOrderId: number | string): Promise<AttachmentItem[]> => {
+    try {
+        const response = await axiosInstance.get(`/deliveryOrder/${deliveryOrderId}/attachments`);
+        return response.data.data || [];
+    } catch (error) {
+        showError(error, `Failed to fetch attachments for Delivery Order ${deliveryOrderId}`);
+        return [];
+    }
+};
+
 export const deliveryOrderService = {
     getDeliveryOrders,
     createDeliveryOrder,
-    getSingleDeliveryOrder
+    getSingleDeliveryOrder,
+    getAttachmentsByDeliveryId
 };
