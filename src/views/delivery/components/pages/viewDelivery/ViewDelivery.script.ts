@@ -1,5 +1,8 @@
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { deliveryOrderService } from '@/services/deliveryOrder.service';
+import { requestOrderService } from '@/services/requestOrder.service';
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
+import type { AttachmentItem } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 import { storeToRefs } from 'pinia';
@@ -72,8 +75,10 @@ export default defineComponent({
             items.value = formattedItems.value.filter((i) => i.ItemCode.toLowerCase().includes(search.value) || i.Name.toLowerCase().includes(search.value));
         }
 
-        function previewAttachment(file: any) {
-            window.open(file.path, '_blank');
+        function previewAttachment(file: File | AttachmentItem) {
+            if (!(file instanceof File)) {
+                requestOrderService.previewAttachment(file);
+            }
         }
 
         function formatSize(size: number): string {
@@ -102,6 +107,12 @@ export default defineComponent({
             }
 
             items.value = formattedItems.value;
+        });
+        // preview attachment
+        const attachments = ref<AttachmentItem[]>([]);
+
+        onMounted(async () => {
+            attachments.value = await deliveryOrderService.getAttachmentsByDeliveryId(deliveryId);
         });
 
         return {

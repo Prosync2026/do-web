@@ -216,7 +216,6 @@ const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetReq
 const getRequestOrderById = async (id: string): Promise<ApiResponse<CreateRequestOrderPayload>> => {
     try {
         const response = await axiosInstance.get(`/requestOrder/${id}`);
-        console.log('Request order details response:', response.data);
 
         return response.data;
     } catch (error: unknown) {
