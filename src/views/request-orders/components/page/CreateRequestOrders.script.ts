@@ -933,7 +933,7 @@ export default defineComponent({
                             Rate: item.price ?? 0,
                             Notes: item.notes ?? '',
                             Reason: selectedReason.value || '',
-                            DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
+                            DeliveryDate: item.deliveryDate ? formatDateToAPI(item.deliveryDate) : null
                         };
                     })
                 };
