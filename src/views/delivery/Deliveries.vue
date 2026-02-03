@@ -9,64 +9,32 @@
             </div>
 
             <BaseTab v-model="activeTab" :tabs="tabItems" @update:modelValue="handleTabChange">
-                <template #default="{ activeTab }">
-                    <!-- Pending Deliveries -->
-                    <template v-if="activeTab === '0'">
-                        <ReusableTable
-                            :value="filteredDeliveries"
-                            :columns="deliveryListColumn"
-                            :loading="deliveryStore.loading"
-                            :pagination="deliveryStore.pagination"
-                            :sortField="currentSortField"
-                            :sortOrder="currentSortOrder"
-                            :onPageChange="handlePageChange"
-                            :onPageSizeChange="handlePageSizeChange"
-                            :onFilterChange="handleFilterChange"
-                            :onSearch="handleSearch"
-                            :onSortChange="handleSortChange"
-                            :onActionClick="handleAction"
-                            emptyTitle="No pending deliveries found"
-                        >
-                            <!-- Numbering -->
-                            <template #rowIndex="{ data }">
-                                {{ data.rowIndex }}
-                            </template>
+                <template #default>
+                    <ReusableTable
+                        :value="filteredDeliveries"
+                        :columns="deliveryListColumn"
+                        :loading="deliveryStore.loading"
+                        :pagination="deliveryStore.pagination"
+                        :sortField="currentSortField"
+                        :sortOrder="currentSortOrder"
+                        :onPageChange="handlePageChange"
+                        :onPageSizeChange="handlePageSizeChange"
+                        :onFilterChange="handleFilterChange"
+                        :onSearch="handleSearch"
+                        :onSortChange="handleSortChange"
+                        :onActionClick="handleAction"
+                        emptyTitle="No delivery orders found"
+                    >
+                        <!-- Numbering -->
+                        <template #rowIndex="{ data }">
+                            {{ data.rowIndex }}
+                        </template>
 
-                            <!-- Status -->
-                            <template #status="{ data }">
-                                <Tag :value="data.Status" severity="warn" />
-                            </template>
-                        </ReusableTable>
-                    </template>
-
-                    <!-- Completed Deliveries -->
-                    <template v-else>
-                        <ReusableTable
-                            :value="filteredDeliveries"
-                            :columns="deliveryListColumn"
-                            :loading="deliveryStore.loading"
-                            :pagination="deliveryStore.pagination"
-                            :sortField="currentSortField"
-                            :sortOrder="currentSortOrder"
-                            :onPageChange="handlePageChange"
-                            :onPageSizeChange="handlePageSizeChange"
-                            :onFilterChange="handleFilterChange"
-                            :onSearch="handleSearch"
-                            :onSortChange="handleSortChange"
-                            :onActionClick="handleAction"
-                            emptyTitle="No completed deliveries found"
-                        >
-                            <!-- Numbering -->
-                            <template #rowIndex="{ data }">
-                                {{ data.rowIndex }}
-                            </template>
-
-                            <!-- Status -->
-                            <template #status="{ data }">
-                                <Tag :value="data.Status" severity="success" />
-                            </template>
-                        </ReusableTable>
-                    </template>
+                        <!-- Status -->
+                        <template #status="{ data }">
+                            <Tag :value="data.Status === 'Created' ? 'Pending' : data.Status" :severity="data.Status === 'Created' ? 'warn' : data.Status === 'Completed' ? 'success' : 'danger'" />
+                        </template>
+                    </ReusableTable>
                 </template>
             </BaseTab>
         </div>

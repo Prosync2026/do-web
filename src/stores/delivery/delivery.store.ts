@@ -9,8 +9,6 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
     // STATE
     // ------------------------------
     const loading = ref(false);
-    const incompletedList = ref<DeliveryOrder[]>([]);
-    const completedList = ref<DeliveryOrder[]>([]);
     const search = ref('');
     const projectId = ref(0);
     const singleDelivery = ref<DeliveryOrder | null>(null);
@@ -33,6 +31,9 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         sortOrder: 'desc' as 'asc' | 'desc'
     });
 
+    const status = ref<string>(''); // '' | 'Created' | 'Completed' | 'Cancelled'
+    const list = ref<DeliveryOrder[]>([]);
+
     // ------------------------------
     // ACTIONS
     // ------------------------------
@@ -43,6 +44,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
                 page: pagination.page,
                 pageSize: pagination.pageSize,
                 search: filters.search || search.value || undefined,
+                status: status.value || undefined,
                 startDate: filters.startDate || undefined,
                 endDate: filters.endDate || undefined,
                 sortBy: sorting.sortBy || undefined,
@@ -56,10 +58,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
                 return;
             }
 
-            const allOrders = response.data || [];
-            // TODO: Switch to server-side filtering once API supports &status=Pending
-            incompletedList.value = allOrders.filter((order) => order.Status !== 'Completed');
-            completedList.value = allOrders.filter((order) => order.Status === 'Completed');
+            list.value = response.data || [];
 
             if (response.pagination) {
                 pagination.total = response.pagination.total;
@@ -72,6 +71,12 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         } finally {
             loading.value = false;
         }
+    }
+
+    function setStatus(value: string) {
+        status.value = value;
+        pagination.page = 1;
+        fetchDeliveryOrders();
     }
 
     async function handleSearch(value: string) {
@@ -162,14 +167,13 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
     return {
         // state
         loading,
-        incompletedList,
-        completedList,
         search,
         projectId,
         singleDelivery,
         filters,
         pagination,
         sorting,
+        list,
         // actions
         fetchDeliveryOrders,
         handleSearch,
@@ -178,6 +182,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         clearFilters,
         setPage,
         setPageSize,
-        setSorting
+        setSorting,
+        setStatus
     };
 });
