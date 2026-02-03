@@ -17,14 +17,16 @@ export default defineComponent({
 
         // Tabs
         const tabItems = [
-            { value: '0', label: 'Pending' },
-            { value: '1', label: 'Completed' }
+            { value: 'Created', label: 'Pending' },
+            { value: 'Completed', label: 'Completed' },
+            { value: 'Cancelled', label: 'Cancelled' }
         ];
-        const activeTab = ref('0');
 
-        const handleTabChange = (newTab: string) => {
-            activeTab.value = newTab;
-            loadData();
+        const activeTab = ref<'Created' | 'Completed' | 'Cancelled'>('Created');
+
+        const handleTabChange = (status: 'Created' | 'Completed' | 'Cancelled') => {
+            activeTab.value = status;
+            deliveryStore.setStatus(status);
         };
 
         // Pagination
@@ -34,7 +36,7 @@ export default defineComponent({
 
         // Filtered & numbered deliveries
         const filteredDeliveries = computed(() => {
-            const list = activeTab.value === '0' ? deliveryStore.incompletedList : deliveryStore.completedList;
+            const list = deliveryStore.list;
 
             return list.map((item, index) => ({
                 ...item,
@@ -122,8 +124,20 @@ export default defineComponent({
         }
 
         onMounted(() => {
-            loadData();
+            deliveryStore.setStatus('Created'); // default = Pending
         });
+
+        const getStatusSeverity = (status: string) => {
+            switch (status) {
+                case 'Completed':
+                    return 'success';
+                case 'Cancelled':
+                    return 'danger';
+                case 'Created':
+                default:
+                    return 'warn';
+            }
+        };
 
         return {
             activeTab,
@@ -139,7 +153,8 @@ export default defineComponent({
             handlePageSizeChange,
             handleFilterChange,
             currentSortField,
-            currentSortOrder
+            currentSortOrder,
+            getStatusSeverity
         };
     }
 });
