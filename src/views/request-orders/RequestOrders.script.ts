@@ -20,8 +20,8 @@ import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
 import RoSummary from './components/summary/RoSummary.vue';
 // reject modal
+import { formatCurrency } from '@/utils/format.utils';
 import RejectRo from './components/modal/RejectRo.vue';
-
 export default defineComponent({
     name: 'RequestOrders',
     components: {
@@ -607,7 +607,8 @@ export default defineComponent({
             onRejectConfirmed,
             currentRejectOrder,
             totalApprovedValue,
-            canViewPricing
+            canViewPricing,
+            formatCurrency
         };
     }
 });

@@ -102,8 +102,7 @@ import { Button } from "@prosync/ui-kit";
                                 </template>
 
                                 <template #totalAmount="{ data }">
-                                    <span class="font-semibold" :class="data.isHighValue ? 'text-orange-600' : ''"> RM {{ Number(data.totalAmount).toLocaleString() }} </span>
-
+                                    <span class="font-semibold" :class="data.isHighValue ? 'text-orange-600' : ''"> RM {{ formatCurrency(data.totalAmount) }} </span>
                                     <span v-if="data.isHighValue" class="ml-2 text-xs px-2 py-0.5 rounded bg-orange-100 text-orange-700">High Value</span>
                                 </template>
                             </ReusableTable>

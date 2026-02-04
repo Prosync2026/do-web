@@ -2,6 +2,7 @@ import ReusableTable from '@/components/table/ReusableTable.vue';
 import { deliveryOrderService } from '@/services/deliveryOrder.service';
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { AttachmentItem } from '@/types/request-order.type';
+import { formatDate } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 import { storeToRefs } from 'pinia';
@@ -96,7 +97,6 @@ export default defineComponent({
             }
 
             await deliveryStore.getSingleDeliveryOrder(deliveryId);
-            console.log('singleDelivery', singleDelivery.value);
 
             if (!singleDelivery.value) {
                 showError('Failed to load delivery order details.');
@@ -122,7 +122,8 @@ export default defineComponent({
             parsedAttachments,
             parsedAttachment2,
             formatSize,
-            previewAttachment
+            previewAttachment,
+            formatDate
         };
     }
 });

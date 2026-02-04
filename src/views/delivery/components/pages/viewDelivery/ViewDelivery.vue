@@ -28,7 +28,7 @@
                     </div>
                     <div>
                         <p class="font-semibold">Delivery Date</p>
-                        <p>{{ singleDelivery.Date || '-' }}</p>
+                        <p>{{ formatDate(singleDelivery.Date) || '-' }}</p>
                     </div>
                     <div>
                         <p class="font-semibold">Status</p>
