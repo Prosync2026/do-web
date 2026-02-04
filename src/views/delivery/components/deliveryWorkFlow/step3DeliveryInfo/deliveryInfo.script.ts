@@ -1,4 +1,5 @@
 import type { FormValues, UploadFile } from '@/types/delivery.type';
+import { formatDateToAPI } from '@/utils/dateHelper';
 import Form, { FormResolverOptions, FormSubmitEvent } from '@primevue/forms/form';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
@@ -169,7 +170,8 @@ export default defineComponent({
             //  SEPARATED: attachments and attachments2
             const dataToEmit = {
                 PlateNo: values.driverPlate,
-                Date: values.deliveryDate?.toISOString().slice(0, 10) || '',
+                Date: formatDateToAPI(values.deliveryDate) || '',
+                DeliveryDate: formatDateToAPI(values.deliveryDate) || '',
                 Remarks: values.remarks || '',
                 attachments: deliveryAttachments.value.map((f) => f.raw), // Delivery documents
                 attachments2: evidenceFiles.value.map((f) => f.raw) // Evidence/photos sent as attachments2

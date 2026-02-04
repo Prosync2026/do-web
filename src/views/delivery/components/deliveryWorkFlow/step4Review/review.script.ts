@@ -112,6 +112,7 @@ export default defineComponent({
                 Date: deliveryInfo.value.Date,
                 PlateNo: deliveryInfo.value.PlateNo,
                 Remarks: deliveryInfo.value.Remarks,
+                DeliveryDate: deliveryInfo.value.DeliveryDate,
                 Items: JSON.stringify(
                     verifyItem.value.map((item) => ({
                         PurchaseOrderItemId: item.purchaseOrderItemId,

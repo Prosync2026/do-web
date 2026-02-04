@@ -106,6 +106,7 @@ export interface Step2VerifyItem {
 export interface Step3DeliveryInfo {
     PlateNo: string;
     Date: string;
+    DeliveryDate: string;
     Remarks?: string;
     attachments?: File[];
     attachments2?: File[];
