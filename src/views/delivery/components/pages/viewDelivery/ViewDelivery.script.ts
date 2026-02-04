@@ -1,6 +1,5 @@
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import { deliveryOrderService } from '@/services/deliveryOrder.service';
-import { requestOrderService } from '@/services/requestOrder.service';
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { AttachmentItem } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
@@ -76,7 +75,7 @@ export default defineComponent({
         }
 
         function previewAttachment(file: AttachmentItem) {
-            requestOrderService.previewAttachment(file);
+            deliveryOrderService.previewAttachment(file);
         }
 
         function formatSize(size: number): string {
