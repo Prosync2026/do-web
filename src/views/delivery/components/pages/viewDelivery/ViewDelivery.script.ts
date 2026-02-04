@@ -75,10 +75,8 @@ export default defineComponent({
             items.value = formattedItems.value.filter((i) => i.ItemCode.toLowerCase().includes(search.value) || i.Name.toLowerCase().includes(search.value));
         }
 
-        function previewAttachment(file: File | AttachmentItem) {
-            if (!(file instanceof File)) {
-                requestOrderService.previewAttachment(file);
-            }
+        function previewAttachment(file: AttachmentItem) {
+            requestOrderService.previewAttachment(file);
         }
 
         function formatSize(size: number): string {
