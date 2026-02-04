@@ -56,9 +56,35 @@ const getAttachmentsByDeliveryId = async (deliveryOrderId: number | string): Pro
     }
 };
 
+// Get attachments2 (Evidence Photos)
+const getAttachments2ByDeliveryId = async (deliveryOrderId: number | string): Promise<AttachmentItem[]> => {
+    try {
+        const response = await axiosInstance.get(`/deliveryOrder/${deliveryOrderId}/attachments2`);
+        return response.data.data || [];
+    } catch (error) {
+        showError(error, `Failed to fetch evidence photos for Delivery Order ${deliveryOrderId}`);
+        return [];
+    }
+};
+
+const previewAttachment = (file: AttachmentItem) => {
+    if (!file.path) {
+        showError('File path is missing');
+        return;
+    }
+
+    const cleanPath = file.path.startsWith('/') ? file.path.substring(1) : file.path;
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://do-system-api.qubit-it.com.my';
+    const url = `${apiBaseUrl}/${cleanPath}`;
+
+    window.open(url, '_blank');
+};
+
 export const deliveryOrderService = {
     getDeliveryOrders,
     createDeliveryOrder,
     getSingleDeliveryOrder,
-    getAttachmentsByDeliveryId
+    getAttachmentsByDeliveryId,
+    getAttachments2ByDeliveryId,
+    previewAttachment
 };
