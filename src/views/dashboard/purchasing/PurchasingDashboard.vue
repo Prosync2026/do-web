@@ -67,7 +67,22 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
 
                 <div v-if="recentActivity && recentActivity.length > 0" class="space-y-3">
                     <div v-for="activity in recentActivity" :key="activity.id" class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                        <i :class="['pi text-xl', activity.status === 'Approved' ? 'pi-check-circle text-green-600' : activity.status === 'Pending' ? 'pi-clock text-blue-600' : 'pi-times-circle text-red-600']"></i>
+                        <i
+                            :class="[
+                                'pi text-xl',
+                                activity.status === 'Approved'
+                                    ? 'pi-check-circle text-green-600'
+                                    : activity.status === 'Submitted'
+                                      ? 'pi-clock text-blue-600'
+                                      : activity.status === 'Processing'
+                                        ? 'pi-hourglass text-yellow-600'
+                                        : activity.status === 'Draft'
+                                          ? 'pi-file text-gray-600'
+                                          : activity.status === 'Rejected'
+                                            ? 'pi-times-circle text-red-600'
+                                            : 'pi-question-circle text-gray-400'
+                            ]"
+                        ></i>
                         <div>
                             <p class="text-sm font-medium text-gray-900 dark:text-white">{{ activity.requestOrderNo }} - {{ activity.status }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatTimeAgo(activity.createdAt) }}</p>

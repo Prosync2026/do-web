@@ -20,8 +20,8 @@ import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
 import RoSummary from './components/summary/RoSummary.vue';
 // reject modal
+import { formatCurrency } from '@/utils/format.utils';
 import RejectRo from './components/modal/RejectRo.vue';
-
 export default defineComponent({
     name: 'RequestOrders',
     components: {
@@ -50,6 +50,7 @@ export default defineComponent({
 
         // badges and totals
         const pendingCount = computed(() => totalCounts.value.pending);
+        const submittedCount = computed(() => totalCounts.value.submitted);
         const approvedCount = computed(() => totalCounts.value.approved);
         const totalValue = computed(() => totalCounts.value.totalValue);
         const totalApprovedValue = computed(() => totalCounts.value.totalApprovedValue);
@@ -103,7 +104,7 @@ export default defineComponent({
         const tabItems = computed(() => {
             return [
                 { label: 'All Orders', value: 'all' },
-                { label: 'Submitted', value: 'submitted' },
+                { label: 'Pending', value: 'submitted', badge: submittedCount.value },
                 { label: 'Processing', value: 'processing', badge: pendingCount.value },
                 { label: 'Approved', value: 'approved' },
                 { label: 'Rejected', value: 'rejected' }
@@ -563,6 +564,7 @@ export default defineComponent({
             filteredOrders,
             getStatusSeverity,
             pendingCount,
+            submittedCount,
             approvedCount,
             totalValue,
             isPurchasingRole,
@@ -607,7 +609,8 @@ export default defineComponent({
             onRejectConfirmed,
             currentRejectOrder,
             totalApprovedValue,
-            canViewPricing
+            canViewPricing,
+            formatCurrency
         };
     }
 });

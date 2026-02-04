@@ -20,8 +20,8 @@
                                 <span> {{ deliveryInfo?.PlateNo }}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="font-medium">Date:</span>
-                                <span>{{ formatDate(deliveryInfo?.Date) }}</span>
+                                <span class="font-medium">Delivery Date:</span>
+                                <span>{{ formatDate(deliveryInfo?.DeliveryDate) }}</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="font-medium">Photos:</span>

@@ -2,6 +2,7 @@ import ReusableTable from '@/components/table/ReusableTable.vue';
 import { deliveryOrderService } from '@/services/deliveryOrder.service';
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { AttachmentItem } from '@/types/request-order.type';
+import { formatDate } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 import { storeToRefs } from 'pinia';
@@ -16,6 +17,7 @@ export default defineComponent({
         const route = useRoute();
         const deliveryStore = useDeliveryStore();
         const { singleDelivery, loading } = storeToRefs(deliveryStore);
+        console.log('singleDelivery:', singleDelivery);
 
         const search = ref('');
         const items = ref<any[]>([]);
@@ -28,7 +30,7 @@ export default defineComponent({
             { field: 'Name', header: 'Description' },
             { field: 'Uom', header: 'UOM' },
             { field: 'Quantity', header: 'Quantity' },
-            { field: 'DeliveryDate', header: 'Delivery Date' },
+            // { field: 'DeliveryDate', header: 'Delivery Date', bodySlot: 'deliveryDate' },
             { field: 'status', header: 'Status', bodySlot: 'status' }
         ]);
 
@@ -96,7 +98,6 @@ export default defineComponent({
             }
 
             await deliveryStore.getSingleDeliveryOrder(deliveryId);
-            console.log('singleDelivery', singleDelivery.value);
 
             if (!singleDelivery.value) {
                 showError('Failed to load delivery order details.');
@@ -122,7 +123,8 @@ export default defineComponent({
             parsedAttachments,
             parsedAttachment2,
             formatSize,
-            previewAttachment
+            previewAttachment,
+            formatDate
         };
     }
 });

@@ -28,7 +28,7 @@
                     </div>
                     <div>
                         <p class="font-semibold">Delivery Date</p>
-                        <p>{{ singleDelivery.Date || '-' }}</p>
+                        <p>{{ formatDate(singleDelivery.Date) || '-' }}</p>
                     </div>
                     <div>
                         <p class="font-semibold">Status</p>
@@ -73,6 +73,7 @@
             <div style="margin-top: 60px">
                 <ReusableTable :value="items" :columns="itemsColumns" :onSearch="onSearchWrapper" emptyTitle="No Delivery Items Found">
                     <template #no="{ data }">{{ data.no }}</template>
+                    <template #deliveryDate="{ data }">{{ formatDate(data.DeliveryDate) }}</template>
                     <template #status="{ data }">
                         <Tag :value="data.status" :severity="data.status === 'Completed' ? 'success' : 'warn'" />
                     </template>
