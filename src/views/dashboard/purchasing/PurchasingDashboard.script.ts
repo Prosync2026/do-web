@@ -37,16 +37,22 @@ export function usePurchasingDashboard() {
         return (store.orders || []).filter((o) => o.requestedBy === userRole);
     });
 
-    const pendingApprovals = computed(() => filteredOrders.value.filter((o) => o.status === 'Pending').length);
+    const pendingApprovals = computed(() => filteredOrders.value.filter((o) => o.status === 'Submitted').length);
     const approvedCount = computed(() => filteredOrders.value.filter((o) => o.status === 'Approved').length);
     const rejectedCount = computed(() => filteredOrders.value.filter((o) => o.status === 'Rejected').length);
-    const pendingValue = computed(() => filteredOrders.value.filter((o) => o.status === 'Pending').reduce((sum, o) => sum + Number(o.totalAmount || 0), 0));
+    const pendingValue = computed(() => filteredOrders.value.filter((o) => o.status === 'Submitted').reduce((sum, o) => sum + Number(o.totalAmount || 0), 0));
 
-    const urgentRequests = computed(() => filteredOrders.value.filter((o) => o.isUrgent && o.status === 'Pending').length);
-    const urgentValue = computed(() => filteredOrders.value.filter((o) => o.isUrgent && o.status === 'Pending').reduce((sum, o) => sum + Number(o.totalAmount || 0), 0));
+    const urgentRequests = computed(() => filteredOrders.value.filter((o) => o.isUrgent && o.status === 'Submitted').length);
+    const urgentValue = computed(() => {
+        const urgent = filteredOrders.value.filter((o) => o.isUrgent && o.status === 'Submitted');
+        if (urgent.length > 0) {
+            return urgent.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+        }
+        return pendingValue.value;
+    });
 
     const currentStatus = computed(() => {
-        if (pendingApprovals.value > 0) return 'Pending';
+        if (pendingApprovals.value > 0) return 'Submitted';
         if (approvedCount.value > 0) return 'Stable';
         return 'Idle';
     });

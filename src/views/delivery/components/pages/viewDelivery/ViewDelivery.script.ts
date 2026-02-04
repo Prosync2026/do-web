@@ -30,7 +30,7 @@ export default defineComponent({
             { field: 'Name', header: 'Description' },
             { field: 'Uom', header: 'UOM' },
             { field: 'Quantity', header: 'Quantity' },
-            { field: 'DeliveryDate', header: 'Delivery Date', bodySlot: 'deliveryDate' },
+            // { field: 'DeliveryDate', header: 'Delivery Date', bodySlot: 'deliveryDate' },
             { field: 'status', header: 'Status', bodySlot: 'status' }
         ]);
 

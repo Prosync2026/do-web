@@ -109,10 +109,10 @@ export default defineComponent({
             const payload = {
                 PurchaseOrderId: selectPO.value.id ?? selectPO.value.purchaseOrderId,
                 DocNo: selectPO.value.poNumber ?? selectPO.value.DocNo,
-                Date: deliveryInfo.value.Date,
+                Date: deliveryInfo.value.DeliveryDate,
                 PlateNo: deliveryInfo.value.PlateNo,
                 Remarks: deliveryInfo.value.Remarks,
-                DeliveryDate: deliveryInfo.value.DeliveryDate,
+                // DeliveryDate: deliveryInfo.value.DeliveryDate,
                 Items: JSON.stringify(
                     verifyItem.value.map((item) => ({
                         PurchaseOrderItemId: item.purchaseOrderItemId,
