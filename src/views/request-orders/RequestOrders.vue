@@ -31,7 +31,7 @@ import { Button } from "@prosync/ui-kit";
                     <template #default="{ activeTab }">
                         <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
                             <!-- Approval Legend -->
-                            <div class="flex gap-6 mb-4 items-center text-sm py-2 px-4 border border-gray-200 dark:border-gray-600 rounded-md">
+                            <div class="flex justify-end gap-6 mb-4 items-center text-sm py-2 px-4 border border-gray-200 dark:border-gray-600 rounded-md">
                                 <div class="flex items-center gap-2">
                                     <span class="text-gray-700 dark:text-gray-200">Legend : </span>
                                 </div>
