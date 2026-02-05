@@ -54,9 +54,6 @@
             <div v-else-if="detailViewMode === 'treeLocation'">
                 <HierarchyLocation :budgetId="Number(latestBudgetId)" />
             </div>
-
-            <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" @success="handleImportSuccess" />
-            <ConfirmPopup />
         </div>
     </Motion>
 </template>

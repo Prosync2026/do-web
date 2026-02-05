@@ -4,6 +4,7 @@ import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import { formatCurrency } from '@/utils/format.utils';
+import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
 
 interface PaginationConfig {
     page: number;
@@ -15,7 +16,8 @@ interface PaginationConfig {
 export default defineComponent({
     name: 'BudgetList',
     components: {
-        ReusableTable
+        ReusableTable,
+        BudgetImportModal
     },
     props: {
         budgetId: {
@@ -99,6 +101,11 @@ export default defineComponent({
             }
         });
 
+        async function handleImportSuccess() {
+            showImportModal.value = false;
+            await fetchBudgetList(props.budgetId);
+        }
+
         function handleSearch(value: string) {
             search.value = value;
             filters.value.global = { value };
@@ -136,6 +143,7 @@ export default defineComponent({
             handleImportClick,
             handlePageChange,
             handlePageSizeChange,
+            handleImportSuccess,
             onSearchWrapper: handleSearch
         };
     }

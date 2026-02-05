@@ -19,4 +19,6 @@
             <template #amount="{ data }"> RM {{ formatCurrency(data.amount) }} </template>
         </ReusableTable>
     </div>
+    <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" @success="handleImportSuccess" />
+    <ConfirmPopup />
 </template>
