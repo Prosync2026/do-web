@@ -24,8 +24,12 @@
                                 <span>{{ formatDate(deliveryInfo?.DeliveryDate) }}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="font-medium">Photos:</span>
+                                <span class="font-medium">Attachments:</span>
                                 <span>{{ deliveryInfo?.attachments?.length || 0 }} uploaded</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium">Delivery Photos Evidence:</span>
+                                <span>{{ deliveryInfo?.attachments2?.length || 0 }} uploaded</span>
                             </div>
                         </div>
                     </template>

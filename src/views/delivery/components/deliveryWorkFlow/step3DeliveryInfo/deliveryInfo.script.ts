@@ -77,15 +77,21 @@ export default defineComponent({
         };
 
         const onSelectedFiles = (event: { files: File[] }) => {
-            deliveryAttachments.value.push(
-                ...event.files.map((f) => ({
-                    name: f.name,
-                    size: f.size,
-                    type: f.type,
-                    raw: f,
-                    preview: URL.createObjectURL(f)
-                }))
-            );
+            const newFiles = event.files.map((f) => ({
+                name: f.name,
+                size: f.size,
+                type: f.type,
+                raw: f,
+                preview: URL.createObjectURL(f)
+            }));
+
+            // Check for duplicates before adding
+            const existingNames = new Set(deliveryAttachments.value.map((f) => f.name));
+            const uniqueNewFiles = newFiles.filter((f) => !existingNames.has(f.name));
+
+            if (uniqueNewFiles.length > 0) {
+                deliveryAttachments.value.push(...uniqueNewFiles);
+            }
 
             totalSize.value = deliveryAttachments.value.reduce((sum, f) => sum + f.size, 0);
             totalSizePercent.value = (totalSize.value / 10_000_000) * 100;
@@ -103,15 +109,21 @@ export default defineComponent({
         };
 
         const onSelectedEvidenceFiles = (event: { files: File[] }) => {
-            evidenceFiles.value.push(
-                ...event.files.map((f) => ({
-                    name: f.name,
-                    size: f.size,
-                    type: f.type,
-                    raw: f,
-                    preview: URL.createObjectURL(f)
-                }))
-            );
+            const newFiles = event.files.map((f) => ({
+                name: f.name,
+                size: f.size,
+                type: f.type,
+                raw: f,
+                preview: URL.createObjectURL(f)
+            }));
+
+            // Check for duplicates before adding
+            const existingNames = new Set(evidenceFiles.value.map((f) => f.name));
+            const uniqueNewFiles = newFiles.filter((f) => !existingNames.has(f.name));
+
+            if (uniqueNewFiles.length > 0) {
+                evidenceFiles.value.push(...uniqueNewFiles);
+            }
 
             evidenceTotalSize.value = evidenceFiles.value.reduce((s, f) => s + f.size, 0);
             evidenceTotalSizePercent.value = (evidenceTotalSize.value / 10_000_000) * 100;
