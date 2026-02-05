@@ -85,6 +85,10 @@ export default defineComponent({
             fetchBudgetVersionList();
         });
 
+        async function handleImportSuccess() {
+            await fetchBudgetVersionList();
+        }
+
         return {
             versions,
             viewOptions,
@@ -92,6 +96,7 @@ export default defineComponent({
             viewMode,
             detailViewMode,
             filters,
+            handleImportSuccess,
             HierarchyItemCode,
             BudgetList,
             latestBudgetId

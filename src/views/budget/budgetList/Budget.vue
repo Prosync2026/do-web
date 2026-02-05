@@ -44,7 +44,7 @@
             </div>
 
             <div v-else-if="detailViewMode === 'list'">
-                <BudgetList :budgetId="Number(latestBudgetId)" />
+                <BudgetList :budgetId="Number(latestBudgetId)" @success="handleImportSuccess" />
             </div>
 
             <div v-else-if="detailViewMode === 'tree'">
