@@ -72,7 +72,7 @@ export default defineComponent({
 
             if (!initialLoad.value && previousVersion.value && previousVersion.value !== newVersion) {
                 showInfo(`Switched to Version ${newVersion}`);
-                localStorage.setItem('latestBudgetVersion', newVersion.toString());
+                localStorage.setItem('latestBudgetVersion', String(selected.id));
             }
 
             previousVersion.value = newVersion;
