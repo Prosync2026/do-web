@@ -111,7 +111,6 @@ export default defineComponent({
         }
 
         function handleImportClick() {
-            console.log('checking come here');
             showImportModal.value = true;
         }
 
