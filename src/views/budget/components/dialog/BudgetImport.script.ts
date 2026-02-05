@@ -30,7 +30,23 @@ export default function useImportBudgetDialogLogic(
 
     function onDownloadFormat() {
         try {
-            const headers = [['LOC 1', 'LOC 2', 'ELEMENT', 'SUB ELEMENT', 'SUB SUB ELEMENT', 'ITEM TYPE', 'ITEM CODE', 'PUR.DESCRIPTION', 'DESC 2', 'UNIT', 'BUDGET QTY', 'RATE', 'AMOUNT', 'WASTAGE']];
+            const headers = [
+                [
+                    'ITEM CODE', // item_code
+                    'PUR.DESCRIPTION', // description
+                    'ELEMENT', // element
+                    'SUB ELEMENT', // sub_element
+                    '1ST SUB ELEMENT', // 1st_sub_element
+                    '2ND SUB ELEMENT', // 2nd_sub_element
+                    'LOC 1', // location1
+                    'LOC 2', // location2
+                    'UNIT', // uom
+                    'BUDGET QTY', // budget_qty
+                    'RATE', // rate
+                    'AMOUNT', // amount
+                    'WASTAGE' // wastage
+                ]
+            ];
 
             const worksheet = XLSX.utils.aoa_to_sheet(headers);
             const workbook = XLSX.utils.book_new();

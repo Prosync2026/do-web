@@ -25,7 +25,8 @@ export default defineComponent({
             required: true
         }
     },
-    setup(props) {
+    emits: ['success'],
+    setup(props, { emit }) {
         const budgetStore = useBudgetStore();
 
         const columns: TableColumn[] = [
@@ -103,6 +104,7 @@ export default defineComponent({
 
         async function handleImportSuccess() {
             showImportModal.value = false;
+            emit('success');
             await fetchBudgetList(props.budgetId);
         }
 
