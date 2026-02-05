@@ -4,7 +4,6 @@ import { defineComponent, onMounted, ref, watch } from 'vue';
 
 import BaseTab from '@/components/tab/BaseTab.vue';
 import Overview from '@/views/budget/budgetOverview/Overview.vue';
-import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
 import BudgetList from '../components/tab/BudgetList.vue';
 import HierarchyItemCode from '../components/tab/HierarchyItemCode.vue';
 import HierarchyLocation from '../components/tab/HierarchyLocation.vue';
@@ -20,7 +19,6 @@ export default defineComponent({
         BaseTab,
         Motion,
         Overview,
-        BudgetImportModal,
         HierarchyItemCode,
         HierarchyLocation,
         BudgetList
@@ -44,7 +42,6 @@ export default defineComponent({
         const viewMode = ref<'overview' | 'detail'>('overview');
         const detailViewMode = ref<'list' | 'tree' | 'treeLocation'>('list');
 
-        const showImportModal = ref(false);
         const filters = ref<Record<string, any>>({});
 
         const fetchBudgetVersionList = async () => {
@@ -84,11 +81,6 @@ export default defineComponent({
             if (initialLoad.value) initialLoad.value = false;
         });
 
-        async function handleImportSuccess() {
-            showImportModal.value = false;
-            await fetchBudgetVersionList();
-        }
-
         onMounted(() => {
             fetchBudgetVersionList();
         });
@@ -99,11 +91,9 @@ export default defineComponent({
             selectedVersion,
             viewMode,
             detailViewMode,
-            showImportModal,
             filters,
             HierarchyItemCode,
             BudgetList,
-            handleImportSuccess,
             latestBudgetId
         };
     }
