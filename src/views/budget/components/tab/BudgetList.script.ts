@@ -103,6 +103,7 @@ export default defineComponent({
 
         async function handleImportSuccess() {
             showImportModal.value = false;
+            await fetchBudgetList(props.budgetId);
         }
 
         function handleSearch(value: string) {
