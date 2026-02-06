@@ -1,4 +1,4 @@
-import { defineComponent, reactive } from 'vue';
+import { defineComponent, reactive, ref, watch } from 'vue';
 
 export interface SingleBudgetItem {
     Category: string;
@@ -32,6 +32,15 @@ export default defineComponent({
     emits: ['update:visible', 'items-value'],
 
     setup(props, { emit }) {
+        const localVisible = ref(props.visible);
+        watch(
+            () => props.visible,
+            (val) => {
+                if (localVisible.value !== val) {
+                    localVisible.value = val;
+                }
+            }
+        );
         const defaultForm = (): SingleBudgetItem => ({
             Category: '',
             Location1: '',
@@ -62,13 +71,16 @@ export default defineComponent({
             if (!form.Category) errors.Category = 'Category is required';
             if (!form.Location1) errors.Location1 = 'Location 1 is required';
             if (!form.Element) errors.Element = 'Element is required';
+            if (!form.SubElement) errors.SubElement = 'Sub Element is required';
             if (!form.Unit) errors.Unit = 'Unit is required';
-            if (form.Amount <= 0) errors.Amount = 'Amount is required';
+            if (form.Amount <= 0) errors.Amount = 'Amount must be greater than 0';
+            if (form.Quantity <= 0) errors.Quantity = 'Quantity must be greater than 0';
 
             return Object.keys(errors).length === 0;
         };
 
         const close = () => {
+            Object.assign(form, defaultForm());
             emit('update:visible', false);
         };
 
@@ -83,6 +95,7 @@ export default defineComponent({
 
         return {
             form,
+            localVisible,
             errors,
             close,
             submit
