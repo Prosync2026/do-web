@@ -242,9 +242,13 @@ const selectProject = (company: string, project: Project) => {
     }, 300);
 };
 
-const saveLatestBudgetVersion = (version: number) => {
+const saveLatestBudgetVersion = (versionId: number, versionCode?: number) => {
     try {
-        localStorage.setItem('latestBudgetVersion', version.toString());
+        // Save both ID (for retrieval) and code (for display)
+        localStorage.setItem('selectedBudgetVersionId', versionId.toString());
+        if (versionCode) {
+            localStorage.setItem('selectedBudgetVersionCode', versionCode.toString());
+        }
     } catch (err) {
         console.error('Error saving latest budget version to localStorage', err);
     }
@@ -262,7 +266,8 @@ onMounted(async () => {
     const versions = await budgetStore.fetchBudgetVersion();
     if (versions && versions.length > 0) {
         const latest = versions.reduce((prev, curr) => (Number(curr.id) > Number(prev.id) ? curr : prev));
-        saveLatestBudgetVersion(Number(latest.id));
+        // Save version ID for later retrieval
+        saveLatestBudgetVersion(Number(latest.id), Number(latest.versionCode));
     }
 });
 </script>
