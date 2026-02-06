@@ -58,6 +58,18 @@ export default defineComponent({
                 id: item.id
             }));
 
+            const savedVersionId = localStorage.getItem('selectedBudgetVersionId');
+
+            if (savedVersionId) {
+                const savedVersion = versions.value.find((v) => String(v.id) === savedVersionId);
+                if (savedVersion) {
+                    selectedVersion.value = savedVersion.value;
+                    latestBudgetId.value = savedVersion.id!;
+                    return;
+                }
+            }
+
+            // Only default to latest if no saved version exists
             const latest = versions.value.find((v) => v.latest);
             if (latest) {
                 selectedVersion.value = latest.value;
@@ -72,8 +84,10 @@ export default defineComponent({
 
             if (!initialLoad.value && previousVersion.value && previousVersion.value !== newVersion) {
                 showInfo(`Switched to Version ${newVersion}`);
-                localStorage.setItem('latestBudgetVersion', String(selected.id));
             }
+
+            // ALWAYS save the selected version
+            localStorage.setItem('selectedBudgetVersionId', String(selected.id));
 
             previousVersion.value = newVersion;
             latestBudgetId.value = selected.id!;
