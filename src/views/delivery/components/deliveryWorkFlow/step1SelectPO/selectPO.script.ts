@@ -20,35 +20,48 @@ export default defineComponent({
         const purchaseStore = usePurchaseOrderStore();
 
         const selectedCard = ref<PurchaseOrderCard | null>(null);
-        const allCards = ref<PurchaseOrderCard[]>([]);
-        const filteredCards = ref<PurchaseOrderCard[]>([]);
-        const searchTerm = ref('');
+        const manualSearch = ref('');
 
-        // computed wrapper for reactive pagination
-        const pagination = computed(() => purchaseStore.pagination);
-
-        // Fetch POs on mount
-        const fetchPage = async () => {
-            await purchaseStore.fetchPurchaseOrders();
-            allCards.value = purchaseStore.purchaseOrders.map((po) => ({
+        const filteredCards = computed(() => {
+            let data = purchaseStore.purchaseOrders.map((po) => ({
                 id: po.Id?.toString() ?? '',
                 title: po.DocNo ?? '',
                 content: `${po.PurchaseOrderItems?.length ?? 0} items`,
                 badges: po.PurchaseOrderItems?.map((i: PurchaseOrderItem) => i.ItemCode ?? '').filter(Boolean) ?? [],
                 icon: 'pi-box'
             }));
-            filteredCards.value = [...allCards.value];
 
-            filteredCards.value = [...allCards.value];
+            if (manualSearch.value.trim()) {
+                const keyword = manualSearch.value.toLowerCase();
+                data = data.filter((card) => card.title.toLowerCase().includes(keyword) || card.badges.some((b) => b.toLowerCase().includes(keyword)));
+            }
+
+            return data;
+        });
+
+        const pagination = computed(() => purchaseStore.pagination);
+
+        const fetchPage = async () => {
+            await purchaseStore.fetchPurchaseOrders();
         };
 
         onMounted(fetchPage);
 
         const handlePOSearch = async (event: { query: string }) => {
-            const query = (event.query || '').trim().toLowerCase();
-            await new Promise((resolve) => setTimeout(resolve, 200));
-            if (!query) filteredCards.value = [...allCards.value];
-            else filteredCards.value = allCards.value.filter((c) => c.title.toLowerCase().includes(query) || c.badges.some((b) => b.toLowerCase().includes(query)));
+            const query = (event.query || '').trim();
+
+            purchaseStore.handleSearch(query);
+            await purchaseStore.fetchPurchaseOrders();
+
+            manualSearch.value = query;
+        };
+
+        // clear handler
+        const handleClearSearch = async () => {
+            manualSearch.value = '';
+            selectedCard.value = null;
+            purchaseStore.handleSearch(''); // Clear store search
+            await purchaseStore.fetchPurchaseOrders();
         };
 
         const toggleSelect = (card: PurchaseOrderCard) => {
@@ -129,18 +142,10 @@ export default defineComponent({
             purchaseStore.setPageSize(pageSize);
         };
 
-        const manualSearch = ref('');
+        const handleManualSearch = () => {
+            // just update manualSearch ref
+        };
 
-        function handleManualSearch() {
-            if (!manualSearch.value.trim()) {
-                filteredCards.value = allCards.value; // reset
-                return;
-            }
-
-            const keyword = manualSearch.value.toLowerCase();
-
-            filteredCards.value = allCards.value.filter((card) => card.title.toLowerCase().includes(keyword) || card.content.toLowerCase().includes(keyword));
-        }
         const handlePageSizeChange = (event: Event) => {
             const target = event.target as HTMLSelectElement;
             if (target?.value) {
@@ -150,9 +155,8 @@ export default defineComponent({
 
         return {
             selectedCard,
-            allCards,
             filteredCards,
-            searchTerm,
+            searchTerm: manualSearch,
             handlePOSearch,
             toggleSelect,
             removeCard,
@@ -166,7 +170,8 @@ export default defineComponent({
             purchaseStore,
             handleManualSearch,
             manualSearch,
-            handlePageSizeChange
+            handlePageSizeChange,
+            handleClearSearch
         };
     }
 });
