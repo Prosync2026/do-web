@@ -243,7 +243,7 @@ export default defineComponent({
                 statistics: {
                     budgetQty: Number(item.Quantity || 0),
                     totalOrderedQty: 0,
-                    totalRequestedQty: 0
+                    totalRequestedQty: Number(item.Quantity || 0)
                 }
             });
 
@@ -329,7 +329,7 @@ export default defineComponent({
                     UnitPrice: i.unitPrice,
                     BudgetQty: i.statistics.budgetQty,
                     OrderedQty: i.statistics.totalOrderedQty,
-                    NewOrder: i.statistics.totalRequestedQty,
+                    NewOrder: i.statistics.totalRequestedQty || 0,
                     Description: i.description,
                     Remark: i.remark,
                     Location1: i.location1 || '',
@@ -343,7 +343,6 @@ export default defineComponent({
                 }))
             };
             const attachmentsToSend = attachments.value && attachments.value.length > 0 ? attachments.value : undefined;
-
             const result = await budgetCRStore.createBudgetChangeRequest(payload, attachmentsToSend);
 
             if (result) {

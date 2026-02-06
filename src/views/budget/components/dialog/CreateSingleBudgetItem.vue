@@ -1,5 +1,7 @@
+<script src="./CreateSingleBudgetItem.script.ts"></script>
+
 <template>
-    <Dialog v-model:visible="visible" header="Add Single Budget Item" modal closable :style="{ width: '700px' }" @hide="close">
+    <Dialog v-model:visible="localVisible" header="Add Single Budget Item" modal closable :style="{ width: '700px' }" @hide="close">
         <div class="grid grid-cols-2 gap-4">
             <!-- Item Code -->
             <div>
@@ -50,8 +52,9 @@
 
             <!-- Sub Element -->
             <div>
-                <label>Sub Element</label>
+                <label class="required-label">Sub Element</label>
                 <InputText v-model="form.SubElement" placeholder="Sub element" class="w-full" />
+                <small class="p-error text-red-500 text-xs" v-if="errors.SubElement">{{ errors.SubElement }}</small>
             </div>
 
             <!-- Sub Sub Element -->
@@ -69,8 +72,9 @@
 
             <!-- Quantity -->
             <div>
-                <label>Quantity</label>
+                <label class="required-label">Quantity</label>
                 <InputNumber v-model.number="form.Quantity" :min="0" class="w-full" />
+                <small class="p-error text-red-500 text-xs" v-if="errors.Quantity">{{ errors.Quantity }}</small>
             </div>
 
             <!-- Rate -->
@@ -101,8 +105,6 @@
         </template>
     </Dialog>
 </template>
-
-<script src="./CreateSingleBudgetItem.script.ts"></script>
 
 <style scoped>
 .required-label::after {
