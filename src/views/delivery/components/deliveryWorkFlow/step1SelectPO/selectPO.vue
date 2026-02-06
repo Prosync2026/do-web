@@ -23,10 +23,13 @@
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-3">
                         <!-- AutoComplete Search -->
-                        <AutoComplete v-model="selectedCard" :suggestions="filteredCards" field="title" option-label="title" forceSelection dropdown placeholder="Search Supplier Name..." @complete="handlePOSearch" />
+                        <div class="flex gap-2">
+                            <AutoComplete v-model="selectedCard" :suggestions="filteredCards" field="title" option-label="title" forceSelection dropdown placeholder="Search PO Number..." @complete="handlePOSearch" />
+                            <Button icon="pi pi-times" severity="secondary" class="bg-gray-200" rounded @click="handleClearSearch" v-tooltip="'Clear search'" />
+                        </div>
 
                         <!-- Manual PO Number Search -->
-                        <InputText v-model="manualSearch" placeholder="Search by PO Number..." class="w-full" @input="handleManualSearch" />
+                        <!-- <InputText v-model="manualSearch" placeholder="Search by PO Number..." class="w-full" @input="handleManualSearch" /> -->
                     </div>
 
                     <!-- Cards List -->
