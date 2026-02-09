@@ -2,7 +2,7 @@ import BudgetSummaryData from '@/components/summaryCard/SummaryCard.vue';
 import { budgetService } from '@/services/budget.service';
 import type { CardItem } from '@/types/card.type';
 import { Chart } from 'highcharts-vue';
-import { computed, defineComponent, onMounted, reactive, ref } from 'vue';
+import { computed, defineComponent, onMounted, reactive, ref, watch } from 'vue';
 
 interface BudgetStatisticsResponse {
     totalBudget: number;
@@ -22,9 +22,21 @@ export default defineComponent({
         BudgetSummaryData,
         highcharts: Chart
     },
-    setup() {
+    props: {
+        budgetId: {
+            type: Number,
+            required: true
+        },
+        version: {
+            type: String,
+            required: true
+        }
+    },
+
+    setup(props) {
         const BudgetSummaryDataList = ref<CardItem[]>([]);
         const isLoadingSummary = ref(false);
+        const budgetId = ref<number | null>(null);
 
         const pieData = ref<any>(null);
         const pieOptions = ref<any>(null);
@@ -81,22 +93,13 @@ export default defineComponent({
             ];
         }
 
-        function setColorOptions() {
-            pieData.value = {};
-            pieOptions.value = {};
-        }
-
-        onMounted(async () => {
-            setColorOptions();
+        async function loadStatistics(id: number) {
             isLoadingSummary.value = true;
 
             try {
-                const budgetId = 1;
-                const statistics = await budgetService.budgetStatistics(budgetId);
+                const statistics = await budgetService.budgetStatistics(id);
 
-                const getStatisticsData = statistics.data;
-
-                const cards = mapStatisticsToCards(getStatisticsData);
+                const cards = mapStatisticsToCards(statistics.data);
 
                 BudgetSummaryDataList.value = cards;
             } catch (error) {
@@ -104,6 +107,25 @@ export default defineComponent({
             } finally {
                 isLoadingSummary.value = false;
             }
+        }
+
+        watch(
+            () => props.budgetId,
+            (id) => {
+                if (id) loadStatistics(id);
+            },
+            { immediate: true }
+        );
+
+        function setColorOptions() {
+            pieData.value = {};
+            pieOptions.value = {};
+        }
+
+        onMounted(() => {
+            setColorOptions();
+
+            budgetId.value = 1;
         });
 
         return {

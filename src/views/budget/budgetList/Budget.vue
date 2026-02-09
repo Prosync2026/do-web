@@ -40,7 +40,7 @@
             </div>
 
             <div v-if="viewMode === 'overview'">
-                <Overview class="col-span-12" />
+                <Overview :budgetId="Number(latestBudgetId)" />
             </div>
 
             <div v-else-if="detailViewMode === 'list'">
