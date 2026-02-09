@@ -74,6 +74,10 @@ export default defineComponent({
         const projectId = getCurrentProjectId();
         const globalDeliveryDate = ref<Date | null>(null);
 
+        // draft
+        const draftId = ref<string | null>(route.query.draftId ? String(route.query.draftId) : null);
+        const mode = ref<string | null>(route.query.mode ? String(route.query.mode) : null);
+
         onMounted(async () => {
             calendarValue.value = new Date(); // default to today
             if (route.query.mode === 'edit-draft' && route.query.draftId) {
@@ -938,7 +942,15 @@ export default defineComponent({
                     })
                 };
 
-                const result = await requestOrderService.createRequestOrderDraft(payload, attachments.value.length > 0 ? attachments.value : undefined);
+                let result;
+
+                const attachmentsPayload = attachments.value.length > 0 ? attachments.value : undefined;
+
+                if (mode.value === 'edit-draft' && draftId.value) {
+                    result = await requestOrderService.updateRequestOrderDraft(draftId.value, payload, attachmentsPayload);
+                } else {
+                    result = await requestOrderService.createRequestOrderDraft(payload, attachmentsPayload);
+                }
 
                 if (result.success) {
                     toast.add({
