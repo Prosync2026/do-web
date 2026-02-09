@@ -103,6 +103,26 @@ const submitDraftRequestOrder = async (draftId: string, payload: CreateRequestOr
 };
 
 /**
+ * Update draft request order
+ */
+const updateRequestOrderDraft = async (id: string, payload: CreateRequestOrderPayload, attachments?: Array<File | AttachmentItem>): Promise<CreateRequestOrderResponse> => {
+    try {
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(payload));
+        appendAttachmentsToFormData(formData, attachments);
+
+        const response = await axiosInstance.put(`/requestOrder/${id}/Draft`, formData);
+
+        return { success: true, data: response.data };
+    } catch (error: unknown) {
+        const message = (error as AxiosError<{ message: string }>)?.response?.data?.message || 'Failed to update request order draft';
+
+        showError(error, message);
+        return { success: false, message };
+    }
+};
+
+/**
  * Delete request order
  */
 const deleteRequestOrder = async (id: number): Promise<void> => {
@@ -287,5 +307,6 @@ export const requestOrderService = {
     downloadAttachment,
     previewAttachment,
     getAttachmentsByROId,
-    getROApprovalStatus
+    getROApprovalStatus,
+    updateRequestOrderDraft
 };
