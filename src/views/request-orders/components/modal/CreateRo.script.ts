@@ -78,7 +78,7 @@ export default defineComponent({
             await Promise.all(
                 budgetItemIds.map(async (id) => {
                     try {
-                        const response = await budgetService.budgetStatistics(id);
+                        const response = await budgetService.budgetItemStatistics(id);
                         if (response.success) {
                             stats[id] = response.data;
                         }
@@ -132,7 +132,7 @@ export default defineComponent({
         const selectedItems = ref<BudgetItem[]>([]);
 
         // Budget store
-        const currentVersion = ref<number | null>(props.version || Number(localStorage.getItem('latestBudgetVersion')));
+        const currentVersion = ref<number | null>(props.version || Number(localStorage.getItem('selectedBudgetVersionId')));
 
         // Fetch budget items with server-side filters
         const fetchBudgetItems = async (page: number = 1, pageSize: number = budgetStore.pagination.pageSize) => {
@@ -386,35 +386,6 @@ export default defineComponent({
             { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rateSlot', visible: false },
             { field: 'amount', header: 'Amount', bodySlot: 'amountSlot', visible: false }
         ];
-
-        // const visibleColumns = computed(() => columns.filter((c) => c.visible !== false));
-
-        // const getPaginationNumbers = (): number[] => {
-        //     const totalPages = pagination.value.totalPages || 1;
-        //     const currentPage = pagination.value.page;
-        //     const maxVisible = 5;
-        //     const numbers: number[] = [];
-
-        //     let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-        //     const endPage = Math.min(totalPages, startPage + maxVisible - 1);
-
-        //     if (endPage - startPage + 1 < maxVisible) {
-        //         startPage = Math.max(1, endPage - maxVisible + 1);
-        //     }
-
-        //     for (let i = startPage; i <= endPage; i++) {
-        //         numbers.push(i);
-        //     }
-        //     return numbers;
-        // };
-
-        // const displayStart = computed(() => {
-        //     return (pagination.value.page - 1) * pagination.value.pageSize + 1;
-        // });
-
-        // const displayEnd = computed(() => {
-        //     return Math.min(pagination.value.page * pagination.value.pageSize, pagination.value.total);
-        // });
 
         onMounted(async () => {
             if (currentVersion.value) {

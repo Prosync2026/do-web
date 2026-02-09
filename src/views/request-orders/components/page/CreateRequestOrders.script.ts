@@ -657,7 +657,7 @@ export default defineComponent({
             await Promise.all(
                 budgetItemIds.map(async (id) => {
                     try {
-                        const response = await budgetService.budgetStatistics(id);
+                        const response = await budgetService.budgetItemStatistics(id);
                         if (response.success) {
                             stats[id] = response.data;
                         } else {

@@ -104,6 +104,17 @@ const createBudget = async (formData: FormData) => {
 
 const budgetStatistics = async (budgetId: number) => {
     try {
+        const response = await axiosInstance.get(`/budgets/${budgetId}/statistics`);
+
+        return response.data;
+    } catch (error) {
+        showError(error, 'Failed to fetch budget statistics.');
+        throw error;
+    }
+};
+
+const budgetItemStatistics = async (budgetId: number) => {
+    try {
         const response = await axiosInstance.get(`/budget/item/${budgetId}/statistics`);
 
         return response.data;
@@ -113,4 +124,4 @@ const budgetStatistics = async (budgetId: number) => {
     }
 };
 
-export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget, budgetStatistics, getHierarchyBudgetItem, getHierarchyBudgetLocation };
+export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget, budgetStatistics, budgetItemStatistics, getHierarchyBudgetItem, getHierarchyBudgetLocation };
