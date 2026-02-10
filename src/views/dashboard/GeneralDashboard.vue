@@ -1,17 +1,96 @@
 <script setup lang="ts">
 import SummaryCard from '@/components/summaryCard/SummaryCard.vue';
+import { budgetService } from '@/services/budget.service';
 import type { CardItem } from '@/types/card.type';
+import { onMounted, ref } from 'vue';
 import RevenueStreamWidget from './components/chart/RevenueStreamWidget.vue';
 
 // ---------------------------
-// 1. DATA (constants, refs)
+// STATE
 // ---------------------------
-const BudgetSummaryData: CardItem[] = [
-    { title: 'Total Budget', value: '$1,800,000', description: '24 new since last visit', icon: 'pi pi-dollar', color: 'orange' },
-    { title: 'Total Spent', value: '52%', description: '+52% since last week', icon: 'pi pi-chart-line', color: 'blue' },
-    { title: 'Budget Items', value: '14', description: '5 Delivered', icon: 'pi pi-database', color: 'green' },
-    { title: 'Project Days', value: '669', description: 'Since project start', icon: 'pi pi-calendar', color: 'purple' }
-];
+const BudgetSummaryData = ref<CardItem[]>([]);
+const isLoading = ref(false);
+
+// ---------------------------
+// HELPERS
+// ---------------------------
+function mapStatisticsToCards(data: any): CardItem[] {
+    const totalBudget = data.totalBudget ?? 0;
+    const totalRequested = data.totalRequested ?? 0;
+    const totalOrdered = data.totalOrdered ?? 0;
+    const totalDelivered = data.totalDelivered ?? 0;
+    const totalBalance = data.totalBalance ?? 0;
+
+    return [
+        {
+            title: 'Total Budget',
+            value: `RM ${totalBudget.toLocaleString()}`,
+            description: 'Approved budget',
+            icon: 'pi pi-dollar',
+            color: 'orange'
+        },
+        {
+            title: 'Requested',
+            value: `RM ${totalRequested.toLocaleString()}`,
+            description: 'Total requested amount',
+            icon: 'pi pi-file',
+            color: 'blue'
+        },
+        {
+            title: 'Delivered',
+            value: `RM ${totalDelivered.toLocaleString()}`,
+            description: 'Delivered value',
+            icon: 'pi pi-truck',
+            color: 'green'
+        },
+        {
+            title: 'Balance',
+            value: `RM ${totalBalance.toLocaleString()}`,
+            description: totalBalance < 0 ? 'Over Budget!' : 'Remaining balance',
+            icon: 'pi pi-wallet',
+            color: totalBalance < 0 ? 'red' : 'purple'
+        }
+    ];
+}
+
+// ---------------------------
+// LOAD DATA
+// ---------------------------
+async function loadDashboard() {
+    try {
+        isLoading.value = true;
+
+        const rawBudgetId = localStorage.getItem('selectedBudgetVersionId');
+        const budgetId = rawBudgetId ? Number(rawBudgetId) : null;
+
+        console.log('📊 Dashboard BudgetId:', budgetId);
+
+        if (!budgetId) return;
+
+        const stats = await budgetService.budgetStatistics(budgetId);
+
+        console.log('📊 Dashboard Stats:', stats);
+
+        BudgetSummaryData.value = mapStatisticsToCards(stats.data);
+    } catch (err) {
+        console.error('Dashboard load failed', err);
+    } finally {
+        isLoading.value = false;
+    }
+}
+
+window.addEventListener('storage', (e) => {
+    if (e.key === 'selectedBudgetVersionId') {
+        loadDashboard();
+    }
+});
+
+// ---------------------------
+// LIFECYCLE
+// ---------------------------
+onMounted(() => {
+    loadDashboard();
+});
 </script>
 
 <template>
