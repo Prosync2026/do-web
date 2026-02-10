@@ -9,7 +9,6 @@ import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Menu from 'primevue/menu';
-import type { MenuItemCommandEvent } from 'primevue/menuitem';
 import OverlayPanel from 'primevue/overlaypanel';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
@@ -33,10 +32,10 @@ const handleSignOut = () => {
 
 const profileMenu = ref([
     // { label: 'Notification', icon: 'pi pi-bell', command: (event: MenuItemCommandEvent) => router.push('/notifications') },
-    { label: 'Company', icon: 'pi pi-building', command: (event: MenuItemCommandEvent) => router.push('/companyList') },
-    { separator: true },
-    { label: computed(() => (isDarkTheme.value ? 'Light Mode' : 'Dark Mode')), icon: computed(() => (isDarkTheme.value ? 'pi pi-sun' : 'pi pi-moon')), command: () => toggleDarkMode() },
-    { separator: true },
+    // { label: 'Company', icon: 'pi pi-building', command: (event: MenuItemCommandEvent) => router.push('/companyList') },
+    // { separator: true },
+    // { label: computed(() => (isDarkTheme.value ? 'Light Mode' : 'Dark Mode')), icon: computed(() => (isDarkTheme.value ? 'pi pi-sun' : 'pi pi-moon')), command: () => toggleDarkMode() },
+    // { separator: true },
     { label: 'Sign Out', icon: 'pi pi-sign-out', command: handleSignOut }
 ]);
 
