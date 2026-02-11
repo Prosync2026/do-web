@@ -228,7 +228,10 @@ export default defineComponent({
                 {
                     field: 'approvalProgress',
                     header: 'Approval Status',
-                    bodySlot: 'approvalStatus'
+                    bodySlot: 'approvalStatus',
+                    exportFormatter: (row) => {
+                        return row.approvalProgress?.map((s: any) => s.level).join(' > ') || '';
+                    }
                 },
                 { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
                 {
