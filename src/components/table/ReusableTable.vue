@@ -105,9 +105,25 @@ function handleExport() {
         props.columns
             .filter((c) => !c.action)
             .map((c) => {
+                if (c.exportFormatter) {
+                    return `"${c.exportFormatter(row)}"`;
+                }
+
                 const value = row[c.field!];
-                return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : value;
+
+                if (value === null || value === undefined) return '';
+
+                if (typeof value === 'object') {
+                    return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
+                }
+
+                if (typeof value === 'string') {
+                    return `"${value.replace(/"/g, '""')}"`;
+                }
+
+                return value;
             })
+
             .join(',')
     );
 
