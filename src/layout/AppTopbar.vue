@@ -15,6 +15,7 @@ import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { getRouteByDocumentType } from '@/utils/route-map.util';
 
 const toast = useToast();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
@@ -106,16 +107,15 @@ const loadNotifications = async () => {
 const goToRO = async (item: any) => {
     try {
         await notificationService.markAsRead(item.id);
+        const route = getRouteByDocumentType(item.documentType);
 
         item.isRead = true;
         unreadCount.value = Math.max(0, unreadCount.value - 1);
 
         notificationPanel.value.hide();
 
-        if (item.documentType === 'RO') {
-            router.push('/request-orders');
-        } else if (item.documentType === 'BCR') {
-            router.push('/delivery-orders');
+        if (route) {
+            router.push(route);
         }
     } catch (err) {
         console.error('Notification click failed:', err);
@@ -305,7 +305,7 @@ onMounted(async () => {
                     <OverlayPanel ref="notificationPanel" class="w-96">
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-semibold">Notifications</span>
-                            <Badge v-if="unreadCount > 0" :value="unreadCount" />
+                            <Badge v-if="unreadCount > 0" :value="unreadCount" severity="danger" />
                         </div>
 
                         <div v-if="notifications.length === 0" class="text-sm text-gray-400 py-4 text-center">No notifications</div>
@@ -314,7 +314,7 @@ onMounted(async () => {
                             <div v-for="item in notifications" :key="item.id" :class="['p-2 rounded-lg cursor-pointer transition', item.isRead ? '' : 'bg-gray-100 dark:bg-gray-900/20']" @click="goToRO(item)">
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm font-medium">{{ item.title }}</span>
-                                    <Badge :severity="item.isRead ? 'info' : 'warning'" :value="item.isRead ? 'Read' : 'Unread'" />
+                                    <Badge :severity="item.isRead ? 'info' : 'warn'" :value="item.isRead ? 'Read' : 'Unread'" />
                                 </div>
 
                                 <p class="text-xs text-gray-500 mt-1">
