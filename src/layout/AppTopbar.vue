@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
+import { notificationService } from '@/services/notification.service';
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import { usePermissionStore } from '@/stores/permission/permission.store';
@@ -14,6 +15,7 @@ import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { getRouteByDocumentType } from '@/utils/route-map.util';
 
 const toast = useToast();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
@@ -76,36 +78,10 @@ interface NotificationItem {
     level?: 'PM' | 'PURC' | 'PD';
     unread: boolean;
 }
-const notifications = ref<NotificationItem[]>([
-    {
-        id: 1,
-        roId: 46,
-        roNo: 'RO2601-000011',
-        message: 'Waiting for Procurement approval',
-        status: 'Pending',
-        level: 'PURC',
-        unread: true
-    },
-    {
-        id: 2,
-        roId: 45,
-        roNo: 'RO2601-000010',
-        message: 'Waiting for Project Director approval',
-        status: 'Pending',
-        level: 'PD',
-        unread: true
-    },
-    {
-        id: 3,
-        roId: 44,
-        roNo: 'RO2601-000009',
-        message: 'Request Order approved',
-        status: 'Approved',
-        unread: false
-    }
-]);
 
-const unreadCount = computed(() => notifications.value.filter((n) => n.unread).length);
+// notification
+const notifications = ref<any[]>([]);
+const unreadCount = ref(0);
 
 const notificationPanel = ref();
 
@@ -113,9 +89,37 @@ const toggleNotificationMenu = (event: Event) => {
     notificationPanel.value.toggle(event);
 };
 
-const goToRO = (item: NotificationItem) => {
-    item.unread = false;
-    router.push({ name: 'requestOrderView', params: { id: item.roId } });
+const loadNotifications = async () => {
+    try {
+        const res = await notificationService.getNotifications({
+            page: 1,
+            pageSize: 10,
+            sortBy: 'created_at',
+            sortOrder: 'desc'
+        });
+        notifications.value = res.data.notifications;
+        unreadCount.value = res.data.unreadCount;
+    } catch (err) {
+        console.error('Failed load notifications', err);
+    }
+};
+
+const goToRO = async (item: any) => {
+    try {
+        await notificationService.markAsRead(item.id);
+        const route = getRouteByDocumentType(item.documentType);
+
+        item.isRead = true;
+        unreadCount.value = Math.max(0, unreadCount.value - 1);
+
+        notificationPanel.value.hide();
+
+        if (route) {
+            router.push(route);
+        }
+    } catch (err) {
+        console.error('Notification click failed:', err);
+    }
 };
 
 const projectStore = useProjectStore();
@@ -123,6 +127,7 @@ const companyProjects = computed(() => projectStore.groupedProjects);
 
 onMounted(() => {
     projectStore.fetchProjects();
+    loadNotifications();
 });
 
 const saveProjectToStorage = (project: { company: string; name: string; ProjectId: number } | null) => {
@@ -300,16 +305,16 @@ onMounted(async () => {
                     <OverlayPanel ref="notificationPanel" class="w-96">
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-semibold">Notifications</span>
-                            <Badge v-if="unreadCount > 0" :value="unreadCount" />
+                            <Badge v-if="unreadCount > 0" :value="unreadCount" severity="danger" />
                         </div>
 
                         <div v-if="notifications.length === 0" class="text-sm text-gray-400 py-4 text-center">No notifications</div>
 
                         <div v-else class="space-y-2">
-                            <div v-for="item in notifications" :key="item.id" class="p-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition" @click="goToRO(item)">
+                            <div v-for="item in notifications" :key="item.id" :class="['p-2 rounded-lg cursor-pointer transition', item.isRead ? '' : 'bg-gray-100 dark:bg-gray-900/20']" @click="goToRO(item)">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium">{{ item.roNo }}</span>
-                                    <Badge :severity="item.status === 'Approved' ? 'success' : item.status === 'Rejected' ? 'danger' : 'warning'" :value="item.status" />
+                                    <span class="text-sm font-medium">{{ item.title }}</span>
+                                    <Badge :severity="item.isRead ? 'info' : 'warn'" :value="item.isRead ? 'Read' : 'Unread'" />
                                 </div>
 
                                 <p class="text-xs text-gray-500 mt-1">
