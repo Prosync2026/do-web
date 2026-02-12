@@ -42,6 +42,9 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         totalApprovedValue: 0
     });
 
+    // make the pending count globally accessible for badge
+    const pendingCount = ref(0);
+
     type UIApprovalProgress = {
         level: 'PM' | 'PD' | 'PURCH';
         status: 'Approved' | 'Rejected' | 'Pending';
@@ -113,6 +116,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
 
             orders.value = response.data.map((output): Order => {
                 const apiOutput = output as unknown as RequestOrderResponse;
+                pendingCount.value = response.counts?.submitted ?? 0;
 
                 return {
                     id: apiOutput.Id,
@@ -321,6 +325,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         handleStatusChange,
         setSorting,
         sortField,
-        sortOrder
+        sortOrder,
+        pendingCount
     };
 });

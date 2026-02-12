@@ -4,12 +4,12 @@ import { usePermissionStore } from '@/stores/permission/permission.store';
 import type { MenuItemType } from '@/types/sidebar.type';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import MenuItem from './MenuItem.vue';
+import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 
 export default defineComponent({
     components: { MenuItem },
     setup() {
         const userRole = ref<string | null>(null);
-        const pendingCount = ref(0);
 
         // access permission
         const permissionStore = usePermissionStore();
@@ -22,21 +22,15 @@ export default defineComponent({
 
         const canViewDelivery = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_DELIVERY_ORDER));
 
+        // update the badge count
+        const roStore = useRequestOrderStore();
+
         const loadUserRole = () => {
             try {
                 const user = localStorage.getItem('user');
                 if (user) userRole.value = JSON.parse(user).role;
             } catch (error) {
                 console.error('Error loading user role:', error);
-            }
-        };
-
-        const fetchTotalPending = async () => {
-            try {
-                const res = await requestOrderService.getRequestOrders({ page: 1, pageSize: 10000 });
-                pendingCount.value = res.data.filter((o) => o.Status === 'Submitted' || o.Status === 'Processing').length;
-            } catch (err) {
-                console.error('Failed to fetch total pending orders', err);
             }
         };
 
@@ -58,7 +52,7 @@ export default defineComponent({
                         label: 'Request Orders',
                         icon: 'pi pi-fw pi-shopping-cart',
                         to: '/request-orders',
-                        badge: pendingCount.value,
+                        badge: roStore.pendingCount,
                         visible: canViewRO.value
                     },
                     {
@@ -83,7 +77,6 @@ export default defineComponent({
 
         onMounted(async () => {
             loadUserRole();
-            await fetchTotalPending(); // fetch total pending count for the menu
         });
 
         return { model, canViewRO, canViewBudget, canViewPO, canViewDelivery };
