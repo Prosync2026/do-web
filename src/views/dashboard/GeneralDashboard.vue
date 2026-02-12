@@ -63,13 +63,9 @@ async function loadDashboard() {
         const rawBudgetId = localStorage.getItem('selectedBudgetVersionId');
         const budgetId = rawBudgetId ? Number(rawBudgetId) : null;
 
-        console.log('📊 Dashboard BudgetId:', budgetId);
-
         if (!budgetId) return;
 
         const stats = await budgetService.budgetStatistics(budgetId);
-
-        console.log('📊 Dashboard Stats:', stats);
 
         BudgetSummaryData.value = mapStatisticsToCards(stats.data);
     } catch (err) {

@@ -2,8 +2,8 @@ export type DocumentType = 'RO' | 'BCR' | 'DO' | 'PO';
 
 export const DOCUMENT_ROUTE_MAP: Record<DocumentType, string> = {
     RO: '/request-orders',
-    BCR: '/budget-change-requests',
-    DO: '/delivery-orders',
+    BCR: '/bcr',
+    DO: '/deliveries',
     PO: '/purchase-orders'
 };
 
