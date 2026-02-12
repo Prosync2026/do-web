@@ -15,7 +15,7 @@ const cleanParams = (params?: Record<string, any>) => {
 
 const getNotifications = async (params?: Record<string, any>) => {
     try {
-        const response = await axiosInstance.get('/api/notifications', {
+        const response = await axiosInstance.get('/notifications', {
             params: cleanParams(params)
         });
 
@@ -28,7 +28,7 @@ const getNotifications = async (params?: Record<string, any>) => {
 
 const getUnreadCount = async () => {
     try {
-        const response = await axiosInstance.get('/api/notifications/unread-count');
+        const response = await axiosInstance.get('/notifications/unread-count');
         return response.data;
     } catch (error) {
         showError(error, 'Failed to fetch unread notifications.');
@@ -38,7 +38,7 @@ const getUnreadCount = async () => {
 
 const markAsRead = async (id: number) => {
     try {
-        const response = await axiosInstance.patch(`/api/notifications/${id}/read`);
+        const response = await axiosInstance.patch(`/notifications/${id}/read`);
         return response.data;
     } catch (error) {
         showError(error, 'Failed to mark notification as read.');
@@ -48,7 +48,7 @@ const markAsRead = async (id: number) => {
 
 const markAllAsRead = async () => {
     try {
-        const response = await axiosInstance.post('/api/notifications/read-all');
+        const response = await axiosInstance.post('/notifications/read-all');
         return response.data;
     } catch (error) {
         showError(error, 'Failed to mark all notifications as read.');

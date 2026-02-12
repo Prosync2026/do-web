@@ -16,6 +16,8 @@ import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { getRouteByDocumentType } from '@/utils/route-map.util';
+import { useNotificationStore } from '@/stores/notification/notification.store';
+import type { Project } from '@/types';
 
 const toast = useToast();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
@@ -51,66 +53,18 @@ const username = ref<string | null>(null);
 const showProjectDialog = ref(false);
 const selectedProject = ref<{ company: string; name: string; ProjectId: number } | null>(null);
 
-interface Project {
-    id: number;
-    ProjectId: number;
-    name: string;
-    status: 'Active' | 'Inactive';
-    budget: string;
-    system_company?: {
-        name: string;
-    };
-}
-
-interface CompanyGroup {
-    company: string;
-    projects: Project[];
-}
-
-// mock email nottificcation data
-
-interface NotificationItem {
-    id: number;
-    roId: number;
-    roNo: string;
-    message: string;
-    status: 'Pending' | 'Approved' | 'Rejected';
-    level?: 'PM' | 'PURC' | 'PD';
-    unread: boolean;
-}
-
 // notification
-const notifications = ref<any[]>([]);
-const unreadCount = ref(0);
-
+const notificationStore = useNotificationStore();
 const notificationPanel = ref();
-
 const toggleNotificationMenu = (event: Event) => {
     notificationPanel.value.toggle(event);
 };
 
-const loadNotifications = async () => {
+const goToPageDetails = async (item: any) => {
     try {
-        const res = await notificationService.getNotifications({
-            page: 1,
-            pageSize: 10,
-            sortBy: 'created_at',
-            sortOrder: 'desc'
-        });
-        notifications.value = res.data.notifications;
-        unreadCount.value = res.data.unreadCount;
-    } catch (err) {
-        console.error('Failed load notifications', err);
-    }
-};
+        await notificationStore.markNotificationAsRead(item.id);
 
-const goToRO = async (item: any) => {
-    try {
-        await notificationService.markAsRead(item.id);
         const route = getRouteByDocumentType(item.documentType);
-
-        item.isRead = true;
-        unreadCount.value = Math.max(0, unreadCount.value - 1);
 
         notificationPanel.value.hide();
 
@@ -127,7 +81,7 @@ const companyProjects = computed(() => projectStore.groupedProjects);
 
 onMounted(() => {
     projectStore.fetchProjects();
-    loadNotifications();
+    notificationStore.fetchUnreadNotifications();
 });
 
 const saveProjectToStorage = (project: { company: string; name: string; ProjectId: number } | null) => {
@@ -299,19 +253,19 @@ onMounted(async () => {
                 <div class="layout-topbar-actions flex items-center gap-3 relative border-l border-gray-200 dark:border-gray-700 pl-4">
                     <div class="relative">
                         <Button icon="pi pi-bell" class="p-button-text p-button-plain bell-btn" @click="toggleNotificationMenu" />
-                        <Badge v-if="unreadCount > 0" :value="unreadCount" severity="danger" class="notification-badge absolute -top-1 -right-1" />
+                        <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute -top-1 -right-1" />
                     </div>
 
                     <OverlayPanel ref="notificationPanel" class="w-96">
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-semibold">Notifications</span>
-                            <Badge v-if="unreadCount > 0" :value="unreadCount" severity="danger" />
+                            <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" />
                         </div>
 
-                        <div v-if="notifications.length === 0" class="text-sm text-gray-400 py-4 text-center">No notifications</div>
+                        <div v-if="notificationStore.notifications.length === 0" class="text-sm text-gray-400 py-4 text-center">No notifications</div>
 
                         <div v-else class="space-y-2">
-                            <div v-for="item in notifications" :key="item.id" :class="['p-2 rounded-lg cursor-pointer transition', item.isRead ? '' : 'bg-gray-100 dark:bg-gray-900/20']" @click="goToRO(item)">
+                            <div v-for="item in notificationStore.notifications" :key="item.id" :class="['p-2 rounded-lg cursor-pointer transition', item.isRead ? '' : 'bg-gray-100 dark:bg-gray-900/20']" @click="goToPageDetails(item)">
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm font-medium">{{ item.title }}</span>
                                     <Badge :severity="item.isRead ? 'info' : 'warn'" :value="item.isRead ? 'Read' : 'Unread'" />
