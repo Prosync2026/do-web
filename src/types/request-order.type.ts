@@ -71,6 +71,13 @@ export interface OrderItem {
     remark?: string;
     reason?: string;
     rate?: number;
+
+    // budget deviation
+    originalBudgetQty?: number;
+    requestedQty?: number;
+    exceedBudget?: boolean;
+    exceededQty?: number;
+    exceededPercent?: number;
 }
 
 export interface RequestOrderItemDetail {

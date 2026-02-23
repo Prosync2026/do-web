@@ -40,16 +40,31 @@
                         <th class="p-2 text-left">Description</th>
                         <th class="p-2 text-left">UOM</th>
                         <th class="p-2 text-left">Order Qty</th>
+                        <th class="p-2 text-left">Requested Qty</th>
+                        <th class="p-2 text-left">Exceeded Qty</th>
+                        <th class="p-2 text-left">Exceeded %</th>
                         <th class="p-2 text-left">Delivery Date</th>
                         <th class="p-2 text-left">Note</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, idx) in localOrder.items" :key="idx">
+                    <tr v-for="(item, idx) in localOrder.items" :key="idx" :class="{ 'bg-red-50': item.exceedBudget }">
                         <td class="p-2">{{ item.code }}</td>
                         <td class="p-2">{{ item.description }}</td>
                         <td class="p-2">{{ item.uom }}</td>
-                        <td class="p-2">{{ item.qty }}</td>
+                        <td class="p-2">{{ item.originalBudgetQty }}</td>
+                        <td class="p-2">
+                            <span v-if="item.requestedQty" class="text-black-500 font-semibold"> {{ item.requestedQty?.toFixed(2) }} </span>
+                            <span v-else>-</span>
+                        </td>
+                        <td class="p-2">
+                            <span v-if="item.exceedBudget" class="text-red-500 font-semibold"> +{{ item.exceededQty?.toFixed(2) }} </span>
+                            <span v-else>-</span>
+                        </td>
+                        <td class="p-2">
+                            <span v-if="item.exceedBudget" class="text-red-500 font-semibold"> {{ item.exceededPercent?.toFixed(2) }}% </span>
+                            <span v-else>-</span>
+                        </td>
                         <td class="p-2">{{ item.deliveryDate }}</td>
                         <td class="p-2">{{ item.note }}</td>
                     </tr>
