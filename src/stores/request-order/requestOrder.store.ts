@@ -181,6 +181,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         loading.value = true;
         try {
             const response = await requestOrderService.getRequestOrderById(id);
+            console.log('Raw order details response:', response);
             if (!response) return null;
 
             const o = response.data as unknown as RequestOrderResponse;
@@ -217,7 +218,13 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                     budgetItemId: item.BudgetItemId ?? null,
                     nonBudgetItemId: item.NonBudgetItemId ?? null,
                     reason: item.Reason,
-                    rate: item.Rate
+                    rate: item.Rate,
+
+                    originalBudgetQty: Number(item.OrgBgtQty),
+                    requestedQty: Number(item.Quantity),
+                    exceedBudget: item.budgetDeviation?.exceedBudget,
+                    exceededQty: item.budgetDeviation?.deviation,
+                    exceededPercent: item.budgetDeviation?.deviationPercent
                 })),
 
                 debtorId: o.DebtorId ?? undefined,
