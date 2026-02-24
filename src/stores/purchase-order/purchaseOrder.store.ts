@@ -31,8 +31,6 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         sortOrder: 'desc' as 'asc' | 'desc'
     });
 
-    const status = ref<string>(''); // Created, Ongoing, Completed, Cancelled
-
     const formatDate = (dateString: string | null): string => {
         if (!dateString || dateString === '1970-01-01T00:00:00.000Z') {
             return 'N/A';
@@ -52,8 +50,8 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         loading.value = true;
         try {
             const params = {
+                status: filters.status || undefined,
                 search: filters.search || undefined,
-                status: status.value || undefined,
                 startDate: filters.startDate || undefined,
                 endDate: filters.endDate || undefined,
                 page: pagination.page,
@@ -235,6 +233,11 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         pagination.page = 1;
     }
 
+    function handleStatusChange(status: string) {
+        filters.status = status;
+        pagination.page = 1;
+    }
+
     function setSorting(sortBy: string, order: 'asc' | 'desc' | '') {
         if (!sortBy || !order) {
             sorting.sortBy = 'CreatedAt';
@@ -251,12 +254,6 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         pagination.page = 1;
     }
 
-    function setStatus(value: string) {
-        status.value = value;
-        pagination.page = 1;
-        fetchPurchaseOrders();
-    }
-
     return {
         purchaseOrders,
         selectedPurchaseOrder,
@@ -266,17 +263,16 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         sorting,
         sortField,
         sortOrder,
-        status,
 
         fetchPurchaseOrders,
         fetchPurchaseOrderById,
         updatePurchaseOrder,
-        setStatus,
 
         clearFilters,
         setPage,
         setPageSize,
         handleSearch,
+        handleStatusChange,
         setSorting
     };
 });

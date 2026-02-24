@@ -22,10 +22,12 @@
                 <BaseTab v-model="activeTab" :tabs="tabItems" @update:modelValue="handleTabChange">
                     <template #default="{ activeTab }">
                         <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
-                            <!-- PENDING -->
+                            <!-- =====================
+                                 PENDING
+                            ====================== -->
                             <template v-if="activeTab === '0'">
                                 <ReusableTable
-                                    :value="filteredList"
+                                    :value="pendingList"
                                     :columns="pendingListColumn"
                                     :loading="isLoading"
                                     :pagination="pagination"
@@ -53,10 +55,12 @@
                                 </ReusableTable>
                             </template>
 
-                            <!-- PARTIAL DELIVERY -->
+                            <!-- =====================
+                                 PARTIAL DELIVERY
+                            ====================== -->
                             <template v-else-if="activeTab === '1'">
                                 <ReusableTable
-                                    :value="filteredList"
+                                    :value="partiallyList"
                                     :columns="partiallyListColumn"
                                     :loading="isLoading"
                                     :onSearch="onSearchWrapper"
@@ -70,15 +74,17 @@
                                     </template>
 
                                     <template #status="{ data }">
-                                        <Tag :value="formatPOStatus(data.status)" :severity="poStatusSeverity(data.status)" />
+                                        <Tag value="Partially Delivered" severity="warning" />
                                     </template>
                                 </ReusableTable>
                             </template>
 
-                            <!-- COMPLETED -->
+                            <!-- =====================
+                                 COMPLETED
+                            ====================== -->
                             <template v-else-if="activeTab === '2'">
                                 <ReusableTable
-                                    :value="filteredList"
+                                    :value="completedList"
                                     :columns="completedListColumn"
                                     :loading="isLoading"
                                     :onSearch="onSearchWrapper"
@@ -92,7 +98,7 @@
                                     </template>
 
                                     <template #discrepancyType="{ data }">
-                                        <Tag :value="data.discrepancyType" :severity="data.discrepancyType === 'Ongoing' ? 'warning' : 'danger'" />
+                                        <Tag :value="data.discrepancyType" :severity="data.discrepancyType === 'Partial Delivery' ? 'warning' : 'danger'" />
                                     </template>
 
                                     <template #status="{ data }">
