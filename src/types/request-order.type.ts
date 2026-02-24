@@ -78,6 +78,9 @@ export interface OrderItem {
     exceedBudget?: boolean;
     exceededQty?: number;
     exceededPercent?: number;
+
+    isBudgetExceeded?: boolean;
+    requiresPDApproval?: boolean;
 }
 
 export interface RequestOrderItemDetail {
@@ -123,6 +126,9 @@ export interface Order {
         status: 'Approved' | 'Rejected' | 'Pending';
     }[];
     totalApprovedValue?: string | number;
+
+    isBudgetExceeded?: boolean;
+    requiresPDApproval?: boolean;
 }
 
 export interface PreviewItem {
