@@ -82,10 +82,17 @@ import { Button } from "@prosync/ui-kit";
 
                                 <!-- Budget Type Slot -->
                                 <template #budgetType="{ data }">
-                                    <span class="px-2 py-1 rounded text-xs" :class="data.budgetType === 'Budgeted' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'">
-                                        {{ data.budgetType }}
-                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <!-- Budget badge -->
+                                        <span class="px-2 py-1 rounded text-xs relative" :class="data.budgetType === 'Budgeted' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'">
+                                            {{ data.budgetType }}
+                                        </span>
+
+                                        <!-- icon with tooltip -->
+                                        <i v-if="data.isBudgetExceeded" class="pi pi-exclamation-triangle text-red-500 text-sm" v-tooltip.top="'Budget exceeded - PD approval required'" />
+                                    </div>
                                 </template>
+
                                 <template #approvalStatus="{ data }">
                                     <div class="flex flex-col gap-1 text-xs py-2">
                                         <template v-for="(step, index) in data.approvalProgress" :key="step.level">

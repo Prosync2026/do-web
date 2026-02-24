@@ -133,7 +133,9 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                     approvalFlowType: apiOutput.approvalFlowType,
 
                     currentApprovalStage: parseApprovalStage(apiOutput.CurrentApprovalStage),
-
+                    // exceeded budget
+                    isBudgetExceeded: apiOutput.RequiresPDApproval === true && apiOutput.PDApprovalReason === 'BUDGET_EXCEEDED',
+                    requiresPDApproval: apiOutput.RequiresPDApproval === true,
                     items: (apiOutput.RequestOrderItems || []).map(
                         (item): OrderItem => ({
                             code: String(item.BudgetItemId || item.NonBudgetItemId || ''),
@@ -205,6 +207,11 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 deliveryDate: formatDate(o.request_order_items?.[0]?.DeliveryDate || o.RequestOrderItems?.[0]?.DeliveryDate),
                 totalAmount: String(o.TotalAmount),
                 requestedAt: formatDateTime(o.CreatedAt),
+
+                // budget exceeded flag
+                isBudgetExceeded: o.RequiresPDApproval === true && o.PDApprovalReason === 'BUDGET_EXCEEDED',
+                requiresPDApproval: o.RequiresPDApproval === true,
+
                 items: ((o.request_order_items ?? o.RequestOrderItems ?? []) as RequestOrderItemResponse[]).map((item) => ({
                     code: item.ItemCode || '',
                     description: item.Description,
