@@ -1,3 +1,5 @@
+<script src="./DiscussionThread.script.ts"></script>
+
 <template>
     <div class="card p-4 mb-6 shadow">
         <!-- ================= Header ================= -->
@@ -91,5 +93,3 @@
         <editcommentBCRModal v-if="editingItem" v-model:visible="editComment" :item="editingItem" @submit="init" />
     </div>
 </template>
-
-<script src="./DiscussionThread.script.ts"></script>

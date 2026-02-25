@@ -58,7 +58,7 @@
                                         </template>
                                     </Column>
 
-                                    <Column field="OrderedQty" header="Ordered Qty" >
+                                    <Column field="OrderedQty" header="Ordered Qty">
                                         <template #body="{ data }">
                                             {{ formatNumber(data.OrderedQty) }}
                                         </template>
@@ -72,19 +72,37 @@
 
                                     <Column field="ExceededQty" header="Exceeded Qty">
                                         <template #body="{ data }">
-                                            {{ formatNumber(data.ExceededQty) }}
+                                            <span
+                                                :class="{
+                                                    'text-red-600 font-semibold': data.ExceededQty > 0
+                                                }"
+                                            >
+                                                {{ formatNumber(data.ExceededQty) }}
+                                            </span>
                                         </template>
                                     </Column>
 
                                     <Column field="ExceededPercent" header="% Exceed" v-if="canViewPricing">
                                         <template #body="{ data }">
-                                            {{ formatPercent(data.ExceededPercent) }}
+                                            <span
+                                                :class="{
+                                                    'text-red-600 font-semibold': data.ExceededPercent > 0
+                                                }"
+                                            >
+                                                {{ formatPercent(data.ExceededPercent) }}
+                                            </span>
                                         </template>
                                     </Column>
 
                                     <Column field="EstimatedExceed" header="Estimated Exceed" v-if="canViewPricing">
                                         <template #body="{ data }">
-                                            {{ formatCurrency(data.EstimatedExceed) }}
+                                            <span
+                                                :class="{
+                                                    'text-red-600 font-semibold': data.EstimatedExceed > 0
+                                                }"
+                                            >
+                                                {{ formatCurrency(data.EstimatedExceed) }}
+                                            </span>
                                         </template>
                                     </Column>
 
