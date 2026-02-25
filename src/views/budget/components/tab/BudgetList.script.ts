@@ -40,6 +40,8 @@ export default defineComponent({
             { field: 'subSubElement', header: '2nd Sub Element', sortable: true },
             { field: 'unit', header: 'UOM', sortable: true },
             { field: 'qty', header: 'Qty', sortable: true },
+            { field: 'totalOrderedQty', header: 'Ordered Qty', sortable: true },
+            { field: 'totalRemainingQty', header: 'Remaining Qty', sortable: true, bodySlot: 'remainingQty' },
             { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rate' },
             { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
         ];
@@ -132,6 +134,23 @@ export default defineComponent({
             fetchBudgetList(props.budgetId);
         });
 
+        function formatPercent(value?: number) {
+            if (value == null) return '-';
+            return `${value.toFixed(1)}%`;
+        }
+
+        function getUtilizationClass(value?: number) {
+            if (value == null) return 'bg-gray-100 text-gray-600';
+
+            if (value < 50) return 'bg-green-100 text-green-800';
+
+            if (value < 80) return 'bg-yellow-100 text-yellow-800';
+
+            if (value <= 100) return 'bg-orange-100 text-orange-800';
+
+            return 'bg-red-100 text-red-800';
+        }
+
         return {
             columns,
             budgetItems,
@@ -146,7 +165,9 @@ export default defineComponent({
             handlePageChange,
             handlePageSizeChange,
             handleImportSuccess,
-            onSearchWrapper: handleSearch
+            onSearchWrapper: handleSearch,
+            formatPercent,
+            getUtilizationClass
         };
     }
 });
