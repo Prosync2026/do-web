@@ -19,6 +19,14 @@ export const useBudgetStore = defineStore('budget', () => {
     const pagination = ref<Pagination>({ total: 0, totalPages: 1, page: 1, pageSize: 10 });
     const loading = ref(false);
 
+    const sortField = ref('CreatedAt');
+    const sortOrder = ref<'asc' | 'desc'>('desc');
+
+    const sorting = ref({
+        sortBy: 'CreatedAt',
+        sortOrder: 'desc' as 'asc' | 'desc'
+    });
+
     const applyPagination = (p: any) => {
         const mapped = mapPagination(p);
 
@@ -86,7 +94,9 @@ export const useBudgetStore = defineStore('budget', () => {
                 projectId: getCurrentProjectId(),
                 budgetId: filters.budgetId,
                 page: filters.page ?? pagination.value.page,
-                pageSize: filters.pageSize ?? 10
+                pageSize: filters.pageSize ?? 10,
+                sortBy: sorting.value.sortBy,
+                sortOrder: sorting.value.sortOrder
             };
 
             // Add optional filters only if they have values
@@ -205,5 +215,21 @@ export const useBudgetStore = defineStore('budget', () => {
         }
     }
 
-    return { budgets, budgetItems, pagination, loading, fetchBudgets, fetchBudgetItems, fetchBudgetVersion, fetchHierarchyBudgetItems, fetchHierarchyBudgetLocation };
+    function setSorting(sortBy: string, order: 'asc' | 'desc' | '') {
+        if (!sortBy || !order) {
+            sorting.value.sortBy = 'CreatedAt';
+            sorting.value.sortOrder = 'desc';
+            sortField.value = 'CreatedAt';
+            sortOrder.value = 'desc';
+        } else {
+            sorting.value.sortBy = sortBy;
+            sorting.value.sortOrder = order;
+            sortField.value = sortBy;
+            sortOrder.value = order;
+        }
+
+        pagination.value.page = 1;
+    }
+
+    return { budgets, budgetItems, pagination, loading, fetchBudgets, fetchBudgetItems, fetchBudgetVersion, fetchHierarchyBudgetItems, fetchHierarchyBudgetLocation, sorting, sortField, sortOrder, setSorting };
 });

@@ -203,12 +203,12 @@ const selectionProxy = computed({
 
 // sorting
 function onSort(event: DataTableSortEvent) {
-    console.log('onSort event:', {
-        sortField: event.sortField,
-        sortOrder: event.sortOrder,
-        currentSortField: props.sortField,
-        currentSortOrder: props.sortOrder
-    });
+    // console.log('onSort event:', {
+    //     sortField: event.sortField,
+    //     sortOrder: event.sortOrder,
+    //     currentSortField: props.sortField,
+    //     currentSortOrder: props.sortOrder
+    // });
 
     if (typeof event.sortField !== 'string') return;
 
