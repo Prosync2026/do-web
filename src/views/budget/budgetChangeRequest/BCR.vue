@@ -39,6 +39,16 @@
                 <template #TotalAmount="{ data }">
                     <span class="font-semibold">{{ data.TotalAmount }}</span>
                 </template>
+                <!-- approval flow  -->
+                <template #approvalFlow="{ data }">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <template v-for="(step, index) in data.approvalFlow" :key="step.role">
+                            <Badge :value="step.role" :severity="step.status === 'approved' ? 'success' : step.status === 'pending' ? 'warn' : 'secondary'" />
+
+                            <i v-if="index < data.approvalFlow.length - 1" class="pi pi-angle-right text-gray-400" />
+                        </template>
+                    </div>
+                </template>
             </ReusableTable>
         </div>
     </Motion>
