@@ -107,42 +107,66 @@ export const useBudgetStore = defineStore('budget', () => {
             }
 
             // Map response data to BudgetItem format
-            const mappedItems: any[] = response.data.map((item: any, index: number) => ({
-                id: item.Id,
-                budgetId: item.BudgetId,
-                itemCode: item.ItemCode,
-                itemType: item.ItemType || '',
-                itemClass: item.ItemClass || '',
-                description: item.Description,
-                description2: item.Description2,
-                location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
-                location1: item.Location1,
-                location2: item.Location2,
-                category: item.Category,
-                element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
-                elementCode: item.Element,
-                subElement: item.SubElement,
-                subSubElement: item.SubSubElement,
-                uom: item.Unit,
-                qty: Number(item.Quantity),
-                price: Number(item.Rate),
-                total: Number(item.Quantity) * Number(item.Rate),
-                unit: item.Unit,
-                remark: item.Remark,
-                rate: Number(item.Rate) || 0,
-                amount: (Number(item.Quantity) || 0) * (Number(item.Rate) || 0),
-                wastage: Number(item.Wastage) || 0,
-                status: item.Status,
-                createdAt: formatDate(item.CreatedAt),
-                createdBy: item.CreatedBy,
-                updatedAt: item.UpdatedAt ? formatDate(item.UpdatedAt) : null,
-                updatedBy: item.UpdatedBy,
-                budgetQty: item.statistics?.budgetQty,
-                totalOrderedQty: item.statistics?.totalOrderedQty,
-                totalRequestedQty: item.statistics?.totalRequestedQty,
-                // Add rowIndex here in the store to prevent computed mutation
-                rowIndex: ((queryParams.page ?? 1) - 1) * (queryParams.pageSize ?? 10) + index + 1
-            }));
+            const mappedItems: any[] = response.data.map((item: any, index: number) => {
+                const stats = item.statistics || {};
+
+                // statistics
+                const budgetQty = Number(stats.budgetQty ?? item.Quantity ?? 0);
+                const totalOrderedQty = Number(stats.totalOrderedQty ?? 0);
+                const totalRequestedQty = Number(stats.totalRequestedQty ?? 0);
+                const totalDeliveredQty = Number(stats.totalDeliveredQty ?? 0);
+
+                return {
+                    id: item.Id,
+                    budgetId: item.BudgetId,
+                    itemCode: item.ItemCode,
+                    itemType: item.ItemType || '',
+                    itemClass: item.ItemClass || '',
+                    description: item.Description,
+                    description2: item.Description2,
+                    location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
+                    location1: item.Location1,
+                    location2: item.Location2,
+                    category: item.Category,
+                    element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
+                    elementCode: item.Element,
+                    subElement: item.SubElement,
+                    subSubElement: item.SubSubElement,
+                    uom: item.Unit,
+                    qty: Number(item.Quantity),
+                    price: Number(item.Rate),
+                    total: Number(item.Quantity) * Number(item.Rate),
+                    unit: item.Unit,
+                    remark: item.Remark,
+                    rate: Number(item.Rate) || 0,
+                    amount: (Number(item.Quantity) || 0) * (Number(item.Rate) || 0),
+                    wastage: Number(item.Wastage) || 0,
+                    status: item.Status,
+                    createdAt: formatDate(item.CreatedAt),
+                    createdBy: item.CreatedBy,
+                    updatedAt: item.UpdatedAt ? formatDate(item.UpdatedAt) : null,
+                    updatedBy: item.UpdatedBy,
+
+                    // statistics
+                    budgetQty,
+                    totalOrderedQty,
+                    totalRequestedQty,
+                    totalDeliveredQty,
+
+                    totalRemainingQty: budgetQty - totalOrderedQty,
+                    totalRemainingToDeliverQty: totalOrderedQty - totalDeliveredQty,
+
+                    // utilization
+                    utilizationRequested: budgetQty > 0 ? (totalRequestedQty / budgetQty) * 100 : 0,
+
+                    utilizationOrdered: budgetQty > 0 ? (totalOrderedQty / budgetQty) * 100 : 0,
+
+                    utilizationDelivered: budgetQty > 0 ? (totalDeliveredQty / budgetQty) * 100 : 0,
+
+                    // Add rowIndex here in the store to prevent computed mutation
+                    rowIndex: ((queryParams.page ?? 1) - 1) * (queryParams.pageSize ?? 10) + index + 1
+                };
+            });
 
             budgetItems.value = mappedItems;
             applyPagination(response.pagination);
