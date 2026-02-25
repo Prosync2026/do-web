@@ -27,6 +27,14 @@ export default defineComponent({
     },
     emits: ['success'],
     setup(props, { emit }) {
+        const sortField = computed(() => budgetStore.sortField);
+        const sortOrder = computed(() => budgetStore.sortOrder);
+
+        async function handleSort(event: any) {
+            budgetStore.setSorting(event.sortField, event.sortOrder);
+            await fetchBudgetList(props.budgetId);
+        }
+
         const budgetStore = useBudgetStore();
 
         const columns: TableColumn[] = [
@@ -151,6 +159,63 @@ export default defineComponent({
             return 'bg-red-100 text-red-800';
         }
 
+        // sorting
+        const handleSortChange = async ({ field, order }: { field: string; order: number }) => {
+            if (!field || order === 0) {
+                budgetStore.setSorting('', '');
+                await fetchBudgetList(props.budgetId);
+                return;
+            }
+
+            // map table field → API field (VERY IMPORTANT)
+            const mapFieldToApi: Record<string, string> = {
+                itemCode: 'ItemCode',
+                description: 'Description',
+                location1: 'Location1',
+                location2: 'Location2',
+                elementCode: 'Element',
+                subElement: 'SubElement',
+                subSubElement: 'SubSubElement',
+                unit: 'Unit',
+                qty: 'Quantity',
+                totalOrderedQty: 'totalOrderedQty',
+                totalRemainingQty: 'totalRemainingQty',
+                rate: 'Rate',
+                amount: 'Amount',
+                createdAt: 'CreatedAt'
+            };
+
+            const sortOrder = order === 1 ? 'asc' : 'desc';
+
+            budgetStore.setSorting(mapFieldToApi[field] || 'CreatedAt', sortOrder);
+
+            await fetchBudgetList(props.budgetId);
+        };
+
+        const currentSortField = computed(() => {
+            const reverseMap: Record<string, string> = {
+                ItemCode: 'itemCode',
+                Description: 'description',
+                Location1: 'location1',
+                Location2: 'location2',
+                Element: 'elementCode',
+                SubElement: 'subElement',
+                SubSubElement: 'subSubElement',
+                Unit: 'unit',
+                Quantity: 'qty',
+                Rate: 'rate',
+                Amount: 'amount',
+                CreatedAt: 'createdAt'
+            };
+
+            return reverseMap[budgetStore.sorting.sortBy] || '';
+        });
+
+        const currentSortOrder = computed(() => {
+            if (!budgetStore.sorting.sortBy) return 0;
+            return budgetStore.sorting.sortOrder === 'asc' ? 1 : -1;
+        });
+
         return {
             columns,
             budgetItems,
@@ -167,7 +232,13 @@ export default defineComponent({
             handleImportSuccess,
             onSearchWrapper: handleSearch,
             formatPercent,
-            getUtilizationClass
+            getUtilizationClass,
+            handleSort,
+            sortField,
+            sortOrder,
+            handleSortChange,
+            currentSortField,
+            currentSortOrder
         };
     }
 });
