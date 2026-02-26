@@ -55,7 +55,7 @@ export default defineComponent({
                 data: { name: item.itemCode, amount: item.totalAmount },
                 children: (item.descriptions || []).map((desc: any, d: number) => ({
                     key: `desc-${i}-${d}`,
-                    data: { name: desc.description },
+                    data: { name: desc.description, amount: desc.totalAmount },
                     children: (desc.items || []).map((detail: any, x: number) => ({
                         key: `detail-${i}-${d}-${x}`,
                         data: {
