@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
-import { notificationService } from '@/services/notification.service';
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import { usePermissionStore } from '@/stores/permission/permission.store';
