@@ -1,14 +1,21 @@
 <script setup lang="ts">
 import { setGlobalToast } from '@/utils/showNotification.utils';
 import { useToast } from 'primevue/usetoast';
-import { watch } from 'vue';
+import { watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useAppInitializer } from '@/bootstrap/useAppInitializer';
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 
 setGlobalToast(toast);
+
+const { init } = useAppInitializer();
+
+onMounted(async () => {
+    await init();
+});
 
 watch(
     () => route.query.unauthorized,

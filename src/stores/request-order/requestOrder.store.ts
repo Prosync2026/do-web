@@ -43,7 +43,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
     });
 
     // make the pending count globally accessible for badge
-    const pendingCount = ref(0);
+    const pendingCount = ref(Number(localStorage.getItem('ro_pending_count') || 0));
 
     type UIApprovalProgress = {
         level: 'PM' | 'PD' | 'PURCH';
@@ -63,6 +63,10 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         role?: string;
         project_role_code?: string;
     };
+
+    // polling
+    let pollingTimer: number | null = null;
+    const POLLING_INTERVAL = 30000; // 30 seconds
 
     function normalizeApprovalProgress(raw: RawApprovalProgress[]): UIApprovalProgress[] {
         if (!raw || !Array.isArray(raw)) {
@@ -321,6 +325,40 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         fetchOrders();
     }
 
+    // polling trigger to refresh pending count for badge
+    async function refreshPendingCount() {
+        try {
+            // TO DO: later change into updated api that only return pending count
+            const response = await requestOrderService.getRequestOrders({
+                status: 'Submitted',
+                page: 1,
+                pageSize: 1000
+            });
+
+            pendingCount.value = response.counts?.submitted ?? 0;
+            localStorage.setItem('ro_pending_count', String(pendingCount.value));
+        } catch (error) {
+            console.error('Failed to refresh RO count', error);
+        }
+    }
+
+    function startPolling() {
+        if (pollingTimer) return;
+
+        refreshPendingCount();
+
+        pollingTimer = window.setInterval(() => {
+            refreshPendingCount();
+        }, POLLING_INTERVAL);
+    }
+
+    function stopPolling() {
+        if (pollingTimer) {
+            clearInterval(pollingTimer);
+            pollingTimer = null;
+        }
+    }
+
     return {
         orders,
         selectedOrder,
@@ -340,6 +378,9 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         setSorting,
         sortField,
         sortOrder,
-        pendingCount
+        pendingCount,
+        startPolling,
+        stopPolling,
+        refreshPendingCount
     };
 });
