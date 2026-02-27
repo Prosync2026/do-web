@@ -217,6 +217,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 requiresPDApproval: o.RequiresPDApproval === true,
 
                 items: ((o.request_order_items ?? o.RequestOrderItems ?? []) as RequestOrderItemResponse[]).map((item) => ({
+                    id: item.Id,
                     code: item.ItemCode || '',
                     description: item.Description,
                     location: item.Location,

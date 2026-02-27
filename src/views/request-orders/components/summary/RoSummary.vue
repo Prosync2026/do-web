@@ -3,7 +3,7 @@ import { formatCurrency } from '@/utils/format.utils';
 import { AlertTriangle, CheckCircle, DollarSign } from 'lucide-vue-next';
 
 defineProps<{
-    pendingCount: number;
+    submittedCount: number;
     approvedCount: number;
     totalValue: number;
     totalApprovedValue: number;
@@ -16,16 +16,16 @@ defineProps<{
         <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-400/10 rounded-2xl shadow-sm border">
             <div>
                 <h3 class="font-semibold text-gray-800 dark:text-white">Pending Orders</h3>
-                <p class="text-2xl font-bold text-yellow-600 mt-2">{{ pendingCount }}</p>
+                <p class="text-2xl font-bold text-yellow-600 mt-2">{{ submittedCount }}</p>
                 <p class="dark:text-white text-gray-500 text-sm">Awaiting approval</p>
             </div>
             <AlertTriangle class="w-6 h-6 text-yellow-600" />
         </div>
 
-        <!-- Approved This Week -->
+        <!-- Approved Orders -->
         <div class="flex justify-between items-center p-6 bg-white dark:bg-gray-400/10 rounded-2xl shadow-sm border">
             <div>
-                <h3 class="font-semibold text-gray-800 dark:text-white">Approved This Week</h3>
+                <h3 class="font-semibold text-gray-800 dark:text-white">Approved Orders</h3>
                 <p class="text-2xl font-bold text-green-600 mt-2">{{ approvedCount }}</p>
                 <p class="dark:text-white text-gray-500 text-sm">Approved for purchase</p>
             </div>

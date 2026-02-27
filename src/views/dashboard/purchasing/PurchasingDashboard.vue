@@ -32,12 +32,12 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
                     <i class="pi pi-dollar text-blue-600"></i>
                     Pending Value
                 </h3>
-                <div class="dark:text-blue-100 text-3xl font-bold text-blue-900 mb-2">${{ pendingValue.toLocaleString() }}</div>
+                <div class="dark:text-blue-100 text-3xl font-bold text-blue-900 mb-2">RM{{ pendingValue.toLocaleString() }}</div>
                 <p class="dark:text-blue-100 text-blue-700 text-sm">Total value pending approval</p>
             </div>
 
             <!-- Status -->
-            <div class="shadow-sm border border-gray-200 rounded-lg p-6">
+            <!-- <div class="shadow-sm border border-gray-200 rounded-lg p-6">
                 <h3 class="dark:text-gray-100 text-gray-800 font-semibold mb-2 flex items-center gap-2">
                     <i class="pi pi-refresh text-gray-600"></i>
                     Status
@@ -46,7 +46,7 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
                     {{ currentStatus }}
                 </div>
                 <p class="dark:text-gray-100 text-gray-700 text-sm">Current approval status</p>
-            </div>
+            </div> -->
         </div>
 
         <!-- Urgent Action -->
@@ -54,7 +54,7 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
             <div class="flex items-center justify-between">
                 <div>
                     <h3 class="dark:text-amber-100 text-amber-800 font-semibold text-lg mb-2">Urgent: {{ pendingApprovals }} Request Orders Need Approval</h3>
-                    <p class="dark:text-amber-100 text-amber-700">Total value: ${{ urgentValue.toLocaleString() }}</p>
+                    <p class="dark:text-amber-100 text-amber-700">Total value: RM{{ urgentValue.toLocaleString() }}</p>
                 </div>
                 <Button label="Review Now" icon="pi pi-exclamation-triangle" class="bg-amber-600 hover:bg-amber-700 border-amber-600 hover:border-amber-700" @click="navigateToRequestOrders" />
             </div>
