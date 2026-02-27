@@ -84,7 +84,6 @@ export default defineComponent({
                 }
 
                 const rev = reviews.find((r) => r.ApprovalLevel === role);
-
                 if (rev) {
                     return {
                         id: rev.Id,
@@ -97,12 +96,12 @@ export default defineComponent({
                         recommendationItem:
                             rev.review_items?.map((item) => ({
                                 BudgetChangeItemId: item.BudgetChangeItemId,
-                                ItemCode: '-',
-                                OrderedQty: '',
-                                RecommendedQty: item.RecommendedQty ?? '',
-                                Uom: '',
-                                NewOrder: '',
-                                Description: ''
+                                ItemCode: item.budget_change_item?.ItemCode ?? '-',
+                                OrderedQty: item.budget_change_item?.OrderedQty ?? '',
+                                RecommendedQty: item.budget_change_item?.NewOrder ?? '',
+                                Uom: item.budget_change_item?.Uom ?? '',
+                                NewOrder: item.budget_change_item?.NewOrder ?? '',
+                                Description: item.budget_change_item?.Description ?? ''
                             })) ?? [],
                         documentUrl: []
                     } as DiscussionItem;

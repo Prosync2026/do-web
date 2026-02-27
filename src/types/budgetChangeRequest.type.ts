@@ -279,6 +279,17 @@ export interface ReviewList {
 export interface reviewItem {
     BudgetChangeItemId: number;
     RecommendedQty: string;
+    budget_change_item: BudgetChangeItemDetails;
+}
+
+export interface BudgetChangeItemDetails {
+    ApprovedQty: string;
+    BudgetItemId: number;
+    Description: string;
+    ItemCode: string;
+    NewOrder: string;
+    OrderedQty: string;
+    Uom: string;
 }
 
 export interface AttachmentItem {
