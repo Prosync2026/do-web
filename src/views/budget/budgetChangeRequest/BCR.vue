@@ -43,7 +43,7 @@
                 <template #approvalFlow="{ data }">
                     <div class="flex items-center gap-2 flex-wrap">
                         <template v-for="(step, index) in data.approvalFlow" :key="step.role">
-                            <Badge :value="step.role" :severity="step.status === 'approved' ? 'success' : step.status === 'pending' ? 'warn' : 'secondary'" />
+                            <Badge :value="step.role" :severity="step.status === 'approved' ? 'success' : step.status === 'rejected' ? 'danger' : step.status === 'pending' ? 'warn' : 'secondary'" />
 
                             <i v-if="index < data.approvalFlow.length - 1" class="pi pi-angle-right text-gray-400" />
                         </template>
