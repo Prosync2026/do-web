@@ -212,6 +212,7 @@ export default defineComponent({
 
         // expandedRows for item table
         const expandedRows = ref<{ [key: string]: boolean }>({});
+        const invalidDeliveryByCode = ref<Record<string, boolean>>({});
 
         watch(budgetType, (newType, oldType) => {
             if (budgetSwitching.value || newType === oldType) return;
@@ -424,6 +425,16 @@ export default defineComponent({
             setTimeout(() => (typing.value = false), 150);
         };
 
+        function onDeliveryDateChange(item: Item) {
+            if (item.itemCode && invalidDeliveryByCode.value[item.itemCode]) {
+                if (item.deliveryDate) {
+                    const updated = { ...invalidDeliveryByCode.value };
+                    delete updated[item.itemCode];
+                    invalidDeliveryByCode.value = updated;
+                }
+            }
+        }
+
         const setMenuRef = (el: MenuInstance | null, index: number) => {
             if (el) menuRefs.value[index] = el;
         };
@@ -507,7 +518,7 @@ export default defineComponent({
             }, 0);
         };
 
-        const handleStockItemsSelected = (selectedStockItems: StockItem[]) => {
+        const handleStockItemsSelected = (selectedStockItems: Array<StockItem & { deliveryDate?: string | Date | null }>) => {
             const duplicates: string[] = [];
             const newUniqueItems: Item[] = [];
 
@@ -517,6 +528,16 @@ export default defineComponent({
                 if (exists) {
                     duplicates.push(stockItem.itemCode);
                 } else {
+                    let deliveryDate: Date | null = null;
+                    if (stockItem.deliveryDate) {
+                        if (stockItem.deliveryDate instanceof Date) {
+                            deliveryDate = stockItem.deliveryDate;
+                        } else {
+                            const d = new Date(stockItem.deliveryDate);
+                            deliveryDate = isNaN(d.getTime()) ? null : d;
+                        }
+                    }
+
                     newUniqueItems.push({
                         itemCode: stockItem.itemCode,
                         itemType: stockItem.itemType,
@@ -526,7 +547,7 @@ export default defineComponent({
                         budgetItemId: null,
                         nonBudgetItemId: stockItem.id,
                         qty: 1,
-                        deliveryDate: globalDeliveryDate.value,
+                        deliveryDate,
                         notes: '',
                         remark: '',
                         price: 0,
@@ -728,6 +749,26 @@ export default defineComponent({
         });
 
         function openPreviewModal() {
+            // For unbudgeted items, ensure each row has a delivery date
+            if (budgetType.value === 'Unbudgeted Item') {
+                const missing = items.value.filter((it) => !it.deliveryDate);
+                invalidDeliveryByCode.value = missing.reduce<Record<string, boolean>>((acc, it) => {
+                    acc[it.itemCode] = true;
+                    return acc;
+                }, {});
+
+                if (missing.length > 0) {
+                    showValidation.value = true;
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation Error',
+                        detail: 'Please fill Delivery Date for all items before submitting.',
+                        life: 4000
+                    });
+                    return;
+                }
+            }
+
             if (!canSubmit.value) {
                 showValidation.value = true;
 
@@ -754,15 +795,6 @@ export default defineComponent({
                         severity: 'warn',
                         summary: 'Validation Error',
                         detail: 'RO Date is required.',
-                        life: 4000
-                    });
-                }
-
-                if (!globalDeliveryDate.value) {
-                    toast.add({
-                        severity: 'warn',
-                        summary: 'Validation Error',
-                        detail: 'Delivery Date is required.',
                         life: 4000
                     });
                 }
@@ -805,6 +837,12 @@ export default defineComponent({
                         const budgetItemId = item.budgetItemId;
                         const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
 
+                        // Prefer row delivery date; otherwise fall back to global delivery date if set
+                        let itemDeliveryDate = item.deliveryDate;
+                        if (!itemDeliveryDate && globalDeliveryDate.value) {
+                            itemDeliveryDate = globalDeliveryDate.value;
+                        }
+
                         return {
                             BudgetItemId: item.budgetItemId ?? null,
                             NonBudgetItemId: item.nonBudgetItemId ?? null,
@@ -823,7 +861,7 @@ export default defineComponent({
                             Rate: item.price ?? 0,
                             Notes: item.notes ?? '',
                             Reason: selectedReason.value || '',
-                            DeliveryDate: formatDateToAPI(item.deliveryDate)
+                            DeliveryDate: itemDeliveryDate ? formatDateToAPI(itemDeliveryDate) : null
                         };
                     })
                 };
@@ -1035,6 +1073,8 @@ export default defineComponent({
             expandedRows,
             updateNotes,
             handleNoteInput,
+            invalidDeliveryByCode,
+            onDeliveryDateChange,
             currentProject,
             formatDateToAPI,
 
