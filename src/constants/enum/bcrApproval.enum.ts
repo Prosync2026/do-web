@@ -25,7 +25,7 @@ export enum BcrRecommendationEnum {
     ACCEPT_CHANGE_QS = 'Approve',
     REJECT_CHANGE_QS = 'Reject',
     APPROVE_QS_CHANGE = 'Approve_QS',
-    APPROVE_SITE_CHANGE = 'Approve_SITE',
+    APPROVE_SITE_CHANGE = 'Approve_Site',
     APPROVE_ORIGINAL = 'Approve_As_Requested',
     APPROVE_PD_CHANGE = 'Approve_PD'
 }

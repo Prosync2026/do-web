@@ -36,6 +36,7 @@
                         <Message v-if="showValidation && !selectedReason" severity="error" icon="pi pi-times-circle" class="mt-3"> Reason for request is required </Message>
                     </div>
                 </div>
+
                 <div class="mt-4">
                     <label class="block text-sm text-gray-600 mb-1">Remarks</label>
                     <InputText v-model="remarks" type="text" class="w-full" />
@@ -49,7 +50,6 @@
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex gap-2">
                         <Button label="＋ Add from Budget List" class="bg-blue-500 text-white hover:bg-blue-600" @click="openMeterial" />
-
                         <Button label="＋ Add Manually Budget Item" class="bg-green-500 text-white hover:bg-green-600" @click="openSingleBudgetItem" />
                     </div>
                 </div>
@@ -89,20 +89,6 @@
                                 </template>
                             </Column>
 
-                            <!-- Location 1 -->
-                            <Column field="location1" header="Location 1" style="min-width: 10rem">
-                                <template #body="slotProps">
-                                    <InputText v-model="slotProps.data.location1" class="w-full" disabled />
-                                </template>
-                            </Column>
-
-                            <!-- Location 2 -->
-                            <Column field="location2" header="Location 2" style="min-width: 10rem">
-                                <template #body="slotProps">
-                                    <InputText v-model="slotProps.data.location2" class="w-full" disabled />
-                                </template>
-                            </Column>
-
                             <!-- Units -->
                             <Column field="uom" header="Units" style="min-width: 8rem">
                                 <template #body="slotProps">
@@ -117,23 +103,11 @@
                                 </template>
                             </Column>
 
-                            <!-- Budgeted Qty -->
-                            <Column field="budgetQty" header="Budgeted Qty" style="min-width: 10rem">
-                                <template #body="slotProps">
-                                    <InputText type="number" v-model.number="slotProps.data.statistics.budgetQty" class="w-full" />
-                                </template>
-                            </Column>
-                            <!-- Ordered Qty -->
-                            <Column field="orderedQty" header="Ordered Qty" style="min-width: 10rem">
-                                <template #body="slotProps">
-                                    <InputText type="number" v-model.number="slotProps.data.statistics.totalOrderedQty" class="w-full" />
-                                </template>
-                            </Column>
-
                             <!-- New Order -->
                             <Column field="newOrder" header="Request Qty" style="min-width: 10rem">
                                 <template #body="slotProps">
                                     <InputText type="number" v-model.number="slotProps.data.statistics.totalRequestedQty" class="w-full" />
+                                    <Message v-if="showValidation && slotProps.data.statistics.totalRequestedQty <= 0" severity="error" class="mt-1" text> Requested Qty must be greater than 0 </Message>
                                 </template>
                             </Column>
 
@@ -147,20 +121,6 @@
                                         }"
                                     >
                                         {{ calcExceedQty(slotProps.data) }}
-                                    </span>
-                                </template>
-                            </Column>
-
-                            <!-- Exceeded % -->
-                            <Column field="exceedPercent" header="Exceeded %" style="min-width: 12rem">
-                                <template #body="slotProps">
-                                    <span
-                                        :class="{
-                                            'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0,
-                                            'text-green-600': calcExceedQty(slotProps.data) < 0
-                                        }"
-                                    >
-                                        {{ calcExceedPercent(slotProps.data).toFixed(1) }}%
                                     </span>
                                 </template>
                             </Column>
@@ -179,23 +139,12 @@
                                 </template>
                             </Column>
 
-                            <!-- Remarks -->
-                            <Column field="remark" header="Remarks" style="min-width: 18rem">
-                                <template #body="slotProps">
-                                    <InputText v-model="slotProps.data.remark" class="w-full" />
-                                </template>
-                            </Column>
-
                             <!-- Actions -->
                             <Column header="Actions" style="min-width: 8rem">
                                 <template #body="slotProps">
                                     <Button icon="pi pi-trash" severity="danger" text @click="items.splice(items.indexOf(slotProps.data), 1)" />
                                 </template>
                             </Column>
-
-                            <template #paginatorend>
-                                <Button type="button" icon="pi pi-download" text @click="handleExport" />
-                            </template>
                         </DataTable>
 
                         <div class="pt-3 mt-2 text-small font-semibold flex justify-between items-center">
@@ -205,6 +154,7 @@
                     </Motion>
                 </div>
             </div>
+
             <!-- Attachments -->
             <div class="mt-4">
                 <label class="block text-sm text-gray-600 mb-2">Attachments</label>
@@ -237,12 +187,16 @@
                     </template>
                 </FileUpload>
             </div>
+
+            <!-- Buttons -->
             <div class="flex justify-end mb-6">
                 <div class="flex gap-2">
                     <Button label="Cancel" @click="goBack" outlined />
                     <Button label="Submit Request" @click="submitRequest" />
                 </div>
             </div>
+
+            <!-- Modals -->
             <MeterialModal v-model:visible="showBulkItemModal" @bcr-items-selected="handleBulkItems" :unRequiredDelivery="true" />
             <SingleBudgetModal v-model:visible="showSingleItemModal" @items-value="handleAddItems" />
         </div>

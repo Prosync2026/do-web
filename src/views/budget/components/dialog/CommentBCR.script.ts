@@ -1,6 +1,5 @@
 import type { BcrRoleConfig } from '@/constants/enum/bcrApproval.constants';
 import { BcrReasonEnum, BcrRecommendationEnum, BcrRoleEnum } from '@/constants/enum/bcrApproval.enum';
-import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRFinalDecisionPayload, BCRRecommendationPayload } from '@/types/budgetChangeRequest.type';
 import { getRoleConfig } from '@/utils/bcrApproval.utils';
@@ -137,8 +136,7 @@ export default defineComponent({
                 }));
             }
 
-            console.log('payload', payload);
-            budgetChangeRequestService.rolesReviewRecommendation(budgetChangeRequestId, payload).then(() => {
+            budgetCRStore.rolesReviewRecommendation(budgetChangeRequestId, payload).then(() => {
                 selection.value = '';
                 reasonSelection.value = '';
                 remark.value = '';

@@ -179,7 +179,7 @@ export default defineComponent({
         const handleBulkItems = (selectedMaterials: any[]) => {
             selectedMaterials.forEach((mat) => {
                 const isDuplicate = items.value.some((i) => i.id === mat.id);
-                console.log('value checking', selectedMaterials);
+
                 if (isDuplicate) {
                     toast.add({
                         severity: 'warn',
@@ -286,8 +286,9 @@ export default defineComponent({
 
             const reasonValid = !!selectedReason.value;
             const itemsValid = items.value.length > 0;
+            const requestedQtyValid = !items.value.some((i) => (i.statistics.totalRequestedQty || 0) <= 0);
 
-            if (!reasonValid || !itemsValid) {
+            if (!reasonValid || !itemsValid || !requestedQtyValid) {
                 if (!reasonValid) {
                     toast.add({
                         severity: 'warn',
@@ -304,9 +305,18 @@ export default defineComponent({
                         life: 3000
                     });
                 }
+                if (!requestedQtyValid) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation',
+                        detail: 'Requested Qty must be greater than 0',
+                        life: 3000
+                    });
+                }
                 return;
             }
 
+            // --- Payload logic stays the same ---
             const selectedProject = ref(JSON.parse(localStorage.getItem('selectedProject') || '{}'));
             const projectId = computed(() => selectedProject.value.ProjectId);
 
