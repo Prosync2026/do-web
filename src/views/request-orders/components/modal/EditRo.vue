@@ -65,7 +65,11 @@
                         </template>
                     </Column>
                 </DataTable>
-                <Button label="Add Item" icon="pi pi-plus" outlined @click="addItem" class="mb-4 mt-4" />
+                <Button :label="editForm.budgetType === 'Budgeted' ? 'Add from Budget' : 'Add from Stock'" icon="pi pi-plus" outlined @click="addItem" class="mb-4 mt-4" />
+
+                <!-- Add item modals: same as Create RO - budgeted vs unbudgeted -->
+                <CreateROModal v-model:visible="showBulkItemModal" :projectId="projectId" :version="0" @items-selected="handleBudgetItemsSelected" />
+                <CreateStockItem v-model:visible="showStockItemModal" @items-selected="handleStockItemsSelected" />
 
                 <!-- Overall Attachments -->
                 <div class="mt-4">

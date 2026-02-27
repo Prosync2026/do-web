@@ -217,6 +217,7 @@ export interface CreateRequestOrderResponse {
 }
 
 export interface EditFormItem {
+    id?: number;
     code?: string;
     budgetItemId?: number | null;
     nonBudgetItemId?: number | null;
@@ -231,6 +232,7 @@ export interface EditFormItem {
 }
 
 export interface EditForm {
+    id: number;
     roNumber: string;
     requestedBy: string;
     roDate: Date | null;
