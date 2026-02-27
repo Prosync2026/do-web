@@ -1,5 +1,5 @@
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
-import type { BCRRecommendationPayload, BudgetChangeRequestPayload, RecommendationList, State } from '@/types/budgetChangeRequest.type';
+import type { BCRFinalDecisionPayload, BCRRecommendationPayload, BudgetChangeRequestPayload, RecommendationList, State } from '@/types/budgetChangeRequest.type';
 import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 
@@ -235,6 +235,22 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
 
                 if (!response.success) {
                     showError(response.message || 'Failed to create Recommendation.');
+                    return null;
+                }
+
+                showSuccess(response.message);
+                return response.data ?? null;
+            } finally {
+                this.loading = false;
+            }
+        },
+        async rolesReviewRecommendation(budgetChangeRequestId: number, payload: BCRFinalDecisionPayload) {
+            this.loading = true;
+            try {
+                const response = await budgetChangeRequestService.rolesReviewRecommendation(budgetChangeRequestId, payload);
+
+                if (!response.success) {
+                    showError(response.message || 'Failed to review Recommendation.');
                     return null;
                 }
 

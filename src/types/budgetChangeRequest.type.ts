@@ -7,12 +7,13 @@ export interface BCRTableItem {
     remark?: string;
     location1?: string;
     location2?: string;
-    budgetId?: number;
+    budgetId?: number | undefined;
     category: string;
     element: string;
     subElement: string;
     subsubElement: string;
-    wastage: string;
+    wastage: string | number;
+    itemType: string;
     statistics: {
         budgetQty: number;
         totalOrderedQty: number;
@@ -46,6 +47,30 @@ export interface BudgetChangeItem {
     UpdatedBy: string | null;
     location: string;
     element: string;
+    budgetQty?: string;
+    budgetItemStatistics?: BudgetItemStatistics;
+}
+
+export interface BudgetItemStatistics {
+    budgetAmount: number;
+    budgetId: number;
+    budgetItemId: number;
+    budgetQty: string;
+    description: string;
+    itemCode: string;
+    totalBalance: string;
+    totalDelivered: string;
+    totalDeliveredQty: string;
+    totalOrdered: string;
+    totalOrderedQty: string;
+    totalRequested: string;
+    totalRequestedQty: string;
+    unit: string;
+    utilization: {
+        requestedPercent: string;
+        orderedPercent: string;
+        deliveredPercent: string;
+    };
 }
 
 export interface BudgetChangeRequest {
