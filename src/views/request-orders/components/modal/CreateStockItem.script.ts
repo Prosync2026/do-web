@@ -3,12 +3,13 @@ import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, ref, toRaw, watch } from 'vue';
 
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import { useStockItemStore } from '@/stores/budget/stockItem.store';
 import type { StockItem } from '@/types/stockItem.type';
 import type { TableColumn } from '@/types/table.type';
+import { useToast } from 'primevue/usetoast';
 
 export default defineComponent({
     name: 'CreateROStockItemModal',
@@ -26,6 +27,7 @@ export default defineComponent({
     emits: ['update:visible', 'items-selected'],
     setup(props, { emit }) {
         const stockStore = useStockItemStore();
+        const toast = useToast();
 
         const searchTerm = ref('');
         const selectedCategory = ref<string | null>(null);
@@ -33,6 +35,8 @@ export default defineComponent({
         const selectedItemType = ref<string | null>(null);
 
         const selectedItems = ref<StockItem[]>([]);
+        const deliveryDate = ref<Date | null>(null);
+        const showValidation = ref(false);
         const loading = computed(() => stockStore.loading);
         const pagination = computed(() => stockStore.pagination);
 
@@ -69,10 +73,50 @@ export default defineComponent({
         const closeModal = () => {
             emit('update:visible', false);
             selectedItems.value = [];
+            deliveryDate.value = null;
+            showValidation.value = false;
         };
 
         const addSelectedItems = () => {
-            emit('items-selected', [...selectedItems.value]);
+            showValidation.value = true;
+
+            if (selectedItems.value.length === 0) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'No Items Selected',
+                    detail: 'Please select at least one item.',
+                    life: 3000
+                });
+                return;
+            }
+
+            if (!deliveryDate.value) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Delivery Date Required',
+                    detail: 'Please select a delivery date before adding items.',
+                    life: 3000
+                });
+                return;
+            }
+
+            const rawItems = toRaw(selectedItems.value);
+            const rawDate = toRaw(deliveryDate.value);
+            const items = JSON.parse(JSON.stringify(rawItems));
+
+            const dateStr =
+                rawDate instanceof Date
+                    ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}`
+                    : rawDate
+                    ? String(rawDate)
+                    : '';
+
+            const itemsWithDeliveryDate = items.map((item: any) => ({
+                ...item,
+                deliveryDate: dateStr
+            }));
+
+            emit('items-selected', itemsWithDeliveryDate);
             closeModal();
         };
 
@@ -96,6 +140,8 @@ export default defineComponent({
             loading,
             columns,
             closeModal,
+            deliveryDate,
+            showValidation,
             addSelectedItems,
             handlePageChange: (p: number) => {
                 pagination.value.page = p;

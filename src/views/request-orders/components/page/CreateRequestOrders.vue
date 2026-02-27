@@ -116,7 +116,14 @@
 
                 <Column field="deliveryDate" header="Delivery Date" style="min-width: 150px; width: 150px">
                     <template #body="{ data }">
-                        <DatePicker v-model="data.deliveryDate" placeholder="mm/dd/yyyy" dateFormat="mm/dd/yy" class="w-full" />
+                        <DatePicker
+                            v-model="data.deliveryDate"
+                            placeholder="mm/dd/yyyy"
+                            dateFormat="mm/dd/yy"
+                            class="w-full"
+                            :class="{ 'p-invalid border-red-500': invalidDeliveryByCode[data.itemCode] }"
+                            @update:modelValue="onDeliveryDateChange(data)"
+                        />
                     </template>
                 </Column>
 
