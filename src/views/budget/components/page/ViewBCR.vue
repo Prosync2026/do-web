@@ -58,6 +58,12 @@
                                         </template>
                                     </Column>
 
+                                    <Column field="BudgetQty" header="Budget Qty">
+                                        <template #body="{ data }">
+                                            {{ data.budgetItemStatistics?.budgetQty }}
+                                        </template>
+                                    </Column>
+
                                     <Column field="OrderedQty" header="Ordered Qty">
                                         <template #body="{ data }">
                                             {{ formatNumber(data.OrderedQty) }}

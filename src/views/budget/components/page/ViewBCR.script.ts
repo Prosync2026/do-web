@@ -56,7 +56,7 @@ export default defineComponent({
                 const orderedQty = Number(item.OrderedQty || 0);
                 const newOrder = Number(item.NewOrder || 0);
                 const unitPrice = Number(item.UnitPrice || 0);
-
+                const budgetQty = item?.budgetItemStatistics?.budgetQty;
                 const exceededQty = newOrder - orderedQty;
                 const exceededPercent = orderedQty ? (exceededQty / orderedQty) * 100 : 0;
                 const estimatedExceed = exceededQty * unitPrice;
