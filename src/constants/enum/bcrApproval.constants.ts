@@ -52,7 +52,7 @@ export const BCR_ROLE_CONFIG: Record<BcrRoleEnum, BcrRoleConfig> = {
         recommendations: [
             { value: BcrRecommendationEnum.APPROVE_QS_CHANGE, label: 'Please change Budget Qty according to QS recommendation' },
             { value: BcrRecommendationEnum.APPROVE_SITE_CHANGE, label: 'Please change Budget Qty according to Site recommendation' },
-            { value: BcrRecommendationEnum.ACCEPT_CHANGE_QS, label: 'Please change Budget Qty according to Project Director recommendation' },
+            { value: BcrRecommendationEnum.APPROVE_PD_CHANGE, label: 'Please change Budget Qty according to Project Director recommendation' },
             { value: BcrRecommendationEnum.Specific_Quantity, label: 'Please change Budget Qty to' }
         ]
     }
