@@ -249,7 +249,9 @@ const getRequestOrderById = async (id: string): Promise<ApiResponse<CreateReques
  * Attachment helper
  */
 const getAttachmentUrl = (file: AttachmentItem): string => {
-    return `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/${file.path.replace(/\\/g, '/')}`;
+    const base = String(import.meta.env.VITE_BACKEND_URL || '').replace(/\/+$/, '');
+    const path = file.path.replace(/\\/g, '/').replace(/^\/+/, '');
+    return `${base}/${path}`;
 };
 
 const previewAttachment = (file: AttachmentItem | unknown) => {

@@ -12,8 +12,8 @@ import type {
     SingleBudgetChangeRequestResponse
 } from '@/types/budgetChangeRequest.type';
 import { showError } from '@/utils/showNotification.utils';
-import { isRef, unref } from 'vue';
 import type { AxiosError } from 'axios';
+import { isRef, unref } from 'vue';
 
 export interface GetBudgetParams {
     status?: string;
@@ -229,7 +229,9 @@ const getAttachmentsByBCRId = async (bcrId: number | string): Promise<Attachment
 };
 
 const getAttachmentUrl = (file: AttachmentItem): string => {
-    return `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/${file.path.replace(/\\/g, '/')}`;
+    const base = String(import.meta.env.VITE_BACKEND_URL || '').replace(/\/+$/, '');
+    const path = file.path.replace(/\\/g, '/').replace(/^\/+/, '');
+    return `${base}/${path}`;
 };
 
 const previewAttachment = (file: AttachmentItem | unknown) => {
