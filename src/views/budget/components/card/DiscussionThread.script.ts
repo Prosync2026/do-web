@@ -217,6 +217,12 @@ export default defineComponent({
             window.open(url, '_blank');
         };
 
+        function previewAttachment(file: File | AttachmentItem) {
+            if (!(file instanceof File)) {
+                budgetChangeRequestService.previewAttachment(file);
+            }
+        }
+
         const canEditItem = (item: DiscussionItem) => {
             if (!props.editMode) return false;
             if (!item || !item.id) return false;
@@ -243,7 +249,8 @@ export default defineComponent({
             togglePanel,
             openEditModal,
             openFile,
-            init
+            init,
+            previewAttachment
         };
     }
 });

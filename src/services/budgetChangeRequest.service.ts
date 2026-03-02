@@ -1,5 +1,6 @@
 import axiosInstance from '@/services/backendAxiosInstance';
 import type {
+    AttachmentItem,
     BCRFinalDecisionPayload,
     BCRRecommendationPayload,
     BudgetChangeRequestPayload,
@@ -11,6 +12,8 @@ import type {
     SingleBudgetChangeRequestResponse
 } from '@/types/budgetChangeRequest.type';
 import { showError } from '@/utils/showNotification.utils';
+import { isRef, unref } from 'vue';
+import type { AxiosError } from 'axios';
 
 export interface GetBudgetParams {
     status?: string;
@@ -211,6 +214,31 @@ const fetchReviewList = async (budgetChangeRequestId: number) => {
     }
 };
 
+/**
+ * Attachment helper
+ */
+const getAttachmentsByBCRId = async (bcrId: number | string): Promise<AttachmentItem[]> => {
+    try {
+        const response = await axiosInstance.get(`/budgetChange/${bcrId}/attachments`);
+        return response.data.data || [];
+    } catch (error: unknown) {
+        const message = (error as AxiosError<{ message: string }>)?.response?.data?.message || `Failed to fetch attachments for BCR ${bcrId}`;
+        showError(error, message);
+        return [];
+    }
+};
+
+const getAttachmentUrl = (file: AttachmentItem): string => {
+    return `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/${file.path.replace(/\\/g, '/')}`;
+};
+
+const previewAttachment = (file: AttachmentItem | unknown) => {
+    const rawFile = isRef(file) ? unref(file) : file;
+    if (!(rawFile as AttachmentItem)?.path) return;
+    const url = getAttachmentUrl(rawFile as AttachmentItem);
+    window.open(url, '_blank');
+};
+
 export const budgetChangeRequestService = {
     getBudgetChangeRequests,
     createBudgetChangeRequest,
@@ -223,5 +251,8 @@ export const budgetChangeRequestService = {
     createBCRRecommendation,
     editBCRRecommendation,
     rolesReviewRecommendation,
-    fetchReviewList
+    fetchReviewList,
+    getAttachmentUrl,
+    previewAttachment,
+    getAttachmentsByBCRId
 };

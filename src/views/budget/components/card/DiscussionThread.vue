@@ -74,7 +74,7 @@
                                 </p>
 
                                 <div v-if="item.documentUrl?.length" class="flex flex-wrap gap-2 mt-3">
-                                    <Badge v-for="(file, idx) in item.documentUrl" :key="idx" :value="file.filename || `File ${idx + 1}`" severity="primary" class="cursor-pointer" @click="openFile(file.path)" />
+                                    <Badge v-for="(file, idx) in item.documentUrl" :key="idx" :value="file.filename || `File ${idx + 1}`" severity="primary" class="cursor-pointer" @click="previewAttachment(file)" v-tooltip="'Preview Attachment'" />
                                 </div>
                             </div>
 
