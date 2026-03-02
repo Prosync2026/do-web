@@ -1,3 +1,11 @@
+// Attachment interface
+export interface AttachmentItem {
+    filename: string;
+    path: string;
+    size?: number;
+    type?: string;
+}
+
 export interface BCRTableItem {
     id: number;
     itemCode: string;
