@@ -10,14 +10,12 @@ import Badge from 'primevue/badge';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { buildApprovalFlow } from '@/utils/bcrApprovalFlow.util';
-import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
     components: { ReusableTable, Badge },
     setup() {
         const { hasPermission } = usePermission();
-        const approvalFlowMap = ref<Record<number, any[]>>({});
 
         const canCreateBCR = hasPermission(PermissionCodes.CREATE_BCR);
         const canEditBCR = hasPermission(PermissionCodes.EDIT_BCR);
@@ -54,11 +52,8 @@ export default defineComponent({
         const bcrSummaryCol = computed(() => (canViewPricing.value ? 4 : 3));
 
         const budgetCRStore = useBudgetChangeRequestStore();
-        onMounted(async () => {
-            await budgetCRStore.fetchBudgetChangesRequestList();
-            for (const item of budgetCRStore.budgetChangeRequestList) {
-                loadApprovalFlowForBCR(item.Id);
-            }
+        onMounted(() => {
+            budgetCRStore.fetchBudgetChangesRequestList();
         });
 
         const budgetChangeRequestData = computed(() => {
@@ -73,7 +68,7 @@ export default defineComponent({
 
                 return {
                     ...item,
-                    approvalFlow: approvalFlowMap.value[item.Id] || [],
+                    approvalFlow: buildApprovalFlow(item.budget_change_recommendations || [], item.budget_change_reviews || []),
                     rowIndex: startIndex + index + 1,
                     actions
                 };
@@ -141,35 +136,6 @@ export default defineComponent({
             columns.push({ field: 'actions', header: 'Actions', action: true });
             return columns;
         });
-
-        // TO DO: BE need to provide the approval flow inside the get all BCR API as right now call separate API
-        // approval
-        async function loadApprovalFlowForBCR(bcrId: number) {
-            try {
-                const recommendations = await budgetCRStore.fetchRecommendationList(bcrId);
-
-                const reviewRes = await budgetChangeRequestService.fetchReviewList(bcrId);
-
-                const reviews = Array.isArray(reviewRes) ? reviewRes : reviewRes?.data || [];
-
-                approvalFlowMap.value[bcrId] = buildApprovalFlow(recommendations || [], reviews);
-            } catch (err) {
-                console.error('Approval flow load failed', err);
-                approvalFlowMap.value[bcrId] = [];
-            }
-        }
-
-        watch(
-            () => budgetCRStore.budgetChangeRequestList,
-            (list) => {
-                list.forEach((item) => {
-                    if (!approvalFlowMap.value[item.Id]) {
-                        loadApprovalFlowForBCR(item.Id);
-                    }
-                });
-            },
-            { immediate: true }
-        );
 
         function getStatusSeverity(Status: string) {
             switch (Status) {
