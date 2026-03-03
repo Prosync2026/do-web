@@ -101,14 +101,12 @@
                 <!-- Delivery Date -->
                 <div class="flex flex-col gap-1" v-if="!unRequiredDelivery">
                     <div class="flex items-center gap-3">
-                        <label class="text-sm font-semibold w-32"> Delivery Date <span class="text-red-500">*</span> </label>
+                        <label class="text-sm font-semibold w-32"> Delivery Date </label>
 
                         <Calendar v-model="deliveryDate" dateFormat="dd/mm/yy" showIcon placeholder="Select delivery date" class="w-60" />
 
                         <span class="text-xs text-gray-500"> (Applied to selected items) </span>
                     </div>
-
-                    <Message v-if="showValidation && !deliveryDate" severity="error" icon="pi pi-times-circle"> Delivery date is required </Message>
                 </div>
 
                 <!-- Actions -->

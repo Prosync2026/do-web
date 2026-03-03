@@ -208,17 +208,6 @@ export default defineComponent({
                 return;
             }
 
-            // Validate delivery date
-            if (!deliveryDate.value && !props.unRequiredDelivery) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Delivery Date Required',
-                    detail: 'Please select a delivery date before adding items.',
-                    life: 3000
-                });
-                return;
-            }
-
             // Capture values and strip reactivity immediately
             const rawItems = toRaw(selectedItems.value);
             const rawDate = toRaw(deliveryDate.value);

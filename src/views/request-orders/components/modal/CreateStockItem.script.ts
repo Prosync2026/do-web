@@ -26,6 +26,15 @@ export default defineComponent({
     },
     emits: ['update:visible', 'items-selected'],
     setup(props, { emit }) {
+        const localVisible = ref(props.visible);
+        watch(
+            () => props.visible,
+            (val) => {
+                if (localVisible.value !== val) {
+                    localVisible.value = val;
+                }
+            }
+        );
         const stockStore = useStockItemStore();
         const toast = useToast();
 
@@ -104,12 +113,7 @@ export default defineComponent({
             const rawDate = toRaw(deliveryDate.value);
             const items = JSON.parse(JSON.stringify(rawItems));
 
-            const dateStr =
-                rawDate instanceof Date
-                    ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}`
-                    : rawDate
-                    ? String(rawDate)
-                    : '';
+            const dateStr = rawDate instanceof Date ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}` : rawDate ? String(rawDate) : '';
 
             const itemsWithDeliveryDate = items.map((item: any) => ({
                 ...item,
@@ -143,6 +147,7 @@ export default defineComponent({
             deliveryDate,
             showValidation,
             addSelectedItems,
+            localVisible,
             handlePageChange: (p: number) => {
                 pagination.value.page = p;
                 fetchItems();

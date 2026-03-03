@@ -1,7 +1,7 @@
 <script lang="ts" src="./CreateStockItem.script.ts"></script>
 
 <template>
-    <Dialog v-model:visible="visible" modal header="Add Items from Stock" style="width: 90vw; max-width: 1200px" @hide="closeModal">
+    <Dialog v-model:visible="localVisible" modal header="Add Items from Stock" style="width: 90vw; max-width: 1200px" @hide="closeModal">
         <!-- Search -->
         <div class="flex gap-3 mb-4">
             <InputText v-model="searchTerm" placeholder="Search item code or name" class="w-full" />
@@ -41,9 +41,7 @@
                         <Calendar v-model="deliveryDate" dateFormat="dd/mm/yy" showIcon placeholder="Select delivery date" class="w-60" />
                         <span class="text-xs text-gray-500"> (Applied to selected items) </span>
                     </div>
-                    <Message v-if="showValidation && !deliveryDate" severity="error" icon="pi pi-times-circle">
-                        Delivery date is required
-                    </Message>
+                    <Message v-if="showValidation && !deliveryDate" severity="error" icon="pi pi-times-circle"> Delivery date is required </Message>
                 </div>
 
                 <!-- Actions -->
