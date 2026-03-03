@@ -186,7 +186,6 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         loading.value = true;
         try {
             const response = await requestOrderService.getRequestOrderById(id);
-            console.log('Raw order details response:', response);
             if (!response) return null;
 
             const o = response.data as unknown as RequestOrderResponse;
