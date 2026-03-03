@@ -120,7 +120,6 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
 
             orders.value = response.data.map((output): Order => {
                 const apiOutput = output as unknown as RequestOrderResponse;
-                pendingCount.value = response.counts?.submitted ?? 0;
 
                 return {
                     id: apiOutput.Id,
@@ -335,8 +334,8 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 return;
             }
 
-            pendingCount.value = response.counts ?? 0;
-            totalSubmitted.value = response.totalSubmittedValue ?? 0;
+            pendingCount.value = response.count ?? 0;
+            // totalSubmitted.value = response.totalSubmittedValue ?? 0; // keep for future use if needed
             localStorage.setItem('ro_pending_count', String(pendingCount.value));
         } catch (error) {
             console.error('Failed to refresh RO count', error);
