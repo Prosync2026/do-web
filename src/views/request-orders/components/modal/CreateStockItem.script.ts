@@ -99,15 +99,15 @@ export default defineComponent({
                 return;
             }
 
-            if (!deliveryDate.value) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Delivery Date Required',
-                    detail: 'Please select a delivery date before adding items.',
-                    life: 3000
-                });
-                return;
-            }
+            // if (!deliveryDate.value) {
+            //     toast.add({
+            //         severity: 'warn',
+            //         summary: 'Delivery Date Required',
+            //         detail: 'Please select a delivery date before adding items.',
+            //         life: 3000
+            //     });
+            //     return;
+            // }
 
             const rawItems = toRaw(selectedItems.value);
             const rawDate = toRaw(deliveryDate.value);

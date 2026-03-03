@@ -756,17 +756,6 @@ export default defineComponent({
                     acc[it.itemCode] = true;
                     return acc;
                 }, {});
-
-                if (missing.length > 0) {
-                    showValidation.value = true;
-                    toast.add({
-                        severity: 'warn',
-                        summary: 'Validation Error',
-                        detail: 'Please fill Delivery Date for all items before submitting.',
-                        life: 4000
-                    });
-                    return;
-                }
             }
 
             if (!canSubmit.value) {
@@ -861,11 +850,12 @@ export default defineComponent({
                             Rate: item.price ?? 0,
                             Notes: item.notes ?? '',
                             Reason: selectedReason.value || '',
-                            DeliveryDate: itemDeliveryDate ? formatDateToAPI(itemDeliveryDate) : null
+                            DeliveryDate: itemDeliveryDate ? formatDateToAPI(itemDeliveryDate) : null,
+                            SubconId: selectedSubcon.value && selectedSubcon.value.id ? Number(selectedSubcon.value.id) : null
                         };
                     })
                 };
-                // console.log('Submitting RO with payload:', payload);
+
                 const isDraft = !!route.query.draftId;
                 const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
 
