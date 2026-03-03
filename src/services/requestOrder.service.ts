@@ -294,6 +294,35 @@ const getAttachmentsByROId = async (requestOrderId: number | string): Promise<At
 };
 
 /**
+ * Get submitted RO total count & value
+ */
+const getSubmittedTotal = async (): Promise<{
+    success: boolean;
+    count: number;
+    totalSubmittedValue: number;
+}> => {
+    try {
+        const response = await axiosInstance.get('/requestOrder/submitted-total');
+
+        return {
+            success: response.data.success,
+            count: response.data.data?.count ?? 0,
+            totalSubmittedValue: response.data.data?.totalSubmittedValue ?? 0
+        };
+    } catch (error: unknown) {
+        const message = (error as AxiosError<{ message: string }>)?.response?.data?.message || 'Failed to fetch submitted total';
+
+        showError(error, message);
+
+        return {
+            success: false,
+            count: 0,
+            totalSubmittedValue: 0
+        };
+    }
+};
+
+/**
  * Export service
  */
 export const requestOrderService = {
@@ -310,5 +339,6 @@ export const requestOrderService = {
     previewAttachment,
     getAttachmentsByROId,
     getROApprovalStatus,
-    updateRequestOrderDraft
+    updateRequestOrderDraft,
+    getSubmittedTotal
 };

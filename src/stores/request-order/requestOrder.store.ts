@@ -329,14 +329,14 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
     // polling trigger to refresh pending count for badge
     async function refreshPendingCount() {
         try {
-            // TO DO: later change into updated api that only return pending count
-            const response = await requestOrderService.getRequestOrders({
-                status: 'Submitted',
-                page: 1,
-                pageSize: 1000
-            });
+            const response = await requestOrderService.getSubmittedTotal();
 
-            pendingCount.value = response.counts?.submitted ?? 0;
+            if (!response.success) {
+                return;
+            }
+
+            pendingCount.value = response.counts ?? 0;
+            totalSubmitted.value = response.totalSubmittedValue ?? 0;
             localStorage.setItem('ro_pending_count', String(pendingCount.value));
         } catch (error) {
             console.error('Failed to refresh RO count', error);
