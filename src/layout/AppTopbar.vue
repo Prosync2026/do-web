@@ -227,6 +227,12 @@ onMounted(async () => {
         saveLatestBudgetVersion(Number(latest.id), Number(latest.versionCode));
     }
 });
+
+// notification navigation
+const goToAllNotifications = () => {
+    notificationPanel.value?.hide();
+    router.push({ name: 'notifications' });
+};
 </script>
 
 <template>
@@ -256,14 +262,14 @@ onMounted(async () => {
                     </div>
 
                     <OverlayPanel ref="notificationPanel" class="w-96">
-                        <div class="flex justify-between items-center mb-2">
+                        <div class="flex justify-between items-center mb-2 sticky top-0 bg-white dark:bg-gray-800 z-10 pb-2">
                             <span class="font-semibold">Notifications</span>
                             <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" />
                         </div>
 
                         <div v-if="notificationStore.notifications.length === 0" class="text-sm text-gray-400 py-4 text-center">No notifications</div>
 
-                        <div v-else class="space-y-2">
+                        <div v-else class="space-y-2 max-h-80 overflow-y-auto pr-1">
                             <div v-for="item in notificationStore.notifications" :key="item.id" :class="['p-2 rounded-lg cursor-pointer transition', item.isRead ? '' : 'bg-gray-100 dark:bg-gray-900/20']" @click="goToPageDetails(item)">
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm font-medium">{{ item.title }}</span>
@@ -274,6 +280,11 @@ onMounted(async () => {
                                     {{ item.message }}
                                 </p>
                             </div>
+                        </div>
+
+                        <!-- View All Section -->
+                        <div class="mt-3 pt-3 border-t text-center">
+                            <Button label="View All Notifications" text class="w-full" @click="goToAllNotifications" />
                         </div>
                     </OverlayPanel>
 

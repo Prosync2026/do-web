@@ -148,6 +148,14 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     breadcrumb: [{ label: 'Project List', route: '/projectList' }, { label: 'Project Detail' }]
                 }
+            },
+            {
+                path: '/notifications',
+                name: 'notifications',
+                component: () => import('@/views/notifications/Notifications.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Notifications' }]
+                }
             }
         ]
     },
