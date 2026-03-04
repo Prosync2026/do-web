@@ -40,7 +40,7 @@ export default function useImportBudgetDialogLogic(
                     '2ND SUB ELEMENT', // 2nd_sub_element
                     'LOC 1', // location1
                     'LOC 2', // location2
-                    'UNIT', // uom
+                    'UOM', // uom
                     'BUDGET QTY', // budget_qty
                     'RATE', // rate
                     'AMOUNT', // amount

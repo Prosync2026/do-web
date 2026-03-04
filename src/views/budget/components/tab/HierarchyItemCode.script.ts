@@ -28,6 +28,7 @@ export default defineComponent({
             { field: 'name', header: 'Item Code / Description', expander: true, style: 'width: 40%', boldIfChildren: true },
             { field: 'location1', header: 'Location 1', style: 'width: 15%' },
             { field: 'location2', header: 'Location 2', style: 'width: 15%' },
+            { field: 'category', header: 'Category', style: 'width: 15%' },
             { field: 'element', header: 'Element', style: 'width: 15%' },
             { field: 'subElement', header: '1st Sub Element', style: 'width: 15%' },
             { field: 'subSubElement', header: '2nd Sub Element', style: 'width: 15%' },
@@ -61,6 +62,7 @@ export default defineComponent({
                         data: {
                             location1: detail.location1,
                             location2: detail.location2,
+                            category: detail.category,
                             element: detail.element,
                             subElement: detail.subElement,
                             subSubElement: detail.subSubElement,
