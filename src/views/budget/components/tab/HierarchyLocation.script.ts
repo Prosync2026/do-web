@@ -49,10 +49,10 @@ export default defineComponent({
         function buildTree(apiData: any[]): any[] {
             return (apiData || []).map((loc1: any, i: number) => ({
                 key: `loc1-${i}`,
-                data: { name: loc1.location1, amount: loc1.totalAmount },
+                data: { name: loc1.location1, quantity: loc1.totalQuantity, amount: loc1.totalAmount },
                 children: (loc1.location2s || []).map((loc2: any, j: number) => ({
                     key: `loc2-${i}-${j}`,
-                    data: { name: loc2.location2, amount: loc2.totalAmount },
+                    data: { name: loc2.location2, quantity: loc2.totalQuantity, amount: loc2.totalAmount },
                     children: (loc2.items || []).map((item: any, k: number) => ({
                         key: `item-${i}-${j}-${k}`,
                         data: {
