@@ -41,6 +41,8 @@ export interface PurchaseOrder {
     PurchaseOrderItems: PurchaseOrderItem[];
     purchaseorderitems?: PurchaseOrderItem[];
     purchase_order_items?: PurchaseOrderItem[];
+    ProjectId?: number;
+    projectName?: string;
 
     // Frontend-friendly aliases
     id?: number;
@@ -89,6 +91,7 @@ export interface GetPurchaseOrderParams {
     pageSize?: number;
     search?: string;
     status?: string;
+    projectId?: string | number;
 }
 
 export interface PurchaseOrderWithStatus extends PurchaseOrder {

@@ -466,8 +466,6 @@ export default defineComponent({
                             return;
                         }
 
-                        console.log('Approving order:', order.id, 'by user role:', userRole);
-
                         await requestOrderService.processROApproval(order.id, 'Approved', userRole);
 
                         toast.add({

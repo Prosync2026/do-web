@@ -4,6 +4,7 @@ import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
 
+import { useProjectStore } from '@/stores/project/project.store';
 export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
     const purchaseOrders = ref<PurchaseOrder[]>([]);
     const selectedPurchaseOrder = ref<PurchaseOrderView | null>(null);
@@ -13,7 +14,8 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         status: '',
         search: '',
         startDate: '',
-        endDate: ''
+        endDate: '',
+        projectId: ''
     });
 
     const pagination = reactive({
@@ -46,14 +48,22 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         }
     };
 
+    const projectStore = useProjectStore();
+
+    function getProjectName(projectId: number): string {
+        const project = projectStore.projects.find((p) => p.id === projectId);
+        return project?.name || `Project ${projectId}`;
+    }
+
     async function fetchPurchaseOrders() {
         loading.value = true;
         try {
-            const params = {
+            const params: Record<string, any> = {
                 status: filters.status || undefined,
                 search: filters.search || undefined,
                 startDate: filters.startDate || undefined,
                 endDate: filters.endDate || undefined,
+                projectId: filters.projectId || undefined,
                 page: pagination.page,
                 pageSize: pagination.pageSize,
                 sortBy: sorting.sortBy,
@@ -73,6 +83,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 return {
                     ...output,
                     poNumber: output.DocNo,
+                    projectName: getProjectName(output.ProjectId),
                     totalAmount: output.TotalAmount || 0,
                     supplierName: output.SupplierId?.toString() || '',
                     status: output.Status,
@@ -168,6 +179,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 // Frontend-friendly aliases
                 poNumber: o.DocNo,
                 poDate: formatDate(o.PoDate),
+                projectName: o.ProjectId ? getProjectName(o.ProjectId) : '',
                 items: mappedItems
             };
 
@@ -207,6 +219,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         filters.search = '';
         filters.startDate = '';
         filters.endDate = '';
+        filters.projectId = '';
 
         sorting.sortBy = 'CreatedAt';
         sorting.sortOrder = 'desc';

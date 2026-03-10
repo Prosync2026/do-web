@@ -4,6 +4,7 @@ import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
 
+import { useProjectStore } from '@/stores/project/project.store';
 export const useDeliveryStore = defineStore('deliveryStore', () => {
     // ------------------------------
     // STATE
@@ -16,7 +17,8 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
     const filters = reactive({
         search: '',
         startDate: '',
-        endDate: ''
+        endDate: '',
+        projectId: ''
     });
 
     const pagination = reactive({
@@ -37,16 +39,24 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
     // ------------------------------
     // ACTIONS
     // ------------------------------
+    const projectStore = useProjectStore();
+
+    function getProjectName(projectId: number): string {
+        const project = projectStore.projects.find((p) => p.id === projectId);
+        return project?.name || `Project ${projectId}`;
+    }
+
     async function fetchDeliveryOrders() {
         loading.value = true;
         try {
-            const params = {
+            const params: Record<string, any> = {
                 page: pagination.page,
                 pageSize: pagination.pageSize,
                 search: filters.search || search.value || undefined,
                 status: status.value || undefined,
                 startDate: filters.startDate || undefined,
                 endDate: filters.endDate || undefined,
+                projectId: filters.projectId || undefined,
                 sortBy: sorting.sortBy || undefined,
                 sortOrder: sorting.sortOrder || undefined
             };
@@ -58,7 +68,10 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
                 return;
             }
 
-            list.value = response.data || [];
+            list.value = (response.data || []).map((item: any) => ({
+                ...item,
+                ProjectName: getProjectName(item.ProjectId)
+            }));
 
             if (response.pagination) {
                 pagination.total = response.pagination.total;
@@ -120,7 +133,10 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
                 return;
             }
 
-            singleDelivery.value = response.data;
+            singleDelivery.value = {
+                ...response.data,
+                ProjectName: getProjectName(response.data.ProjectId)
+            } as any;
         } catch (error) {
             showError(error, 'Failed to fetch delivery order.');
             singleDelivery.value = null;
