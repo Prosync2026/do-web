@@ -71,6 +71,7 @@ export interface OrderItem {
     remark?: string;
     reason?: string;
     rate?: number;
+    projectName?: string;
 
     // budget deviation
     originalBudgetQty?: number;
@@ -118,6 +119,7 @@ export interface Order {
     currency?: string;
     attachments?: AttachmentItem[];
     isUrgent?: boolean;
+    projectName?: string;
     // approval
     currentApprovalStage?: 'PM' | 'PD' | 'PURC' | 'PURCH';
     approvalFlowType?: 'HIGH_VALUE' | 'NORMAL';
@@ -392,6 +394,7 @@ export interface RequestOrdersFilters {
     search?: string;
     startDate?: string;
     endDate?: string;
+    projectId?: string | number;
 }
 
 // action type

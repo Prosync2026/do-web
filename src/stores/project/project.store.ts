@@ -43,8 +43,20 @@ export const useProjectStore = defineStore('project', () => {
 
             const authStore = useAuthStore();
             const userProjectId = authStore.user?.project_id;
+            const accessLevel = authStore.user?.user_project_role_code;
 
-            projects.value = userProjectId ? res.data.filter((p: any) => p.id === userProjectId) : [];
+            // PURC can see ALL projects
+            if (accessLevel === 'PURC') {
+                projects.value = res.data;
+            }
+            // user only sees their project
+            else if (userProjectId) {
+                projects.value = res.data.filter((p: any) => p.id === userProjectId);
+            }
+            // fallback
+            else {
+                projects.value = res.data;
+            }
         } catch (error: any) {
             showError(error.message || 'Failed to load project list');
         } finally {
@@ -52,10 +64,19 @@ export const useProjectStore = defineStore('project', () => {
         }
     }
 
+    // project code helper
+    const projectOptions = computed(() =>
+        projects.value.map((p) => ({
+            label: `${p.code}`,
+            value: p.id
+        }))
+    );
+
     return {
         projects,
         groupedProjects,
         loading,
-        fetchProjects
+        fetchProjects,
+        projectOptions
     };
 });

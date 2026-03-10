@@ -22,6 +22,11 @@ const toast = useToast();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 const router = useRouter();
 const authStore = useAuthStore();
+
+// for PURC view
+const userRoleCode = computed(() => authStore.user?.user_project_role_code);
+const showProjectSelector = computed(() => userRoleCode.value !== 'PURC');
+
 const permissionStore = usePermissionStore();
 
 watch(isDarkTheme, (dark) => {
@@ -246,7 +251,11 @@ const goToAllNotifications = () => {
             </div>
 
             <!-- Project dropdown -->
-            <div class="cursor-pointer border border-gray-200 dark:border-gray-600 dark:bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-2" @click="showProjectDialog = true">
+            <div
+                v-if="showProjectSelector"
+                class="cursor-pointer border border-gray-200 dark:border-gray-600 dark:bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-2"
+                @click="showProjectDialog = true"
+            >
                 <i class="pi pi-briefcase text-sm text-gray-500 dark:text-gray-300"></i>
                 <span class="text-gray-700 dark:text-gray-200 font-semibold text-sm hidden md:inline">
                     {{ selectedProject?.name || 'Select Project' }}
@@ -335,7 +344,7 @@ const goToAllNotifications = () => {
         </div>
     </Motion>
     <!-- Project Dialog -->
-    <Dialog v-model:visible="showProjectDialog" header="Select Project" :style="{ width: '40rem', maxWidth: '90vw' }">
+    <Dialog v-if="showProjectSelector" v-model:visible="showProjectDialog" header="Select Project" :style="{ width: '40rem', maxWidth: '90vw' }">
         <div v-for="group in companyProjects" :key="group.company" class="mb-6">
             <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">{{ group.company }}</h3>
             <div class="space-y-3">
