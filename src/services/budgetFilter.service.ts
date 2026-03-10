@@ -24,7 +24,7 @@ export const budgetFilterService = {
 
     async getElements(): Promise<string[]> {
         try {
-            const res = await axiosInstance.get('/budget/elements/elements');
+            const res = await axiosInstance.get('/budget/elements/list');
             return res.data.data || [];
         } catch (error) {
             showError(error, 'Failed to fetch Elements list.');
