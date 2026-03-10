@@ -22,6 +22,7 @@
                         :onFilterChange="handleFilterChange"
                         :onSearch="handleSearch"
                         :onSortChange="handleSortChange"
+                        :extraFilters="tableFilters"
                         :onActionClick="handleAction"
                         emptyTitle="No delivery orders found"
                     >

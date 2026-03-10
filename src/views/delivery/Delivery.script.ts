@@ -1,4 +1,5 @@
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
+import { useProjectStore } from '@/stores/project/project.store';
 import type { TableColumn } from '@/types/table.type';
 import Tag from 'primevue/tag';
 import { useConfirm } from 'primevue/useconfirm';
@@ -11,9 +12,30 @@ export default defineComponent({
     components: { Tag },
     setup() {
         const deliveryStore = useDeliveryStore();
+        const projectStore = useProjectStore();
         const router = useRouter();
         const toast = useToast();
         const confirm = useConfirm();
+
+        // User role
+        type UserRole = 'PM' | 'PD' | 'PURC';
+        const getUserRole = (): UserRole | null => {
+            const user = localStorage.getItem('user');
+            if (!user) return null;
+            try {
+                const parsed = JSON.parse(user);
+                const role = parsed.user_project_role_code;
+                if (role === 'PM' || role === 'PD' || role === 'PURC') {
+                    return role;
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        };
+
+        const userRole = getUserRole();
+        const isPurchasingRole = userRole === 'PURC';
 
         // Tabs
         const tabItems = [
@@ -61,14 +83,25 @@ export default defineComponent({
         });
 
         // Columns
-        const deliveryListColumn: TableColumn[] = [
-            { field: 'rowIndex', header: '#', sortable: false },
-            { field: 'DocNo', header: 'DO Number', sortable: true },
-            { field: 'PlateNo', header: 'Plate No', sortable: true },
-            { field: 'Remark', header: 'Remark', sortable: false },
-            { field: 'Status', header: 'Status', sortable: true, bodySlot: 'status' },
-            { header: 'Action', action: true, actions: ['view'] }
-        ];
+        const deliveryListColumn = computed<TableColumn[]>(() => {
+            const cols: TableColumn[] = [
+                { field: 'rowIndex', header: '#', sortable: false },
+                { field: 'DocNo', header: 'DO Number', sortable: true },
+            ];
+
+            if (isPurchasingRole) {
+                cols.push({ field: 'ProjectName', header: 'Project', sortable: true });
+            }
+
+            cols.push(
+                { field: 'PlateNo', header: 'Plate No', sortable: true },
+                { field: 'Remark', header: 'Remark', sortable: false },
+                { field: 'Status', header: 'Status', sortable: true, bodySlot: 'status' },
+                { header: 'Action', action: true, actions: ['view'] }
+            );
+
+            return cols;
+        });
 
         const loadData = async () => {
             try {
@@ -113,6 +146,7 @@ export default defineComponent({
 
         function handleFilterChange(filters: Record<string, any>): void {
             deliveryStore.filters.search = filters.search ?? '';
+            deliveryStore.filters.projectId = filters.projectId ?? '';
             deliveryStore.pagination.page = 1;
             loadData();
         }
@@ -125,6 +159,7 @@ export default defineComponent({
 
         onMounted(() => {
             deliveryStore.setStatus('Created'); // default = Pending
+            projectStore.fetchProjects();
         });
 
         const getStatusSeverity = (status: string) => {
@@ -138,6 +173,22 @@ export default defineComponent({
                     return 'warn';
             }
         };
+
+        const tableFilters = computed(() => {
+            const filters: any[] = [];
+
+            if (isPurchasingRole) {
+                filters.push({
+                    type: 'select',
+                    field: 'projectId',
+                    placeholder: 'Project',
+                    options: [{ label: 'All Projects', value: '' }, ...projectStore.projectOptions],
+                    model: deliveryStore.filters.projectId
+                });
+            }
+
+            return filters;
+        });
 
         return {
             activeTab,
@@ -154,7 +205,8 @@ export default defineComponent({
             handleFilterChange,
             currentSortField,
             currentSortOrder,
-            getStatusSeverity
+            getStatusSeverity,
+            tableFilters
         };
     }
 });

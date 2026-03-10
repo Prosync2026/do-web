@@ -6,6 +6,7 @@ import POSummaryData from '@/components/summaryCard/SummaryCard.vue';
 import BaseTabUnderLine from '@/components/tab/BaseTabUnderLine.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import router from '@/router';
+import { useProjectStore } from '@/stores/project/project.store';
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import type { CardItem } from '@/types/card.type';
 import type { PurchaseOrderWithStatus } from '@/types/purchase.type';
@@ -30,6 +31,27 @@ export default defineComponent({
     setup() {
         const isLoading = ref(true);
         const store = usePurchaseOrderStore();
+        const projectStore = useProjectStore();
+
+        // User role
+        type UserRole = 'PM' | 'PD' | 'PURC';
+        const getUserRole = (): UserRole | null => {
+            const user = localStorage.getItem('user');
+            if (!user) return null;
+            try {
+                const parsed = JSON.parse(user);
+                const role = parsed.user_project_role_code;
+                if (role === 'PM' || role === 'PD' || role === 'PURC') {
+                    return role;
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        };
+
+        const userRole = getUserRole();
+        const isPurchasingRole = userRole === 'PURC';
 
         // pricing permission
         const { canViewPricing } = usePurchaseOrderPermission();
@@ -161,13 +183,20 @@ export default defineComponent({
         const pendingListColumn = computed<TableColumn[]>(() => {
             const cols: TableColumn[] = [
                 { field: 'no', header: '#', sortable: false },
-                { field: 'poNumber', header: 'PO Number', sortable: true },
+                { field: 'poNumber', header: 'PO Number', sortable: true }
+            ];
+
+            if (isPurchasingRole) {
+                cols.push({ field: 'projectName', header: 'Project', sortable: true });
+            }
+
+            cols.push(
                 { field: 'supplier', header: 'Supplier', sortable: true },
                 { field: 'poDate', header: 'Date', sortable: true },
                 { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
                 { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
                 { field: 'action', header: 'Action', sortable: false, bodySlot: 'action' }
-            ];
+            );
 
             // hide pricing column if no permission
             if (!canViewPricing?.value) {
@@ -211,6 +240,22 @@ export default defineComponent({
             loadData();
         };
 
+        const tableFilters = computed(() => {
+            const filters: any[] = [];
+
+            if (isPurchasingRole) {
+                filters.push({
+                    type: 'select',
+                    field: 'projectId',
+                    placeholder: 'Project',
+                    options: [{ label: 'All Projects', value: '' }, ...projectStore.projectOptions],
+                    model: store.filters.projectId
+                });
+            }
+
+            return filters;
+        });
+
         const viewPO = (po: PurchaseOrderWithStatus & { no?: number }) => {
             router.push({
                 name: 'ViewDetailsPO',
@@ -219,7 +264,16 @@ export default defineComponent({
             });
         };
 
-        onMounted(loadData);
+        const handleFilterChange = (filters: any) => {
+            store.filters.projectId = filters.projectId ?? '';
+            store.pagination.page = 1;
+            loadData();
+        };
+
+        onMounted(() => {
+            loadData();
+            projectStore.fetchProjects();
+        });
 
         return {
             isLoading,
@@ -245,7 +299,9 @@ export default defineComponent({
             activeTab,
             tabItems,
 
-            viewPO
+            viewPO,
+            tableFilters,
+            handleFilterChange
         };
     }
 });
