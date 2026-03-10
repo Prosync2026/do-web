@@ -4,6 +4,7 @@ import { formatDate, formatDateTime } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
+import { useProjectStore } from '@/stores/project/project.store';
 
 export const useRequestOrderStore = defineStore('requestOrder', () => {
     const orders = ref<Order[]>([]);
@@ -18,7 +19,8 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         budgetType: '',
         search: '',
         startDate: '',
-        endDate: ''
+        endDate: '',
+        projectId: ''
     });
 
     const sorting = reactive({
@@ -68,6 +70,13 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
     let pollingTimer: number | null = null;
     const POLLING_INTERVAL = 30000; // 30 seconds
 
+    const projectStore = useProjectStore();
+
+    function getProjectName(projectId: number): string {
+        const project = projectStore.projects.find((p) => p.id === projectId);
+        return project?.name || `Project ${projectId}`;
+    }
+
     function normalizeApprovalProgress(raw: RawApprovalProgress[]): UIApprovalProgress[] {
         if (!raw || !Array.isArray(raw)) {
             console.warn('Invalid approval progress data:', raw);
@@ -105,6 +114,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         loading.value = true;
         try {
             const params = {
+                projectId: filters.projectId || undefined,
                 status: filters.status || undefined,
                 budgetType: filters.budgetType || undefined,
                 search: filters.search || undefined,
@@ -115,7 +125,6 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 sortBy: sorting.sortBy,
                 sortOrder: sorting.sortOrder
             };
-
             const response: GetRequestOrdersResponse = await requestOrderService.getRequestOrders(params);
 
             orders.value = response.data.map((output): Order => {
@@ -132,6 +141,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                     status: apiOutput.Status,
                     requestedAt: formatDateTime(apiOutput.CreatedAt),
                     approvalProgress: normalizeApprovalProgress((apiOutput.approvalProgress || []) as RawApprovalProgress[]),
+                    projectName: getProjectName(apiOutput.ProjectId),
 
                     approvalFlowType: apiOutput.approvalFlowType,
 
@@ -209,6 +219,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 deliveryDate: formatDate(o.request_order_items?.[0]?.DeliveryDate || o.RequestOrderItems?.[0]?.DeliveryDate),
                 totalAmount: String(o.TotalAmount),
                 requestedAt: formatDateTime(o.CreatedAt),
+                projectName: getProjectName(o.ProjectId),
 
                 // budget exceeded flag
                 isBudgetExceeded: o.RequiresPDApproval === true && o.PDApprovalReason === 'BUDGET_EXCEEDED',
@@ -279,7 +290,9 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         filters.search = '';
         filters.startDate = '';
         filters.endDate = '';
+        filters.projectId = '';
         pagination.page = 1;
+
         fetchOrders();
     }
 

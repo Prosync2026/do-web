@@ -20,8 +20,10 @@ import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
 import RoSummary from './components/summary/RoSummary.vue';
 // reject modal
+import { useProjectStore } from '@/stores/project/project.store';
 import { formatCurrency } from '@/utils/format.utils';
 import RejectRo from './components/modal/RejectRo.vue';
+
 export default defineComponent({
     name: 'RequestOrders',
     components: {
@@ -66,7 +68,8 @@ export default defineComponent({
                 budgetType: selectedBudgetType.value,
                 startDate: startDate.value,
                 endDate: endDate.value,
-                search: store.filters.search
+                search: store.filters.search,
+                projectId: store.filters.projectId
             });
         }
 
@@ -100,6 +103,9 @@ export default defineComponent({
         const isPmPdRole = userRole === 'PM' || userRole === 'PD';
         // const activeTab = ref(isPurchasingRole ? 'all' : 'all');
         const activeTab = ref('all');
+
+        // project store
+        const projectStore = useProjectStore();
 
         const tabItems = computed(() => {
             return [
@@ -137,6 +143,7 @@ export default defineComponent({
         onMounted(() => {
             fetchOrders();
             fetchTotalCounts();
+            projectStore.fetchProjects();
         });
         watch(activeTab, (tab) => {
             store.filters.status = tab === 'all' ? '' : tab.charAt(0).toUpperCase() + tab.slice(1);
@@ -207,11 +214,16 @@ export default defineComponent({
         const tableColumns = computed<TableColumn[]>(() => {
             const columns: TableColumn[] = [
                 { field: 'rowIndex', header: '#', sortable: true },
-                { field: 'roNumber', header: 'RO Number', sortable: true },
-                { field: 'requestedBy', header: 'Requested By', sortable: true },
-                { field: 'roDate', header: 'RO Date', sortable: true },
-                { field: 'deliveryDate', header: 'Delivery Date', sortable: true }
+                { field: 'roNumber', header: 'RO Number', sortable: true }
             ];
+            if (isPurchasingRole) {
+                columns.push({
+                    field: 'projectName',
+                    header: 'Project',
+                    sortable: true
+                });
+            }
+            columns.push({ field: 'requestedBy', header: 'Requested By', sortable: true }, { field: 'roDate', header: 'RO Date', sortable: true }, { field: 'deliveryDate', header: 'Delivery Date', sortable: true });
 
             // only show pricing to dedicated users
             if (canViewPricing.value) {
@@ -264,6 +276,13 @@ export default defineComponent({
         const tableFilters = computed(() => [
             {
                 type: 'select' as const,
+                field: 'projectId',
+                placeholder: 'Project',
+                options: [{ label: 'All Projects', value: '' }, ...projectStore.projectOptions],
+                model: store.filters.projectId
+            },
+            {
+                type: 'select' as const,
                 field: 'budgetType',
                 placeholder: 'Budget',
                 options: [
@@ -284,6 +303,12 @@ export default defineComponent({
                 placeholder: 'End Date'
             }
         ]);
+        watch(
+            () => store.filters.projectId,
+            (val) => {
+                console.log('Selected Project:', val);
+            }
+        );
 
         function getApprovalDotClass(status: string) {
             switch (status) {
@@ -556,6 +581,7 @@ export default defineComponent({
             store.filters.search = filters.search ?? '';
             store.filters.startDate = filters.startDate ?? '';
             store.filters.endDate = filters.endDate ?? '';
+            store.filters.projectId = (filters.projectId as string) ?? '';
             store.pagination.page = 1;
             store.fetchOrders();
         }
