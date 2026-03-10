@@ -273,42 +273,46 @@ export default defineComponent({
             return columns;
         });
 
-        const tableFilters = computed(() => [
-            {
-                type: 'select' as const,
-                field: 'projectId',
-                placeholder: 'Project',
-                options: [{ label: 'All Projects', value: '' }, ...projectStore.projectOptions],
-                model: store.filters.projectId
-            },
-            {
-                type: 'select' as const,
-                field: 'budgetType',
-                placeholder: 'Budget',
-                options: [
-                    { label: 'All Type', value: '' },
-                    { label: 'Budgeted', value: 'Budgeted' },
-                    { label: 'NonBudgeted', value: 'NonBudgeted' }
-                ],
-                model: store.filters.budgetType
-            },
-            {
-                type: 'date',
-                field: 'startDate',
-                placeholder: 'Start Date'
-            },
-            {
-                type: 'date',
-                field: 'endDate',
-                placeholder: 'End Date'
+        const tableFilters = computed(() => {
+            const filters: any[] = [];
+
+            // PURC only
+            if (isPurchasingRole) {
+                filters.push({
+                    type: 'select',
+                    field: 'projectId',
+                    placeholder: 'Project',
+                    options: [{ label: 'All Projects', value: '' }, ...projectStore.projectOptions],
+                    model: store.filters.projectId
+                });
             }
-        ]);
-        watch(
-            () => store.filters.projectId,
-            (val) => {
-                console.log('Selected Project:', val);
-            }
-        );
+
+            filters.push(
+                {
+                    type: 'select',
+                    field: 'budgetType',
+                    placeholder: 'Budget',
+                    options: [
+                        { label: 'All Type', value: '' },
+                        { label: 'Budgeted', value: 'Budgeted' },
+                        { label: 'NonBudgeted', value: 'NonBudgeted' }
+                    ],
+                    model: store.filters.budgetType
+                },
+                {
+                    type: 'date',
+                    field: 'startDate',
+                    placeholder: 'Start Date'
+                },
+                {
+                    type: 'date',
+                    field: 'endDate',
+                    placeholder: 'End Date'
+                }
+            );
+
+            return filters;
+        });
 
         function getApprovalDotClass(status: string) {
             switch (status) {
