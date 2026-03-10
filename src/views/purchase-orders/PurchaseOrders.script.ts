@@ -206,23 +206,45 @@ export default defineComponent({
             return cols;
         });
 
-        const partiallyListColumn: TableColumn[] = [
-            { field: 'no', header: '#', sortable: false },
-            { field: 'poNumber', header: 'PO Number', sortable: true },
-            { field: 'supplier', header: 'Supplier', sortable: true },
-            { field: 'poDate', header: 'Date', sortable: true },
-            { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
-        ];
+        const partiallyListColumn = computed<TableColumn[]>(() => {
+            const cols: TableColumn[] = [
+                { field: 'no', header: '#', sortable: false },
+                { field: 'poNumber', header: 'PO Number', sortable: true }
+            ];
 
-        const completedListColumn: TableColumn[] = [
-            { field: 'no', header: '#', sortable: false },
-            { field: 'doNumber', header: 'DO Number', sortable: true },
-            { field: 'poNumber', header: 'PO Number', sortable: true },
-            { field: 'poDate', header: 'Date', sortable: true },
-            { field: 'receivedBy', header: 'Received By', sortable: true },
-            { field: 'discrepancyType', header: 'Discrepancy Type', sortable: true, bodySlot: 'discrepancyType' },
-            { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
-        ];
+            if (isPurchasingRole) {
+                cols.push({ field: 'projectName', header: 'Project', sortable: true });
+            }
+
+            cols.push(
+                { field: 'supplier', header: 'Supplier', sortable: true },
+                { field: 'poDate', header: 'Date', sortable: true },
+                { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
+            );
+
+            return cols;
+        });
+
+        const completedListColumn = computed<TableColumn[]>(() => {
+            const cols: TableColumn[] = [
+                { field: 'no', header: '#', sortable: false },
+                { field: 'doNumber', header: 'DO Number', sortable: true },
+                { field: 'poNumber', header: 'PO Number', sortable: true }
+            ];
+
+            if (isPurchasingRole) {
+                cols.push({ field: 'projectName', header: 'Project', sortable: true });
+            }
+
+            cols.push(
+                { field: 'poDate', header: 'Date', sortable: true },
+                { field: 'receivedBy', header: 'Received By', sortable: true },
+                { field: 'discrepancyType', header: 'Discrepancy Type', sortable: true, bodySlot: 'discrepancyType' },
+                { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
+            );
+
+            return cols;
+        });
 
         /* =========================
          * TABS & ACTION
@@ -265,7 +287,7 @@ export default defineComponent({
         };
 
         const handleFilterChange = (filters: any) => {
-            store.filters.projectId = filters.projectId ?? '';
+            store.filters.projectId = (filters.projectId as string) ?? '';
             store.pagination.page = 1;
             loadData();
         };

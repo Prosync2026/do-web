@@ -35,6 +35,8 @@
                                     :sortOrder="currentSortOrder"
                                     :onSearch="onSearchWrapper"
                                     :onSortChange="handleSortChange"
+                                    :extraFilters="tableFilters"
+                                    :onFilterChange="handleFilterChange"
                                     emptyTitle="No Pending Purchase Orders Found"
                                 >
                                     <template #no="{ data }">
@@ -67,6 +69,8 @@
                                     :onSortChange="handleSortChange"
                                     :sortField="currentSortField"
                                     :sortOrder="currentSortOrder"
+                                    :extraFilters="tableFilters"
+                                    :onFilterChange="handleFilterChange"
                                     emptyTitle="No Partially Delivered Purchase Orders Found"
                                 >
                                     <template #no="{ data }">
@@ -91,6 +95,8 @@
                                     :onSortChange="handleSortChange"
                                     :sortField="currentSortField"
                                     :sortOrder="currentSortOrder"
+                                    :extraFilters="tableFilters"
+                                    :onFilterChange="handleFilterChange"
                                     emptyTitle="No Completed Purchase Orders Found"
                                 >
                                     <template #no="{ data }">
