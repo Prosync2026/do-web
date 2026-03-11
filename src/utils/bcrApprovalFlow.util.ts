@@ -1,4 +1,4 @@
-export const ROLE_ORDER = ['QS', 'CM', 'SITE', 'PD', 'MGM'];
+export const ROLE_ORDER = ['QS', 'CM', 'SITE', 'PD', 'MGM', 'PURC'];
 
 export type FlowStep = {
     role: string;

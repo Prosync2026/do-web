@@ -14,6 +14,7 @@ import type { DiscussionItem, ReviewList } from '@/types/budgetChangeRequest.typ
 import { formatDate } from '@/utils/dateHelper';
 import commentBCRModal from '@/views/budget/components/dialog/CommentBCR.vue';
 import editcommentBCRModal from '@/views/budget/components/dialog/EditCommentBCR.vue';
+import { useToast } from 'primevue/usetoast';
 
 export default defineComponent({
     name: 'DiscussionThread',
@@ -36,6 +37,7 @@ export default defineComponent({
     setup(props) {
         const route = useRoute();
         const store = useBudgetChangeRequestStore();
+        const toast = useToast();
 
         const showApprovalFlow = ref(true);
         const active = ref<string[]>([]);
@@ -48,7 +50,7 @@ export default defineComponent({
         const discussions = ref<DiscussionItem[]>([]);
         const currentUserRole = ref<string | null>(null);
 
-        const ROLE_ORDER = ['QS', 'CM', 'SITE', 'PD', 'MGM'];
+        const ROLE_ORDER = ['QS', 'CM', 'SITE', 'PD', 'MGM', 'PURC'];
         const CREATOR_ROLES = ['QS', 'SITE'];
 
         const fetchCombinedDiscussion = async () => {
@@ -136,6 +138,16 @@ export default defineComponent({
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(bcrId);
             } else {
                 canRecommend.value = await budgetChangeRequestService.checkingUserCanReviewRecommendation(bcrId);
+
+                // Manual override for PURC if backend does not return true
+                if (currentUserRole.value === 'PURC' && !canRecommend.value) {
+                    const mgmIndex = ROLE_ORDER.indexOf('MGM');
+                    const purcIndex = ROLE_ORDER.indexOf('PURC');
+
+                    if (discussions.value[mgmIndex].RecommendationType && !discussions.value[purcIndex].RecommendationType) {
+                        canRecommend.value = true;
+                    }
+                }
             }
         };
 
@@ -155,9 +167,8 @@ export default defineComponent({
             return -1;
         };
         const isFinalStepCompleted = () => {
-            const pdIndex = ROLE_ORDER.indexOf('PD');
-            const mgmIndex = ROLE_ORDER.indexOf('MGM');
-            return !!(discussions.value[pdIndex].RecommendationType || discussions.value[mgmIndex].RecommendationType);
+            const purcIndex = ROLE_ORDER.indexOf('PURC');
+            return !!discussions.value[purcIndex].RecommendationType;
         };
 
         const getStepStatusText = (item: DiscussionItem, index: number) => {
@@ -173,9 +184,13 @@ export default defineComponent({
                 return 'Waiting';
             }
 
-            if (!isFinalStepCompleted()) {
-                return 'Pending';
-            }
+            const pdIndex = ROLE_ORDER.indexOf('PD');
+            const mgmIndex = ROLE_ORDER.indexOf('MGM');
+            const purcIndex = ROLE_ORDER.indexOf('PURC');
+
+            if (index === pdIndex) return 'Pending';
+            if (index === mgmIndex) return discussions.value[pdIndex].RecommendationType ? 'Pending' : 'Waiting';
+            if (index === purcIndex) return discussions.value[mgmIndex].RecommendationType ? 'Pending' : 'Waiting';
 
             return 'Waiting';
         };
@@ -194,9 +209,13 @@ export default defineComponent({
                 return 'secondary';
             }
 
-            if (!isFinalStepCompleted()) {
-                return 'warn';
-            }
+            const pdIndex = ROLE_ORDER.indexOf('PD');
+            const mgmIndex = ROLE_ORDER.indexOf('MGM');
+            const purcIndex = ROLE_ORDER.indexOf('PURC');
+
+            if (index === pdIndex) return 'warn';
+            if (index === mgmIndex) return discussions.value[pdIndex].RecommendationType ? 'warn' : 'secondary';
+            if (index === purcIndex) return discussions.value[mgmIndex].RecommendationType ? 'warn' : 'secondary';
 
             return 'secondary';
         };
@@ -233,6 +252,36 @@ export default defineComponent({
             return true;
         };
 
+        const handleAcknowledge = async () => {
+            if (currentUserRole.value === 'PURC') {
+                const bcrId = Number(route.params.budgetChangeRequestId);
+
+                try {
+                    await store.rolesReviewRecommendation(bcrId, {
+                        ReviewType: 'Acknowledge'
+                    });
+
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Acknowledged',
+                        detail: 'Budget Change Request acknowledged by PURC',
+                        life: 3000
+                    });
+
+                    await init(); // Refresh lists
+                } catch (error) {
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to submit acknowledgement',
+                        life: 3000
+                    });
+                }
+            } else {
+                createComment.value = true;
+            }
+        };
+
         return {
             showApprovalFlow,
             active,
@@ -251,7 +300,9 @@ export default defineComponent({
             openEditModal,
             openFile,
             init,
-            previewAttachment
+            previewAttachment,
+            currentUserRole,
+            handleAcknowledge
         };
     }
 });
