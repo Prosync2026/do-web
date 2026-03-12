@@ -24,7 +24,7 @@
                 </div>
 
                 <!---CHECK ACCESS PERMISSION -->
-                <Button icon="pi pi-plus" label="Add Comment" class="h-8" v-if="canRecommend" @click="createComment = true" />
+                <Button icon="pi pi-plus" :label="currentUserRole === 'PURC' ? 'Acknowledge' : 'Add Comment'" class="h-8" v-if="canRecommend" @click="handleAcknowledge" />
             </div>
 
             <!-- ================= Accordion ================= -->

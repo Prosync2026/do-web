@@ -108,9 +108,9 @@
             <div class="flex justify-end gap-3 mt-4">
                 <Button label="Cancel" outlined class="p-button-sm" @click="$emit('update:visible', false)" />
 
-                <!-- if roles is  CM / PD / MGM -->
-                <template v-if="['CM', 'PD', 'MGM'].includes(user.role)">
-                    <Button label="Approve" class="p-button-sm" @click="() => handleReviewSubmit('approve')" />
+                <!-- if roles is CM / PD / MGM / PURC -->
+                <template v-if="['CM', 'PD', 'MGM', 'PURC'].includes(user.role)">
+                    <Button :label="user.role === 'PURC' ? 'Acknowledge' : 'Approve'" class="p-button-sm" @click="() => handleReviewSubmit('approve')" />
                     <Button label="Reject" class="p-button-sm p-button-danger" @click="() => handleReviewSubmit('reject')" />
                 </template>
 
