@@ -564,74 +564,107 @@ export default defineComponent({
 
         const handleStockItemsSelected = (selectedStockItems: Array<StockItem & { deliveryDate?: string | Date | null }>) => {
             const duplicates: string[] = [];
-            const newUniqueItems: Item[] = [];
 
-            selectedStockItems.forEach((stockItem) => {
-                const exists = items.value.some((i) => i.itemCode === stockItem.itemCode);
+            setTimeout(() => {
+                const groupedMap = new Map<string, Item>();
 
-                if (exists) {
-                    duplicates.push(stockItem.itemCode);
-                } else {
-                    let deliveryDate: Date | null = null;
-                    if (stockItem.deliveryDate) {
-                        if (stockItem.deliveryDate instanceof Date) {
-                            deliveryDate = stockItem.deliveryDate;
-                        } else {
-                            const d = new Date(stockItem.deliveryDate);
-                            deliveryDate = isNaN(d.getTime()) ? null : d;
+                selectedStockItems.forEach((stockItem) => {
+                    const desc2 = ''; 
+                    const groupKey = `${stockItem.itemCode}|${stockItem.name}|${desc2}`;
+
+                    const stockId = stockItem.id;
+                    const exists = items.value.some((i) => {
+                        if (i.nonBudgetItemId === stockId) return true;
+                        if (i.originalBudgetItems?.some((orig) => (orig.id || orig.nonBudgetItemId) === stockId)) return true;
+                        return false;
+                    });
+
+                    if (exists) {
+                        duplicates.push(stockItem.itemCode);
+                    } else if (groupedMap.has(groupKey)) {
+                        const existing = groupedMap.get(groupKey)!;
+                        existing.qty += 1;
+
+                        const loc1Set = new Set(existing.location1 ? existing.location1.split(',').map((s) => s.trim()).filter(Boolean) : []);
+                        if (stockItem.element) loc1Set.add(stockItem.element.trim());
+                        existing.location1 = Array.from(loc1Set).join(', ');
+
+                        const loc2Set = new Set(existing.location2 ? existing.location2.split(',').map((s) => s.trim()).filter(Boolean) : []);
+                        if (stockItem.subElement) loc2Set.add(stockItem.subElement.trim());
+                        existing.location2 = Array.from(loc2Set).join(', ');
+
+                        existing.location = [existing.location1, existing.location2].filter(Boolean).join(' > ');
+                        existing.originalBudgetItems!.push({ ...stockItem, qty: 1, nonBudgetItemId: stockId });
+                    } else {
+                        let deliveryDate: Date | null = null;
+                        if (stockItem.deliveryDate) {
+                            if (stockItem.deliveryDate instanceof Date) {
+                                deliveryDate = stockItem.deliveryDate;
+                            } else {
+                                const d = new Date(stockItem.deliveryDate);
+                                deliveryDate = isNaN(d.getTime()) ? null : d;
+                            }
+                        }
+
+                        groupedMap.set(groupKey, {
+                            itemCode: stockItem.itemCode,
+                            itemType: stockItem.itemType,
+                            description: stockItem.name,
+                            description2: '',
+                            location: `${stockItem.element || ''} > ${stockItem.subElement || ''}`.replace(/^ > | > $/g, '') || '',
+                            location1: stockItem.element || '',
+                            location2: stockItem.subElement || '',
+                            uom: stockItem.uom,
+                            budgetItemId: null,
+                            nonBudgetItemId: stockId,
+                            qty: 1,
+                            deliveryDate,
+                            notes: '',
+                            remark: '',
+                            price: 0,
+                            showNotes: false,
+                            showRemark: false,
+                            isBudgeted: false,
+                            originalBudgetItems: [{ ...stockItem, qty: 1, nonBudgetItemId: stockId }]
+                        });
+
+                        const existingOption = itemOptions.value.find((opt) => opt.value === stockItem.itemCode && opt.description === stockItem.name);
+                        if (!existingOption) {
+                            itemOptions.value.push({
+                                label: stockItem.itemCode,
+                                value: stockItem.itemCode,
+                                description: stockItem.name,
+                                description2: '',
+                                location: `${stockItem.element || ''} > ${stockItem.subElement || ''}`.replace(/^ > | > $/g, '') || '',
+                                uom: stockItem.uom
+                            });
                         }
                     }
+                });
 
-                    newUniqueItems.push({
-                        itemCode: stockItem.itemCode,
-                        itemType: stockItem.itemType,
-                        description: stockItem.name,
-                        location: `${stockItem.element} > ${stockItem.subElement}`,
-                        uom: stockItem.uom,
-                        budgetItemId: null,
-                        nonBudgetItemId: stockItem.id,
-                        qty: 1,
-                        deliveryDate,
-                        notes: '',
-                        remark: '',
-                        price: 0,
-                        showNotes: false,
-                        showRemark: false,
-                        isBudgeted: false
+                const finalGrouped = Array.from(groupedMap.values());
+
+                if (finalGrouped.length > 0) {
+                    items.value.push(...finalGrouped);
+
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Items Added',
+                        detail: `${finalGrouped.length} item(s) grouped and added from stock`,
+                        life: 2500
                     });
-                    const existingOption = itemOptions.value.find((opt) => opt.value === stockItem.itemCode);
-
-                    if (!existingOption) {
-                        itemOptions.value.push({
-                            label: stockItem.itemCode,
-                            value: stockItem.itemCode,
-                            description: stockItem.name,
-                            location: `${stockItem.element} > ${stockItem.subElement}`,
-                            uom: stockItem.uom
-                        });
-                    }
                 }
-            });
 
-            if (newUniqueItems.length > 0) {
-                items.value.push(...newUniqueItems);
-
-                toast.add({
-                    severity: 'success',
-                    summary: 'Items Added',
-                    detail: `${newUniqueItems.length} item(s) added from stock`,
-                    life: 2500
-                });
-            }
-
-            if (duplicates.length > 0) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Duplicate Items',
-                    detail: `These items were already added: ${duplicates.join(', ')}`,
-                    life: 9000
-                });
-            }
+                if (duplicates.length > 0) {
+                    const uniqueDups = Array.from(new Set(duplicates));
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Duplicate Items',
+                        detail: `These items were already added: ${uniqueDups.join(', ')}`,
+                        life: 9000
+                    });
+                }
+            }, 0);
         };
 
         function removeAttachment(index: number) {
@@ -864,13 +897,16 @@ export default defineComponent({
                         remainingQty -= qtyToAssign;
 
                         if (qtyToAssign > 0 || item.originalBudgetItems!.length === 1) {
+                            const newLoc1 = orig.location1 || orig.element || '';
+                            const newLoc2 = orig.location2 || orig.subElement || '';
                             ungrouped.push({
                                 ...item,
-                                budgetItemId: orig.id || orig.budgetItemId,
+                                budgetItemId: item.isBudgeted ? (orig.id || orig.budgetItemId) : null,
+                                nonBudgetItemId: !item.isBudgeted ? (orig.id || orig.nonBudgetItemId) : null,
                                 qty: qtyToAssign > 0 ? qtyToAssign : 0,
-                                location1: orig.location1 || '',
-                                location2: orig.location2 || '',
-                                location: orig.location || [orig.location1, orig.location2].filter(Boolean).join(' > '),
+                                location1: newLoc1,
+                                location2: newLoc2,
+                                location: orig.location || [newLoc1, newLoc2].filter(Boolean).join(' > '),
                                 originalBudgetItems: undefined // Wipe this cleanly
                             });
                         }
