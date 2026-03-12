@@ -16,7 +16,7 @@ import { useToast } from 'primevue/usetoast';
 import type { StockItem } from 'src/types/stockItem.type.ts';
 import { ComponentPublicInstance, computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
+import type { BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 import CreateROModal from '../modal/CreateRo.vue';
 import CreateStockItem from '../modal/CreateStockItem.vue';
@@ -451,69 +451,113 @@ export default defineComponent({
 
         const showCreateROModal = ref(false);
 
-        const handleSelectedItems = (selectedBudgetItems: BudgetItem[]) => {
+        const handleSelectedItems = (selectedBudgetItems: any[]) => {
             const duplicates: string[] = [];
-            const newUniqueItems: Item[] = [];
 
             // Defer processing to next tick to avoid recursive updates from immediate state changes
             setTimeout(() => {
+                const groupedMap = new Map<string, Item>();
+
                 selectedBudgetItems.forEach((budgetItem) => {
-                    const exists = items.value.some((i) => i.itemCode === budgetItem.itemCode);
+                    const desc2 = budgetItem.description2 || '';
+                    const groupKey = `${budgetItem.itemCode}|${budgetItem.description}|${desc2}`;
+
+                    // To prevent dupes across already selected items in the UI, we check if budgetItemId already exists anywhere.
+                    const budgetId = budgetItem.id || budgetItem.budgetItemId;
+                    const exists = items.value.some((i) => {
+                        if (i.budgetItemId === budgetId) return true;
+                        if (i.originalBudgetItems?.some((orig) => (orig.id || orig.budgetItemId) === budgetId)) return true;
+                        return false;
+                    });
 
                     if (exists) {
                         duplicates.push(budgetItem.itemCode);
+                    } else if (groupedMap.has(groupKey)) {
+                        const existing = groupedMap.get(groupKey)!;
+                        existing.qty += Number(budgetItem.qty || 0);
+
+                        const loc1Set = new Set(
+                            existing.location1
+                                ? existing.location1
+                                      .split(',')
+                                      .map((s) => s.trim())
+                                      .filter(Boolean)
+                                : []
+                        );
+                        if (budgetItem.location1) loc1Set.add(budgetItem.location1.trim());
+                        existing.location1 = Array.from(loc1Set).join(', ');
+
+                        const loc2Set = new Set(
+                            existing.location2
+                                ? existing.location2
+                                      .split(',')
+                                      .map((s) => s.trim())
+                                      .filter(Boolean)
+                                : []
+                        );
+                        if (budgetItem.location2) loc2Set.add(budgetItem.location2.trim());
+                        existing.location2 = Array.from(loc2Set).join(', ');
+
+                        existing.location = [existing.location1, existing.location2].filter(Boolean).join(' > ');
+                        existing.originalBudgetItems!.push({ ...budgetItem });
                     } else {
-                        newUniqueItems.push({
+                        groupedMap.set(groupKey, {
                             itemCode: budgetItem.itemCode,
                             itemType: budgetItem.itemType,
                             description: budgetItem.description,
-                            location: budgetItem.location,
-                            location1: budgetItem.location1,
-                            location2: budgetItem.location2,
+                            description2: desc2,
+                            location: budgetItem.location || [budgetItem.location1, budgetItem.location2].filter(Boolean).join(' > '),
+                            location1: budgetItem.location1 || '',
+                            location2: budgetItem.location2 || '',
                             uom: budgetItem.uom,
-                            budgetItemId: budgetItem.id,
-                            qty: budgetItem.qty,
+                            budgetItemId: budgetId,
+                            qty: Number(budgetItem.qty || 0),
                             deliveryDate: budgetItem.deliveryDate ? new Date(budgetItem.deliveryDate) : null,
                             notes: '',
                             remark: '',
                             price: budgetItem.price,
                             showNotes: false,
                             showRemark: false,
-                            isBudgeted: true
+                            isBudgeted: true,
+                            originalBudgetItems: [{ ...budgetItem }]
                         });
-                        const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode);
+
+                        const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode && opt.description === budgetItem.description && opt.description2 === desc2);
                         if (!existingOption) {
                             itemOptions.value.push({
                                 label: budgetItem.itemCode,
                                 value: budgetItem.itemCode,
                                 description: budgetItem.description,
-                                location: budgetItem.location,
+                                description2: desc2,
+                                location: budgetItem.location || [budgetItem.location1, budgetItem.location2].filter(Boolean).join(' > '),
                                 uom: budgetItem.uom
                             });
                         }
                     }
                 });
 
-                if (newUniqueItems.length > 0) {
-                    items.value.push(...newUniqueItems);
+                const finalGrouped = Array.from(groupedMap.values());
+
+                if (finalGrouped.length > 0) {
+                    items.value.push(...finalGrouped);
                     toast.add({
                         severity: 'success',
                         summary: 'Items Added',
-                        detail: `${newUniqueItems.length} item(s) added from budget`,
+                        detail: `${finalGrouped.length} item(s) grouped and added from budget`,
                         life: 2500
                     });
                 }
 
                 if (duplicates.length > 0) {
+                    const uniqueDups = Array.from(new Set(duplicates));
                     toast.add({
                         severity: 'warn',
                         summary: 'Duplicate Items',
-                        detail: `These items were already added: ${duplicates.join(', ')}. Only new items were added.`,
+                        detail: `These items were already added: ${uniqueDups.join(', ')}`,
                         life: 9000
                     });
                 }
 
-                // Close modal AFTER processing items
                 showCreateROModal.value = false;
             }, 0);
         };
@@ -718,7 +762,7 @@ export default defineComponent({
                         itemType: item.itemType || '',
                         description: item.description,
                         uom: item.uom,
-                        qty: item.qty,
+                        qty: Number(item.qty.toFixed(2)),
                         price: item.price ?? 0,
                         deliveryDate: item.deliveryDate ? (item.deliveryDate instanceof Date ? item.deliveryDate : new Date(item.deliveryDate)) : null,
                         location: item.location,
@@ -804,6 +848,40 @@ export default defineComponent({
             showPreviewModal.value = true;
         }
 
+        const getUngroupedItems = () => {
+            const ungrouped: Item[] = [];
+            items.value.forEach((item) => {
+                if (item.originalBudgetItems && item.originalBudgetItems.length > 0) {
+                    let remainingQty = item.qty;
+                    item.originalBudgetItems.forEach((orig, index) => {
+                        const isLast = index === item.originalBudgetItems!.length - 1;
+                        let qtyToAssign = 0;
+                        if (isLast) {
+                            qtyToAssign = remainingQty;
+                        } else {
+                            qtyToAssign = Math.min(Number(orig.qty || 0), remainingQty);
+                        }
+                        remainingQty -= qtyToAssign;
+
+                        if (qtyToAssign > 0 || item.originalBudgetItems!.length === 1) {
+                            ungrouped.push({
+                                ...item,
+                                budgetItemId: orig.id || orig.budgetItemId,
+                                qty: qtyToAssign > 0 ? qtyToAssign : 0,
+                                location1: orig.location1 || '',
+                                location2: orig.location2 || '',
+                                location: orig.location || [orig.location1, orig.location2].filter(Boolean).join(' > '),
+                                originalBudgetItems: undefined // Wipe this cleanly
+                            });
+                        }
+                    });
+                } else {
+                    ungrouped.push(item);
+                }
+            });
+            return ungrouped;
+        };
+
         const submitRequestOrder = async () => {
             try {
                 const projectId = getCurrentProjectId();
@@ -822,7 +900,7 @@ export default defineComponent({
                     Status: 'Processing',
                     Currency: 'MYR',
                     Reason: selectedReason.value || '',
-                    Items: items.value.map((item) => {
+                    Items: getUngroupedItems().map((item) => {
                         const budgetItemId = item.budgetItemId;
                         const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
 
@@ -840,7 +918,8 @@ export default defineComponent({
                             Uom: item.uom,
                             ItemCode: item.itemCode,
                             ItemType: item.itemType,
-                            Quantity: item.qty,
+                            Quantity: Number(item.qty.toFixed(2)),
+
                             Location1: item.location1,
                             Location2: item.location2,
                             OrgBgtQty: stats?.totalOrderedQty ?? 0,
@@ -945,7 +1024,7 @@ export default defineComponent({
                     Status: 'Processing',
                     Currency: 'MYR',
                     TotalAmount: grandTotal.value,
-                    Items: items.value.map((item) => {
+                    Items: getUngroupedItems().map((item) => {
                         const budgetItemId = item.budgetItemId;
                         const stats = budgetItemId != null ? itemStats.value[budgetItemId] : undefined;
 
@@ -957,7 +1036,7 @@ export default defineComponent({
                             Uom: item.uom,
                             ItemCode: item.itemCode,
                             ItemType: item.itemType || 'CO',
-                            Quantity: item.qty,
+                            Quantity: Number(item.qty.toFixed(2)),
                             OrgBgtQty: stats?.totalOrderedQty ?? 0,
                             BgtBalQty: stats?.totalBalance ?? 0,
                             TotalGrnQty: stats?.totalDeliveredQty ?? 0,
