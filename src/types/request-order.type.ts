@@ -2,6 +2,7 @@ export interface Item {
     itemCode: string;
     itemType: string;
     description: string;
+    description2?: string;
     location: string;
     location1?: string;
     location2?: string;
@@ -18,12 +19,14 @@ export interface Item {
     nonBudgetItemId?: number | null;
     StockItemId?: number | null;
     stockItemId?: number;
+    originalBudgetItems?: any[];
 }
 
 export interface ItemOption {
     label: string;
     value: string;
     description: string;
+    description2?: string;
     location: string;
     uom: string;
 }
@@ -37,6 +40,7 @@ export interface BudgetItem {
     id: number;
     itemCode: string;
     description: string;
+    description2?: string;
     location: string;
     location1?: string;
     location2?: string;
