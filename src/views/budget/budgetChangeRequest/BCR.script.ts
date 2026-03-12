@@ -137,6 +137,13 @@ export default defineComponent({
             return columns;
         });
 
+        const statusSeverity: Record<string, string> = {
+            approved: 'success',
+            acknowledged: 'success',
+            rejected: 'danger',
+            pending: 'warn'
+        };
+
         function getStatusSeverity(Status: string) {
             switch (Status) {
                 case 'Approved':
@@ -243,7 +250,8 @@ export default defineComponent({
             bcrSummaryCol,
             handleSortChange,
             currentSortField,
-            currentSortOrder
+            currentSortOrder,
+            statusSeverity
         };
     }
 });
