@@ -62,7 +62,7 @@ export default defineComponent({
             const reviews: ReviewList[] = Array.isArray(reviewRes) ? reviewRes : reviewRes?.data || [];
 
             discussions.value = ROLE_ORDER.map((role) => {
-                const disc = discussionRes?.find((r) => r.Department?.toLowerCase() === role.toLowerCase());
+                const disc = discussionRes?.find((r) => r.Department?.toLowerCase() === role.toLowerCase() || (role === 'PURC' && r.Department?.toLowerCase() === 'purch'));
 
                 if (disc) {
                     return {
@@ -85,7 +85,7 @@ export default defineComponent({
                     } as DiscussionItem;
                 }
 
-                const rev = reviews.find((r) => r.ApprovalLevel === role);
+                const rev = reviews.find((r) => r.ApprovalLevel === role || (role === 'PURC' && r.ApprovalLevel === 'PURCH'));
 
                 if (rev) {
                     return {
@@ -172,7 +172,10 @@ export default defineComponent({
         };
 
         const getStepStatusText = (item: DiscussionItem, index: number) => {
-            if (item.RecommendationType) return item.RecommendationType;
+            if (item.RecommendationType) {
+                if (item.RecommendationType === 'Acknowledge') return 'Acknowledged';
+                return item.RecommendationType;
+            }
 
             if (index < 3) {
                 const pendingIndex = getCurrentPrePendingIndex();
