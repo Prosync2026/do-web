@@ -3,10 +3,12 @@ import type { TableColumn } from '@/types/table.type';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';
 import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Menu from 'primevue/menu';
+import Row from 'primevue/row';
 import { computed, ref, watch } from 'vue';
 
 import ResultNotFound from '@/components/resulNotFound/ResultNotFound.vue';
@@ -58,6 +60,11 @@ const props = defineProps<{
     onSortChange?: (payload: { field: string; order: number }) => void;
     sortField?: string;
     sortOrder?: number;
+    searchValue?: string;
+    columnGroups: {
+        type: Array;
+        default: () => [];
+    };
 }>();
 
 const visibleColumns = computed(() => props.columns.filter((c) => c.visible !== false));
@@ -66,9 +73,20 @@ const emit = defineEmits<{
     'update:selection': [value: TableRow[]];
 }>();
 
-const search = ref('');
+const search = ref(props.searchValue ?? '');
 const activeFilters = ref<Record<string, any>>({});
 const hasLoadedOnce = ref(false);
+
+// Keep local search in sync if parent updates the searchValue prop
+// (e.g. when this component is remounted due to v-if/v-else switching)
+watch(
+    () => props.searchValue,
+    (val) => {
+        if (val !== undefined && val !== search.value) {
+            search.value = val;
+        }
+    }
+);
 
 const menu = ref();
 const currentRow = ref<TableRow | null>(null);
@@ -76,12 +94,13 @@ const menuItems = ref<any[]>([]);
 
 const isServerSidePagination = computed(() => props.pagination !== undefined);
 
+// Set hasLoadedOnce as soon as the search callback is provided.
+// This ensures the search field remains visible even when results are empty,
+// preventing the field from disappearing after a no-result search.
 watch(
-    () => props.value,
-    (val) => {
-        if (val && val.length > 0) {
-            hasLoadedOnce.value = true;
-        }
+    () => props.onSearch,
+    (fn) => {
+        if (fn) hasLoadedOnce.value = true;
     },
     { immediate: true }
 );
@@ -92,9 +111,15 @@ function handleSearch() {
     clearTimeout(searchTimeout);
 
     searchTimeout = setTimeout(() => {
-        props.onSearch?.(search.value);
+        props.onSearch?.(search.value || '');
     }, 400);
 }
+
+watch(search, (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+        handleSearch();
+    }
+});
 
 function handleExport() {
     props.onExport?.();
@@ -256,7 +281,8 @@ function handleFilterChange(field: string, value: any) {
 
         <div class="flex gap-2 flex-wrap items-center">
             <span class="p-input-icon-left">
-                <InputText v-if="props.onSearch && hasLoadedOnce" v-model="search" placeholder="Search..." @input="handleSearch" class="w-full sm:w-auto" />
+                <i class="pi pi-search" />
+                <InputText v-if="props.onSearch && hasLoadedOnce" v-model="search" placeholder="Search..." class="w-full sm:w-auto" />
             </span>
 
             <template v-for="(f, i) in props.extraFilters" :key="i">
@@ -308,7 +334,7 @@ function handleFilterChange(field: string, value: any) {
             <!-- Checkbox Column -->
             <Column v-if="props.selectionMode === 'checkbox'" selection-mode="multiple" style="width: 3rem" />
 
-            <Column v-for="(col, idx) in visibleColumns" :key="col.field || idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
+            <Column v-for="(col, idx) in visibleColumns" :key="col.field || idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style" :headerClass="col.class" :bodyClass="col.class">
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
                     <slot :name="col.bodySlot" :data="slotProps.data" />
                 </template>
@@ -330,7 +356,7 @@ function handleFilterChange(field: string, value: any) {
         </DataTable>
 
         <DataTable :sortMode="'single'" :lazy="true" @sort="onSort" :removableSort="true" v-else :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem" :data-key="props.dataKey || 'id'">
-            <Column v-for="(col, idx) in visibleColumns" :key="col.field || idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
+            <Column v-for="(col, idx) in visibleColumns" :key="col.field || idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style" :headerClass="col.class" :bodyClass="col.class">
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
                     <slot :name="col.bodySlot" :data="slotProps.data" />
                 </template>
