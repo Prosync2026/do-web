@@ -1,6 +1,8 @@
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import { PurchaseOrderCard } from '@/types/delivery.type';
 import type { PurchaseOrderItem } from '@/types/purchase.type';
+import SmartScanModal from '@/views/delivery/components/smartScan/SmartScanModal.vue';
+import type { OcrResult } from '@/views/delivery/components/smartScan/SmartScanModal.script';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
 import AutoComplete from 'primevue/autocomplete';
 import Badge from 'primevue/badge';
@@ -13,12 +15,13 @@ import { computed, defineComponent, onMounted, ref } from 'vue';
 
 export default defineComponent({
     name: 'SelectPO',
-    components: { AutoComplete, Card, Button, Message, Toast, Form, Badge },
-    emits: ['update', 'next-step', 'prev-step'],
+    components: { AutoComplete, Card, Button, Message, Toast, Form, Badge, SmartScanModal },
+    emits: ['update', 'next-step', 'prev-step', 'smartScan', 'smartScanManual'],
     setup(_, { emit }) {
         const toast = useToast();
         const purchaseStore = usePurchaseOrderStore();
 
+        const showScanModal = ref(false);
         const selectedCard = ref<PurchaseOrderCard | null>(null);
         const manualSearch = ref('');
 
@@ -153,7 +156,16 @@ export default defineComponent({
             }
         };
 
+        const onScanConfirm = (result: OcrResult) => {
+            emit('smartScan', result);
+        };
+
+        const onScanManual = () => {
+            emit('smartScanManual');
+        };
+
         return {
+            showScanModal,
             selectedCard,
             filteredCards,
             searchTerm: manualSearch,
@@ -171,7 +183,9 @@ export default defineComponent({
             handleManualSearch,
             manualSearch,
             handlePageSizeChange,
-            handleClearSearch
+            handleClearSearch,
+            onScanConfirm,
+            onScanManual
         };
     }
 });

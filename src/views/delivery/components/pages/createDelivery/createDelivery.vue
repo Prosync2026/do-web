@@ -85,13 +85,13 @@
                 <!-- Panels -->
                 <StepPanels>
                     <StepPanel :value="1">
-                        <SelectPO @update="handleStep1Update" />
+                        <SelectPO @update="handleStep1Update" @smartScan="handleSmartScan" @smartScanManual="handleSmartScanManual" />
                     </StepPanel>
                     <StepPanel :value="2">
                         <VerifyItem @update="handleStep2Update" @next-step="goStep(3)" :selected-po="deliveryData.selectPO" @prev-step="goStep(1)" />
                     </StepPanel>
                     <StepPanel :value="3">
-                        <DeliveryInfo @update="handleStep3Update" @next-step="goStep(4)" @prev-step="goStep(2)" />
+                        <DeliveryInfo @update="handleStep3Update" @next-step="goStep(4)" @prev-step="goStep(2)" :prefill-attachment="scanAttachment" />
                     </StepPanel>
                     <StepPanel :value="4">
                         <div v-if="canPassToReview"><Review :deliveryData="deliveryData" /></div>

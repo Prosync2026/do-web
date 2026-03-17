@@ -12,7 +12,7 @@ import ProgressBar from 'primevue/progressbar';
 import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -30,8 +30,14 @@ export default defineComponent({
         ProgressBar,
         Badge
     },
+    props: {
+        prefillAttachment: {
+            type: File,
+            default: null
+        }
+    },
     emits: ['update'],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
         const router = useRouter();
         const toast = useToast();
         const toastRef = ref<InstanceType<typeof Toast> | null>(null);
@@ -50,6 +56,23 @@ export default defineComponent({
         const deliveryAttachments = ref<UploadFile[]>([]);
         const totalSize = ref(0);
         const totalSizePercent = ref(0);
+
+        // Pre-fill with the SmartScan uploaded file if provided
+        onMounted(() => {
+            if (props.prefillAttachment) {
+                const f = props.prefillAttachment;
+                const uploadFile: UploadFile = {
+                    name: f.name,
+                    size: f.size,
+                    type: f.type,
+                    raw: f,
+                    preview: f.type.startsWith('image') ? URL.createObjectURL(f) : undefined
+                };
+                deliveryAttachments.value.push(uploadFile);
+                totalSize.value = f.size;
+                totalSizePercent.value = (f.size / 10_000_000) * 100;
+            }
+        });
 
         // -------------------------------------------------------
         // EVIDENCE ATTACHMENTS (with preview)
