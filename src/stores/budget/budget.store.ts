@@ -28,6 +28,8 @@ export const useBudgetStore = defineStore('budget', () => {
     const comparisonData = ref<any>(null);
 
     const selectedVersionCode = ref<string>('');
+    const selectedFromVersionCode = ref<number>(1);
+    const selectedToVersionCode = ref<number | null>(null);
 
     const sortField = ref('CreatedAt');
     const sortOrder = ref<'asc' | 'desc'>('desc');
@@ -241,7 +243,19 @@ export const useBudgetStore = defineStore('budget', () => {
         pagination.value.page = 1;
     }
 
-    async function fetchBudgetComparison(filters?: { search?: string, page?: number, pageSize?: number, budgetId?: number }) {
+    async function fetchBudgetComparison(filters?: {
+        search?: string;
+        page?: number;
+        pageSize?: number;
+        budgetId?: number;
+        fromVersionCode?: number;
+        toVersionCode?: number;
+        changeType?: string;
+        location1?: string;
+        location2?: string;
+        element?: string;
+        category?: string;
+    }) {
         loading.value = true;
 
         try {
@@ -251,16 +265,22 @@ export const useBudgetStore = defineStore('budget', () => {
                 page: filters?.page !== undefined ? filters.page : pagination.value.page,
                 pageSize: filters?.pageSize !== undefined ? filters.pageSize : pagination.value.pageSize,
                 sortBy: sorting.value.sortBy,
-                sortOrder: sorting.value.sortOrder,
-                budgetId: filters?.budgetId // Ensure exact version is sent if provided
+                sortOrder: sorting.value.sortOrder
             };
+
+            // fromVersionCode / toVersionCode
+            if (filters?.fromVersionCode !== undefined) queryParams.fromVersionCode = filters.fromVersionCode;
+            if (filters?.toVersionCode !== undefined) queryParams.toVersionCode = filters.toVersionCode;
+            if (filters?.changeType && filters.changeType !== 'all') queryParams.changeType = filters.changeType;
+            if (filters?.location1) queryParams.location1 = filters.location1;
+            if (filters?.location2) queryParams.location2 = filters.location2;
+            if (filters?.element) queryParams.element = filters.element;
+            if (filters?.category) queryParams.category = filters.category;
 
             if (filters?.search !== undefined) {
                 const keyword = filters.search.trim();
 
                 if (keyword) {
-                    // Only send `search` — the API uses it to match itemCode, description, or element.
-                    // location1/location2/element/category are separate EXACT filters, not global search.
                     queryParams.search = keyword;
                 } else {
                     delete queryParams.search;
@@ -277,7 +297,7 @@ export const useBudgetStore = defineStore('budget', () => {
 
             comparisonData.value = response.data;
             comparisonItems.value = response.data.items || [];
-            
+
             if (response.data.pagination) {
                 applyPagination(response.data.pagination, queryParams.pageSize);
             }
@@ -290,5 +310,25 @@ export const useBudgetStore = defineStore('budget', () => {
         }
     }
 
-    return { budgets, budgetItems, pagination, loading, fetchBudgets, fetchBudgetItems, fetchBudgetVersion, fetchHierarchyBudgetItems, fetchHierarchyBudgetLocation, sorting, sortField, sortOrder, setSorting, comparisonData, comparisonItems, fetchBudgetComparison, selectedVersionCode };
+    return {
+        budgets,
+        budgetItems,
+        pagination,
+        loading,
+        fetchBudgets,
+        fetchBudgetItems,
+        fetchBudgetVersion,
+        fetchHierarchyBudgetItems,
+        fetchHierarchyBudgetLocation,
+        sorting,
+        sortField,
+        sortOrder,
+        setSorting,
+        comparisonData,
+        comparisonItems,
+        fetchBudgetComparison,
+        selectedVersionCode,
+        selectedFromVersionCode,
+        selectedToVersionCode
+    };
 });

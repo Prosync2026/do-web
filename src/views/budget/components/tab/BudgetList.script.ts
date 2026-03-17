@@ -23,6 +23,11 @@ export default defineComponent({
         budgetId: {
             type: Number,
             required: true
+        },
+        // The versionCode of the currently selected budget passed from Budget.script.ts(parent)
+        budgetVersionCode: {
+            type: Number,
+            default: null
         }
     },
     emits: ['success'],
@@ -41,19 +46,36 @@ export default defineComponent({
         const comparisonData = computed(() => budgetStore.comparisonData);
         const comparisonItems = computed(() => comparisonData.value?.items || []);
 
-        const previousVersionLabel = computed(() => comparisonData.value?.firstVersion?.budgetName || 'Previous Version');
+        // Populated from comparisonData.availableVersions after first fetch
+        const availableVersionOptions = computed(() => {
+            const versions: { id: number; versionCode: number; docNo: string; budgetName: string; totalAmount: number }[] = comparisonData.value?.availableVersions || [];
+            return versions.map((v) => ({
+                label: `${v.budgetName}`,
+                value: v.versionCode
+            }));
+        });
+
+        // Default fromVersionCode = 1
+        const selectedFromVersionCode = ref<number>(1);
+        const selectedToVersionCode = ref<number | null>(null);
+
+        // Labels derived from new API fields (fromVersion / toVersion)
+        const previousVersionLabel = computed(() => {
+            const v = comparisonData.value?.fromVersion;
+            return v ? `${v.budgetName} (RM ${formatCurrency(v.totalAmount)})` : 'From Version';
+        });
         const currentVersionLabel = computed(() => {
-            const code = budgetStore.selectedVersionCode || localStorage.getItem('selectedBudgetVersionCode');
-            return code ? `Version ${code}` : (comparisonData.value?.latestVersion?.budgetName || 'Current Version');
+            const v = comparisonData.value?.toVersion;
+            return v ? `${v.budgetName} (RM ${formatCurrency(v.totalAmount)})` : 'To Version';
         });
 
         // Impact Summary
         const impactSummary = computed(() => {
             const summary = comparisonData.value?.summary || {};
-            const firstVersion = comparisonData.value?.firstVersion || {};
-            const latestVersion = comparisonData.value?.latestVersion || {};
+            const fromVersion = comparisonData.value?.fromVersion || {};
+            const toVersion = comparisonData.value?.toVersion || {};
 
-            const totalAmountDiff = (latestVersion.totalAmount || 0) - (firstVersion.totalAmount || 0);
+            const totalAmountDiff = (toVersion.totalAmount || 0) - (fromVersion.totalAmount || 0);
 
             return {
                 totalItems: summary.totalItems || 0,
@@ -76,6 +98,60 @@ export default defineComponent({
         const showImportModal = ref(false);
         const filters = ref<Record<string, any>>({});
 
+        const activeFilters = ref({
+            location1: '' as string,
+            location2: '' as string,
+            element: '' as string,
+            category: '' as string,
+            changeType: 'all' as string
+        });
+
+        // Populated from API response filterOptions
+        const filterOptions = computed(() => ({
+            locations1: comparisonData.value?.filterOptions?.locations1 || [],
+            locations2: comparisonData.value?.filterOptions?.locations2 || [],
+            elements: comparisonData.value?.filterOptions?.elements || [],
+            categories: comparisonData.value?.filterOptions?.categories || []
+        }));
+
+        const changeTypeOptions = [
+            { label: 'All Changes', value: 'all' },
+            { label: 'Added', value: 'new' },
+            { label: 'Removed', value: 'removed' }
+        ];
+
+        const fetchComparison = async (page = pagination.value.page, pageSize = pagination.value.pageSize) => {
+            await budgetStore.fetchBudgetComparison({
+                search: search.value,
+                page,
+                pageSize,
+                fromVersionCode: selectedFromVersionCode.value,
+                toVersionCode: selectedToVersionCode.value ?? undefined,
+                changeType: activeFilters.value.changeType,
+                location1: activeFilters.value.location1 || undefined,
+                location2: activeFilters.value.location2 || undefined,
+                element: activeFilters.value.element || undefined,
+                category: activeFilters.value.category || undefined
+            });
+
+            pagination.value.total = budgetStore.pagination.total;
+            pagination.value.totalPages = budgetStore.pagination.totalPages;
+            pagination.value.page = budgetStore.pagination.page;
+            pagination.value.pageSize = budgetStore.pagination.pageSize;
+        };
+
+        async function handleFilterChange() {
+            pagination.value.page = 1;
+            await fetchComparison(1);
+        }
+
+        function handleFilterReset() {
+            activeFilters.value = { location1: '', location2: '', element: '', category: '', changeType: 'all' };
+            search.value = '';
+            pagination.value.page = 1;
+            fetchComparison(1);
+        }
+
         const fetchBudgetList = async (budgetId: number, searchTerm?: string) => {
             if (!budgetId) return;
 
@@ -85,7 +161,6 @@ export default defineComponent({
                 pageSize: pagination.value.pageSize
             };
 
-            // Pass search term to API for server-side searching
             if (searchTerm) params.search = searchTerm;
 
             await budgetStore.fetchBudgetItems(params);
@@ -99,26 +174,33 @@ export default defineComponent({
             pagination.value.totalPages = budgetStore.pagination.totalPages;
         };
 
+        // Watch budgetId (version change from parent dropdown)
         watch(
-            () => props.budgetId,
-            async (newId) => {
+            () => [props.budgetId, props.budgetVersionCode] as const,
+            async ([newId, newVersionCode]) => {
                 if (newId) {
-                    await budgetStore.fetchBudgetComparison({ search: search.value, page: 1, budgetId: newId });
-                    
-                    if (!comparisonData.value) {
-                        await fetchBudgetList(newId);
+                    // Sync toVersionCode to match the parent-selected version
+                    if (newVersionCode && newVersionCode !== selectedToVersionCode.value) {
+                        selectedToVersionCode.value = newVersionCode;
                     }
-
-                    pagination.value.total = budgetStore.pagination.total;
-                    pagination.value.totalPages = budgetStore.pagination.totalPages;
-                    pagination.value.page = budgetStore.pagination.page;
-                    pagination.value.pageSize = budgetStore.pagination.pageSize;
+                    await fetchComparison(1);
                 }
             },
             { immediate: true }
         );
 
-        // No client-side filtering — search is handled server-side via fetchBudgetItems
+        // Watch from/to version selectors
+        watch(selectedFromVersionCode, async () => {
+            pagination.value.page = 1;
+            await fetchComparison(1);
+        });
+
+        watch(selectedToVersionCode, async (newVal) => {
+            if (newVal === null) return;
+            pagination.value.page = 1;
+            await fetchComparison(1);
+        });
+
         const filteredItems = computed(() => budgetItems.value);
 
         const showImportFile = computed(() => {
@@ -144,9 +226,8 @@ export default defineComponent({
             pagination.value.page = 1;
 
             if (comparisonData.value) {
-                budgetStore.fetchBudgetComparison({ search: value || '', page: 1, budgetId: props.budgetId });
+                fetchComparison(1);
             } else {
-                // Pass the search term so the API does a server-side search
                 fetchBudgetList(props.budgetId, value || undefined);
             }
         }
@@ -158,32 +239,23 @@ export default defineComponent({
         async function handlePageChange(page: number) {
             pagination.value.page = page;
             if (comparisonData.value) {
-                await budgetStore.fetchBudgetComparison({ search: search.value, page: page, pageSize: pagination.value.pageSize, budgetId: props.budgetId });
+                await fetchComparison(page, pagination.value.pageSize);
             } else {
                 await fetchBudgetList(props.budgetId, search.value || undefined);
             }
-            pagination.value.total = budgetStore.pagination.total;
-            pagination.value.totalPages = budgetStore.pagination.totalPages;
-            pagination.value.page = budgetStore.pagination.page;
-            pagination.value.pageSize = budgetStore.pagination.pageSize;
         }
 
         async function handlePageSizeChange(size: number) {
             pagination.value.pageSize = size;
             pagination.value.page = 1;
             if (comparisonData.value) {
-                await budgetStore.fetchBudgetComparison({ search: search.value, page: 1, pageSize: size, budgetId: props.budgetId });
+                await fetchComparison(1, size);
             } else {
                 await fetchBudgetList(props.budgetId, search.value || undefined);
             }
-            pagination.value.total = budgetStore.pagination.total;
-            pagination.value.totalPages = budgetStore.pagination.totalPages;
-            pagination.value.page = budgetStore.pagination.page;
-            pagination.value.pageSize = budgetStore.pagination.pageSize;
         }
 
         onMounted(() => {
-            // Re-sync correct pagination specifically for the component state if comparison was loaded
             if (comparisonData.value) {
                 pagination.value.total = budgetStore.pagination.total;
                 pagination.value.totalPages = budgetStore.pagination.totalPages;
@@ -207,6 +279,10 @@ export default defineComponent({
             { field: 'rowIndex', header: '#' },
             { field: 'itemCode', header: 'Item Code', sortable: true },
             { field: 'description', header: 'Description', sortable: true },
+            { field: 'category', header: 'Category', sortable: true },
+            { field: 'element', header: 'Element', sortable: true },
+            { field: 'subElement', header: 'Sub Element', sortable: true },
+            { field: 'subSubElement', header: 'Sub Sub Element', sortable: true },
             { field: 'location1', header: 'Location 1', sortable: true },
             { field: 'location2', header: 'Location 2', sortable: true },
             { field: 'originalQty', header: 'Old Qty', sortable: true, class: '!bg-gray-100' },
@@ -243,13 +319,9 @@ export default defineComponent({
 
         function getUtilizationClass(value?: number) {
             if (value == null) return 'bg-gray-100 text-gray-600';
-
             if (value < 50) return 'bg-green-100 text-green-800';
-
             if (value < 80) return 'bg-yellow-100 text-yellow-800';
-
             if (value <= 100) return 'bg-orange-100 text-orange-800';
-
             return 'bg-red-100 text-red-800';
         }
 
@@ -258,14 +330,13 @@ export default defineComponent({
             if (!field || order === 0) {
                 budgetStore.setSorting('', '');
                 if (comparisonData.value) {
-                    await budgetStore.fetchBudgetComparison({ search: search.value, page: 1, budgetId: props.budgetId });
+                    await fetchComparison(1);
                 } else {
                     await fetchBudgetList(props.budgetId);
                 }
                 return;
             }
 
-            // map table field → API field (VERY IMPORTANT)
             const mapFieldToApi: Record<string, string> = {
                 itemCode: 'ItemCode',
                 description: 'Description',
@@ -292,11 +363,10 @@ export default defineComponent({
             };
 
             const sortOrder = order === 1 ? 'asc' : 'desc';
-
             budgetStore.setSorting(mapFieldToApi[field] || 'CreatedAt', sortOrder);
 
             if (comparisonData.value) {
-                await budgetStore.fetchBudgetComparison({ search: search.value, page: 1, budgetId: props.budgetId });
+                await fetchComparison(1);
             } else {
                 await fetchBudgetList(props.budgetId);
             }
@@ -361,7 +431,18 @@ export default defineComponent({
             currentVersionLabel,
             impactSummary,
             comparisonTable,
-            comparisonColumns
+            comparisonColumns,
+            comparisonData,
+            // Version selector
+            availableVersionOptions,
+            selectedFromVersionCode,
+            selectedToVersionCode,
+            // Filters
+            activeFilters,
+            filterOptions,
+            changeTypeOptions,
+            handleFilterChange,
+            handleFilterReset
         };
     }
 });

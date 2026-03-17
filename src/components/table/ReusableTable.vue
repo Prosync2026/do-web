@@ -281,7 +281,6 @@ function handleFilterChange(field: string, value: any) {
 
         <div class="flex gap-2 flex-wrap items-center">
             <span class="p-input-icon-left">
-                <i class="pi pi-search" />
                 <InputText v-if="props.onSearch && hasLoadedOnce" v-model="search" placeholder="Search..." class="w-full sm:w-auto" />
             </span>
 
