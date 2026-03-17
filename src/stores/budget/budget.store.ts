@@ -6,18 +6,30 @@ import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-export const mapPagination = (p: any): Pagination => ({
-    total: p?.total ?? p?.totalBudgetItems ?? 0,
-    totalPages: p?.totalPages ?? 1,
-    page: p?.page ?? 1,
-    pageSize: 10 //set as default 10
-});
+export const mapPagination = (p: any, usedPageSize?: number): Pagination => {
+    const total = p?.total ?? p?.totalBudgetItems ?? 0;
+    const pageSize = usedPageSize ?? p?.pageSize ?? 10;
+    const totalPages = usedPageSize ? Math.ceil(total / pageSize) || 1 : (p?.totalPages ?? 1);
+    return {
+        total,
+        totalPages,
+        page: p?.page ?? 1,
+        pageSize
+    };
+};
 
 export const useBudgetStore = defineStore('budget', () => {
     const budgets = ref<Budget[]>([]);
     const budgetItems = ref<BudgetItem[]>([]);
     const pagination = ref<Pagination>({ total: 0, totalPages: 1, page: 1, pageSize: 10 });
     const loading = ref(false);
+
+    const comparisonItems = ref<any[]>([]);
+    const comparisonData = ref<any>(null);
+
+    const selectedVersionCode = ref<string>('');
+    const selectedFromVersionCode = ref<number>(1);
+    const selectedToVersionCode = ref<number | null>(null);
 
     const sortField = ref('CreatedAt');
     const sortOrder = ref<'asc' | 'desc'>('desc');
@@ -27,8 +39,8 @@ export const useBudgetStore = defineStore('budget', () => {
         sortOrder: 'desc' as 'asc' | 'desc'
     });
 
-    const applyPagination = (p: any) => {
-        const mapped = mapPagination(p);
+    const applyPagination = (p: any, usedPageSize?: number) => {
+        const mapped = mapPagination(p, usedPageSize);
 
         pagination.value.total = mapped.total;
         pagination.value.totalPages = mapped.totalPages;
@@ -179,7 +191,7 @@ export const useBudgetStore = defineStore('budget', () => {
             });
 
             budgetItems.value = mappedItems;
-            applyPagination(response.pagination);
+            applyPagination(response.pagination, queryParams.pageSize);
         } catch (error) {
             console.error('Budget items fetch error:', error);
             showError(error, 'Failed to fetch budget items.');
@@ -231,5 +243,92 @@ export const useBudgetStore = defineStore('budget', () => {
         pagination.value.page = 1;
     }
 
-    return { budgets, budgetItems, pagination, loading, fetchBudgets, fetchBudgetItems, fetchBudgetVersion, fetchHierarchyBudgetItems, fetchHierarchyBudgetLocation, sorting, sortField, sortOrder, setSorting };
+    async function fetchBudgetComparison(filters?: {
+        search?: string;
+        page?: number;
+        pageSize?: number;
+        budgetId?: number;
+        fromVersionCode?: number;
+        toVersionCode?: number;
+        changeType?: string;
+        location1?: string;
+        location2?: string;
+        element?: string;
+        category?: string;
+    }) {
+        loading.value = true;
+
+        try {
+            const projectId = getCurrentProjectId();
+
+            const queryParams: Record<string, any> = {
+                page: filters?.page !== undefined ? filters.page : pagination.value.page,
+                pageSize: filters?.pageSize !== undefined ? filters.pageSize : pagination.value.pageSize,
+                sortBy: sorting.value.sortBy,
+                sortOrder: sorting.value.sortOrder
+            };
+
+            // fromVersionCode / toVersionCode
+            if (filters?.fromVersionCode !== undefined) queryParams.fromVersionCode = filters.fromVersionCode;
+            if (filters?.toVersionCode !== undefined) queryParams.toVersionCode = filters.toVersionCode;
+            if (filters?.changeType && filters.changeType !== 'all') queryParams.changeType = filters.changeType;
+            if (filters?.location1) queryParams.location1 = filters.location1;
+            if (filters?.location2) queryParams.location2 = filters.location2;
+            if (filters?.element) queryParams.element = filters.element;
+            if (filters?.category) queryParams.category = filters.category;
+
+            if (filters?.search !== undefined) {
+                const keyword = filters.search.trim();
+
+                if (keyword) {
+                    queryParams.search = keyword;
+                } else {
+                    delete queryParams.search;
+                }
+            }
+
+            const response = await budgetService.getBudgetComparison(projectId, queryParams);
+
+            if (!response.success || !response.data) {
+                comparisonItems.value = [];
+                comparisonData.value = null;
+                return;
+            }
+
+            comparisonData.value = response.data;
+            comparisonItems.value = response.data.items || [];
+
+            if (response.data.pagination) {
+                applyPagination(response.data.pagination, queryParams.pageSize);
+            }
+        } catch (error) {
+            showError(error, 'Failed to fetch budget comparison.');
+            comparisonItems.value = [];
+            comparisonData.value = null;
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    return {
+        budgets,
+        budgetItems,
+        pagination,
+        loading,
+        fetchBudgets,
+        fetchBudgetItems,
+        fetchBudgetVersion,
+        fetchHierarchyBudgetItems,
+        fetchHierarchyBudgetLocation,
+        sorting,
+        sortField,
+        sortOrder,
+        setSorting,
+        comparisonData,
+        comparisonItems,
+        fetchBudgetComparison,
+        selectedVersionCode,
+        selectedFromVersionCode,
+        selectedToVersionCode
+    };
 });

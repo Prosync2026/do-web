@@ -86,6 +86,21 @@ const getBudgetVersion = async (params?: GetBudgetsParams): Promise<GetBudgetsRe
     }
 };
 
+const getBudgetComparison = async (projectId: number, params?: any) => {
+    try {
+        const response = await axiosInstance.get(`/budgets/comparison/${projectId}`, { params: cleanParams(params) });
+
+        return {
+            success: response.data.success,
+            data: response.data.data || null,
+            pagination: response.data.pagination ? mapPagination(response.data.pagination) : undefined
+        };
+    } catch (error: any) {
+        showError(error, 'Failed to fetch budget comparison.');
+        return { success: false, data: null };
+    }
+};
+
 const createBudget = async (formData: FormData) => {
     try {
         const response = await axiosInstance.post('/budgets/import', formData, {
@@ -124,4 +139,4 @@ const budgetItemStatistics = async (budgetId: number) => {
     }
 };
 
-export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget, budgetStatistics, budgetItemStatistics, getHierarchyBudgetItem, getHierarchyBudgetLocation };
+export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget, budgetStatistics, budgetItemStatistics, getHierarchyBudgetItem, getHierarchyBudgetLocation, getBudgetComparison };

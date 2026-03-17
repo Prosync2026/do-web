@@ -12,4 +12,5 @@ export interface TableColumn {
     action?: boolean;
     actions?: ActionType[] | ((row: any) => ActionType[]);
     exportFormatter?: (row: any) => string;
+    class?: string;
 }

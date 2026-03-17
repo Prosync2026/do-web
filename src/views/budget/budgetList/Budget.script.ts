@@ -1,6 +1,6 @@
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { FilterVersion } from '@/types/budget.type';
-import { defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
 import BaseTab from '@/components/tab/BaseTab.vue';
 import Overview from '@/views/budget/budgetOverview/Overview.vue';
@@ -37,7 +37,10 @@ export default defineComponent({
         const selectedVersion = ref<string>('');
         const latestBudgetId = ref<number | null>(null);
         const previousVersion = ref<string | null>(null);
+        const previousVersionCode = ref<string | null>(null);
         const initialLoad = ref(true);
+        // Numeric versionCode of the currently selected version (for the comparison "To" default)
+        const selectedNumericVersionCode = ref<number | null>(null);
 
         const viewMode = ref<'overview' | 'detail'>('overview');
         const detailViewMode = ref<'list' | 'tree' | 'treeLocation'>('list');
@@ -88,9 +91,12 @@ export default defineComponent({
 
             // ALWAYS save the selected version
             localStorage.setItem('selectedBudgetVersionId', String(selected.id));
+            localStorage.setItem('selectedBudgetVersionCode', String(selected.value));
+            budgetStore.selectedVersionCode = String(selected.value);
 
             previousVersion.value = newVersion;
             latestBudgetId.value = selected.id!;
+            selectedNumericVersionCode.value = Number(selected.value);
 
             if (initialLoad.value) initialLoad.value = false;
         });
@@ -113,7 +119,8 @@ export default defineComponent({
             handleImportSuccess,
             HierarchyItemCode,
             BudgetList,
-            latestBudgetId
+            latestBudgetId,
+            selectedNumericVersionCode
         };
     }
 });
