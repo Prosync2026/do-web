@@ -57,13 +57,17 @@ export default defineComponent({
         watch(
             () => props.selectedPo,
             (newPo) => {
-                if (!newPo) {
+                // Treat null or empty object as no PO selected
+                if (!newPo || Object.keys(newPo).length === 0) {
                     itemList.value = [];
                     poNumber.value = null;
                     return;
                 }
 
-                const items = newPo.purchase_order_items ?? newPo.items ?? newPo.PurchaseOrderItems ?? [];
+                const items = (newPo as any).purchase_order_items
+                    ?? (newPo as any).items
+                    ?? (newPo as any).PurchaseOrderItems
+                    ?? [];
 
                 if (!items || items.length === 0) {
                     itemList.value = [];
@@ -71,24 +75,24 @@ export default defineComponent({
                     return;
                 }
 
-                itemList.value = items.map((i: PurchaseOrderItem) => {
-                    const item = {
-                        id: i.id ?? i.Id,
-                        purchaseOrderId: newPo.id ?? newPo.Id,
-                        requestOrderId: i.requestOrderId ?? 0,
-                        name: i.description ?? i.Name ?? 'Unnamed Item',
-                        order: i.code ?? i.ItemCode ?? '',
-                        status: 'Pending',
-                        location: '',
-                        category: '',
-                        type: '',
-                        delivered: 0,
-                        total: Number(i.qty ?? i.Quantity) || 0
-                    };
-                    return item;
-                });
+                itemList.value = items.map((i: PurchaseOrderItem) => ({
+                    id: i.id ?? (i as any).Id,
+                    purchaseOrderId: (newPo as any).id ?? (newPo as any).Id,
+                    requestOrderId: i.requestOrderId ?? 0,
+                    name: i.description ?? (i as any).Name ?? 'Unnamed Item',
+                    order: i.code ?? (i as any).ItemCode ?? '',
+                    status: 'Pending',
+                    location: '',
+                    category: '',
+                    type: '',
+                    delivered: 0,
+                    total: Number(i.qty ?? (i as any).Quantity) || 0,
+                    uom: (i as any).uom ?? (i as any).Uom ?? '-',
+                    price: Number((i as any).price ?? (i as any).Price) || 0,
+                    roDocNo: (i as any).roDocNo ?? (i as any).RoDocNo ?? '-'
+                }));
 
-                poNumber.value = newPo.poNumber ?? newPo.DocNo ?? null;
+                poNumber.value = (newPo as any).poNumber ?? (newPo as any).DocNo ?? null;
             },
             { immediate: true, deep: true }
         );
