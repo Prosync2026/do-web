@@ -310,6 +310,19 @@ export const useBudgetStore = defineStore('budget', () => {
         }
     }
 
+    async function updateBudgetItem(id: number, payload: Record<string, any>) {
+        loading.value = true;
+        try {
+            const result = await budgetService.updateBudgetItem(id, payload);
+            return result;
+        } catch (error) {
+            showError(error, 'Failed to update budget item.');
+            return { success: false };
+        } finally {
+            loading.value = false;
+        }
+    }
+
     return {
         budgets,
         budgetItems,
@@ -329,6 +342,7 @@ export const useBudgetStore = defineStore('budget', () => {
         fetchBudgetComparison,
         selectedVersionCode,
         selectedFromVersionCode,
-        selectedToVersionCode
+        selectedToVersionCode,
+        updateBudgetItem
     };
 });

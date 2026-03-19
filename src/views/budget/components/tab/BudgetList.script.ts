@@ -5,6 +5,8 @@ import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import { formatCurrency } from '@/utils/format.utils';
 import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
+import { budgetService } from '@/services/budget.service';
+import EditBudgetItem from '@/views/budget/components/dialog/EditBudgetItem.vue';
 
 interface PaginationConfig {
     page: number;
@@ -17,7 +19,8 @@ export default defineComponent({
     name: 'BudgetList',
     components: {
         ReusableTable,
-        BudgetImportModal
+        BudgetImportModal,
+        EditBudgetItem
     },
     props: {
         budgetId: {
@@ -96,6 +99,8 @@ export default defineComponent({
 
         const search = ref('');
         const showImportModal = ref(false);
+        const showEditModal = ref(false);
+        const selectedEditItem = ref<any>(null);
         const filters = ref<Record<string, any>>({});
 
         const activeFilters = ref({
@@ -174,7 +179,6 @@ export default defineComponent({
             pagination.value.totalPages = budgetStore.pagination.totalPages;
         };
 
-        // Watch budgetId (version change from parent dropdown)
         watch(
             () => [props.budgetId, props.budgetVersionCode] as const,
             async ([newId, newVersionCode]) => {
@@ -234,6 +238,29 @@ export default defineComponent({
 
         function handleImportClick() {
             showImportModal.value = true;
+        }
+
+        function handleEditClick(row: any) {
+            // Only safe in budget list mode where each row has a unique mapped id.
+            // Editing from comparison mode is disabled until BE includes budgetItemId
+            // in the comparison response (itemCode alone is not unique per budget).
+            selectedEditItem.value = row;
+            showEditModal.value = true;
+        }
+
+        async function handleActionClick(type: string, row: any) {
+            if (type === 'edit') {
+                handleEditClick(row);
+            }
+        }
+
+        async function handleEditSuccess() {
+            showEditModal.value = false;
+            if (comparisonData.value) {
+                await fetchComparison(pagination.value.page, pagination.value.pageSize);
+            } else {
+                await fetchBudgetList(props.budgetId);
+            }
         }
 
         async function handlePageChange(page: number) {
@@ -309,7 +336,8 @@ export default defineComponent({
             { field: 'totalOrderedQty', header: 'Ordered Qty', sortable: true },
             { field: 'totalRemainingQty', header: 'Remaining Qty', sortable: true, bodySlot: 'remainingQty' },
             { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rate' },
-            { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
+            { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' },
+            { field: 'actions', header: '', action: true, actions: ['edit'] }
         ];
 
         function formatPercent(value?: number) {
@@ -410,11 +438,16 @@ export default defineComponent({
             filteredItems,
             search,
             showImportModal,
+            showEditModal,
+            selectedEditItem,
             pagination,
             filters,
             showImportFile,
             formatCurrency,
             handleImportClick,
+            handleEditClick,
+            handleActionClick,
+            handleEditSuccess,
             handlePageChange,
             handlePageSizeChange,
             handleImportSuccess,

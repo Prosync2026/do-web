@@ -130,6 +130,7 @@
             @search="onSearchWrapper"
             :showImportFile="showImportFile"
             :onImportFile="handleImportClick"
+            :onActionClick="handleActionClick"
         >
             <template #remainingQty="{ data }">
                 <div class="flex flex-col gap-1">
@@ -145,5 +146,6 @@
         </ReusableTable>
     </div>
     <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" @success="handleImportSuccess" />
+    <EditBudgetItem v-model:visible="showEditModal" :item="selectedEditItem" @success="handleEditSuccess" />
     <ConfirmPopup />
 </template>
