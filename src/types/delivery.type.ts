@@ -76,6 +76,9 @@ export interface VerifyPurchaseOrderItem {
     type: string;
     delivered: number;
     total: number;
+    uom: string;
+    price: number;
+    roDocNo: string;
 }
 
 export interface PurchaseOrderItem {

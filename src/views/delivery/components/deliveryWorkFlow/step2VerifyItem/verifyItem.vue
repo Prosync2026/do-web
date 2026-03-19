@@ -74,16 +74,16 @@
                                     <div v-show="expanded.includes(index)" class="text-sm text-gray-700 mt-3">
                                         <div class="grid grid-cols-3 gap-4 mb-3 ms-5">
                                             <div>
-                                                <div class="text-xs text-gray-500 font-medium">Location</div>
-                                                <div class="font-semibold">{{ item.location }}</div>
+                                                <div class="text-xs text-gray-500 font-medium">Ordered Qty</div>
+                                                <div class="font-semibold">{{ item.total }} <span class="text-gray-400 text-xs">{{ item.uom }}</span></div>
                                             </div>
                                             <div>
-                                                <div class="text-xs text-gray-500 font-medium">Element</div>
-                                                <div class="font-semibold">{{ item.category }}</div>
+                                                <div class="text-xs text-gray-500 font-medium">Unit Price</div>
+                                                <div class="font-semibold">RM {{ item.price.toFixed(2) }}</div>
                                             </div>
                                             <div>
-                                                <div class="text-xs text-gray-500 font-medium">Item Type</div>
-                                                <div class="font-semibold">{{ item.type }}</div>
+                                                <div class="text-xs text-gray-500 font-medium">RO Reference</div>
+                                                <div class="font-semibold text-xs">{{ item.roDocNo }}</div>
                                             </div>
                                         </div>
 
@@ -91,21 +91,8 @@
 
                                         <div class="flex items-center gap-2 mt-2 ms-5">
                                             <label class="font-medium">Delivery Qty:</label>
-                                            <InputNumber v-model="item.delivered" class="w-20 text-center" />
-                                            <span>
-                                                <span v-if="item.order.includes('kg')">kg</span>
-                                                <span v-else-if="item.order.includes('m³')">m³</span>
-                                                <span v-else-if="item.order.includes('pcs')">pcs</span>
-                                                <span v-else-if="item.order.includes('unit')">unit</span>
-                                            </span>
-                                            <span class="text-gray-500 text-sm">
-                                                of {{ item.total }}
-                                                <span v-if="item.order.includes('kg')">kg</span>
-                                                <span v-else-if="item.order.includes('m³')">m³</span>
-                                                <span v-else-if="item.order.includes('pcs')">pcs</span>
-                                                <span v-else-if="item.order.includes('unit')">unit</span>
-                                                ordered
-                                            </span>
+                                            <InputNumber v-model="item.delivered" class="w-20 text-center" :min="0" :max="item.total" />
+                                            <span class="text-gray-500 text-sm">{{ item.uom }} &nbsp;/&nbsp; {{ item.total }} {{ item.uom }} </span>
                                         </div>
                                     </div>
                                 </template>
