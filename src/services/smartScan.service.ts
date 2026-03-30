@@ -7,7 +7,9 @@
 
 // In dev: proxied through Vite (/ai-api → https://ai-api-dev.qubit-it.com.my/api) to bypass CORS.
 // In production: route through backend instead.
-const SMART_SCAN_API_URL = import.meta.env.DEV 
+
+const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const SMART_SCAN_API_URL = isLocalhost 
     ? '/ai-api/extract-pdf' 
     : 'https://ai-api-dev.qubit-it.com.my/api/extract-pdf';
 
