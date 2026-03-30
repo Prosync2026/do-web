@@ -1,5 +1,5 @@
 // src/services/newBudget.service.ts
-import type { GetBudgetsParams, GetBudgetsResponse, Pagination } from '@/types/newBudget.type';
+import type { GetBudgetItemsParams, GetBudgetsParams, GetBudgetsResponse, Pagination } from '@/types/newBudget.type';
 import { showError } from '@/utils/showNotification.utils';
 import axiosInstance from './backendAxiosInstance';
 
@@ -34,7 +34,7 @@ const getBudgets = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse
     }
 };
 
-const getBudgetItems = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
+const getBudgetItems = async (params?: GetBudgetItemsParams): Promise<GetBudgetsResponse> => {
     try {
         const response = await axiosInstance.get('/budget/items', { params: cleanParams(params) });
         return {
@@ -139,4 +139,14 @@ const budgetItemStatistics = async (budgetId: number) => {
     }
 };
 
-export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget, budgetStatistics, budgetItemStatistics, getHierarchyBudgetItem, getHierarchyBudgetLocation, getBudgetComparison };
+const updateBudgetItem = async (id: number, payload: Record<string, any>) => {
+    try {
+        const response = await axiosInstance.put(`/budget/item/${id}`, payload);
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        showError(error, 'Failed to update budget item.');
+        return { success: false, message: error.response?.data?.message || 'Update failed' };
+    }
+};
+
+export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget, budgetStatistics, budgetItemStatistics, getHierarchyBudgetItem, getHierarchyBudgetLocation, getBudgetComparison, updateBudgetItem };
