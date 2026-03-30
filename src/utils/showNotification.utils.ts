@@ -64,3 +64,19 @@ export function showInfo(message?: string, fallbackMessage = 'Info.') {
         life: 2000
     });
 }
+
+export function showWarning(message?: string, fallbackMessage = 'Warning.') {
+    const toast = getGlobalToast();
+
+    if (!toast) {
+        console.warn('⚠️ Toast not initialized');
+        return;
+    }
+
+    toast.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: message || fallbackMessage,
+        life: 3000
+    });
+}
