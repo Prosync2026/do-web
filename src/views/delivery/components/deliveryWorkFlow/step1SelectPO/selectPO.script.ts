@@ -1,8 +1,8 @@
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import { PurchaseOrderCard } from '@/types/delivery.type';
 import type { PurchaseOrderItem } from '@/types/purchase.type';
-import SmartScanModal from '@/views/delivery/components/smartScan/SmartScanModal.vue';
 import type { OcrResult } from '@/views/delivery/components/smartScan/SmartScanModal.script';
+import SmartScanModal from '@/views/delivery/components/smartScan/SmartScanModal.vue';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
 import AutoComplete from 'primevue/autocomplete';
 import Badge from 'primevue/badge';
@@ -149,6 +149,61 @@ export default defineComponent({
             // just update manualSearch ref
         };
 
+        //  Smart Scan handlers 
+        function onScanManual() {
+            showScanModal.value = false;
+        }
+
+        async function onScanConfirm(result: OcrResult) {
+            showScanModal.value = false;
+
+            const scannedSO = result.soNo?.trim();
+
+            // Find a matching PO in the store by DocNo
+            const matchedPO = purchaseStore.purchaseOrders.find(
+                (po) => po.DocNo?.trim().toLowerCase() === scannedSO?.toLowerCase()
+            );
+
+            const proceedWithScan = (po: any) => {
+                const items = po.purchase_order_items ?? po.PurchaseOrderItems ?? [];
+                emit('update', {
+                    id: po.Id,
+                    poNumber: po.DocNo,
+                    items,
+                    scannedFile: result.sourceFile ?? null,
+                    scannedPlate: result.plateNo ?? ''
+                });
+                emit('next-step');
+                toast.add({
+                    severity: 'success',
+                    summary: 'Smart Scan Complete',
+                    detail: `Matched PO: ${po.DocNo}. Delivery info pre-filled.`,
+                    life: 3000
+                });
+            };
+
+            if (matchedPO) {
+                // Perfect match - auto-proceed
+                proceedWithScan(matchedPO);
+            } else if (scannedSO) {
+                // SO found in scan but not in DB — warn, user picks PO manually
+                toast.add({
+                    severity: 'warn',
+                    summary: 'SO Number Mismatch',
+                    detail: `"${scannedSO}" was not found in the system. Please select the correct PO manually.`,
+                    life: 5000
+                });
+            } else {
+                // No SO found in scan at all
+                toast.add({
+                    severity: 'warn',
+                    summary: 'No SO Number Detected',
+                    detail: 'Could not detect an SO number from the document. Please select the PO manually.',
+                    life: 3500
+                });
+            }
+        }
+
         const handlePageSizeChange = (event: Event) => {
             const target = event.target as HTMLSelectElement;
             if (target?.value) {
@@ -156,13 +211,7 @@ export default defineComponent({
             }
         };
 
-        const onScanConfirm = (result: OcrResult) => {
-            emit('smartScan', result);
-        };
 
-        const onScanManual = () => {
-            emit('smartScanManual');
-        };
 
         return {
             showScanModal,

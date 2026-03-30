@@ -1,19 +1,21 @@
+import { extractDeliveryOrder } from '@/services/smartScan.service';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
-import { defineComponent, ref, watch } from 'vue';
-import OcrResultTable from './OcrResultTable.vue';
+import { defineComponent, onUnmounted, ref, watch } from 'vue';
 import type { OcrLineItem } from './OcrResultTable.script';
+import OcrResultTable from './OcrResultTable.vue';
 
 export interface OcrResult {
     soNo: string;
     doNo: string;
     supplierName: string;
     deliveryDate: string;
+    plateNo: string;
     items: OcrLineItem[];
-    /** The original file that was uploaded */
+    // The original file that was uploaded 
     sourceFile?: File;
 }
 
@@ -32,7 +34,7 @@ export default defineComponent({
     },
     emits: ['update:modelValue', 'confirm', 'manual'],
     setup(props, { emit }) {
-        // ─── State ──────────────────────────────────────────────────────────────
+        //State
         const visible = ref(props.modelValue);
         const phase = ref<Phase>('upload');
         const isDragging = ref(false);
@@ -41,14 +43,23 @@ export default defineComponent({
         const errorMessage = ref('');
         const scanningMessage = ref('Analysing layout…');
         const fileInput = ref<HTMLInputElement | null>(null);
+        const filePreviewUrl = ref<string | null>(null);
 
         const ocrResult = ref<OcrResult>({
             soNo: '',
             doNo: '',
             supplierName: '',
             deliveryDate: '',
+            plateNo: '',
             items: []
         });
+
+        function revokePreviewUrl() {
+            if (filePreviewUrl.value) {
+                URL.revokeObjectURL(filePreviewUrl.value);
+                filePreviewUrl.value = null;
+            }
+        }
 
         watch(
             () => props.modelValue,
@@ -57,14 +68,22 @@ export default defineComponent({
                 if (v) {
                     phase.value = 'upload';
                     selectedFile.value = null;
-                    ocrResult.value = { soNo: '', doNo: '', supplierName: '', deliveryDate: '', items: [] };
+                    revokePreviewUrl();
+                    ocrResult.value = { soNo: '', doNo: '', supplierName: '', deliveryDate: '', plateNo: '', items: [] };
                 }
             }
         );
 
+        watch(selectedFile, (file) => {
+            revokePreviewUrl();
+            if (file) filePreviewUrl.value = URL.createObjectURL(file);
+        });
+
+        onUnmounted(revokePreviewUrl);
+
         watch(visible, (v) => emit('update:modelValue', v));
 
-        // ─── File handling ───────────────────────────────────────────────────
+        // File handling
         function triggerFileInput() {
             fileInput.value?.click();
         }
@@ -106,9 +125,15 @@ export default defineComponent({
             return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
         }
 
-        // ─── Scanning (mock OCR) ──────────────────────────────────────────────
+        // Scanning
         async function startScan() {
             if (!selectedFile.value) return;
+
+            if (selectedFile.value.type !== 'application/pdf') {
+                errorMessage.value = 'Only PDF files are supported for Smart Scan.';
+                phase.value = 'error';
+                return;
+            }
 
             phase.value = 'scanning';
             isScanning.value = true;
@@ -120,46 +145,25 @@ export default defineComponent({
             }, 900);
 
             try {
-                // ── PHASE 1: MOCK RESPONSE ──────────────────────────────────────
-                // Replace this block with real API call in Phase 2:
-                // const result = await doOcrService.scan(selectedFile.value);
-                await new Promise((r) => setTimeout(r, 3500));
+                const result = await extractDeliveryOrder(selectedFile.value);
 
-                const mockResult: OcrResult = {
-                    soNo: 'SO-1772162123648',
-                    doNo: 'DO-2026-00342',
-                    supplierName: 'Syarikat Bahan Binaan Sdn Bhd',
-                    deliveryDate: '2026-03-17',
+                ocrResult.value = {
+                    soNo: result.soNo,
+                    doNo: result.doNo,
+                    supplierName: result.supplierName,
+                    deliveryDate: result.deliveryDate,
+                    plateNo: result.plateNo,
                     sourceFile: selectedFile.value,
-                    items: [
-                        {
-                            itemCode: 'MAT-001',
-                            description: 'Steel Bar 12mm x 6m',
-                            qty: 50,
-                            uom: 'PCS',
-                            remarks: '',
-                            confidence: { itemCode: 0.95, description: 0.92, qty: 0.88, uom: 0.97 }
-                        },
-                        {
-                            itemCode: 'MAT-007',
-                            description: 'Concrete Mix Grade 30',
-                            qty: 12,
-                            uom: 'M3',
-                            remarks: '',
-                            confidence: { itemCode: 0.91, description: 0.89, qty: 0.6, uom: 0.95 }
-                        },
-                        {
-                            itemCode: 'MAT-023',
-                            description: "Plywood 18mm (4'x8')",
-                            qty: 30,
-                            uom: 'SHT',
-                            remarks: 'Handle with care',
-                            confidence: { itemCode: 0.55, description: 0.7, qty: 0.93, uom: 0.9 }
-                        }
-                    ]
+                    items: result.items.map((i) => ({
+                        itemCode: i.itemCode,
+                        description: i.description,
+                        qty: i.qty,
+                        uom: i.uom,
+                        remarks: i.remarks,
+                        confidence: { itemCode: 1, description: 1, qty: 1, uom: 1 }
+                    }))
                 };
 
-                ocrResult.value = mockResult;
                 phase.value = 'result';
             } catch (err: any) {
                 errorMessage.value = err?.message || 'An unexpected error occurred. Please try again or enter manually.';
@@ -170,7 +174,7 @@ export default defineComponent({
             }
         }
 
-        // ─── Actions ──────────────────────────────────────────────────────────
+        // Actions 
         function onConfirm() {
             emit('confirm', { ...ocrResult.value });
             visible.value = false;
@@ -196,6 +200,7 @@ export default defineComponent({
             scanningMessage,
             fileInput,
             ocrResult,
+            filePreviewUrl,
             triggerFileInput,
             onFileInputChange,
             onDrop,

@@ -12,7 +12,7 @@ import ProgressBar from 'primevue/progressbar';
 import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-import { defineComponent, onMounted, reactive, ref } from 'vue';
+import { defineComponent, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -34,6 +34,10 @@ export default defineComponent({
         prefillAttachment: {
             type: File,
             default: null
+        },
+        prefillPlate: {
+            type: String,
+            default: ''
         }
     },
     emits: ['update'],
@@ -50,38 +54,51 @@ export default defineComponent({
 
         const errors = reactive<{ driverPlate?: string; deliveryDate?: string }>({});
 
-        // -------------------------------------------------------
         // MAIN ATTACHMENTS (with preview)
-        // -------------------------------------------------------
         const deliveryAttachments = ref<UploadFile[]>([]);
         const totalSize = ref(0);
         const totalSizePercent = ref(0);
 
-        // Pre-fill with the SmartScan uploaded file if provided
-        onMounted(() => {
-            if (props.prefillAttachment) {
-                const f = props.prefillAttachment;
-                const uploadFile: UploadFile = {
-                    name: f.name,
-                    size: f.size,
-                    type: f.type,
-                    raw: f,
-                    preview: f.type.startsWith('image') ? URL.createObjectURL(f) : undefined
-                };
-                deliveryAttachments.value.push(uploadFile);
-                totalSize.value = f.size;
-                totalSizePercent.value = (f.size / 10_000_000) * 100;
-            }
-        });
+        // Pre-fill with the SmartScan uploaded file and/or lorry plate if provided
+        watch(
+            () => props.prefillPlate,
+            (newPlate) => {
+                if (newPlate) {
+                    initialValues.driverPlate = newPlate;
+                }
+            },
+            { immediate: true }
+        );
 
-        // -------------------------------------------------------
+        watch(
+            () => props.prefillAttachment,
+            (newAttachment) => {
+                if (newAttachment) {
+                    // Check if already have it to avoid duplicates
+                    const exists = deliveryAttachments.value.some((a) => a.name === newAttachment.name);
+                    if (!exists) {
+                        const f = newAttachment;
+                        const uploadFile: UploadFile = {
+                            name: f.name,
+                            size: f.size,
+                            type: f.type,
+                            raw: f,
+                            preview: f.type.startsWith('image') ? URL.createObjectURL(f) : undefined
+                        };
+                        deliveryAttachments.value.push(uploadFile);
+                        totalSize.value = deliveryAttachments.value.reduce((sum, f) => sum + f.size, 0);
+                        totalSizePercent.value = (totalSize.value / 10_000_000) * 100;
+                    }
+                }
+            },
+            { immediate: true }
+        );
+
         // EVIDENCE ATTACHMENTS (with preview)
-        // -------------------------------------------------------
         const evidenceFiles = ref<UploadFile[]>([]);
         const evidenceTotalSize = ref(0);
         const evidenceTotalSizePercent = ref(0);
 
-        // -------------------------------------------------------
         const formatSize = (bytes: number) => {
             const k = 1024;
             const dm = 2;
@@ -167,7 +184,7 @@ export default defineComponent({
         const uploadEvent = (callback: () => void) => callback();
 
         const onFormSubmit = async (event: FormSubmitEvent<Record<string, any>>) => {
-            const values = event.values as FormValues;
+            const values = initialValues;
 
             errors.driverPlate = '';
             errors.deliveryDate = '';

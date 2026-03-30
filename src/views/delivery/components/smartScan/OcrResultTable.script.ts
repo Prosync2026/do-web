@@ -17,7 +17,7 @@ export interface OcrLineItem {
     };
 }
 
-/** Confidence threshold below which a field is flagged */
+//  Confidence threshold below which a field is flagged 
 const LOW_CONFIDENCE = 0.75;
 
 export default defineComponent({
