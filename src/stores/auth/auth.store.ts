@@ -29,11 +29,13 @@ export const useAuthStore = defineStore('auth', {
                     this.setUser({
                         id: user.id,
                         username: user?.Username || username,
-                        role: user?.project_member_system_user[0].project_member?.project_role?.name,
-                        role_id: user?.project_member_system_user[0].project_member?.project_role_id,
-                        access_level: user?.client_management_group_system_user[0]?.access_level.code,
-                        project_id: user.project_member_system_user[0].project_member.project_id,
-                        user_project_role_code: user?.project_member_system_user[0].project_member?.project_role?.code,
+                        role: user?.project_member_system_user?.[0]?.project_member?.project_role?.name,
+                        role_id: user?.project_member_system_user?.[0]?.project_member?.project_role_id,
+                        access_level: user?.client_management_group_system_user?.[0]?.access_level?.code,
+                        project_id: user?.project_member_system_user?.[0]?.project_member?.project_id,
+                        user_project_role_code: 
+                            user?.project_member_system_user?.[0]?.project_member?.project_role?.code || 
+                            user?.client_management_group_system_user?.[0]?.access_level?.code,
                         email: user?.email
                     });
                     return true;

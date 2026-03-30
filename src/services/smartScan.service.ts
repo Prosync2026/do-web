@@ -7,7 +7,9 @@
 
 // In dev: proxied through Vite (/ai-api → https://ai-api-dev.qubit-it.com.my/api) to bypass CORS.
 // In production: route through backend instead.
-const SMART_SCAN_API_URL = '/ai-api/extract-pdf';
+const SMART_SCAN_API_URL = import.meta.env.DEV 
+    ? '/ai-api/extract-pdf' 
+    : 'https://ai-api-dev.qubit-it.com.my/api/extract-pdf';
 
 // TODO: move to DB / user settings (SSA-managed)
 const SMART_SCAN_TOKEN = 'rcp_220PbLHcagDht8COyx0Sg_adC5rTXSfR6zONZib2FpCqm0CVuMz-TtIK-55xdHda';
@@ -114,13 +116,16 @@ export async function extractDeliveryOrder(file: File): Promise<SmartScanResult>
     formData.append('temperature', '0');
     formData.append('dpi', '200');
 
+    const savedToken = localStorage.getItem('smart_scan_api_token');
+    const tokenToUse = savedToken || SMART_SCAN_TOKEN;
+
     let response: Response;
     try {
         response = await fetch(SMART_SCAN_API_URL, {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
-                Authorization: `Bearer ${SMART_SCAN_TOKEN}`
+                Authorization: `Bearer ${tokenToUse}`
             },
             body: formData
         });

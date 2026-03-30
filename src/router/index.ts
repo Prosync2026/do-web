@@ -156,6 +156,15 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     breadcrumb: [{ label: 'Notifications' }]
                 }
+            },
+            {
+                path: '/settings',
+                name: 'settings',
+                component: () => import('@/views/settings/Settings.vue'),
+                meta: {
+                    requiresAuth: true,
+                    breadcrumb: [{ label: 'Settings', route: '/settings' }]
+                }
             }
         ]
     },
