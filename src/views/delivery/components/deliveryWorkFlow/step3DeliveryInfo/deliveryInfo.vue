@@ -14,7 +14,7 @@
                     <div class="grid grid-cols-2 gap-4 p-3">
                         <div class="flex flex-col">
                             <label for="driverPlate">Driver Plate Number</label>
-                            <InputText name="driverPlate" placeholder="Plate Number" fluid />
+                            <InputText name="driverPlate" v-model="initialValues.driverPlate" placeholder="Plate Number" fluid />
                             <Message v-if="errors.driverPlate" severity="error" size="small" variant="simple">
                                 {{ errors.driverPlate }}
                             </Message>
@@ -22,7 +22,7 @@
 
                         <div class="flex flex-col">
                             <label for="deliveryDate">Delivery Date</label>
-                            <Calendar name="deliveryDate" placeholder="Select Date" showIcon :showTime="false" dateFormat="yy-mm-dd" />
+                            <Calendar name="deliveryDate" v-model="initialValues.deliveryDate" placeholder="Select Date" showIcon :showTime="false" dateFormat="yy-mm-dd" />
                             <Message v-if="errors.deliveryDate" severity="error" size="small" variant="simple">
                                 {{ errors.deliveryDate }}
                             </Message>
@@ -32,7 +32,7 @@
                     <div class="grid grid-cols-1 gap-4 p-3">
                         <div class="flex flex-col">
                             <label for="remarks">Additional Remarks</label>
-                            <Textarea name="remarks" rows="5" cols="30" />
+                            <Textarea name="remarks" v-model="initialValues.remarks" rows="5" cols="30" />
                         </div>
                     </div>
 
