@@ -38,14 +38,22 @@ const handleSignOut = () => {
     router.push({ name: 'login' });
 };
 
-const profileMenu = ref([
-    // { label: 'Notification', icon: 'pi pi-bell', command: (event: MenuItemCommandEvent) => router.push('/notifications') },
-    // { label: 'Company', icon: 'pi pi-building', command: (event: MenuItemCommandEvent) => router.push('/companyList') },
-    // { separator: true },
-    // { label: computed(() => (isDarkTheme.value ? 'Light Mode' : 'Dark Mode')), icon: computed(() => (isDarkTheme.value ? 'pi pi-sun' : 'pi pi-moon')), command: () => toggleDarkMode() },
-    // { separator: true },
-    { label: 'Sign Out', icon: 'pi pi-sign-out', command: handleSignOut }
-]);
+// Dynamic profile menu based on roles
+const profileMenu = computed(() => {
+    const items = [];
+    if (userRoleCode.value === 'SSA') {
+        items.push({ 
+            label: 'Settings', 
+            icon: 'pi pi-cog', 
+            command: () => router.push('/settings') 
+        });
+        items.push({ separator: true });
+    }
+    
+    items.push({ label: 'Sign Out', icon: 'pi pi-sign-out', command: handleSignOut });
+    
+    return items;
+});
 
 const profileMenuRef = ref();
 const toggleProfileMenu = (event: Event) => {
