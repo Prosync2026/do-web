@@ -205,8 +205,8 @@ export default defineComponent({
         });
 
         const filteredItems = computed(() => budgetItems.value);
-
-        const showImportFile = computed(() => {
+        
+        const isQS = computed(() => {
             try {
                 const userStr = localStorage.getItem('user');
                 if (!userStr) return false;
@@ -298,44 +298,56 @@ export default defineComponent({
             });
         });
 
-        const comparisonColumns: TableColumn[] = [
-            { field: 'rowIndex', header: '#' },
-            { field: 'itemCode', header: 'Item Code', sortable: true },
-            { field: 'description', header: 'Description', sortable: true },
-            { field: 'category', header: 'Category', sortable: true },
-            { field: 'element', header: 'Element', sortable: true },
-            { field: 'subElement', header: 'Sub Element', sortable: true },
-            { field: 'subSubElement', header: 'Sub Sub Element', sortable: true },
-            { field: 'location1', header: 'Location 1', sortable: true },
-            { field: 'location2', header: 'Location 2', sortable: true },
-            { field: 'originalQty', header: 'Old Qty', sortable: true, class: '!bg-gray-100' },
-            { field: 'originalAmount', header: 'Old Amount', sortable: true, bodySlot: 'amount', class: '!bg-gray-100' },
-            { field: 'latestQty', header: 'New Qty', sortable: true, class: '!bg-blue-50' },
-            { field: 'latestAmount', header: 'New Amount', sortable: true, bodySlot: 'amount', class: '!bg-blue-50' },
-            { field: 'qtyDiff', header: 'Δ Qty', sortable: true },
-            { field: 'amountDiff', header: 'Δ Amount', sortable: true, bodySlot: 'amount' },
-            { field: 'impact', header: 'Impact', sortable: true, bodySlot: 'impact' },
-            { field: 'actions', header: '', action: true, actions: ['edit'] }
-        ];
+        const comparisonColumns = computed<TableColumn[]>(() => {
+            const cols: TableColumn[] = [
+                { field: 'rowIndex', header: '#' },
+                { field: 'itemCode', header: 'Item Code', sortable: true },
+                { field: 'description', header: 'Description', sortable: true },
+                { field: 'category', header: 'Category', sortable: true },
+                { field: 'element', header: 'Element', sortable: true },
+                { field: 'subElement', header: 'Sub Element', sortable: true },
+                { field: 'subSubElement', header: 'Sub Sub Element', sortable: true },
+                { field: 'location1', header: 'Location 1', sortable: true },
+                { field: 'location2', header: 'Location 2', sortable: true },
+                { field: 'originalQty', header: 'Old Qty', sortable: true, class: '!bg-gray-100' },
+                { field: 'originalAmount', header: 'Old Amount', sortable: true, bodySlot: 'amount', class: '!bg-gray-100' },
+                { field: 'latestQty', header: 'New Qty', sortable: true, class: '!bg-blue-50' },
+                { field: 'latestAmount', header: 'New Amount', sortable: true, bodySlot: 'amount', class: '!bg-blue-50' },
+                { field: 'qtyDiff', header: 'Δ Qty', sortable: true },
+                { field: 'amountDiff', header: 'Δ Amount', sortable: true, bodySlot: 'amount' },
+                { field: 'impact', header: 'Impact', sortable: true, bodySlot: 'impact' }
+            ];
 
-        const columns: TableColumn[] = [
-            { field: 'rowIndex', header: '#' },
-            { field: 'itemCode', header: 'Item Code', sortable: true },
-            { field: 'description', header: 'Description', sortable: true },
-            { field: 'location1', header: 'Location 1', sortable: true },
-            { field: 'location2', header: 'Location 2', sortable: true },
-            { field: 'category', header: 'Category', sortable: true },
-            { field: 'elementCode', header: 'Element', sortable: true },
-            { field: 'subElement', header: '1st Sub Element', sortable: true },
-            { field: 'subSubElement', header: '2nd Sub Element', sortable: true },
-            { field: 'unit', header: 'UOM', sortable: true },
-            { field: 'qty', header: 'Qty', sortable: true },
-            { field: 'totalOrderedQty', header: 'Ordered Qty', sortable: true },
-            { field: 'totalRemainingQty', header: 'Remaining Qty', sortable: true, bodySlot: 'remainingQty' },
-            { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rate' },
-            { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' },
-            { field: 'actions', header: '', action: true, actions: ['edit'] }
-        ];
+            if (isQS.value) {
+                cols.push({ field: 'actions', header: '', action: true, actions: ['edit'] });
+            }
+            return cols;
+        });
+
+        const columns = computed<TableColumn[]>(() => {
+            const cols: TableColumn[] = [
+                { field: 'rowIndex', header: '#' },
+                { field: 'itemCode', header: 'Item Code', sortable: true },
+                { field: 'description', header: 'Description', sortable: true },
+                { field: 'location1', header: 'Location 1', sortable: true },
+                { field: 'location2', header: 'Location 2', sortable: true },
+                { field: 'category', header: 'Category', sortable: true },
+                { field: 'elementCode', header: 'Element', sortable: true },
+                { field: 'subElement', header: '1st Sub Element', sortable: true },
+                { field: 'subSubElement', header: '2nd Sub Element', sortable: true },
+                { field: 'unit', header: 'UOM', sortable: true },
+                { field: 'qty', header: 'Qty', sortable: true },
+                { field: 'totalOrderedQty', header: 'Ordered Qty', sortable: true },
+                { field: 'totalRemainingQty', header: 'Remaining Qty', sortable: true, bodySlot: 'remainingQty' },
+                { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rate' },
+                { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
+            ];
+
+            if (isQS.value) {
+                cols.push({ field: 'actions', header: '', action: true, actions: ['edit'] });
+            }
+            return cols;
+        });
 
         function formatPercent(value?: number) {
             if (value == null) return '-';
@@ -439,7 +451,7 @@ export default defineComponent({
             selectedEditItem,
             pagination,
             filters,
-            showImportFile,
+            showImportFile: isQS,
             formatCurrency,
             handleImportClick,
             handleEditClick,
