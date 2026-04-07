@@ -1,7 +1,8 @@
 // src/services/newBudget.service.ts
 import type { GetBudgetItemsParams, GetBudgetsParams, GetBudgetsResponse, Pagination } from '@/types/newBudget.type';
-import { showError } from '@/utils/showNotification.utils';
+import { showError, showWarning } from '@/utils/showNotification.utils';
 import axiosInstance from './backendAxiosInstance';
+
 
 export const mapPagination = (p: any): Pagination => ({
     total: p?.total ?? p?.totalBudgetItems ?? 0,
@@ -121,9 +122,25 @@ const budgetStatistics = async (budgetId: number) => {
     try {
         const response = await axiosInstance.get(`/budgets/${budgetId}/statistics`);
 
+        if (!response.data.success) {
+            showError(null, 'Budget not found.');
+            showWarning('Please upload budget to proceed.');
+        }
+
         return response.data;
-    } catch (error) {
-        showError(error, 'Failed to fetch budget statistics.');
+    } catch (error: any) {
+        const apiMessage = error?.response?.data?.message || '';
+        const isBudgetNotFound =
+            error?.response?.status === 404 ||
+            apiMessage.toLowerCase().includes('budget not found');
+
+        if (isBudgetNotFound) {
+            showError(null, 'Budget not found.');
+            showWarning('Please upload budget to proceed.');
+        } else {
+            showError(error, 'Failed to fetch budget statistics.');
+        }
+
         throw error;
     }
 };
