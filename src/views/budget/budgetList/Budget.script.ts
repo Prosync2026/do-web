@@ -8,7 +8,7 @@ import BudgetList from '../components/tab/BudgetList.vue';
 import HierarchyItemCode from '../components/tab/HierarchyItemCode.vue';
 import HierarchyLocation from '../components/tab/HierarchyLocation.vue';
 
-import { setGlobalToast, showInfo } from '@/utils/showNotification.utils';
+import { setGlobalToast, showError, showInfo, showWarning } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 
 import { useToast } from 'primevue/usetoast';
@@ -49,7 +49,11 @@ export default defineComponent({
 
         const fetchBudgetVersionList = async () => {
             const versionsData = await budgetStore.fetchBudgetVersion();
-            if (!versionsData || versionsData.length === 0) return;
+            if (!versionsData || versionsData.length === 0) {
+                showError('Budget not found.');
+                showWarning('Please upload budget to proceed.');
+                return;
+            }
 
             const sorted = [...versionsData].sort((a, b) => Number(a.versionCode) - Number(b.versionCode));
             const latestVersionCode = Math.max(...sorted.map((v) => Number(v.versionCode)));

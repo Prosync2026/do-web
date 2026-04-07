@@ -1,8 +1,10 @@
 import BudgetSummaryData from '@/components/summaryCard/SummaryCard.vue';
 import { budgetService } from '@/services/budget.service';
 import type { CardItem } from '@/types/card.type';
+import { showError, showWarning } from '@/utils/showNotification.utils';
 import { Chart } from 'highcharts-vue';
 import { computed, defineComponent, onMounted, reactive, ref, watch } from 'vue';
+
 
 interface BudgetStatisticsResponse {
     totalBudget: number;
@@ -98,6 +100,12 @@ export default defineComponent({
 
             try {
                 const statistics = await budgetService.budgetStatistics(id);
+
+                if (!statistics.success) {
+                    showError('Budget not found.');
+                    showWarning('Please upload budget to proceed.');
+                    return;
+                }
 
                 const cards = mapStatisticsToCards(statistics.data);
 

@@ -200,8 +200,8 @@ router.beforeEach(async (to, from, next) => {
     const requiredPermissions = to.meta.permissions as PermissionCode[] | undefined;
 
     if (requiredPermissions && requiredPermissions.length > 0) {
-        // Ensure permissions are loaded
-        if (permissionStore.permissions.length === 0) {
+        // Ensure permissions are loaded only after authentication
+        if (authStore.isAuthenticated && permissionStore.permissions.length === 0) {
             await permissionStore.fetchPermissions(authStore.user?.project_id);
         }
 
