@@ -339,6 +339,10 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
 
     // polling trigger to refresh pending count for badge
     async function refreshPendingCount() {
+        // Skip API call if user is not authenticated
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
         try {
             const response = await requestOrderService.getSubmittedTotal();
 

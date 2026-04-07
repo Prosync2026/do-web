@@ -26,15 +26,21 @@ export const useAuthStore = defineStore('auth', {
                     if (!token) return false;
 
                     this.setToken(token);
+                    // Collect ALL project IDs the user is assigned to
+                    const allProjectIds: number[] = (user?.project_member_system_user ?? []).map(
+                        (pm: any) => pm?.project_member?.project_id
+                    ).filter(Boolean);
+
                     this.setUser({
                         id: user.id,
                         username: user?.Username || username,
                         role: user?.project_member_system_user?.[0]?.project_member?.project_role?.name,
                         role_id: user?.project_member_system_user?.[0]?.project_member?.project_role_id,
                         access_level: user?.client_management_group_system_user?.[0]?.access_level?.code,
-                        project_id: user?.project_member_system_user?.[0]?.project_member?.project_id,
-                        user_project_role_code: 
-                            user?.project_member_system_user?.[0]?.project_member?.project_role?.code || 
+                        project_id: allProjectIds[0],         // first project (backward compat)
+                        project_ids: allProjectIds,           // ALL assigned projects
+                        user_project_role_code:
+                            user?.project_member_system_user?.[0]?.project_member?.project_role?.code ||
                             user?.client_management_group_system_user?.[0]?.access_level?.code,
                         email: user?.email
                     });

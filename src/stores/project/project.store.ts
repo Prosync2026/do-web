@@ -42,18 +42,23 @@ export const useProjectStore = defineStore('project', () => {
             }
 
             const authStore = useAuthStore();
-            const userProjectId = authStore.user?.project_id;
-            const accessLevel = authStore.user?.user_project_role_code;
+            const userProjectIds = authStore.user?.project_ids;   // array of all assigned IDs
+            const userProjectId  = authStore.user?.project_id;    // single ID (fallback)
+            const accessLevel    = authStore.user?.user_project_role_code;
 
-            // PURC can see ALL projects
-            if (accessLevel === 'PURC') {
+            // PURC / ADMIN can see ALL projects
+            if (accessLevel === 'PURC' || accessLevel === 'SSA') {
                 projects.value = res.data;
             }
-            // user only sees their project
+            // user has multiple assigned projects → filter by all of them
+            else if (userProjectIds && userProjectIds.length > 0) {
+                projects.value = res.data.filter((p: any) => userProjectIds.includes(p.id));
+            }
+            // fallback: single project_id (legacy)
             else if (userProjectId) {
                 projects.value = res.data.filter((p: any) => p.id === userProjectId);
             }
-            // fallback
+            // last resort: show everything
             else {
                 projects.value = res.data;
             }
