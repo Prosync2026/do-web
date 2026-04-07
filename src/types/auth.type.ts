@@ -62,6 +62,7 @@ export interface User {
     role_id: number;
     access_level?: string;
     project_id?: number;
+    project_ids?: number[]; // all assigned project IDs
     user_project_role_code?: string;
 }
 
