@@ -7,13 +7,14 @@ import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
 import { formatDate } from '@/utils/dateHelper';
 import Badge from 'primevue/badge';
+import { ProButton } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { buildApprovalFlow } from '@/utils/bcrApprovalFlow.util';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
-    components: { ReusableTable, Badge },
+    components: { ReusableTable, Badge, ProButton },
     setup() {
         const { hasPermission } = usePermission();
 

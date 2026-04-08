@@ -10,7 +10,9 @@
                     <h1 class="text-2xl font-bold">Budget Change Request</h1>
                     <p class="dark:text-gray-200 text-gray-500">Manage budget change requests and track approval status</p>
                 </div>
-                <Button label="+ New Change Request" v-if="canCreateBCR" @click="$router.push('/bcr/create')" />
+                <ProButton variant="primary" v-if="canCreateBCR" @click="$router.push('/bcr/create')">
+                    + New Change Request
+                </ProButton>
             </div>
 
             <div class="grid grid-cols-12 gap-4 mt-4 mb-16">
