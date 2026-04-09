@@ -19,6 +19,12 @@ import { useToast } from 'primevue/usetoast';
 
 import { vPermission } from '@/directives/permission.directive';
 
+import prosyncUiStyle from '@prosync_solutions/ui/style.css?raw';
+// Inject UI kit styles bypassing PostCSS (avoids Tailwind v3/v4 @layer conflict)
+const _ps = document.createElement('style');
+_ps.textContent = prosyncUiStyle;
+document.head.appendChild(_ps);
+
 const app = createApp(App);
 const pinia = createPinia();
 

@@ -1,22 +1,13 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
-import type { MenuItem } from 'primevue/menuitem';
+import Toast from 'primevue/toast';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import AppSidebar from './AppSidebar.vue';
 import AppTopbar from './AppTopbar.vue';
 
-const { layoutConfig, layoutState, isSidebarActive } = useLayout();
+const { isSidebarActive, layoutState } = useLayout();
 const route = useRoute();
-
-const home: MenuItem = {
-    icon: 'pi pi-home',
-    route: '/'
-};
-
-const items = computed<MenuItem[]>(() => {
-    return (route.meta.breadcrumb ?? []) as MenuItem[];
-});
 
 const outsideClickListener = ref<((event: Event) => void) | null>(null);
 
@@ -28,22 +19,12 @@ watch(isSidebarActive, (newVal) => {
     }
 });
 
-const containerClass = computed(() => {
-    return {
-        'layout-overlay': layoutConfig.menuMode === 'overlay',
-        'layout-static': layoutConfig.menuMode === 'static',
-        'layout-static-inactive': layoutState.staticMenuDesktopInactive && layoutConfig.menuMode === 'static',
-        'layout-overlay-active': layoutState.overlayMenuActive,
-        'layout-mobile-active': layoutState.staticMenuMobileActive
-    };
-});
-
 function bindOutsideClickListener() {
     if (!outsideClickListener.value) {
         outsideClickListener.value = (event) => {
             if (isOutsideClicked(event)) {
-                layoutState.overlayMenuActive = false;
                 layoutState.staticMenuMobileActive = false;
+                layoutState.overlayMenuActive = false;
                 layoutState.menuHoverActive = false;
             }
         };
@@ -59,92 +40,40 @@ function unbindOutsideClickListener() {
 }
 
 function isOutsideClicked(event: Event) {
-    const sidebarEl = document.querySelector('.layout-sidebar');
-    const topbarEl = document.querySelector('.layout-menu-button');
+    const sidebarEl = document.querySelector('aside');
+    const topbarBtnEl = document.querySelector('.layout-menu-button');
 
-    return !((sidebarEl && (sidebarEl.isSameNode(event.target as Node) || sidebarEl.contains(event.target as Node))) || (topbarEl && (topbarEl.isSameNode(event.target as Node) || topbarEl.contains(event.target as Node))));
+    return !(
+        (sidebarEl && (sidebarEl.isSameNode(event.target as Node) || sidebarEl.contains(event.target as Node))) ||
+        (topbarBtnEl && (topbarBtnEl.isSameNode(event.target as Node) || topbarBtnEl.contains(event.target as Node)))
+    );
 }
+
+// Ensure overlay panel class logic works just in case layout config is requested elsewhere
+const containerClass = computed(() => {
+    return {
+        'layout-mobile-active': layoutState.staticMenuMobileActive
+    };
+});
 </script>
 
 <template>
-    <div class="layout-wrapper" :class="containerClass">
-        <!-- LEFT: Sidebar -->
-        <app-sidebar></app-sidebar>
-
-        <!-- RIGHT: Topbar + Content -->
-        <div class="layout-right-section">
-            <app-topbar></app-topbar>
-
-            <div class="layout-main-container">
-                <div class="layout-main">
-                    <!-- Page Content -->
-                    <router-view></router-view>
-                </div>
-            </div>
+    <div class="flex h-screen overflow-hidden bg-surface-main-bg" :class="containerClass">
+        <AppSidebar />
+        
+        <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <AppTopbar />
+            
+            <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6">
+                <router-view></router-view>
+            </main>
         </div>
 
-        <div class="layout-mask animate-fadein"></div>
+        <div v-if="layoutState.staticMenuMobileActive" class="fixed inset-0 bg-black/60 z-40 md:hidden" @click="layoutState.staticMenuMobileActive = false"></div>
     </div>
     <Toast />
 </template>
 
-<style scoped lang="scss">
-.layout-wrapper {
-    width: 100%;
-    height: 100vh;
-}
-
-.layout-sidebar {
-    flex-shrink: 0;
-    width: 18rem;
-    position: relative;
-    z-index: 998;
-}
-
-.layout-right-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 1;
-
-    margin-right: -2rem;
-    margin-top: -1.5rem;
-}
-
-.layout-main-container {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    position: relative;
-
-    scroll-behavior: smooth;
-}
-
-.layout-main {
-    padding: 0rem 1.5rem;
-}
-
-.layout-mask {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 998;
-    width: 100%;
-    height: 100%;
-}
-
-.animate-fadein {
-    animation: fadeIn 0.15s linear;
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
+<style scoped>
+/* No more complex scoped SCSS; replaced by Tailwind flex layout */
 </style>
