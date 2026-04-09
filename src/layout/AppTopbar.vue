@@ -5,6 +5,7 @@ import { useBudgetStore } from '@/stores/budget/budget.store';
 import { usePermissionStore } from '@/stores/permission/permission.store';
 import { useProjectStore } from '@/stores/project/project.store';
 import { ProTopbar } from '@prosync_solutions/ui';
+import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
@@ -249,9 +250,10 @@ const goToAllNotifications = () => {
 </script>
 
 <template>
-    <ProTopbar :user-name="username || 'PM User'" :user-avatar="'https://randomuser.me/api/portraits/women/44.jpg'">
-        <template #left>
-            <!-- Project dropdown (Moved to left slot) -->
+    <Motion tag="div" class="w-full" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
+        <ProTopbar :user-name="username || 'PM User'" :user-avatar="'https://randomuser.me/api/portraits/women/44.jpg'">
+            <template #left>
+                <!-- Project dropdown (Moved to left slot) -->
             <div
                 v-if="showProjectSelector"
                 class="cursor-pointer bg-white dark:bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-2 border border-gray-200 dark:border-gray-700"
@@ -316,6 +318,7 @@ const goToAllNotifications = () => {
             </button>
         </template>
     </ProTopbar>
+    </Motion>
     <!-- Project Dialog -->
     <Dialog v-if="showProjectSelector" v-model:visible="showProjectDialog" header="Select Project" :style="{ width: '40rem', maxWidth: '90vw' }">
         <div v-for="group in companyProjects" :key="group.company" class="mb-6">

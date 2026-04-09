@@ -5,6 +5,7 @@ import { usePermissionStore } from '@/stores/permission/permission.store';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import { PhBook, PhChartBar, PhHouse, PhShoppingCart, PhTag, PhTicket, PhTruck, PhWrench } from '@phosphor-icons/vue';
 import { ProSidebar } from '@prosync_solutions/ui';
+import { Motion } from '@motionone/vue';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -75,14 +76,16 @@ const navItems = computed(() => [
 </script>
 
 <template>
-    <div class="h-screen bg-white">
-        <ProSidebar :key="route.path" :nav-items="navItems" :default-expanded="true" :persist-state="false">
-            <template #logo="{ isExpanded }">
-                <router-link to="/" class="flex items-center justify-center p-1">
-                    <h1 v-if="isExpanded" class="text-2xl font-extrabold leading-tight m-0 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent truncate w-full text-center">DO SYSTEM</h1>
-                    <h1 v-else class="text-2xl font-extrabold leading-tight m-0 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">DO</h1>
-                </router-link>
-            </template>
-        </ProSidebar>
-    </div>
+    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
+        <div class="h-screen bg-white">
+            <ProSidebar :key="route.path" :nav-items="navItems" :default-expanded="true" :persist-state="false">
+                <template #logo="{ isExpanded }">
+                    <router-link to="/" class="flex items-center justify-center p-1">
+                        <h1 v-if="isExpanded" class="text-2xl font-extrabold leading-tight m-0 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent truncate w-full text-center">DO SYSTEM</h1>
+                        <h1 v-else class="text-2xl font-extrabold leading-tight m-0 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">DO</h1>
+                    </router-link>
+                </template>
+            </ProSidebar>
+        </div>
+    </Motion>
 </template>
