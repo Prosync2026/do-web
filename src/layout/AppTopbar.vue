@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth/auth.store';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import { usePermissionStore } from '@/stores/permission/permission.store';
 import { useProjectStore } from '@/stores/project/project.store';
-import { Motion } from '@motionone/vue';
+import { ProTopbar } from '@prosync_solutions/ui';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
@@ -249,19 +249,12 @@ const goToAllNotifications = () => {
 </script>
 
 <template>
-    <Motion tag="div" class="layout-topbar" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
-        <div class="flex items-center w-full h-full gap-4">
-            <!-- LEFT: Menu button -->
-            <div class="flex items-center gap-4">
-                <button class="layout-menu-button layout-topbar-action p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition" @click="toggleMenu">
-                    <i class="pi pi-bars text-lg dark:text-white text-gray-700"></i>
-                </button>
-            </div>
-
-            <!-- Project dropdown -->
+    <ProTopbar :user-name="username || 'PM User'" :user-avatar="'https://randomuser.me/api/portraits/women/44.jpg'">
+        <template #left>
+            <!-- Project dropdown (Moved to left slot) -->
             <div
                 v-if="showProjectSelector"
-                class="cursor-pointer border border-gray-200 dark:border-gray-600 dark:bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-2"
+                class="cursor-pointer bg-white dark:bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-2 border border-gray-200 dark:border-gray-700"
                 @click="showProjectDialog = true"
             >
                 <i class="pi pi-briefcase text-sm text-gray-500 dark:text-gray-300"></i>
@@ -270,87 +263,59 @@ const goToAllNotifications = () => {
                 </span>
                 <i class="pi pi-chevron-down text-xs text-gray-500 dark:text-gray-400"></i>
             </div>
-
-            <div class="ml-auto" style="padding-right: 3rem">
-                <div class="layout-topbar-actions flex items-center gap-3 relative border-l border-gray-200 dark:border-gray-700 pl-4">
-                    <div class="relative">
-                        <Button icon="pi pi-bell" class="p-button-text p-button-plain bell-btn" @click="toggleNotificationMenu" />
-                        <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute -top-1 -right-1" />
-                    </div>
-
-                    <OverlayPanel ref="notificationPanel" class="w-96">
-                        <div class="flex justify-between items-center mb-2 sticky top-0 bg-white dark:bg-gray-800 z-10 pb-2">
-                            <span class="font-semibold">Notifications</span>
-                            <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" />
-                        </div>
-
-                        <div v-if="notificationStore.notifications.length === 0" class="text-sm text-gray-400 py-4 text-center">No notifications</div>
-
-                        <div v-else class="space-y-2 max-h-80 overflow-y-auto pr-1">
-                            <div v-for="item in notificationStore.notifications" :key="item.id" :class="['p-2 rounded-lg cursor-pointer transition', item.isRead ? '' : 'bg-gray-100 dark:bg-gray-900/20']" @click="goToPageDetails(item)">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium">{{ item.title }}</span>
-                                    <Badge :severity="item.isRead ? 'info' : 'warn'" :value="item.isRead ? 'Read' : 'Unread'" />
-                                </div>
-
-                                <p class="text-xs text-gray-500 mt-1">
-                                    {{ item.message }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- View All Section -->
-                        <div class="mt-3 pt-3 border-t text-center">
-                            <Button label="View All Notifications" text class="w-full" @click="goToAllNotifications" />
-                        </div>
-                    </OverlayPanel>
-
-                    <!-- Desktop: show avatar + username -->
-                    <div class="hidden lg:flex items-center gap-2">
-                        <Button class="p-button-text p-button-plain p-button-sm flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 transition" @click="toggleProfileMenu">
-                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Avatar" class="w-8 h-8 rounded-full object-cover border border-gray-300 dark:border-gray-600" />
-                            <span class="font-medium">{{ username || 'PM User' }}</span>
-                        </Button>
-                    </div>
-
-                    <!-- Mobile: show 3-dots button -->
-                    <div class="flex lg:hidden items-center relative">
-                        <Button ref="mobileProfileButtonRef" icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-lg text-gray-700 dark:text-gray-200 hover:text-blue-500" @click="toggleProfileMenu" />
-                    </div>
-
-                    <!-- Shared dropdown menu -->
-                    <Menu ref="profileMenuRef" :model="profileMenu" popup class="w-56 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900">
-                        <!-- Profile header only on mobile -->
-                        <template #start>
-                            <div class="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg">
-                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-gray-300 dark:border-gray-600" />
-                                <span class="font-semibold text-gray-800 dark:text-gray-100">
-                                    {{ username || 'PM User' }}
-                                </span>
-                            </div>
-                        </template>
-
-                        <template #item="{ item }">
-                            <Motion
-                                tag="div"
-                                class="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                                :initial="{ opacity: 0, y: 1 }"
-                                :animate="{ opacity: 1, y: 0 }"
-                                :transition="{ duration: 0.2, ease: 'easeOut' }"
-                                @click="item.command && item.command($event)"
-                            >
-                                <i :class="item.icon" class="text-gray-600 dark:text-gray-300"></i>
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-100">
-                                    {{ item.label }}
-                                </span>
-                            </Motion>
-                        </template>
-                    </Menu>
-                    <Toast />
-                </div>
+        </template>
+        
+        <template #right>
+            <!-- Notifications (Moved to right slot before user menu) -->
+            <div class="relative mr-2">
+                <Button icon="pi pi-bell" class="p-button-text p-button-plain p-button-rounded relative" style="width: 2.5rem; height: 2.5rem" @click="toggleNotificationMenu" />
+                <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute shadow-sm" style="top: -2px; right: 0px;" />
             </div>
-        </div>
-    </Motion>
+
+            <OverlayPanel ref="notificationPanel" class="w-96 shadow-xl rounded-xl">
+                <div class="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800">
+                    <span class="font-semibold text-gray-800 dark:text-white">Notifications</span>
+                    <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" />
+                </div>
+
+                <div v-if="notificationStore.notifications.length === 0" class="text-sm text-gray-400 py-6 text-center">No notifications</div>
+
+                <div v-else class="space-y-2 max-h-80 overflow-y-auto pr-1 mt-3">
+                    <div v-for="item in notificationStore.notifications" :key="item.id" :class="['p-3 rounded-lg cursor-pointer transition border border-transparent', item.isRead ? 'hover:bg-gray-50' : 'bg-blue-50/50 border-blue-100 hover:bg-blue-50']" @click="goToPageDetails(item)">
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ item.title }}</span>
+                            <Badge :severity="item.isRead ? 'secondary' : 'info'" :value="item.isRead ? 'Read' : 'Unread'" class="text-[10px]" />
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">{{ item.message }}</p>
+                    </div>
+                </div>
+
+                <!-- View All Section -->
+                <div class="mt-3 pt-3 border-t border-gray-100 text-center">
+                    <Button label="View All Notifications" text class="w-full text-sm font-semibold" @click="goToAllNotifications" />
+                </div>
+            </OverlayPanel>
+        </template>
+        
+        <template #menu-items="{ close }">
+            <div v-if="userRoleCode === 'SSA'">
+                <button
+                    @click="() => { close(); router.push('/settings'); }"
+                    class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors text-gray-700"
+                >
+                    <i class="pi pi-cog text-gray-500"></i> Settings
+                </button>
+                <div class="border-t border-border-border my-1"></div>
+            </div>
+            
+            <button
+                @click="() => { close(); handleSignOut(); }"
+                class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            >
+                <i class="pi pi-sign-out"></i> Logout
+            </button>
+        </template>
+    </ProTopbar>
     <!-- Project Dialog -->
     <Dialog v-if="showProjectSelector" v-model:visible="showProjectDialog" header="Select Project" :style="{ width: '40rem', maxWidth: '90vw' }">
         <div v-for="group in companyProjects" :key="group.company" class="mb-6">
