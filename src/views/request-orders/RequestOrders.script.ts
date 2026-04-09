@@ -1,5 +1,4 @@
 import BaseTab from '@/components/tab/BaseTab.vue';
-import ReusableTable from '@/components/table/ReusableTable.vue';
 import { useDashboard } from '@/composables/useDashboard';
 import { requestOrderService } from '@/services/requestOrder.service';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
@@ -19,17 +18,23 @@ import EditRo from './components/modal/EditRo.vue';
 import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
 import RoSummary from './components/summary/RoSummary.vue';
-// reject modal
 import { useProjectStore } from '@/stores/project/project.store';
 import { formatCurrency } from '@/utils/format.utils';
 import RejectRo from './components/modal/RejectRo.vue';
+import { ProTable, ProPageHeader, ProButton, ProCard, ProInput, ProTag, ProSelect } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'RequestOrders',
     components: {
         BaseTab,
         Motion,
-        ReusableTable,
+        ProTable,
+        ProPageHeader,
+        ProButton,
+        ProCard,
+        ProInput,
+        ProTag,
+        ProSelect,
         RoSummary,
         ViewRo,
         EditRo,
@@ -211,108 +216,44 @@ export default defineComponent({
             }))
         );
 
-        const tableColumns = computed<TableColumn[]>(() => {
-            const columns: TableColumn[] = [
-                { field: 'rowIndex', header: '#', sortable: true },
-                { field: 'roNumber', header: 'RO Number', sortable: true }
+        const tableColumns = computed(() => {
+            const columns: any[] = [
+                { key: 'rowIndex', label: '#', sortable: true },
+                { key: 'roNumber', label: 'RO Number', sortable: true }
             ];
             if (isPurchasingRole) {
                 columns.push({
-                    field: 'projectName',
-                    header: 'Project',
+                    key: 'projectName',
+                    label: 'Project',
                     sortable: true
                 });
             }
-            columns.push({ field: 'requestedBy', header: 'Requested By', sortable: true }, { field: 'roDate', header: 'RO Date', sortable: true }, { field: 'deliveryDate', header: 'Delivery Date', sortable: true });
+            columns.push(
+                { key: 'requestedBy', label: 'Requested By', sortable: true },
+                { key: 'roDate', label: 'RO Date', sortable: true },
+                { key: 'deliveryDate', label: 'Delivery Date', sortable: true }
+            );
 
             // only show pricing to dedicated users
             if (canViewPricing.value) {
                 columns.push({
-                    field: 'totalAmount',
-                    header: 'Total Amount',
-                    sortable: true,
-                    bodySlot: 'totalAmount'
+                    key: 'totalAmount',
+                    label: 'Total Amount',
+                    sortable: true
                 });
             }
 
             columns.push(
-                { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
-                {
-                    field: 'approvalProgress',
-                    header: 'Approval Status',
-                    bodySlot: 'approvalStatus',
-                    exportFormatter: (row) => {
-                        return row.approvalProgress?.map((s: any) => s.level).join(' > ') || '';
-                    }
-                },
-                { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
-                {
-                    field: 'actions',
-                    header: 'Actions',
-                    action: true,
-                    actions: (row: Order) => {
-                        const actions: ActionType[] = [];
-
-                        if (canViewRO.value) actions.push('view');
-
-                        if (canEditRO.value && isPurchasingRole && row.currentApprovalStage === 'PURCH') {
-                            actions.push('edit');
-                        }
-
-                        if (canApproveRow(row)) {
-                            actions.push('approve', 'reject');
-                        }
-
-                        if (canDeleteRO.value) actions.push('delete');
-
-                        return actions;
-                    }
-                }
+                { key: 'budgetType', label: 'Budget Type', sortable: true },
+                { key: 'approvalProgress', label: 'Approval Status' },
+                { key: 'status', label: 'Status', sortable: true },
+                { key: 'actions', label: 'Actions' }
             );
 
             return columns;
         });
 
-        const tableFilters = computed(() => {
-            const filters: any[] = [];
-
-            // PURC only
-            if (isPurchasingRole) {
-                filters.push({
-                    type: 'select',
-                    field: 'projectId',
-                    placeholder: 'Project',
-                    options: [{ label: 'All Projects', value: '' }, ...projectStore.projectOptions],
-                    model: store.filters.projectId
-                });
-            }
-
-            filters.push(
-                {
-                    type: 'select',
-                    field: 'budgetType',
-                    placeholder: 'Budget',
-                    options: [
-                        { label: 'All Type', value: '' },
-                        { label: 'Budgeted', value: 'Budgeted' },
-                        { label: 'NonBudgeted', value: 'NonBudgeted' }
-                    ],
-                    model: store.filters.budgetType
-                },
-                {
-                    type: 'date',
-                    field: 'startDate',
-                    placeholder: 'Start Date'
-                },
-                {
-                    type: 'date',
-                    field: 'endDate',
-                    placeholder: 'End Date'
-                }
-            );
-
-            return filters;
-        });
+        // Removed tableFilters as filters will be handled purely in template
 
         function getApprovalDotClass(status: string) {
             switch (status) {
@@ -577,16 +518,25 @@ export default defineComponent({
             store.fetchOrders();
         }
 
-        function handleFilterChange(filters: RequestOrdersFilters): void {
-            store.filters.status = filters.status ?? '';
-            store.filters.budgetType = filters.budgetType ?? '';
-            store.filters.search = filters.search ?? '';
-            store.filters.startDate = filters.startDate ?? '';
-            store.filters.endDate = filters.endDate ?? '';
-            store.filters.projectId = (filters.projectId as string) ?? '';
+        function handleFilterChange(filters?: any): void {
+            if (filters) {
+                store.filters.status = filters.status ?? store.filters.status;
+                store.filters.budgetType = filters.budgetType ?? store.filters.budgetType;
+                store.filters.search = filters.search ?? store.filters.search;
+                store.filters.startDate = filters.startDate ?? store.filters.startDate;
+                store.filters.endDate = filters.endDate ?? store.filters.endDate;
+                store.filters.projectId = (filters.projectId as string) ?? store.filters.projectId;
+            }
             store.pagination.page = 1;
             store.fetchOrders();
         }
+
+        const handleUpdatePagination = async (newPagination: any) => {
+            if (store.pagination.page === newPagination.page && store.pagination.pageSize === newPagination.pageSize) return;
+            store.pagination.page = newPagination.page;
+            store.pagination.pageSize = newPagination.pageSize;
+            store.fetchOrders();
+        };
 
         return {
             activeTab,
@@ -609,7 +559,6 @@ export default defineComponent({
             handleApproveFromModal,
             handleRejectFromModal,
             tableColumns,
-            tableFilters,
             handleActionClick,
             handleFilterChange,
             showDraftModal,
@@ -641,7 +590,10 @@ export default defineComponent({
             currentRejectOrder,
             totalApprovedValue,
             canViewPricing,
-            formatCurrency
+            formatCurrency,
+            handleUpdatePagination,
+            canApproveRow,
+            projectStore
         };
     }
 });
