@@ -2,22 +2,22 @@
 import { useLayout } from '@/layout/composables/layout';
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { useBudgetStore } from '@/stores/budget/budget.store';
+import { useNotificationStore } from '@/stores/notification/notification.store';
 import { usePermissionStore } from '@/stores/permission/permission.store';
 import { useProjectStore } from '@/stores/project/project.store';
-import { ProTopbar } from '@prosync_solutions/ui';
+import type { Project } from '@/types';
+import { getRouteByDocumentType } from '@/utils/route-map.util';
 import { Motion } from '@motionone/vue';
+import { PhBell, PhBriefcase, PhCaretDown, PhGear, PhSignOut } from '@phosphor-icons/vue';
+import { ProTopbar } from '@prosync_solutions/ui';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import Menu from 'primevue/menu';
 import OverlayPanel from 'primevue/overlaypanel';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { getRouteByDocumentType } from '@/utils/route-map.util';
-import { useNotificationStore } from '@/stores/notification/notification.store';
-import type { Project } from '@/types';
 
 const toast = useToast();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
@@ -250,28 +250,30 @@ const goToAllNotifications = () => {
 </script>
 
 <template>
-    <Motion tag="div" class="w-full" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
+    <Motion tag="div" class="w-full relative z-[60]" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
         <ProTopbar :user-name="username || 'PM User'" :user-avatar="'https://randomuser.me/api/portraits/women/44.jpg'">
             <template #left>
-                <!-- Project dropdown (Moved to left slot) -->
+            <!-- Project dropdown (Moved to left slot) -->
             <div
                 v-if="showProjectSelector"
                 class="cursor-pointer bg-white dark:bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-2 border border-gray-200 dark:border-gray-700"
                 @click="showProjectDialog = true"
             >
-                <i class="pi pi-briefcase text-sm text-gray-500 dark:text-gray-300"></i>
+                <PhBriefcase :size="16" class="text-gray-500 dark:text-gray-300" />
                 <span class="text-gray-700 dark:text-gray-200 font-semibold text-sm hidden md:inline">
                     {{ selectedProject?.name || 'Select Project' }}
                 </span>
-                <i class="pi pi-chevron-down text-xs text-gray-500 dark:text-gray-400"></i>
+                <PhCaretDown :size="14" class="text-gray-500 dark:text-gray-400" />
             </div>
         </template>
         
         <template #right>
             <!-- Notifications (Moved to right slot before user menu) -->
-            <div class="relative mr-2">
-                <Button icon="pi pi-bell" class="p-button-text p-button-plain p-button-rounded relative" style="width: 2.5rem; height: 2.5rem" @click="toggleNotificationMenu" />
-                <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute shadow-sm" style="top: -2px; right: 0px;" />
+            <div class="relative mr-2 flex items-center justify-center">
+                <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative" @click="toggleNotificationMenu">
+                    <PhBell :size="20" class="text-gray-600 dark:text-gray-300" />
+                </button>
+                <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute shadow-sm" style="top: 0px; right: 2px;" />
             </div>
 
             <OverlayPanel ref="notificationPanel" class="w-96 shadow-xl rounded-xl">
@@ -305,7 +307,7 @@ const goToAllNotifications = () => {
                     @click="() => { close(); router.push('/settings'); }"
                     class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors text-gray-700"
                 >
-                    <i class="pi pi-cog text-gray-500"></i> Settings
+                    <PhGear :size="18" class="text-gray-500" /> Settings
                 </button>
                 <div class="border-t border-border-border my-1"></div>
             </div>
@@ -314,7 +316,7 @@ const goToAllNotifications = () => {
                 @click="() => { close(); handleSignOut(); }"
                 class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
-                <i class="pi pi-sign-out"></i> Logout
+                <PhSignOut :size="18" /> Logout
             </button>
         </template>
     </ProTopbar>
@@ -359,5 +361,6 @@ const goToAllNotifications = () => {
     top: 4px;
     right: 4px;
     line-height: 13px;
+    z-index: 1000 !important;   
 }
 </style>

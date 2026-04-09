@@ -64,7 +64,7 @@ const containerClass = computed(() => {
         <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
             <AppTopbar />
             
-            <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6 relative z-0">
+            <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6">
                 <router-view></router-view>
             </main>
         </div>
