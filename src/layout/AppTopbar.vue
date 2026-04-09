@@ -9,10 +9,9 @@ import type { Project } from '@/types';
 import { getRouteByDocumentType } from '@/utils/route-map.util';
 import { Motion } from '@motionone/vue';
 import { PhBell, PhBriefcase, PhCaretDown, PhGear, PhSignOut } from '@phosphor-icons/vue';
-import { ProTopbar } from '@prosync_solutions/ui';
+import { ProModal, ProTopbar } from '@prosync_solutions/ui';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
 import OverlayPanel from 'primevue/overlaypanel';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
@@ -322,7 +321,7 @@ const goToAllNotifications = () => {
     </ProTopbar>
     </Motion>
     <!-- Project Dialog -->
-    <Dialog v-if="showProjectSelector" v-model:visible="showProjectDialog" header="Select Project" :style="{ width: '40rem', maxWidth: '90vw' }">
+    <ProModal v-if="showProjectSelector" v-model="showProjectDialog" title="Select Project" size="md" class="z-[100]"  >
         <div v-for="group in companyProjects" :key="group.company" class="mb-6">
             <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">{{ group.company }}</h3>
             <div class="space-y-3">
@@ -341,7 +340,7 @@ const goToAllNotifications = () => {
                 </div>
             </div>
         </div>
-    </Dialog>
+    </ProModal>
     <div v-if="showReloadSpinner" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
         <div class="flex flex-col items-center gap-4">
             <ProgressSpinner style="width: 50px; height: 50px" />
@@ -350,17 +349,4 @@ const goToAllNotifications = () => {
     </div>
 </template>
 
-<style scoped>
-.notification-badge {
-    font-size: 9px;
-    padding: 0 4px;
-    min-width: 13px;
-    height: 13px;
 
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    line-height: 13px;
-    z-index: 1000 !important;   
-}
-</style>
