@@ -15,7 +15,10 @@ const routes: RouteRecordRaw[] = [
             {
                 path: '/',
                 name: 'dashboard',
-                component: () => import('@/views/dashboard/Dashboard.vue')
+                component: () => import('@/views/dashboard/Dashboard.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Dashboard' }]
+                }
             },
             {
                 path: '/request-orders',

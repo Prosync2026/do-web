@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { usePageHeader } from '@/composables/usePageHeader';
 import { useLayout } from '@/layout/composables/layout';
+import { ProPageHeader } from '@prosync_solutions/ui';
 import Toast from 'primevue/toast';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -8,6 +10,7 @@ import AppTopbar from './AppTopbar.vue';
 
 const { isSidebarActive, layoutState } = useLayout();
 const route = useRoute();
+const { breadcrumbs, pageTitle } = usePageHeader();
 
 const outsideClickListener = ref<((event: Event) => void) | null>(null);
 
@@ -43,10 +46,7 @@ function isOutsideClicked(event: Event) {
     const sidebarEl = document.querySelector('aside');
     const topbarBtnEl = document.querySelector('.layout-menu-button');
 
-    return !(
-        (sidebarEl && (sidebarEl.isSameNode(event.target as Node) || sidebarEl.contains(event.target as Node))) ||
-        (topbarBtnEl && (topbarBtnEl.isSameNode(event.target as Node) || topbarBtnEl.contains(event.target as Node)))
-    );
+    return !((sidebarEl && (sidebarEl.isSameNode(event.target as Node) || sidebarEl.contains(event.target as Node))) || (topbarBtnEl && (topbarBtnEl.isSameNode(event.target as Node) || topbarBtnEl.contains(event.target as Node))));
 }
 
 // Ensure overlay panel class logic works just in case layout config is requested elsewhere
@@ -60,11 +60,12 @@ const containerClass = computed(() => {
 <template>
     <div class="flex h-screen overflow-hidden bg-surface-main-bg" :class="containerClass">
         <AppSidebar />
-        
+
         <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
             <AppTopbar />
-            
+
             <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6">
+                <ProPageHeader v-if="breadcrumbs.length > 0" :title="pageTitle" :breadcrumbs="breadcrumbs" class="mb-4" />
                 <router-view></router-view>
             </main>
         </div>
