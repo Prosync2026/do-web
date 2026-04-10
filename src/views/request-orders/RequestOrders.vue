@@ -4,7 +4,7 @@ import { Button } from "@prosync/ui-kit";
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-6 space-y-6">
+        <div class="p-1">
             <BreadcrumbList />
             <!-- Header -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -26,8 +26,7 @@ import { Button } from "@prosync/ui-kit";
 
             <!-- Tabs and Table Wrap in Card -->
             <ProCard class="shadow-sm">
-                <BaseTab v-model="activeTab" :tabs="tabItems">
-                    <template #default="{ activeTab }">
+                <ProTabs v-model="activeTab" :tabs="tabItems">
                         <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
                             
                             <!-- Filters Bar -->
@@ -125,8 +124,7 @@ import { Button } from "@prosync/ui-kit";
                                 </template>
                             </ProTable>
                         </Motion>
-                    </template>
-                </BaseTab>
+                </ProTabs>
             </ProCard>
 
             <ViewRo v-model:visible="showDetailsModal" :order="selectedOrder" :isPurchasingRole="isPurchasingRole" @approve="handleApproveFromModal" @reject="handleRejectFromModal" />

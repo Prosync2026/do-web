@@ -1,8 +1,7 @@
-import BaseTab from '@/components/tab/BaseTab.vue';
+
 import { useDashboard } from '@/composables/useDashboard';
 import { requestOrderService } from '@/services/requestOrder.service';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
-import type { TableColumn } from '@/types/table.type';
 import { showError } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
@@ -11,22 +10,22 @@ import { useToast } from 'primevue/usetoast';
 import { nextTick } from 'vue';
 
 import { useRequestOrderPermission } from '@/permissions';
+import { useProjectStore } from '@/stores/project/project.store';
 import { USER_ROLE_TO_APPROVAL_ROLE } from '@/utils/approvalRole.util';
+import { formatCurrency } from '@/utils/format.utils';
+import { ProButton, ProCard, ProInput, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
-import type { ActionType, Order, RequestOrdersFilters } from '../../types/request-order.type';
+import type { Order } from '../../types/request-order.type';
 import EditRo from './components/modal/EditRo.vue';
+import RejectRo from './components/modal/RejectRo.vue';
 import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
 import RoSummary from './components/summary/RoSummary.vue';
-import { useProjectStore } from '@/stores/project/project.store';
-import { formatCurrency } from '@/utils/format.utils';
-import RejectRo from './components/modal/RejectRo.vue';
-import { ProTable, ProPageHeader, ProButton, ProCard, ProInput, ProTag, ProSelect } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'RequestOrders',
     components: {
-        BaseTab,
+        ProTabs,
         Motion,
         ProTable,
         ProPageHeader,
@@ -114,11 +113,11 @@ export default defineComponent({
 
         const tabItems = computed(() => {
             return [
-                { label: 'All Orders', value: 'all' },
-                { label: 'Pending', value: 'submitted', badge: submittedCount.value },
-                { label: 'Processing', value: 'processing', badge: pendingCount.value },
-                { label: 'Approved', value: 'approved' },
-                { label: 'Rejected', value: 'rejected' }
+                { label: 'All Orders', key: 'all' },
+                { label: 'Pending', key: 'submitted', badge: submittedCount.value },
+                { label: 'Processing', key: 'processing', badge: pendingCount.value },
+                { label: 'Approved', key: 'approved' },
+                { label: 'Rejected', key: 'rejected' }
             ];
         });
         // Fetch orders on mount and whenever filters change
