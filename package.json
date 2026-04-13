@@ -11,10 +11,11 @@
     "dependencies": {
         "@motionone/dom": "^10.18.0",
         "@motionone/vue": "^10.16.4",
+        "@phosphor-icons/vue": "^2.2.1",
         "@primeuix/themes": "^1.0.0",
         "@primevue/forms": "^4.3.9",
         "@primevue/themes": "^4.3.9",
-        "@prosync_solutions/ui": "^0.1.8",
+        "@prosync_solutions/ui": "^0.3.0",
         "axios": "^1.12.2",
         "chart.js": "^3.9.1",
         "cross-env": "^10.1.0",

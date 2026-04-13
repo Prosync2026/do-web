@@ -21,6 +21,8 @@ import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 import CreateROModal from '../modal/CreateRo.vue';
 import CreateStockItem from '../modal/CreateStockItem.vue';
 import PreviewRo from '../modal/PreviewRo.vue';
+import { ProButton, ProCard, ProInput, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag, ProTextarea, ProDatePicker, ProUploadFile, type UploadFile, type DateRange, type TableColumn } from '@prosync_solutions/ui';
+import { PhPackage, PhPlus, PhDotsThreeVertical, PhXCircle, PhWarning, PhTrash, PhFileText } from '@phosphor-icons/vue';
 
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
@@ -28,7 +30,7 @@ type MenuInstance = ComponentPublicInstance & {
 
 export default defineComponent({
     name: 'CreateRequestOrders',
-    components: { Motion, BudgetInfoCard, Menu, CreateROModal, CreateStockItem, PreviewRo, FileUpload, ProgressBar },
+    components: { Motion, BudgetInfoCard, Menu, CreateROModal, CreateStockItem, PreviewRo, FileUpload, ProgressBar, ProButton, ProCard, ProInput, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag, ProTextarea, AutoComplete, ProDatePicker, ProUploadFile, PhPackage, PhPlus, PhDotsThreeVertical, PhXCircle, PhWarning, PhTrash, PhFileText },
     setup() {
         const router = useRouter();
         const route = useRoute();
@@ -62,9 +64,21 @@ export default defineComponent({
         const files = ref<File[]>([]);
         const overallRemark = ref('');
         const MAX_FILE_SIZE = 1_000_000;
-        const attachments = ref<Array<File | AttachmentItem>>([]); // unified array
-        const newAttachments = ref<File[]>([]);
-        const existingAttachments = ref<AttachmentItem[]>([]);
+
+        const tableColumns = computed<TableColumn[]>(() => {
+            return [
+                { key: 'itemCode', label: 'Item Code', width: '20%' },
+                { key: 'description', label: 'Description', width: '25%' },
+                { key: 'location', label: 'Location', width: '18%' },
+                { key: 'uom', label: 'UOM', width: '70px', align: 'center' },
+                { key: 'qty', label: 'Quantity', width: '100px' },
+                { key: 'deliveryDate', label: 'Delivery Date', width: '160px' },
+                { key: 'price', label: 'Price', width: '140px' }, // Keep logic but can hide with classes
+                { key: 'total', label: 'Total', width: '130px', align: 'right' },
+                { key: 'action', label: 'Action', width: '60px', align: 'center' }
+            ];
+        });
+        const uploadFilesList = ref<UploadFile[]>([]); // Unified storage for ProUploadFile
         const isAttachmentValid = ref(true);
 
         const showValidation = ref(false);
@@ -120,14 +134,21 @@ export default defineComponent({
 
                     if (draft.Attachment) {
                         try {
-                            const parsed = JSON.parse(draft.Attachment);
-                            existingAttachments.value = parsed.map((att: any) => ({
-                                filename: att.filename,
-                                path: att.path.replace(/\\/g, '/'),
-                                size: att.size,
-                                type: att.type
+                            const draftAttachments: AttachmentItem[] = JSON.parse(draft.Attachment);
+                            uploadFilesList.value = draftAttachments.map(att => ({
+                                id: att.path || att.filename,
+                                file: new File([], att.filename),
+                                name: att.filename,
+                                size: att.size || 0,
+                                type: att.type || 'application/octet-stream',
+                                status: 'done',
+                                url: requestOrderService.getAttachmentUrl({
+                                    filename: att.filename,
+                                    path: att.path.replace(/\\/g, '/'),
+                                    size: att.size,
+                                    type: att.type
+                                })
                             }));
-                            attachments.value = [...existingAttachments.value];
                         } catch (e) {
                             console.error('Failed to parse attachment JSON');
                         }
@@ -217,7 +238,7 @@ export default defineComponent({
         watch(budgetType, (newType, oldType) => {
             if (budgetSwitching.value || newType === oldType) return;
 
-            if (items.value.length === 0 && attachments.value.length === 0 && !overallRemark.value.trim()) {
+            if (items.value.length === 0 && uploadFilesList.value.length === 0 && !overallRemark.value.trim()) {
                 resetFormForType(newType);
                 return;
             }
@@ -256,9 +277,7 @@ export default defineComponent({
 
         function resetFormForType(type: string) {
             items.value = [];
-            attachments.value = [];
-            newAttachments.value = [];
-            existingAttachments.value = [];
+            uploadFilesList.value = [];
             overallRemark.value = '';
 
             if (type === 'Budgeted Item') {
@@ -297,44 +316,6 @@ export default defineComponent({
                 ];
             }
         }
-
-        const onRemoveTemplatingFile = (file: File, removeFileCallback: (index: number) => void, index: number) => {
-            removeFileCallback(index);
-            totalSize.value -= file.size;
-            totalSizePercent.value = Math.min((totalSize.value / 1000000) * 100, 100);
-        };
-
-        const onClearTemplatingUpload = (clear: () => void) => {
-            clear();
-            totalSize.value = 0;
-            totalSizePercent.value = 0;
-        };
-
-        const uploadEvent = (callback: () => void) => {
-            totalSizePercent.value = Math.min((totalSize.value / 1000000) * 100, 100);
-            callback();
-        };
-
-        const onTemplatedUpload = () => {
-            toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
-        };
-
-        const formatSize = (bytes: number) => {
-            const k = 1024;
-            const dm = 3;
-
-            // Fallback sizes if $primevue or locale is undefined
-            const sizes = $primevue?.config?.locale?.fileSizeTypes ?? ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-
-            if (bytes === 0) return `0 ${sizes[0]}`;
-
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-
-            const sizeLabel = sizes[i] ?? 'Bytes';
-
-            return `${formattedSize} ${sizeLabel}`;
-        };
 
         let tempIdCounter = 0;
 
@@ -380,7 +361,7 @@ export default defineComponent({
         const getActionItems = (item: Item, index: number) => [
             {
                 label: 'Delete Item',
-                icon: 'pi pi-trash',
+                icon: PhTrash,
                 command: () => {
                     items.value.splice(index, 1);
                     menuRefs.value.splice(index, 1);
@@ -389,7 +370,7 @@ export default defineComponent({
             },
             {
                 label: item.showNotes ? 'Hide Note' : 'Add Note',
-                icon: 'pi pi-file',
+                icon: PhFileText,
                 command: () => toggleNotes(item)
             }
         ];
@@ -434,6 +415,17 @@ export default defineComponent({
                 }
             }
         }
+
+        const handleDeliveryInput = (event: Event, item: Item) => {
+            const target = event.target as HTMLInputElement;
+            item.deliveryDate = target.value ? new Date(target.value) : null;
+            onDeliveryDateChange(item);
+        };
+
+        const handleDeliveryPicker = (val: string | Date | null, item: Item) => {
+            item.deliveryDate = typeof val === 'string' && val ? new Date(val) : (val instanceof Date ? val : null);
+            onDeliveryDateChange(item);
+        };
 
         const setMenuRef = (el: MenuInstance | null, index: number) => {
             if (el) menuRefs.value[index] = el;
@@ -667,64 +659,6 @@ export default defineComponent({
             }, 0);
         };
 
-        function removeAttachment(index: number) {
-            const removed = attachments.value.splice(index, 1)[0];
-
-            // If it's an existing attachment, also remove from existingAttachments
-            if ('path' in removed) {
-                existingAttachments.value = existingAttachments.value.filter((att) => att.path !== removed.path);
-            } else {
-                newAttachments.value = newAttachments.value.filter((f) => f !== removed);
-            }
-
-            console.log('Attachments after removal:', attachments.value);
-        }
-
-        // Preview/download existing attachment
-        function previewAttachment(file: AttachmentItem) {
-            // URL in a new tab
-            const url = requestOrderService.getAttachmentUrl(file);
-            window.open(url, '_blank');
-        }
-
-        function downloadAttachment(file: AttachmentItem) {
-            requestOrderService.downloadAttachment(file);
-        }
-
-        const onSelectedFiles = (event: { files: File[] }) => {
-            attachments.value = event.files;
-            let totalSizeTemp = 0;
-            let valid = true;
-
-            attachments.value.forEach((file) => {
-                const size = file.size || 0; // default to 0 if undefined
-                totalSizeTemp += size;
-                if (size > MAX_FILE_SIZE) valid = false;
-            });
-
-            totalSize.value = totalSizeTemp;
-            totalSizePercent.value = (totalSize.value / MAX_FILE_SIZE) * 100;
-
-            if (!valid || totalSize.value > MAX_FILE_SIZE) {
-                toast.add({
-                    severity: 'error',
-                    summary: 'File too large',
-                    detail: `Each file must not exceed ${formatBytes(MAX_FILE_SIZE)}.`,
-                    life: 5000
-                });
-                isAttachmentValid.value = false;
-            } else {
-                isAttachmentValid.value = true;
-            }
-        };
-
-        const formatBytes = (bytes: number) => {
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            if (bytes === 0) return '0 B';
-            const i = Math.floor(Math.log(bytes) / Math.log(1024));
-            return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
-        };
-
         const grandTotal = computed(() => {
             return items.value.reduce((sum, item) => {
                 const price = item.price ?? 0;
@@ -811,7 +745,7 @@ export default defineComponent({
                     };
                 }),
                 overallRemark: overallRemark.value,
-                attachmentsCount: attachments.value.length
+                attachmentsCount: uploadFilesList.value.length
             };
 
             return data;
@@ -919,6 +853,8 @@ export default defineComponent({
         };
 
         const submitRequestOrder = async () => {
+            if (!canSubmit.value) return;
+
             try {
                 const projectId = getCurrentProjectId();
                 const payload: CreateRequestOrderPayload = {
@@ -971,15 +907,27 @@ export default defineComponent({
                     })
                 };
 
+                // add existing attachments
+                const carryOvers = uploadFilesList.value.filter((uf: UploadFile) => uf.status === 'done').map((uf: UploadFile) => ({
+                    filename: uf.name,
+                    path: uf.id, // we mapped path to id earlier
+                    size: uf.size,
+                    type: uf.type
+                }));
+                
+                if (carryOvers.length > 0) {
+                    payload.Attachment = JSON.stringify(carryOvers);
+                }
+
                 const isDraft = !!route.query.draftId;
-                const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
+                const filesToSend = uploadFilesList.value.filter((uf: UploadFile) => uf.status !== 'done').map((uf: UploadFile) => uf.file);
 
                 let result: CreateRequestOrderResponse;
 
                 if (isDraft) {
-                    result = await requestOrderService.submitDraftRequestOrder(route.query.draftId as string, payload, attachmentsToSend);
+                    result = await requestOrderService.submitDraftRequestOrder(route.query.draftId as string, payload, filesToSend);
                 } else {
-                    result = await requestOrderService.createRequestOrder(payload, attachmentsToSend);
+                    result = await requestOrderService.createRequestOrder(payload, filesToSend);
                 }
 
                 if (result.success) {
@@ -1014,7 +962,7 @@ export default defineComponent({
             }
         };
 
-        async function saveDraft() {
+        const saveDraft = async () => {
             if (!canSubmit.value) {
                 showValidation.value = true;
 
@@ -1042,6 +990,10 @@ export default defineComponent({
             }
 
             showValidation.value = false;
+
+            if (roNumber.value === 'New ID') {
+                return;
+            }
 
             try {
                 const projectId = getCurrentProjectId();
@@ -1085,14 +1037,26 @@ export default defineComponent({
                     })
                 };
 
+                // add existing attachments
+                const carryOvers = uploadFilesList.value.filter((uf: UploadFile) => uf.status === 'done').map((uf: UploadFile) => ({
+                    filename: uf.name,
+                    path: uf.id,
+                    size: uf.size,
+                    type: uf.type
+                }));
+                
+                if (carryOvers.length > 0) {
+                    payload.Attachment = JSON.stringify(carryOvers);
+                }
+
+                const filesToSend = uploadFilesList.value.filter(uf => uf.status !== 'done').map(uf => uf.file);
+
                 let result;
 
-                const attachmentsPayload = attachments.value.length > 0 ? attachments.value : undefined;
-
                 if (mode.value === 'edit-draft' && draftId.value) {
-                    result = await requestOrderService.updateRequestOrderDraft(draftId.value, payload, attachmentsPayload);
+                    result = await requestOrderService.updateRequestOrderDraft(draftId.value, payload, filesToSend);
                 } else {
-                    result = await requestOrderService.createRequestOrderDraft(payload, attachmentsPayload);
+                    result = await requestOrderService.createRequestOrderDraft(payload, filesToSend);
                 }
 
                 if (result.success) {
@@ -1132,6 +1096,7 @@ export default defineComponent({
             roDate,
             budgetOptions,
             calendarValue,
+            tableColumns,
             items,
             addItem,
             itemOptions,
@@ -1152,34 +1117,23 @@ export default defineComponent({
             saveDraft,
             previewSummary,
             files,
+            uploadFilesList,
             totalSize,
-            totalSizePercent,
-            onSelectedFiles,
-            uploadEvent,
-            onTemplatedUpload,
-            formatSize,
-            onRemoveTemplatingFile,
-            onClearTemplatingUpload,
-            isAttachmentValid,
-            attachments,
             overallRemark,
-            removeAttachment,
-            newAttachments,
-            existingAttachments,
             MAX_FILE_SIZE,
-            previewAttachment,
             showValidation,
             AutoComplete,
             searchSubcon,
-            selectedSubcon,
             filteredSubconList,
             handleSubconSearch,
-            downloadAttachment,
+            selectedSubcon,
             expandedRows,
             updateNotes,
             handleNoteInput,
             invalidDeliveryByCode,
             onDeliveryDateChange,
+            handleDeliveryInput,
+            handleDeliveryPicker,
             currentProject,
             formatDateToAPI,
 
