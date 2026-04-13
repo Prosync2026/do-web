@@ -1,12 +1,7 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
-import Accordion from 'primevue/accordion';
-import AccordionContent from 'primevue/accordioncontent';
-import AccordionHeader from 'primevue/accordionheader';
-import AccordionPanel from 'primevue/accordionpanel';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
+import { ProButton, ProCard, ProDivider, ProEmpty, ProTag, ProToast, ProTooltip } from '@prosync_solutions/ui';
 
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
@@ -14,17 +9,17 @@ import type { DiscussionItem, ReviewList } from '@/types/budgetChangeRequest.typ
 import { formatDate } from '@/utils/dateHelper';
 import commentBCRModal from '@/views/budget/components/dialog/CommentBCR.vue';
 import editcommentBCRModal from '@/views/budget/components/dialog/EditCommentBCR.vue';
-import { useToast } from 'primevue/usetoast';
 
 export default defineComponent({
     name: 'DiscussionThread',
     components: {
-        Accordion,
-        AccordionPanel,
-        AccordionHeader,
-        AccordionContent,
-        Button,
-        Badge,
+        ProButton,
+        ProTag,
+        ProCard,
+        ProDivider,
+        ProEmpty,
+        ProTooltip,
+        ProToast,
         editcommentBCRModal,
         commentBCRModal
     },
@@ -37,7 +32,11 @@ export default defineComponent({
     setup(props) {
         const route = useRoute();
         const store = useBudgetChangeRequestStore();
-        const toast = useToast();
+
+        const toastState = ref({ visible: false, message: '', type: 'information' as 'information' | 'success' | 'warn' | 'error' });
+        const showToastMsg = (type: 'information' | 'success' | 'warn' | 'error', message: string) => {
+            toastState.value = { visible: true, message, type };
+        };
 
         const showApprovalFlow = ref(true);
         const active = ref<string[]>([]);
@@ -264,21 +263,11 @@ export default defineComponent({
                         ReviewType: 'Acknowledge'
                     });
 
-                    toast.add({
-                        severity: 'success',
-                        summary: 'Acknowledged',
-                        detail: 'Budget Change Request acknowledged by PURC',
-                        life: 3000
-                    });
+                    showToastMsg('success', 'Budget Change Request acknowledged by PURC');
 
                     await init(); // Refresh lists
                 } catch (error) {
-                    toast.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to submit acknowledgement',
-                        life: 3000
-                    });
+                    showToastMsg('error', 'Failed to submit acknowledgement');
                 }
             } else {
                 createComment.value = true;
@@ -305,7 +294,8 @@ export default defineComponent({
             init,
             previewAttachment,
             currentUserRole,
-            handleAcknowledge
+            handleAcknowledge,
+            toastState
         };
     }
 });

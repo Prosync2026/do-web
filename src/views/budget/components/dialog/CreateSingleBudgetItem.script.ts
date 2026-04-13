@@ -1,3 +1,4 @@
+import { ProButton, ProInput, ProModal } from '@prosync_solutions/ui';
 import { defineComponent, reactive, ref, watch } from 'vue';
 
 export interface SingleBudgetItem {
@@ -21,6 +22,7 @@ export interface SingleBudgetItem {
 
 export default defineComponent({
     name: 'CreateSingleBudgetItem',
+    components: { ProModal, ProInput, ProButton },
 
     props: {
         visible: {

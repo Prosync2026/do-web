@@ -98,6 +98,8 @@ export interface BudgetChangeRequest {
     UpdatedAt: string;
     UpdatedBy: string | null;
     budget_change_items: BudgetChangeItem[];
+    budget_change_recommendations?: any[];
+    budget_change_reviews?: any[];
 }
 
 export interface PaginationMeta {

@@ -17,10 +17,15 @@ import { isRef, unref } from 'vue';
 
 export interface GetBudgetParams {
     status?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
     page?: number;
     pageSize?: number;
     version?: string | undefined;
     projectId?: number;
+    sortBy?: string;
+    sortOrder?: string;
 }
 
 export interface GetBudgetListParams {

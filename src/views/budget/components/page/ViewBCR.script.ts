@@ -5,13 +5,14 @@ import { formatCurrency, formatNumber as formatNum, formatPercent as formatPct }
 import ActivitiesLog from '@/views/budget/components/card/ActivitiesLog.vue';
 import DiscussionThread from '@/views/budget/components/card/DiscussionThread.vue';
 import { Motion } from '@motionone/vue';
+import { ProCard, ProTabs } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { PermissionCodes } from '@/permissions/permission.codes';
 export default defineComponent({
     name: 'ViewBCR',
-    components: { Motion, ActivitiesLog, DiscussionThread },
+    components: { Motion, ActivitiesLog, DiscussionThread, ProTabs, ProCard },
     setup() {
         const router = useRouter();
         const route = useRoute();
@@ -80,8 +81,8 @@ export default defineComponent({
 
         const activeTab = ref('detail');
         const tabItems = [
-            { label: 'Detail', value: 'detail' },
-            { label: 'Activities Log', value: 'activities' }
+            { key: 'detail', label: 'Detail' },
+            { key: 'activities', label: 'Activities Log' }
         ];
 
         const goBack = () => router.push({ name: 'bcr' });

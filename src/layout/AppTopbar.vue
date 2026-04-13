@@ -42,16 +42,16 @@ const handleSignOut = () => {
 const profileMenu = computed(() => {
     const items = [];
     if (userRoleCode.value === 'SSA') {
-        items.push({ 
-            label: 'Settings', 
-            icon: 'pi pi-cog', 
-            command: () => router.push('/settings') 
+        items.push({
+            label: 'Settings',
+            icon: 'pi pi-cog',
+            command: () => router.push('/settings')
         });
         items.push({ separator: true });
     }
-    
+
     items.push({ label: 'Sign Out', icon: 'pi pi-sign-out', command: handleSignOut });
-    
+
     return items;
 });
 
@@ -249,79 +249,94 @@ const goToAllNotifications = () => {
 </script>
 
 <template>
-    <Motion tag="div" class="w-full relative z-[60]" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
+    <Motion tag="div" class="w-full relative" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
         <ProTopbar :user-name="username || 'PM User'" :user-avatar="'https://randomuser.me/api/portraits/women/44.jpg'">
             <template #left>
-            <!-- Project dropdown (Moved to left slot) -->
-            <div
-                v-if="showProjectSelector"
-                class="cursor-pointer bg-white dark:bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-2 border border-gray-200 dark:border-gray-700"
-                @click="showProjectDialog = true"
-            >
-                <PhBriefcase :size="16" class="text-gray-500 dark:text-gray-300" />
-                <span class="text-gray-700 dark:text-gray-200 font-semibold text-sm hidden md:inline">
-                    {{ selectedProject?.name || 'Select Project' }}
-                </span>
-                <PhCaretDown :size="14" class="text-gray-500 dark:text-gray-400" />
-            </div>
-        </template>
-        
-        <template #right>
-            <!-- Notifications (Moved to right slot before user menu) -->
-            <div class="relative mr-2 flex items-center justify-center">
-                <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative" @click="toggleNotificationMenu">
-                    <PhBell :size="20" class="text-gray-600 dark:text-gray-300" />
-                </button>
-                <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute shadow-sm" style="top: 0px; right: 2px;" />
-            </div>
-
-            <OverlayPanel ref="notificationPanel" class="w-96 shadow-xl rounded-xl">
-                <div class="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800">
-                    <span class="font-semibold text-gray-800 dark:text-white">Notifications</span>
-                    <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" />
-                </div>
-
-                <div v-if="notificationStore.notifications.length === 0" class="text-sm text-gray-400 py-6 text-center">No notifications</div>
-
-                <div v-else class="space-y-2 max-h-80 overflow-y-auto pr-1 mt-3">
-                    <div v-for="item in notificationStore.notifications" :key="item.id" :class="['p-3 rounded-lg cursor-pointer transition border border-transparent', item.isRead ? 'hover:bg-gray-50' : 'bg-blue-50/50 border-blue-100 hover:bg-blue-50']" @click="goToPageDetails(item)">
-                        <div class="flex justify-between items-start gap-2">
-                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ item.title }}</span>
-                            <Badge :severity="item.isRead ? 'secondary' : 'info'" :value="item.isRead ? 'Read' : 'Unread'" class="text-[10px]" />
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">{{ item.message }}</p>
-                    </div>
-                </div>
-
-                <!-- View All Section -->
-                <div class="mt-3 pt-3 border-t border-gray-100 text-center">
-                    <Button label="View All Notifications" text class="w-full text-sm font-semibold" @click="goToAllNotifications" />
-                </div>
-            </OverlayPanel>
-        </template>
-        
-        <template #menu-items="{ close }">
-            <div v-if="userRoleCode === 'SSA'">
-                <button
-                    @click="() => { close(); router.push('/settings'); }"
-                    class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors text-gray-700"
+                <!-- Project dropdown (Moved to left slot) -->
+                <div
+                    v-if="showProjectSelector"
+                    class="cursor-pointer bg-white dark:bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-2 border border-gray-200 dark:border-gray-700"
+                    @click="showProjectDialog = true"
                 >
-                    <PhGear :size="18" class="text-gray-500" /> Settings
+                    <PhBriefcase :size="16" class="text-gray-500 dark:text-gray-300" />
+                    <span class="text-gray-700 dark:text-gray-200 font-semibold text-sm hidden md:inline">
+                        {{ selectedProject?.name || 'Select Project' }}
+                    </span>
+                    <PhCaretDown :size="14" class="text-gray-500 dark:text-gray-400" />
+                </div>
+            </template>
+
+            <template #right>
+                <!-- Notifications (Moved to right slot before user menu) -->
+                <div class="relative mr-2 flex items-center justify-center">
+                    <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative" @click="toggleNotificationMenu">
+                        <PhBell :size="20" class="text-gray-600 dark:text-gray-300" />
+                    </button>
+                    <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute shadow-sm" style="top: 0px; right: 2px" />
+                </div>
+
+                <OverlayPanel ref="notificationPanel" class="w-96 shadow-xl rounded-xl">
+                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800">
+                        <span class="font-semibold text-gray-800 dark:text-white">Notifications</span>
+                        <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" />
+                    </div>
+
+                    <div v-if="notificationStore.notifications.length === 0" class="text-sm text-gray-400 py-6 text-center">No notifications</div>
+
+                    <div v-else class="space-y-2 max-h-80 overflow-y-auto pr-1 mt-3">
+                        <div
+                            v-for="item in notificationStore.notifications"
+                            :key="item.id"
+                            :class="['p-3 rounded-lg cursor-pointer transition border border-transparent', item.isRead ? 'hover:bg-gray-50' : 'bg-blue-50/50 border-blue-100 hover:bg-blue-50']"
+                            @click="goToPageDetails(item)"
+                        >
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ item.title }}</span>
+                                <Badge :severity="item.isRead ? 'secondary' : 'info'" :value="item.isRead ? 'Read' : 'Unread'" class="text-[10px]" />
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">{{ item.message }}</p>
+                        </div>
+                    </div>
+
+                    <!-- View All Section -->
+                    <div class="mt-3 pt-3 border-t border-gray-100 text-center">
+                        <Button label="View All Notifications" text class="w-full text-sm font-semibold" @click="goToAllNotifications" />
+                    </div>
+                </OverlayPanel>
+            </template>
+
+            <template #menu-items="{ close }">
+                <div v-if="userRoleCode === 'SSA'">
+                    <button
+                        @click="
+                            () => {
+                                close();
+                                router.push('/settings');
+                            }
+                        "
+                        class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors text-gray-700"
+                    >
+                        <PhGear :size="18" class="text-gray-500" /> Settings
+                    </button>
+                    <div class="border-t border-border-border my-1"></div>
+                </div>
+
+                <button
+                    @click="
+                        () => {
+                            close();
+                            handleSignOut();
+                        }
+                    "
+                    class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                >
+                    <PhSignOut :size="18" /> Logout
                 </button>
-                <div class="border-t border-border-border my-1"></div>
-            </div>
-            
-            <button
-                @click="() => { close(); handleSignOut(); }"
-                class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-            >
-                <PhSignOut :size="18" /> Logout
-            </button>
-        </template>
-    </ProTopbar>
+            </template>
+        </ProTopbar>
     </Motion>
     <!-- Project Dialog -->
-    <ProModal v-if="showProjectSelector" v-model="showProjectDialog" title="Select Project" size="md" class="z-[100]"  >
+    <ProModal v-if="showProjectSelector" v-model="showProjectDialog" title="Select Project" size="md" class="z-[100]">
         <div v-for="group in companyProjects" :key="group.company" class="mb-6">
             <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">{{ group.company }}</h3>
             <div class="space-y-3">
@@ -348,5 +363,3 @@ const goToAllNotifications = () => {
         </div>
     </div>
 </template>
-
-

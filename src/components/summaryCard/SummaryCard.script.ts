@@ -1,3 +1,4 @@
+import { ProCard } from '@prosync_solutions/ui';
 import { computed, defineComponent, PropType } from 'vue';
 
 export interface CardItem {
@@ -10,6 +11,7 @@ export interface CardItem {
 
 export default defineComponent({
     name: 'DeliveriesSummaryData',
+    components: { ProCard },
     props: {
         cardItems: {
             type: Array as PropType<CardItem[]>,

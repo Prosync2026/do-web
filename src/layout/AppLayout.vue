@@ -10,7 +10,7 @@ import AppTopbar from './AppTopbar.vue';
 
 const { isSidebarActive, layoutState } = useLayout();
 const route = useRoute();
-const { breadcrumbs, pageTitle } = usePageHeader();
+const { breadcrumbs, pageTitle, pageSubtitle } = usePageHeader();
 
 const outsideClickListener = ref<((event: Event) => void) | null>(null);
 
@@ -65,7 +65,11 @@ const containerClass = computed(() => {
             <AppTopbar />
 
             <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6">
-                <ProPageHeader v-if="breadcrumbs.length > 0" :title="pageTitle" :breadcrumbs="breadcrumbs" class="mb-4" />
+                <ProPageHeader v-if="breadcrumbs.length > 0" :title="pageTitle" :subtitle="pageSubtitle" :breadcrumbs="breadcrumbs" class="mb-4">
+                    <template #actions>
+                        <div id="page-header-actions"></div>
+                    </template>
+                </ProPageHeader>
                 <router-view></router-view>
             </main>
         </div>
