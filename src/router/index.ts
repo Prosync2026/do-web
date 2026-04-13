@@ -27,7 +27,8 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     requiresAuth: true,
                     permissions: [PermissionCodes.VIEW_REQUEST_ORDER],
-                    breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }]
+                    breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }],
+                    subtitle: 'Manage purchase requests for project materials and services'
                 }
             },
             {
@@ -37,7 +38,8 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     requiresAuth: true,
                     permissions: [PermissionCodes.CREATE_REQUEST_ORDER],
-                    breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }, { label: 'Create' }]
+                    breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }, { label: 'Create' }],
+                    subtitle: 'Create a new purchase request'
                 }
             },
             {

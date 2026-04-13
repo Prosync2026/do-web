@@ -5,9 +5,8 @@ import { Button } from "@prosync/ui-kit";
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-1">
-            <!-- Header -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <ProPageHeader title="Request Orders" subtitle="Manage purchase requests for project materials and services" />
+            <!-- Header Actions teleported to AppLayout -->
+            <Teleport to="#page-header-actions">
                 <div class="flex gap-4 items-center">
                     <ProButton variant="secondary" @click="showDraftModal = true">
                         View Drafts
@@ -17,7 +16,7 @@ import { Button } from "@prosync/ui-kit";
                         <i class="pi pi-plus mr-2"></i> New Request Order
                     </ProButton>
                 </div>
-            </div>
+            </Teleport>
             
             <ViewDraftRo :visible="showDraftModal" @update:visible="showDraftModal = $event" @update:count="draftCount = $event" />
 

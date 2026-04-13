@@ -2,7 +2,6 @@
 
 <template>
     <div class="p-1 space-y-1">
-        <ProPageHeader title="Create Request Order" :subtitle="`Create a new request order for project: ${currentProject}`" />
 
         <ProCard class="shadow-sm">
             <h2 class="text-lg font-semibold mb-4 text-text-heading">Request Order Details</h2>
