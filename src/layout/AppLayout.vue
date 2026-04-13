@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePageHeader } from '@/composables/usePageHeader';
 import { useLayout } from '@/layout/composables/layout';
-import { ProBreadcrumbs } from '@prosync_solutions/ui';
+import { ProPageHeader } from '@prosync_solutions/ui';
 import Toast from 'primevue/toast';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -10,7 +10,7 @@ import AppTopbar from './AppTopbar.vue';
 
 const { isSidebarActive, layoutState } = useLayout();
 const route = useRoute();
-const { breadcrumbs, pageTitle } = usePageHeader();
+const { breadcrumbs, pageTitle, pageSubtitle } = usePageHeader();
 
 const outsideClickListener = ref<((event: Event) => void) | null>(null);
 
@@ -65,8 +65,12 @@ const containerClass = computed(() => {
             <AppTopbar />
 
             <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6">
-                <ProBreadcrumbs v-if="breadcrumbs.length > 0" :items="breadcrumbs" class="mb-6" />
-                <router-view></router-view>
+                <ProPageHeader v-if="breadcrumbs.length > 0" :title="pageTitle" :subtitle="pageSubtitle" :breadcrumbs="breadcrumbs" class="mb-4">
+                    <template #actions>
+                        <div id="page-header-actions"></div>
+                    </template>
+                </ProPageHeader>
+                <router-view :key="route.path"></router-view>
             </main>
         </div>
 

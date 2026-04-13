@@ -15,6 +15,11 @@ export default function useImportBudgetDialogLogic(
     const selectedFile = ref<File | null>(null);
     const isSubmitting = ref(false);
 
+    const toastState = ref({ visible: false, message: '', type: 'information' as 'information' | 'success' | 'warn' | 'error' });
+    const showToastMsg = (type: 'information' | 'success' | 'warn' | 'error', message: string) => {
+        toastState.value = { visible: true, message, type };
+    };
+
     watch(
         () => props.visible,
         (val) => {
@@ -210,6 +215,7 @@ export default function useImportBudgetDialogLogic(
         onDownloadFormat,
         onSubmitUpload,
         selectedFile,
-        isSubmitting
+        isSubmitting,
+        toastState
     };
 }

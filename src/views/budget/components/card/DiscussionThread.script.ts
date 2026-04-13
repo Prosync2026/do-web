@@ -1,12 +1,7 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
-import Accordion from 'primevue/accordion';
-import AccordionContent from 'primevue/accordioncontent';
-import AccordionHeader from 'primevue/accordionheader';
-import AccordionPanel from 'primevue/accordionpanel';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
+import { ProButton, ProCard, ProDivider, ProEmpty, ProTag, ProToast, ProTooltip } from '@prosync_solutions/ui';
 
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
@@ -14,17 +9,17 @@ import type { DiscussionItem, ReviewList } from '@/types/budgetChangeRequest.typ
 import { formatDate } from '@/utils/dateHelper';
 import commentBCRModal from '@/views/budget/components/dialog/CommentBCR.vue';
 import editcommentBCRModal from '@/views/budget/components/dialog/EditCommentBCR.vue';
-import { useToast } from 'primevue/usetoast';
 
 export default defineComponent({
     name: 'DiscussionThread',
     components: {
-        Accordion,
-        AccordionPanel,
-        AccordionHeader,
-        AccordionContent,
-        Button,
-        Badge,
+        ProButton,
+        ProTag,
+        ProCard,
+        ProDivider,
+        ProEmpty,
+        ProTooltip,
+        ProToast,
         editcommentBCRModal,
         commentBCRModal
     },
@@ -37,7 +32,11 @@ export default defineComponent({
     setup(props) {
         const route = useRoute();
         const store = useBudgetChangeRequestStore();
-        const toast = useToast();
+
+        const toastState = ref({ visible: false, message: '', type: 'information' as 'information' | 'success' | 'warn' | 'error' });
+        const showToastMsg = (type: 'information' | 'success' | 'warn' | 'error', message: string) => {
+            toastState.value = { visible: true, message, type };
+        };
 
         const showApprovalFlow = ref(true);
         const active = ref<string[]>([]);
@@ -198,32 +197,55 @@ export default defineComponent({
             return 'Waiting';
         };
 
-        const getStepSeverity = (item: DiscussionItem, index: number) => {
-            if (item.RecommendationType === 'Reject') return 'danger';
-            if (item.RecommendationType) return 'success';
+        const getStepStatus = (item: DiscussionItem, index: number): 'completed' | 'rejected' | 'pending' | 'waiting' => {
+            if (item.RecommendationType === 'Reject') return 'rejected';
+            if (item.RecommendationType) return 'completed';
 
             if (index < 3) {
                 const pendingIndex = getCurrentPrePendingIndex();
-                if (index === pendingIndex) return 'warn';
-                return 'secondary';
+                if (index === pendingIndex) return 'pending';
+                return 'waiting';
             }
 
             if (!isPreStepsCompleted()) {
-                return 'secondary';
+                return 'waiting';
             }
 
             const pdIndex = ROLE_ORDER.indexOf('PD');
             const mgmIndex = ROLE_ORDER.indexOf('MGM');
             const purcIndex = ROLE_ORDER.indexOf('PURC');
 
-            if (index === pdIndex) return 'warn';
-            if (index === mgmIndex) return discussions.value[pdIndex].RecommendationType ? 'warn' : 'secondary';
-            if (index === purcIndex) return discussions.value[mgmIndex].RecommendationType ? 'warn' : 'secondary';
+            if (index === pdIndex) return 'pending';
+            if (index === mgmIndex) return discussions.value[pdIndex].RecommendationType ? 'pending' : 'waiting';
+            if (index === purcIndex) return discussions.value[mgmIndex].RecommendationType ? 'pending' : 'waiting';
 
+            return 'waiting';
+        };
+
+        // ProButton: primary | secondary | plain | danger | ghost | warning
+        const getButtonVariant = (item: DiscussionItem, index: number) => {
+            const status = getStepStatus(item, index);
+
+            if (status === 'rejected') return 'danger';
+            if (status === 'completed') return 'primary';
+            if (status === 'pending') return 'warning';
             return 'secondary';
         };
 
-        const getStepIcon = (item: DiscussionItem) => (item.id ? 'pi pi-check-circle' : 'pi pi-clock');
+        // ProTag: secondary | success | info | warn | error | attention
+        const getTagVariant = (item: DiscussionItem, index: number) => {
+            const status = getStepStatus(item, index);
+            if (status === 'rejected') return 'error';
+            if (status === 'completed') return 'success';
+            if (status === 'pending') return 'warn';
+            return 'secondary';
+        };
+
+        const getStepIcon = (item: DiscussionItem) => {
+            if (item.RecommendationType === 'Reject') return 'pi pi-times-circle';
+            if (item.RecommendationType) return 'pi pi-check-circle';
+            return 'pi pi-exclamation-circle';
+        };
         const getStepLabel = (item: DiscussionItem) => item.role;
 
         const togglePanel = (index: number) => {
@@ -264,21 +286,11 @@ export default defineComponent({
                         ReviewType: 'Acknowledge'
                     });
 
-                    toast.add({
-                        severity: 'success',
-                        summary: 'Acknowledged',
-                        detail: 'Budget Change Request acknowledged by PURC',
-                        life: 3000
-                    });
+                    showToastMsg('success', 'Budget Change Request acknowledged by PURC');
 
                     await init(); // Refresh lists
                 } catch (error) {
-                    toast.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to submit acknowledgement',
-                        life: 3000
-                    });
+                    showToastMsg('error', 'Failed to submit acknowledgement');
                 }
             } else {
                 createComment.value = true;
@@ -297,7 +309,8 @@ export default defineComponent({
             formatDate,
             getStepLabel,
             getStepIcon,
-            getStepSeverity,
+            getButtonVariant,
+            getTagVariant,
             getStepStatusText,
             togglePanel,
             openEditModal,
@@ -305,7 +318,8 @@ export default defineComponent({
             init,
             previewAttachment,
             currentUserRole,
-            handleAcknowledge
+            handleAcknowledge,
+            toastState
         };
     }
 });

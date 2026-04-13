@@ -1,4 +1,3 @@
-// CreateBCR.script.ts
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { AttachmentItem, BCRTableItem, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
@@ -6,13 +5,13 @@ import { getCurrentProjectName } from '@/utils/contextHelper';
 import SingleBudgetModal from '@/views/budget/components/dialog/CreateSingleBudgetItem.vue';
 import MeterialModal from '@/views/request-orders/components/modal/CreateRo.vue';
 import { Motion } from '@motionone/vue';
-import { useToast } from 'primevue';
+import { ProBanner, ProButton, ProCard, ProEmpty, ProInput, ProSelect, ProToast } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'CreateBCR',
-    components: { Motion, MeterialModal, SingleBudgetModal },
+    components: { Motion, MeterialModal, SingleBudgetModal, ProButton, ProInput, ProSelect, ProCard, ProBanner, ProEmpty, ProToast },
     setup() {
         const router = useRouter();
         const budgetCRStore = useBudgetChangeRequestStore();
@@ -27,7 +26,11 @@ export default defineComponent({
         const remarks = ref('');
         const projectName = getCurrentProjectName();
         const showValidation = ref(false);
-        const toast = useToast();
+
+        const toastState = ref({ visible: false, message: '', type: 'information' as 'information' | 'success' | 'warn' | 'error' });
+        const showToastMsg = (type: 'information' | 'success' | 'warn' | 'error', message: string) => {
+            toastState.value = { visible: true, message, type };
+        };
 
         // File upload states
         const totalSize = ref(0);
@@ -69,12 +72,7 @@ export default defineComponent({
             isAttachmentValid.value = valid && totalSize.value <= MAX_FILE_SIZE;
 
             if (!isAttachmentValid.value) {
-                toast.add({
-                    severity: 'error',
-                    summary: 'File too large',
-                    detail: `Each file must not exceed ${formatBytes(MAX_FILE_SIZE)}.`,
-                    life: 5000
-                });
+                showToastMsg('error', `Each file must not exceed ${formatBytes(MAX_FILE_SIZE)}.`);
             }
         };
 
@@ -181,12 +179,7 @@ export default defineComponent({
                 const isDuplicate = items.value.some((i) => i.id === mat.id);
 
                 if (isDuplicate) {
-                    toast.add({
-                        severity: 'warn',
-                        summary: 'Duplicate Item',
-                        detail: `Item with ID ${mat.id} already added.`,
-                        life: 3000
-                    });
+                    showToastMsg('warn', `Item with ID ${mat.id} already added.`);
                     return;
                 }
                 items.value.push({
@@ -290,28 +283,13 @@ export default defineComponent({
 
             if (!reasonValid || !itemsValid || !requestedQtyValid) {
                 if (!reasonValid) {
-                    toast.add({
-                        severity: 'warn',
-                        summary: 'Validation',
-                        detail: 'Please select a reason for the request',
-                        life: 3000
-                    });
+                    showToastMsg('warn', 'Please select a reason for the request');
                 }
                 if (!itemsValid) {
-                    toast.add({
-                        severity: 'warn',
-                        summary: 'Validation',
-                        detail: 'Please add at least one item',
-                        life: 3000
-                    });
+                    showToastMsg('warn', 'Please add at least one item');
                 }
                 if (!requestedQtyValid) {
-                    toast.add({
-                        severity: 'warn',
-                        summary: 'Validation',
-                        detail: 'Requested Qty must be greater than 0',
-                        life: 3000
-                    });
+                    showToastMsg('warn', 'Requested Qty must be greater than 0');
                 }
                 return;
             }
@@ -400,7 +378,8 @@ export default defineComponent({
             totalSizePercent,
             fileupload,
             onSelectedFiles,
-            createObjectURL
+            createObjectURL,
+            toastState
         };
     }
 });

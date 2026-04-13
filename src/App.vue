@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { useAppInitializer } from '@/bootstrap/useAppInitializer';
 import { setGlobalToast } from '@/utils/showNotification.utils';
 import { useToast } from 'primevue/usetoast';
-import { watch, onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useAppInitializer } from '@/bootstrap/useAppInitializer';
 
 const route = useRoute();
 const router = useRouter();
@@ -41,9 +41,5 @@ watch(
 <template>
     <ConfirmDialog />
     <Toast />
-    <router-view v-slot="{ Component }">
-        <Motion :initial="{ opacity: 0, x: 40 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -40 }" :transition="{ duration: 0.4 }">
-            <component :is="Component" />
-        </Motion>
-    </router-view>
+    <router-view />
 </template>

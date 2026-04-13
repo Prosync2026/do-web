@@ -61,7 +61,8 @@ const routes: RouteRecordRaw[] = [
                 name: 'budget',
                 component: () => import('@/views/budget/budgetList/Budget.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Budget', route: '/budget' }]
+                    breadcrumb: [{ label: 'Budget', route: '/budget' }],
+                    subtitle: 'Interactive charts showing budget distribution.'
                 }
             },
             {
@@ -69,7 +70,8 @@ const routes: RouteRecordRaw[] = [
                 name: 'budgetChangeRequest',
                 component: () => import('@/views/budget/budgetChangeRequest/BCR.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Budget Change Request', route: '/bcr' }]
+                    breadcrumb: [{ label: 'Budget Change Request', route: '/bcr' }],
+                    subtitle: 'Manage budget change requests and track approval status'
                 }
             },
             {
@@ -77,7 +79,8 @@ const routes: RouteRecordRaw[] = [
                 name: 'budgetChangeRequest-create',
                 component: () => import('@/views/budget/components/page/CreateBCR.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Budget Change Request', route: '/bcr' }, { label: 'Create Budget Change Request' }]
+                    breadcrumb: [{ label: 'Budget Change Request', route: '/bcr' }, { label: 'Create Budget Change Request' }],
+                    subtitle: 'Submit a new budget change request for approval.'
                 }
             },
             {
@@ -85,7 +88,8 @@ const routes: RouteRecordRaw[] = [
                 name: 'budgetChangeRequest-edit',
                 component: () => import('@/views/budget/components/page/EditBCR.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'BCR', route: '/bcr' }, { label: 'Edit Budget Change Request' }]
+                    breadcrumb: [{ label: 'BCR', route: '/bcr' }, { label: 'Edit Budget Change Request' }],
+                    subtitle: 'Modify the details of an existing budget change request.'
                 }
             },
             {
@@ -93,7 +97,8 @@ const routes: RouteRecordRaw[] = [
                 name: 'budgetChangeRequest-view',
                 component: () => import('@/views/budget/components/page/ViewBCR.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'BCR', route: '/bcr' }, { label: 'View Budget Change Request' }]
+                    breadcrumb: [{ label: 'BCR', route: '/bcr' }, { label: 'View Budget Change Request' }],
+                    subtitle: 'Review the details and approval status of this change request.'
                 }
             },
             {
