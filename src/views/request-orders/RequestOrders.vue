@@ -81,7 +81,7 @@ import { Button } from "@prosync/ui-kit";
                                     </div>
                                 </template>
 
-                                <template #cell-approvalStatus="{ row }">
+                                <template #cell-approvalProgress="{ row }">
                                     <div class="flex flex-col gap-1 text-xs py-2">
                                         <template v-for="(step, index) in row.approvalProgress" :key="step.level">
                                             <div class="flex items-center gap-2">

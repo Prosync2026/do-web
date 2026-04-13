@@ -380,11 +380,15 @@ export default defineComponent({
 
             if (row.currentApprovalStage && userRole) {
                 const approvalRole = USER_ROLE_TO_APPROVAL_ROLE[userRole];
-                if (row.currentApprovalStage === approvalRole && canApproveRO.value) return true;
+                if (row.currentApprovalStage === approvalRole) return true;
+                
+                // If a stage explicitly dictates another role, strictly deny bypasses
+                return false;
             }
 
             if (canApproveRO.value) return true;
 
+            // Legacy fallback ONLY if the record has no currentApprovalStage populated
             if (isPurchasingRole && ((row.status as string) === 'Pending' || row.status === 'Submitted')) {
                 return true;
             }
