@@ -1,9 +1,9 @@
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { FilterVersion } from '@/types/budget.type';
-import { computed, defineComponent, onMounted, ref, watch } from 'vue';
+import { defineComponent, onMounted, ref, watch } from 'vue';
 
-import BaseTab from '@/components/tab/BaseTab.vue';
 import Overview from '@/views/budget/budgetOverview/Overview.vue';
+import { ProButton, ProCard, ProSelect, ProTabs } from '@prosync_solutions/ui';
 import BudgetList from '../components/tab/BudgetList.vue';
 import HierarchyItemCode from '../components/tab/HierarchyItemCode.vue';
 import HierarchyLocation from '../components/tab/HierarchyLocation.vue';
@@ -16,7 +16,10 @@ import { useToast } from 'primevue/usetoast';
 export default defineComponent({
     name: 'BudgetManagement',
     components: {
-        BaseTab,
+        ProButton,
+        ProCard,
+        ProSelect,
+        ProTabs,
         Motion,
         Overview,
         HierarchyItemCode,
@@ -45,7 +48,12 @@ export default defineComponent({
         const viewMode = ref<'overview' | 'detail'>('overview');
         const detailViewMode = ref<'list' | 'tree' | 'treeLocation'>('list');
 
-        const filters = ref<Record<string, any>>({});
+        const viewTabs = [
+            { key: 'overview', label: 'Overview' },
+            { key: 'detail', label: 'Detail' }
+        ];
+
+        const versionOptions = ref<{ label: string; value: string }[]>([]);
 
         const fetchBudgetVersionList = async () => {
             const versionsData = await budgetStore.fetchBudgetVersion();
@@ -63,6 +71,11 @@ export default defineComponent({
                 value: String(item.versionCode),
                 latest: Number(item.versionCode) === latestVersionCode,
                 id: item.id
+            }));
+
+            versionOptions.value = versions.value.map((v) => ({
+                label: v.latest ? `${v.label} (Latest)` : v.label,
+                value: v.value
             }));
 
             const savedVersionId = localStorage.getItem('selectedBudgetVersionId');
@@ -115,11 +128,11 @@ export default defineComponent({
 
         return {
             versions,
-            viewOptions,
+            viewTabs,
+            versionOptions,
             selectedVersion,
             viewMode,
             detailViewMode,
-            filters,
             handleImportSuccess,
             HierarchyItemCode,
             BudgetList,

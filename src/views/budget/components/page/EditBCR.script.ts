@@ -9,16 +9,13 @@ import { useRoute, useRouter } from 'vue-router';
 import { usePermission } from '@/permissions/budgetChangeRequest.permission';
 import { PermissionCodes } from '@/permissions/permission.codes';
 
-import Button from 'primevue/button';
-import Calendar from 'primevue/calendar';
+import { ProButton, ProCard, ProInput, ProSelect } from '@prosync_solutions/ui';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
-import Dropdown from 'primevue/dropdown';
-import InputText from 'primevue/inputtext';
 
 export default defineComponent({
     name: 'EditBCR',
-    components: { InputText, Calendar, Dropdown, Button, DataTable, Column },
+    components: { ProInput, ProSelect, ProButton, ProCard, DataTable, Column },
     setup() {
         const router = useRouter();
         const route = useRoute();
