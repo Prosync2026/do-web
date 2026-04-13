@@ -171,6 +171,5 @@
         <CreateStockItem v-model:visible="showStockItemModal" @items-selected="handleStockItemsSelected" />
 
         <PreviewRo v-model:visible="showPreviewModal" :summaryData="previewSummary" @submit="submitRequestOrder" />
-        <ConfirmDialog />
     </div>
 </template>
