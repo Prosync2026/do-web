@@ -2,62 +2,48 @@
 
 <template>
     <Motion :initial="{ opacity: 0, y: 20 }" :animate="{ opacity: 1, y: 0 }" :exit="{ opacity: 0, y: -20 }" :transition="{ duration: 0.6 }">
-        <div class="p-6 card">
-            <BreadcrumbList />
-
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h1 class="text-2xl font-bold">New Budget Change Request</h1>
-                    <p class="text-gray-500">Project: {{ projectName }}</p>
-                </div>
-            </div>
-
+        <ProCard padding="lg">
             <!-- Header Information -->
-            <div class="card p-4 mb-6 border">
-                <h2 class="text-lg font-semibold mb-4">Header Information</h2>
+            <ProCard title="Header Information" padding="md" class="mb-6">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">Date Requested</label>
-                        <InputText v-model="requestDate" type="text" class="w-full" disabled />
+                        <ProInput v-model="requestDate" label="Date Requested" type="text" disabled />
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">Requested By</label>
-                        <InputText v-model="requestBy" type="text" class="w-full" disabled />
+                        <ProInput v-model="requestBy" label="Requested By" type="text" disabled />
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">Department</label>
-                        <InputText v-model="department" type="text" class="w-full" disabled />
+                        <ProInput v-model="department" label="Department" type="text" disabled />
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1"> Reason for Request <span class="text-red-600 font-bold">*</span> </label>
 
-                        <Dropdown v-model="selectedReason" :options="reasonOptions" optionLabel="label" optionValue="value" placeholder="Select Reason" class="w-full" :invalid="showValidation && !selectedReason" />
+                        <ProSelect v-model="selectedReason" :options="reasonOptions" placeholder="Select Reason" class="w-full" />
 
-                        <Message v-if="showValidation && !selectedReason" severity="error" icon="pi pi-times-circle" class="mt-3"> Reason for request is required </Message>
+                        <ProBanner v-if="showValidation && !selectedReason" variant="error" title="Reason for request is required" class="mt-3" />
                     </div>
                 </div>
 
                 <div class="mt-4">
-                    <label class="block text-sm text-gray-600 mb-1">Remarks</label>
-                    <InputText v-model="remarks" type="text" class="w-full" />
+                    <ProInput v-model="remarks" label="Remarks" type="text" />
                 </div>
-            </div>
+            </ProCard>
 
             <!-- Materials Section -->
             <label class="block text-sm text-gray-600 mb-1">Materials Section</label>
 
-            <div class="card p-4 mb-6 border">
+            <ProCard title="Materials" padding="md" class="mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex gap-2">
-                        <Button label="＋ Add from Budget List" class="bg-blue-500 text-white hover:bg-blue-600" @click="openMeterial" />
-                        <Button label="＋ Add Manually Budget Item" class="bg-green-500 text-white hover:bg-green-600" @click="openSingleBudgetItem" />
+                        <ProButton variant="primary" @click="openMeterial">＋ Add from Budget List</ProButton>
+                        <ProButton variant="secondary" @click="openSingleBudgetItem">＋ Add Manually Budget Item</ProButton>
                     </div>
                 </div>
 
                 <div v-if="items.length === 0" class="flex justify-center items-center py-10 text-gray-500">
                     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-                        <ResultNotFound />
-                        <Message v-if="showValidation && items.length === 0" severity="error" icon="pi pi-times-circle" class="mt-2"> Please add at least one item. </Message>
+                        <ProEmpty title="No Materials" description="Add items from the budget list or manually." />
+                        <ProBanner v-if="showValidation && items.length === 0" variant="error" title="Please add at least one item." class="mt-2" />
                     </Motion>
                 </div>
 
@@ -67,47 +53,42 @@
                             <!-- Item Code -->
                             <Column field="itemCode" header="Item Code" style="min-width: 14rem">
                                 <template #body="slotProps">
-                                    <Dropdown v-model="slotProps.data.itemCode" :options="budgetItems" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(slotProps.data)">
-                                        <template #option="slotProps">
-                                            <div class="flex flex-col">
-                                                <span class="font-medium">{{ slotProps.option.label }}</span>
-                                                <span class="text-xs text-gray-500">{{ slotProps.option.description }}</span>
-                                            </div>
-                                        </template>
-                                        <template #value="slotProps">
-                                            <span v-if="slotProps.value">{{ getItemLabel(slotProps.value) }}</span>
-                                            <span v-else class="text-gray-400">Select item...</span>
-                                        </template>
-                                    </Dropdown>
+                                    <ProSelect
+                                        v-model="slotProps.data.itemCode"
+                                        :options="budgetItems.map((b) => ({ label: b.label, value: b.value }))"
+                                        placeholder="Select item..."
+                                        class="w-full"
+                                        @update:modelValue="fillItemDetails(slotProps.data)"
+                                    />
                                 </template>
                             </Column>
 
                             <!-- Description -->
                             <Column field="description" header="Description" style="min-width: 22rem">
                                 <template #body="slotProps">
-                                    <InputText v-model="slotProps.data.description" class="w-full" disabled />
+                                    <ProInput v-model="slotProps.data.description" disabled />
                                 </template>
                             </Column>
 
                             <!-- Units -->
                             <Column field="uom" header="Units" style="min-width: 8rem">
                                 <template #body="slotProps">
-                                    <InputText v-model="slotProps.data.uom" class="w-full" disabled />
+                                    <ProInput v-model="slotProps.data.uom" disabled />
                                 </template>
                             </Column>
 
                             <!-- Unit Price -->
                             <Column field="unitPrice" header="Unit Price" style="min-width: 10rem">
                                 <template #body="slotProps">
-                                    <InputText type="number" v-model.number="slotProps.data.unitPrice" class="w-full" />
+                                    <ProInput type="number" v-model.number="slotProps.data.unitPrice" />
                                 </template>
                             </Column>
 
                             <!-- New Order -->
                             <Column field="newOrder" header="Request Qty" style="min-width: 10rem">
                                 <template #body="slotProps">
-                                    <InputText type="number" v-model.number="slotProps.data.statistics.totalRequestedQty" class="w-full" />
-                                    <Message v-if="showValidation && slotProps.data.statistics.totalRequestedQty <= 0" severity="error" class="mt-1" text> Requested Qty must be greater than 0 </Message>
+                                    <ProInput type="number" v-model.number="slotProps.data.statistics.totalRequestedQty" />
+                                    <ProBanner v-if="showValidation && slotProps.data.statistics.totalRequestedQty <= 0" variant="error" title="Requested Qty must be greater than 0" class="mt-1" />
                                 </template>
                             </Column>
 
@@ -142,7 +123,7 @@
                             <!-- Actions -->
                             <Column header="Actions" style="min-width: 8rem">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-trash" severity="danger" text @click="items.splice(items.indexOf(slotProps.data), 1)" />
+                                    <ProButton variant="danger" size="sm" @click="items.splice(items.indexOf(slotProps.data), 1)">Delete</ProButton>
                                 </template>
                             </Column>
                         </DataTable>
@@ -153,7 +134,7 @@
                         </div>
                     </Motion>
                 </div>
-            </div>
+            </ProCard>
 
             <!-- Attachments -->
             <div class="mt-4">
@@ -164,8 +145,8 @@
                         <div v-for="(file, index) in existingAttachments" :key="`existing-${index}`" class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
                             <i class="pi pi-file"></i>
                             <span class="text-sm">{{ file.filename }}</span>
-                            <Button icon="pi pi-eye" text rounded severity="info" @click="previewAttachment(file)" />
-                            <Button icon="pi pi-times" text rounded severity="danger" @click="removeAttachment(index)" />
+                            <ProButton variant="ghost" size="sm" @click="previewAttachment(file)"><i class="pi pi-eye"></i></ProButton>
+                            <ProButton variant="danger" size="sm" @click="removeAttachment(index)">Remove</ProButton>
                         </div>
                     </div>
                 </div>
@@ -175,7 +156,7 @@
                         <div v-if="attachments && attachments.length > 0" class="flex flex-wrap gap-4 mt-4">
                             <div v-for="(file, index) of attachments" :key="`${file.name}-${index}`" class="relative w-24 h-24">
                                 <img :src="createObjectURL(file)" :alt="file.name" class="w-full h-full object-cover rounded-lg" />
-                                <Button icon="pi pi-times" rounded severity="danger" class="absolute -top-2 -right-2 w-8 h-8" @click="attachments.splice(index, 1)" />
+                                <ProButton variant="danger" size="sm" class="absolute -top-2 -right-2 w-8 h-8" @click="attachments.splice(index, 1)">×</ProButton>
                             </div>
                         </div>
                     </template>
@@ -191,14 +172,17 @@
             <!-- Buttons -->
             <div class="flex justify-end mb-6">
                 <div class="flex gap-2">
-                    <Button label="Cancel" @click="goBack" outlined />
-                    <Button label="Submit Request" @click="submitRequest" />
+                    <ProButton variant="secondary" @click="goBack">Cancel</ProButton>
+                    <ProButton variant="primary" @click="submitRequest">Submit Request</ProButton>
                 </div>
             </div>
 
             <!-- Modals -->
             <MeterialModal v-model:visible="showBulkItemModal" @bcr-items-selected="handleBulkItems" :unRequiredDelivery="true" />
             <SingleBudgetModal v-model:visible="showSingleItemModal" @items-value="handleAddItems" />
-        </div>
+
+            <!-- Toast -->
+            <ProToast v-model="toastState.visible" :type="toastState.type" :message="toastState.message" :autoDismiss="true" :duration="3000" />
+        </ProCard>
     </Motion>
 </template>

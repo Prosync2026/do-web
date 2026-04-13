@@ -3,11 +3,12 @@ import { BcrRecommendationEnum, BcrRoleEnum } from '@/constants/enum/bcrApproval
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { DiscussionItem } from '@/types/budgetChangeRequest.type';
 import { getRoleConfig } from '@/utils/bcrApproval.utils';
-import { useToast } from 'primevue/usetoast';
+import { ProButton, ProEmpty, ProInput, ProModal, ProSelect, ProTextarea, ProToast } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
+    components: { ProModal, ProInput, ProButton, ProTextarea, ProEmpty, ProSelect, ProToast },
     props: {
         visible: { type: Boolean, required: true },
         item: { type: Object as () => DiscussionItem, required: true }
@@ -16,9 +17,13 @@ export default defineComponent({
 
     setup(props, { emit }) {
         const route = useRoute();
-        const toast = useToast();
         const budgetCRStore = useBudgetChangeRequestStore();
         const budgetChangeRequestId = Number(route.params.budgetChangeRequestId);
+
+        const toastState = ref({ visible: false, message: '', type: 'information' as 'information' | 'success' | 'warn' | 'error' });
+        const showToastMsg = (type: 'information' | 'success' | 'warn' | 'error', message: string) => {
+            toastState.value = { visible: true, message, type };
+        };
 
         const user = ref({ role: '', username: '' });
         const reasonSelection = ref('');
@@ -59,12 +64,7 @@ export default defineComponent({
 
         function onFileSelect(event: { files: File[] }) {
             selectedFiles.value = event.files;
-            toast.add({
-                severity: 'info',
-                summary: 'Files Attached',
-                detail: `${event.files.length} file(s) added`,
-                life: 2500
-            });
+            showToastMsg('information', `${event.files.length} file(s) added`);
         }
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
         user.value.role = storedUser.user_project_role_code || '';
@@ -151,7 +151,8 @@ export default defineComponent({
             onSelectItem,
             onFileSelect,
             handleSubmit,
-            showAttachment
+            showAttachment,
+            toastState
         };
     }
 });

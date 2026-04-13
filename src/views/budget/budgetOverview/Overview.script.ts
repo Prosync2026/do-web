@@ -2,9 +2,9 @@ import BudgetSummaryData from '@/components/summaryCard/SummaryCard.vue';
 import { budgetService } from '@/services/budget.service';
 import type { CardItem } from '@/types/card.type';
 import { showError, showWarning } from '@/utils/showNotification.utils';
+import { ProCard, ProSpinner } from '@prosync_solutions/ui';
 import { Chart } from 'highcharts-vue';
 import { computed, defineComponent, onMounted, reactive, ref, watch } from 'vue';
-
 
 interface BudgetStatisticsResponse {
     totalBudget: number;
@@ -22,7 +22,9 @@ export default defineComponent({
     name: 'Overview',
     components: {
         BudgetSummaryData,
-        highcharts: Chart
+        highcharts: Chart,
+        ProCard,
+        ProSpinner
     },
     props: {
         budgetId: {
@@ -37,7 +39,7 @@ export default defineComponent({
 
     setup(props) {
         const BudgetSummaryDataList = ref<CardItem[]>([]);
-        const isLoadingSummary = ref(false);
+        const isLoadingSummary = ref(true);
         const budgetId = ref<number | null>(null);
 
         const pieData = ref<any>(null);

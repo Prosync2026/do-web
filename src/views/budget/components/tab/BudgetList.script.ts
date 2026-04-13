@@ -1,11 +1,11 @@
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { TableColumn } from '@/types/table.type';
-import { computed, defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 
-import ReusableTable from '@/components/table/ReusableTable.vue';
 import { formatCurrency } from '@/utils/format.utils';
 import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
 import EditBudgetItem from '@/views/budget/components/dialog/EditBudgetItem.vue';
+import { ProButton, ProInput, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
 
 interface PaginationConfig {
     page: number;
@@ -17,9 +17,13 @@ interface PaginationConfig {
 export default defineComponent({
     name: 'BudgetList',
     components: {
-        ReusableTable,
         BudgetImportModal,
-        EditBudgetItem
+        EditBudgetItem,
+        ProButton,
+        ProInput,
+        ProSelect,
+        ProTable,
+        ProTag
     },
     props: {
         budgetId: {
@@ -146,14 +150,22 @@ export default defineComponent({
 
         async function handleFilterChange() {
             pagination.value.page = 1;
-            await fetchComparison(1);
+            if (comparisonData.value) {
+                await fetchComparison(1);
+            } else {
+                await fetchBudgetList(props.budgetId, search.value || undefined);
+            }
         }
 
         function handleFilterReset() {
             activeFilters.value = { location1: '', location2: '', element: '', category: '', changeType: 'all' };
             search.value = '';
             pagination.value.page = 1;
-            fetchComparison(1);
+            if (comparisonData.value) {
+                fetchComparison(1);
+            } else {
+                fetchBudgetList(props.budgetId);
+            }
         }
 
         const fetchBudgetList = async (budgetId: number, searchTerm?: string) => {
@@ -166,6 +178,10 @@ export default defineComponent({
             };
 
             if (searchTerm) params.search = searchTerm;
+            if (activeFilters.value.location1) params.location1 = activeFilters.value.location1;
+            if (activeFilters.value.location2) params.location2 = activeFilters.value.location2;
+            if (activeFilters.value.element) params.element = activeFilters.value.element;
+            if (activeFilters.value.category) params.category = activeFilters.value.category;
 
             await budgetStore.fetchBudgetItems(params);
 
@@ -205,7 +221,7 @@ export default defineComponent({
         });
 
         const filteredItems = computed(() => budgetItems.value);
-        
+
         const isQS = computed(() => {
             try {
                 const userStr = localStorage.getItem('user');
@@ -220,20 +236,36 @@ export default defineComponent({
         async function handleImportSuccess() {
             showImportModal.value = false;
             emit('success');
-            await fetchBudgetList(props.budgetId);
+            if (comparisonData.value) {
+                await fetchComparison(pagination.value.page, pagination.value.pageSize);
+            } else {
+                await fetchBudgetList(props.budgetId);
+            }
         }
 
-        function handleSearch(value: string) {
+        async function handleSearch(value: string) {
             search.value = value;
             filters.value.global = { value };
             pagination.value.page = 1;
 
             if (comparisonData.value) {
-                fetchComparison(1);
+                await fetchComparison(1);
             } else {
-                fetchBudgetList(props.budgetId, value || undefined);
+                await fetchBudgetList(props.budgetId, value || undefined);
             }
         }
+
+        // Debounce: auto-search after user stops typing
+        let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+        watch(search, (newVal) => {
+            if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                handleSearch(newVal);
+            }, 500);
+        });
+        onUnmounted(() => {
+            if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+        });
 
         function handleImportClick() {
             showImportModal.value = true;
@@ -441,6 +473,86 @@ export default defineComponent({
             return budgetStore.sorting.sortOrder === 'asc' ? 1 : -1;
         });
 
+        // ProTable columns for the budget items list (v-else table)
+        const proTableBudgetColumns = computed(() => {
+            const cols: any[] = [
+                { key: 'itemCode', label: 'Item Code', sortable: true },
+                { key: 'description', label: 'Description', sortable: true },
+                { key: 'location1', label: 'Location 1', sortable: true },
+                { key: 'location2', label: 'Location 2', sortable: true },
+                { key: 'category', label: 'Category', sortable: true },
+                { key: 'elementCode', label: 'Element', sortable: true },
+                { key: 'subElement', label: '1st Sub Element', sortable: true },
+                { key: 'subSubElement', label: '2nd Sub Element', sortable: true },
+                { key: 'unit', label: 'UOM', sortable: true },
+                { key: 'qty', label: 'Qty', sortable: true },
+                { key: 'totalOrderedQty', label: 'Ordered Qty', sortable: true },
+                { key: 'totalRemainingQty', label: 'Remaining Qty', sortable: true },
+                { key: 'rate', label: 'Rate', sortable: true },
+                { key: 'amount', label: 'Amount', sortable: true }
+            ];
+            if (isQS.value) {
+                cols.push({ key: 'actions', label: '', actions: true });
+            }
+            return cols;
+        });
+
+        const proTableComparisonColumns = computed(() => {
+            const cols: any[] = [
+                { key: 'itemCode', label: 'Item Code', sortable: true },
+                { key: 'description', label: 'Description', sortable: true },
+                { key: 'category', label: 'Category', sortable: true },
+                { key: 'element', label: 'Element', sortable: true },
+                { key: 'subElement', label: 'Sub Element', sortable: true },
+                { key: 'subSubElement', label: 'Sub Sub Element', sortable: true },
+                { key: 'location1', label: 'Location 1', sortable: true },
+                { key: 'location2', label: 'Location 2', sortable: true },
+                { key: 'originalQty', label: 'Old Qty', sortable: true },
+                { key: 'originalAmount', label: 'Old Amount', sortable: true },
+                { key: 'latestQty', label: 'New Qty', sortable: true },
+                { key: 'latestAmount', label: 'New Amount', sortable: true },
+                { key: 'qtyDiff', label: 'Δ Qty', sortable: true },
+                { key: 'amountDiff', label: 'Δ Amount', sortable: true },
+                {
+                    key: 'impact',
+                    label: 'Impact',
+                    sortable: true,
+                    tagRules: [
+                        { value: 'Added', variant: 'success' },
+                        { value: 'Removed', variant: 'error' },
+                        { value: 'Increase', variant: 'warn' },
+                        { value: 'Decrease', variant: 'info' },
+                        { value: 'No Change', variant: 'info' }
+                    ]
+                }
+            ];
+            if (isQS.value) {
+                cols.push({ key: 'actions', label: '', actions: true });
+            }
+            return cols;
+        });
+
+        const pageSizeOptions = [
+            { label: '10', value: 10 },
+            { label: '25', value: 25 },
+            { label: '50', value: 50 },
+            { label: '100', value: 100 }
+        ];
+
+        function handleProTableSort(event: { key: string; direction: 'asc' | 'desc' | null }) {
+            if (!event.key || !event.direction) {
+                handleSortChange({ field: '', order: 0 });
+            } else {
+                handleSortChange({ field: event.key, order: event.direction === 'asc' ? 1 : -1 });
+            }
+        }
+
+        function handleProTablePaginationUpdate(newPagination: any) {
+            if (newPagination.page !== pagination.value.page) {
+                handlePageChange(newPagination.page);
+            }
+        }
+
         return {
             columns,
             budgetItems,
@@ -484,7 +596,13 @@ export default defineComponent({
             filterOptions,
             changeTypeOptions,
             handleFilterChange,
-            handleFilterReset
+            handleFilterReset,
+            // ProTable
+            proTableComparisonColumns,
+            proTableBudgetColumns,
+            pageSizeOptions,
+            handleProTableSort,
+            handleProTablePaginationUpdate
         };
     }
 });

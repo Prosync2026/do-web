@@ -2,7 +2,6 @@
 
 <template>
     <Toast />
-    <ConfirmDialog />
 
     <Dialog v-model:visible="localVisible" modal header="Draft Request Orders" class="w-11/12 md:w-5/6" @update:visible="handleClose">
         <div class="mb-4">

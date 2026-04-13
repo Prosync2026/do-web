@@ -1,9 +1,11 @@
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import { showSuccess, showWarning } from '@/utils/showNotification.utils';
+import { ProButton, ProInput, ProModal } from '@prosync_solutions/ui';
 import { computed, defineComponent, reactive, ref, watch } from 'vue';
 
 export default defineComponent({
     name: 'EditBudgetItem',
+    components: { ProModal, ProInput, ProButton },
 
     props: {
         visible: {

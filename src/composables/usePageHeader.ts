@@ -43,5 +43,9 @@ export function usePageHeader() {
         return meta[meta.length - 1].label;
     });
 
-    return { breadcrumbs, pageTitle };
+    const pageSubtitle = computed(() => {
+        return (route.meta.subtitle as string) ?? '';
+    });
+
+    return { breadcrumbs, pageTitle, pageSubtitle };
 }

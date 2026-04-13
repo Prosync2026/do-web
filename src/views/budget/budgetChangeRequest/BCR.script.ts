@@ -1,20 +1,20 @@
-import ReusableTable from '@/components/table/ReusableTable.vue';
+import SummaryCard from '@/components/summaryCard/SummaryCard.vue';
 import { usePermission } from '@/permissions/budgetChangeRequest.permission';
 import { PermissionCodes } from '@/permissions/permission.codes';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
-import { formatDate } from '@/utils/dateHelper';
-import Badge from 'primevue/badge';
-import { ProButton } from '@prosync_solutions/ui';
-import { computed, defineComponent, onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { buildApprovalFlow } from '@/utils/bcrApprovalFlow.util';
+import { formatDate } from '@/utils/dateHelper';
+import { Motion } from '@motionone/vue';
+import { ProButton, ProCard, ProInput, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
+import { computed, defineComponent, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
-    components: { ReusableTable, Badge, ProButton },
+    components: { SummaryCard, Motion, ProTag, ProButton, ProTable, ProInput, ProSelect, ProCard },
     setup() {
         const { hasPermission } = usePermission();
 
@@ -145,6 +145,82 @@ export default defineComponent({
             pending: 'warn'
         };
 
+        // ProTable columns
+        const proTableColumns = computed(() => {
+            const cols: any[] = [
+                { key: 'DocNo', label: 'BCR No', sortable: true },
+                { key: 'RequestedBy', label: 'Requested By', sortable: true },
+                { key: 'RequestDate', label: 'Date Requested', sortable: true, format: 'date' },
+                {
+                    key: 'Status',
+                    label: 'Status',
+                    sortable: true,
+                    tagRules: [
+                        { value: 'Under Review', variant: 'warn' },
+                        { value: 'Pending Review', variant: 'info' },
+                        { value: 'Approved', variant: 'success' },
+                        { value: 'Rejected', variant: 'error' },
+                        { value: 'Draft', variant: 'secondary' }
+                    ]
+                },
+                { key: 'Remark', label: 'Remark' }
+            ];
+
+            if (canViewPricing.value) {
+                cols.push({ key: 'TotalAmount', label: 'Variance Amount', sortable: true });
+            }
+
+            cols.push({ key: 'approvalFlow', label: 'Approval Flow' });
+            cols.push({ key: 'actions', label: '', actions: true });
+
+            return cols;
+        });
+
+        const bcrSearchTerm = ref('');
+        const bcrStatusFilter = ref('');
+
+        const statusFilterOptions = [
+            { label: 'All Status', value: '' },
+            { label: 'Draft', value: 'Draft' },
+            { label: 'Under Review', value: 'Under Review' },
+            { label: 'Approved', value: 'Approved' },
+            { label: 'Rejected', value: 'Rejected' }
+        ];
+
+        const pageSizeOptions = [
+            { label: '10', value: 10 },
+            { label: '25', value: 25 },
+            { label: '50', value: 50 },
+            { label: '100', value: 100 }
+        ];
+
+        function handleProTableSort(event: { key: string; direction: 'asc' | 'desc' | null }) {
+            if (!event.key || !event.direction) {
+                handleSortChange({ field: '', order: 0 });
+            } else {
+                handleSortChange({ field: event.key, order: event.direction === 'asc' ? 1 : -1 });
+            }
+        }
+
+        function handleProTablePaginationUpdate(newPagination: any) {
+            if (newPagination.page !== budgetCRStore.pagination.page) {
+                handlePageChange(newPagination.page);
+            }
+        }
+
+        function handleBcrSearch() {
+            handleSearch(bcrSearchTerm.value);
+        }
+
+        function handleBcrStatusFilterChange(value: string) {
+            bcrStatusFilter.value = value;
+            handleFilterChange({ status: value });
+        }
+
+        function handleBcrActionClick(row: any) {
+            // ProTable action slot - handled in template
+        }
+
         function getStatusSeverity(Status: string) {
             switch (Status) {
                 case 'Approved':
@@ -252,7 +328,17 @@ export default defineComponent({
             handleSortChange,
             currentSortField,
             currentSortOrder,
-            statusSeverity
+            statusSeverity,
+            proTableColumns,
+            bcrSearchTerm,
+            bcrStatusFilter,
+            statusFilterOptions,
+            pageSizeOptions,
+            handleProTableSort,
+            handleProTablePaginationUpdate,
+            handleBcrSearch,
+            handleBcrStatusFilterChange,
+            formatDate
         };
     }
 });

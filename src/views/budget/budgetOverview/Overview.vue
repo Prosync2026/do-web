@@ -2,7 +2,8 @@
 
 <template>
     <!--HEADER-->
-    <div class="grid grid-cols-12 gap-4 mb-3 mt-4">
+    <ProSpinner v-if="isLoadingSummary" text="Loading budget overview..." />
+    <div v-else class="grid grid-cols-12 gap-4 mb-3 mt-4">
         <BudgetSummaryData :cardItems="BudgetSummaryDataList" :cardCol="3" />
     </div>
 

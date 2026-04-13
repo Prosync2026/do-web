@@ -3,7 +3,7 @@ import { BcrReasonEnum, BcrRecommendationEnum, BcrRoleEnum } from '@/constants/e
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRFinalDecisionPayload, BCRRecommendationPayload } from '@/types/budgetChangeRequest.type';
 import { getRoleConfig } from '@/utils/bcrApproval.utils';
-import { useToast } from 'primevue/usetoast';
+import { ProButton, ProEmpty, ProInput, ProModal, ProSelect, ProTextarea, ProToast } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 interface AdjustmentItem {
@@ -15,13 +15,18 @@ interface AdjustmentItem {
 }
 
 export default defineComponent({
+    components: { ProModal, ProInput, ProButton, ProTextarea, ProEmpty, ProSelect, ProToast },
     props: { visible: { type: Boolean, required: true } },
     emits: ['update:visible', 'submit'],
     setup(props, { emit }) {
         const route = useRoute();
-        const toast = useToast();
         const budgetCRStore = useBudgetChangeRequestStore();
         const budgetChangeRequestId = Number(route.params.budgetChangeRequestId);
+
+        const toastState = ref({ visible: false, message: '', type: 'information' as 'information' | 'success' | 'warn' | 'error' });
+        const showToastMsg = (type: 'information' | 'success' | 'warn' | 'error', message: string) => {
+            toastState.value = { visible: true, message, type };
+        };
 
         const user = ref({ role: '', username: '' });
 
@@ -73,12 +78,7 @@ export default defineComponent({
         }
         function onFileSelect(event: { files: File[] }) {
             selectedFiles.value = event.files;
-            toast.add({
-                severity: 'info',
-                summary: 'Files Attached',
-                detail: `${event.files.length} file(s) added`,
-                life: 2500
-            });
+            showToastMsg('information', `${event.files.length} file(s) added`);
         }
 
         onMounted(async () => {
@@ -119,7 +119,7 @@ export default defineComponent({
                     emit('submit');
                 })
                 .catch(() => {
-                    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to submit recommendation', life: 3000 });
+                    showToastMsg('error', 'Failed to submit recommendation');
                 });
         }
 
@@ -163,7 +163,8 @@ export default defineComponent({
             budgetItemList,
             selectedFiles,
             onFileSelect,
-            handleSubmit
+            handleSubmit,
+            toastState
         };
     }
 });
