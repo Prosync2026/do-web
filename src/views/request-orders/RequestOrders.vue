@@ -99,25 +99,25 @@ import { Button } from "@prosync/ui-kit";
 
                                 <template #cell-actions="{ row }">
                                     <div class="flex items-center gap-2 relative z-50">
-                                        <ProButton v-if="canViewRO" variant="secondary" size="sm" @click="handleActionClick('view', row)">
-                                            <i class="pi pi-eye"></i>
+                                        <ProButton v-if="canViewRO" variant="secondary" size="sm" @click="handleActionClick('view', row)" title="View">
+                                            <i class="pi pi-eye text-lg text-gray-700"></i>
                                         </ProButton>
                                         
-                                        <ProButton v-if="canEditRO && isPurchasingRole && row.currentApprovalStage === 'PURCH'" variant="secondary" size="sm" @click="handleActionClick('edit', row)">
-                                            <i class="pi pi-pencil"></i>
+                                        <ProButton v-if="canEditRO && ['Pending', 'Submitted', 'Processing'].includes(row.status)" variant="secondary" size="sm" @click="handleActionClick('edit', row)" title="Edit">
+                                            <i class="pi pi-pencil text-lg text-blue-600"></i>
                                         </ProButton>
 
                                         <template v-if="canApproveRow(row)">
-                                            <ProButton variant="success" size="sm" @click="handleActionClick('approve', row)">
-                                                <i class="pi pi-check text-white"></i>
+                                            <ProButton variant="secondary" size="sm" @click="handleActionClick('approve', row)" title="Approve">
+                                                <i class="pi pi-check text-lg text-green-600 font-bold"></i>
                                             </ProButton>
-                                            <ProButton variant="danger" size="sm" @click="handleActionClick('reject', row)">
-                                                <i class="pi pi-times"></i>
+                                            <ProButton variant="secondary" size="sm" @click="handleActionClick('reject', row)" title="Reject">
+                                                <i class="pi pi-times text-lg text-red-600 font-bold"></i>
                                             </ProButton>
                                         </template>
 
-                                        <ProButton v-if="canDeleteRO" variant="danger" size="sm" @click="handleActionClick('delete', row)">
-                                            <i class="pi pi-trash"></i>
+                                        <ProButton v-if="canDeleteRO" variant="secondary" size="sm" @click="handleActionClick('delete', row)" title="Delete">
+                                            <i class="pi pi-trash text-lg text-red-600"></i>
                                         </ProButton>
                                     </div>
                                 </template>

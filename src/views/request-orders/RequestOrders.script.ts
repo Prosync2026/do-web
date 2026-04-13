@@ -375,15 +375,21 @@ export default defineComponent({
 
         // approve
         function canApproveRow(row: Order) {
-            if (!canApproveRO.value) return false;
-            if (!row.currentApprovalStage) return false;
-            if (!userRole) return false;
+            const approvableStatuses: Array<string> = ['Submitted', 'Processing', 'Pending'];
+            if (!approvableStatuses.includes(row.status as string)) return false;
 
-            const approvableStatuses: Array<Order['status']> = ['Submitted', 'Processing'];
+            if (row.currentApprovalStage && userRole) {
+                const approvalRole = USER_ROLE_TO_APPROVAL_ROLE[userRole];
+                if (row.currentApprovalStage === approvalRole && canApproveRO.value) return true;
+            }
 
-            const approvalRole = USER_ROLE_TO_APPROVAL_ROLE[userRole];
+            if (canApproveRO.value) return true;
 
-            return approvableStatuses.includes(row.status) && row.currentApprovalStage === approvalRole;
+            if (isPurchasingRole && ((row.status as string) === 'Pending' || row.status === 'Submitted')) {
+                return true;
+            }
+
+            return false;
         }
 
         function approveOrder(order: Order) {
