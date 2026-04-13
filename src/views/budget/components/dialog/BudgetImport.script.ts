@@ -127,21 +127,25 @@ export default function useImportBudgetDialogLogic(
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
 
-            const jsonData: Record<string, any>[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+            const EXPECTED_HEADERS = [
+                'ITEM CODE',
+                'PUR.DESCRIPTION',
+                'ELEMENT',
+                'SUB ELEMENT',
+                '1ST SUB ELEMENT',
+                '2ND SUB ELEMENT',
+                'LOC 1',
+                'LOC 2',
+                'UOM',
+                'BUDGET QTY',
+                'RATE',
+                'AMOUNT',
+                'WASTAGE'
+            ];
 
-            const filteredData = jsonData
-                .map((row) => {
-                    const newRow: Record<string, any> = {};
-                    Object.entries(row).forEach(([key, value]) => {
-                        if (value !== null && value !== undefined && value !== '') {
-                            newRow[key] = value;
-                        }
-                    });
-                    return newRow;
-                })
-                .filter((row) => Object.keys(row).length > 0);
+            const rawData: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
 
-            if (filteredData.length === 0) {
+            if (rawData.length <= 1) {
                 toast.add({
                     severity: 'warn',
                     summary: 'No Data',
@@ -151,7 +155,16 @@ export default function useImportBudgetDialogLogic(
                 return;
             }
 
-            const newSheet = XLSX.utils.json_to_sheet(filteredData);
+            rawData[0] = EXPECTED_HEADERS;
+
+            const filteredData = rawData.filter((row, index) => {
+                // Keep the header safely
+                if (index === 0) return true;
+                // Only keep remaining rows that have at least one meaningful value
+                return row.some((val) => val !== null && val !== undefined && val !== '');
+            });
+
+            const newSheet = XLSX.utils.aoa_to_sheet(filteredData);
             const newWorkbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(newWorkbook, newSheet, 'Budget');
 

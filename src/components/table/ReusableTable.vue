@@ -335,7 +335,7 @@ function handleFilterChange(field: string, value: any) {
 
             <Column v-for="(col, idx) in visibleColumns" :key="col.field || idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style" :headerClass="col.class" :bodyClass="col.class">
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
-                    <slot :name="col.bodySlot" :data="slotProps.data" />
+                    <slot :name="col.bodySlot" :data="slotProps.data" :field="col.field" />
                 </template>
 
                 <template v-else-if="col.body" #body="slotProps">
@@ -357,7 +357,7 @@ function handleFilterChange(field: string, value: any) {
         <DataTable :sortMode="'single'" :lazy="true" @sort="onSort" :removableSort="true" v-else :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem" :data-key="props.dataKey || 'id'">
             <Column v-for="(col, idx) in visibleColumns" :key="col.field || idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style" :headerClass="col.class" :bodyClass="col.class">
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
-                    <slot :name="col.bodySlot" :data="slotProps.data" />
+                    <slot :name="col.bodySlot" :data="slotProps.data" :field="col.field" />
                 </template>
 
                 <template v-else-if="col.body" #body="slotProps">
