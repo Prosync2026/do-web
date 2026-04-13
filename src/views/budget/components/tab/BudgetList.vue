@@ -174,7 +174,6 @@
                     <ProButton variant="ghost" size="sm" @click="handleActionClick('edit', row)">
                         <i class="pi pi-pencil"></i>
                     </ProButton>
-                    </ProMenu>
                 </template>
             </ProTable>
         </div>
