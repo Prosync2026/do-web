@@ -5,7 +5,6 @@ import { Button } from "@prosync/ui-kit";
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-1">
-            <BreadcrumbList />
             <!-- Header -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <ProPageHeader title="Request Orders" subtitle="Manage purchase requests for project materials and services" />

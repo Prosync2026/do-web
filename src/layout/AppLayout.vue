@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePageHeader } from '@/composables/usePageHeader';
 import { useLayout } from '@/layout/composables/layout';
-import { ProPageHeader } from '@prosync_solutions/ui';
+import { ProBreadcrumbs } from '@prosync_solutions/ui';
 import Toast from 'primevue/toast';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -65,7 +65,7 @@ const containerClass = computed(() => {
             <AppTopbar />
 
             <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6">
-                <ProPageHeader v-if="breadcrumbs.length > 0" :title="pageTitle" :breadcrumbs="breadcrumbs" class="mb-4" />
+                <ProBreadcrumbs v-if="breadcrumbs.length > 0" :items="breadcrumbs" class="mb-6" />
                 <router-view></router-view>
             </main>
         </div>
