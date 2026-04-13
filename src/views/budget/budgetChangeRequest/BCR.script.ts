@@ -8,13 +8,13 @@ import type { TableColumn } from '@/types/table.type';
 import { buildApprovalFlow } from '@/utils/bcrApprovalFlow.util';
 import { formatDate } from '@/utils/dateHelper';
 import { Motion } from '@motionone/vue';
-import { ProButton, ProCard, ProInput, ProMenu, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
+import { ProButton, ProCard, ProInput, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
-    components: { SummaryCard, Motion, ProTag, ProButton, ProTable, ProInput, ProSelect, ProCard, ProMenu },
+    components: { SummaryCard, Motion, ProTag, ProButton, ProTable, ProInput, ProSelect, ProCard },
     setup() {
         const { hasPermission } = usePermission();
 

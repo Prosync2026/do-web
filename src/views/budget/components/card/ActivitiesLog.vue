@@ -26,7 +26,13 @@ export default defineComponent({
         };
 
         onMounted(loadActivities);
-        watch(() => route.params.requestNo, loadActivities);
+        watch(
+            () => route.params.budgetChangeRequestId,
+            () => {
+                currentPage.value = 1;
+                loadActivities();
+            }
+        );
 
         const activities = computed(() => bcrStore.historyList);
         const currentPage = ref(1);

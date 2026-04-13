@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePageHeader } from '@/composables/usePageHeader';
 import { useLayout } from '@/layout/composables/layout';
-import { ProBreadcrumbs } from '@prosync_solutions/ui';
+import { ProPageHeader } from '@prosync_solutions/ui';
 import Toast from 'primevue/toast';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -70,7 +70,7 @@ const containerClass = computed(() => {
                         <div id="page-header-actions"></div>
                     </template>
                 </ProPageHeader>
-                <router-view></router-view>
+                <router-view :key="route.path"></router-view>
             </main>
         </div>
 

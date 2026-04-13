@@ -18,7 +18,7 @@
                 </div>
 
                 <!-- Reason Selection -->
-                <div v-if="reasonOptions.length === '0'">
+                <div v-if="reasonOptions.length > 0">
                     <label class="block text-sm font-medium text-gray-700">Reason (choose one):</label>
                     <div class="flex flex-col gap-2 ml-3 mt-1">
                         <div v-for="(reason, idx) in reasonOptions" :key="idx" class="flex items-center gap-2">
@@ -29,7 +29,7 @@
                 </div>
 
                 <!-- Recommendation Selection -->
-                <div v-if="recommendationOptions">
+                <div v-if="recommendationOptions.length > 0">
                     <label class="block text-sm font-medium text-gray-700">Recommendation (choose one, optional):</label>
                     <div class="flex flex-col gap-2 ml-3 mt-1">
                         <div v-for="(rec, idx) in recommendationOptions" :key="idx" class="flex items-center gap-2">

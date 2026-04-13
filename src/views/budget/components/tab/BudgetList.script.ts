@@ -5,7 +5,7 @@ import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from 'v
 import { formatCurrency } from '@/utils/format.utils';
 import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
 import EditBudgetItem from '@/views/budget/components/dialog/EditBudgetItem.vue';
-import { ProButton, ProInput, ProMenu, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
+import { ProButton, ProInput, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
 
 interface PaginationConfig {
     page: number;
@@ -21,7 +21,6 @@ export default defineComponent({
         EditBudgetItem,
         ProButton,
         ProInput,
-        ProMenu,
         ProSelect,
         ProTable,
         ProTag
@@ -237,7 +236,11 @@ export default defineComponent({
         async function handleImportSuccess() {
             showImportModal.value = false;
             emit('success');
-            await fetchBudgetList(props.budgetId);
+            if (comparisonData.value) {
+                await fetchComparison(pagination.value.page, pagination.value.pageSize);
+            } else {
+                await fetchBudgetList(props.budgetId);
+            }
         }
 
         async function handleSearch(value: string) {

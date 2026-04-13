@@ -79,7 +79,7 @@ const navItems = computed(() =>
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }" tag="div" class="relative">
         <div class="h-screen bg-white">
-            <ProSidebar :key="route.path" :nav-items="navItems" :default-expanded="true" :persist-state="false">
+            <ProSidebar :nav-items="navItems" :default-expanded="true" :persist-state="false">
                 <template #logo="{ isExpanded }">
                     <router-link to="/" class="flex items-center justify-center p-1">
                         <h1 v-if="isExpanded" class="text-2xl font-extrabold leading-tight m-0 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent truncate w-full text-center">DO SYSTEM</h1>

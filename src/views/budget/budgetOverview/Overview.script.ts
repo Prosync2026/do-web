@@ -39,7 +39,7 @@ export default defineComponent({
 
     setup(props) {
         const BudgetSummaryDataList = ref<CardItem[]>([]);
-        const isLoadingSummary = ref(false);
+        const isLoadingSummary = ref(true);
         const budgetId = ref<number | null>(null);
 
         const pieData = ref<any>(null);

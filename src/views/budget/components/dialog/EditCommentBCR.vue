@@ -18,7 +18,7 @@
                 </div>
 
                 <!-- Reason -->
-                <div v-if="reasonOptions.length === '0'">
+                <div v-if="reasonOptions.length > 0">
                     <label class="block text-sm font-medium text-gray-700"> Reason (choose one): </label>
                     <div class="flex flex-col gap-2 ml-3 mt-1">
                         <div v-for="(reason, idx) in reasonOptions" :key="idx" class="flex items-center gap-2">
