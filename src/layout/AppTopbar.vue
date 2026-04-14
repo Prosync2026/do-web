@@ -272,7 +272,7 @@ const goToAllNotifications = () => {
                     <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative" @click="toggleNotificationMenu">
                         <PhBell :size="20" class="text-gray-600 dark:text-gray-300" />
                     </button>
-                    <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute shadow-sm" style="top: 0px; right: 2px" />
+                    <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute shadow-sm pointer-events-none" style="top: -2px; right: -4px; transform: scale(0.75); transform-origin: top right" />
                 </div>
 
                 <OverlayPanel ref="notificationPanel" class="w-96 shadow-xl rounded-xl">
