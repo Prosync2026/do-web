@@ -1,12 +1,9 @@
 import { requestOrderService } from '@/services/requestOrder.service';
 import type { DraftRO } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
+import { PhPencilSimple, PhTrash, PhX } from '@phosphor-icons/vue';
+import { ProModal, ProInput, ProTable, ProButton, ProTag } from '@prosync_solutions/ui';
+import type { TableColumn } from '@prosync_solutions/ui/dist/types';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
@@ -14,7 +11,7 @@ import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'ViewDraftRo',
-    components: { Dialog, Button, DataTable, Column, InputText, Badge },
+    components: { ProModal, ProTable, ProButton, ProInput, ProTag, PhPencilSimple, PhTrash, PhX },
     props: { visible: { type: Boolean, required: true } },
     emits: ['update:visible', 'update:count'],
     setup(props, { emit }) {
@@ -176,6 +173,17 @@ export default defineComponent({
             return date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
         };
 
+        const columns: TableColumn[] = [
+            { key: 'rowIndex', label: '#' },
+            { key: 'draftId', label: 'Draft ID', sortable: true },
+            { key: 'project', label: 'Project', sortable: true },
+            { key: 'budgetType', label: 'Budget Type', sortable: true },
+            { key: 'requestedBy', label: 'Requested By', sortable: true },
+            { key: 'itemsCount', label: 'Items' },
+            { key: 'lastModified', label: 'Last Modified', sortable: true },
+            { key: 'actions', label: 'Actions', actions: true }
+        ];
+
         return {
             searchQuery,
             drafts,
@@ -186,7 +194,8 @@ export default defineComponent({
             formatDate,
             localVisible,
             draftCount,
-            loading
+            loading,
+            columns
         };
     }
 });

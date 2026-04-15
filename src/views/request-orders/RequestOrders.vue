@@ -8,10 +8,12 @@ import { Button } from "@prosync/ui-kit";
             <!-- Header Actions teleported to AppLayout -->
             <Teleport to="#page-header-actions">
                 <div class="flex gap-4 items-center">
-                    <ProButton variant="secondary" @click="showDraftModal = true">
-                        View Drafts
-                        <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="ml-2" />
-                    </ProButton>
+                    <div class="relative">
+                        <ProButton variant="secondary" @click="showDraftModal = true">
+                            View Drafts
+                        </ProButton>
+                        <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85);" />
+                    </div>
                     <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')">
                         <i class="pi pi-plus mr-2"></i> New Request Order
                     </ProButton>
