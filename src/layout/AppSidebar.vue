@@ -77,7 +77,7 @@ const navItems = computed(() =>
 </script>
 
 <template>
-    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }" tag="div" class="relative">
+    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }" tag="div" class="relative z-[60]">
         <div class="h-screen bg-white">
             <ProSidebar :nav-items="navItems" :default-expanded="true" :persist-state="false">
                 <template #logo="{ isExpanded }">
