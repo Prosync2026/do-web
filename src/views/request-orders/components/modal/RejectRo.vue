@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { ProButton, ProModal } from '@prosync_solutions/ui';
 import { PhWarning, PhX } from '@phosphor-icons/vue';
+import { ProButton, ProModal } from '@prosync_solutions/ui';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
     visible: Boolean,
@@ -79,7 +79,7 @@ function confirmReject() {
                     <template #iconLeft><PhX :size="16" /></template>
                     Cancel
                 </ProButton>
-                <ProButton variant="danger" @click="confirmReject" :disabled="!isValid">
+                <ProButton variant="danger" class="" @click="confirmReject" :disabled="!isValid">
                     <template #iconLeft><PhWarning :size="16" /></template>
                     Confirm Rejection
                 </ProButton>
@@ -87,3 +87,4 @@ function confirmReject() {
         </template>
     </ProModal>
 </template>
+
