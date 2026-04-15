@@ -246,7 +246,7 @@ const goToAllNotifications = () => {
 </script>
 
 <template>
-    <Motion tag="div" class="w-full relative" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
+    <Motion tag="div" class="w-full relative z-50" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
         <ProTopbar :user-name="username || 'PM User'" :user-avatar="'https://randomuser.me/api/portraits/women/44.jpg'">
             <template #left>
                 <!-- Project dropdown (Moved to left slot) -->

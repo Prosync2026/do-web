@@ -1,7 +1,7 @@
 <script lang="ts" src="./PreviewRo.script.ts"></script>
 
 <template>
-    <Dialog v-model:visible="localVisible" modal header="Summary Order" class="w-11/12 md:w-5/6" @update:visible="handleClose">
+    <ProModal :modelValue="localVisible" @update:modelValue="(val: boolean) => { localVisible = val; if (!val) $emit('update:visible', false); }" title="Summary Order" size="full">
         <!-- Summary Section -->
         <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-6 shadow-sm">
             <div class="grid grid-cols-2 gap-3 text-sm">
@@ -39,87 +39,53 @@
 
         <!-- Items Table -->
         <div class="overflow-x-auto mb-4">
-            <DataTable :value="summaryData.items" class="text-sm" scrollable scrollHeight="400px">
-                <Column field="no" header="No" style="min-width: 50px; width: 50px">
-                    <template #body="{ index }">
-                        {{ index + 1 }}
-                    </template>
-                </Column>
-
-                <Column field="itemType" header="Item Type" style="min-width: 100px">
-                    <template #body="{ data }">
-                        <span>{{ data.itemType }}</span>
-                    </template>
-                </Column>
-
-                <Column field="itemCode" header="Item Code" style="min-width: 120px">
-                    <template #body="{ data }">
-                        <span class="font-medium">{{ data.itemCode }}</span>
-                    </template>
-                </Column>
-
-                <Column field="description" header="Description" style="min-width: 200px">
-                    <template #body="{ data }">
-                        <div>
-                            <div class="font-medium">{{ data.description }}</div>
-                            <div v-if="data.notes" class="text-xs text-gray-500 mt-1">Note: {{ data.notes }}</div>
-                        </div>
-                    </template>
-                </Column>
-                <Column field="location" header="Location" style="min-width: 150px">
-                    <template #body="{ data }">
-                        <div class="text-xs">{{ data.location }}</div>
-                    </template>
-                </Column>
-                <Column field="uom" header="UOM" style="min-width: 70px; text-align: center">
-                    <template #body="{ data }">
-                        {{ data.uom }}
-                    </template>
-                </Column>
-
-                <Column field="qty" header="QTY" style="min-width: 80px; text-align: center">
-                    <template #body="{ data }">
-                        {{ data.qty }}
-                    </template>
-                </Column>
-
-                <Column field="qtyRequested" header="ReqQty" style="min-width: 80px; text-align: center">
-                    <template #body="{ data }">
-                        {{ data.qtyRequested || '' }}
-                    </template>
-                </Column>
-                <Column field="budgetQty" header="BgtQty" style="min-width: 80px; text-align: center">
-                    <template #body="{ data }">
-                        {{ data.budgetQty || '' }}
-                    </template>
-                </Column>
-                <Column field="qtyOrdered" header="QtyOrd" style="min-width: 80px; text-align: center">
-                    <template #body="{ data }">
-                        {{ data.qtyOrdered || '' }}
-                    </template>
-                </Column>
-
-                <Column field="qtyDelivered" header="QtyDelivered" style="min-width: 100px; text-align: center">
-                    <template #body="{ data }">
-                        {{ data.qtyDelivered || '' }}
-                    </template>
-                </Column>
-
-                <Column field="price" header="APPLY" style="min-width: 120px; text-align: right; display: none">
-                    <template #body="{ data }">
-                        <div>
-                            <div>{{ formatCurrency(data.price) }}</div>
-                            <div v-if="data.remark" class="text-xs text-gray-500 mt-1">Remark: {{ data.remark }}</div>
-                        </div>
-                    </template>
-                </Column>
-
-                <Column header="Del. Date" style="min-width: 100px; text-align: center">
-                    <template #body="{ data }">
-                        {{ formatDate(data.deliveryDate) }}
-                    </template>
-                </Column>
-            </DataTable>
+            <ProTable :data="summaryData.items" :columns="columns" class="text-sm">
+                <template #cell-no="{ row }">
+                    {{ summaryData.items.indexOf(row) + 1 }}
+                </template>
+                <template #cell-itemType="{ row }">
+                    {{ row.itemType }}
+                </template>
+                <template #cell-itemCode="{ row }">
+                    <span class="font-medium">{{ row.itemCode }}</span>
+                </template>
+                <template #cell-description="{ row }">
+                    <div>
+                        <div class="font-medium">{{ row.description }}</div>
+                        <div v-if="row.notes" class="text-xs text-gray-500 mt-1">Note: {{ row.notes }}</div>
+                    </div>
+                </template>
+                <template #cell-location="{ row }">
+                    <div class="text-xs">{{ row.location }}</div>
+                </template>
+                <template #cell-uom="{ row }">
+                    {{ row.uom }}
+                </template>
+                <template #cell-qty="{ row }">
+                    {{ row.qty }}
+                </template>
+                <template #cell-qtyRequested="{ row }">
+                    {{ row.qtyRequested || '' }}
+                </template>
+                <template #cell-budgetQty="{ row }">
+                    {{ row.budgetQty || '' }}
+                </template>
+                <template #cell-qtyOrdered="{ row }">
+                    {{ row.qtyOrdered || '' }}
+                </template>
+                <template #cell-qtyDelivered="{ row }">
+                    {{ row.qtyDelivered || '' }}
+                </template>
+                <template #cell-price="{ row }">
+                    <div>
+                        <div>{{ formatCurrency(row.price) }}</div>
+                        <div v-if="row.remark" class="text-xs text-gray-500 mt-1">Remark: {{ row.remark }}</div>
+                    </div>
+                </template>
+                <template #cell-deliveryDate="{ row }">
+                    {{ formatDate(row.deliveryDate) }}
+                </template>
+            </ProTable>
         </div>
 
         <!-- Overall Remark -->
@@ -146,9 +112,9 @@
 
         <template #footer>
             <div class="flex justify-end gap-2">
-                <Button label="Cancel" severity="secondary" outlined icon="pi pi-times" @click="handleClose" />
-                <Button label="Submit" severity="success" outlined icon="pi pi-check" @click="handleSubmit" :loading="isSubmitting" />
+                <ProButton variant="secondary" @click="handleClose" class="mr-2">Cancel</ProButton>
+                <ProButton variant="primary" @click="handleSubmit" :loading="isSubmitting">Submit</ProButton>
             </div>
         </template>
-    </Dialog>
+    </ProModal>
 </template>
