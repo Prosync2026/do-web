@@ -128,6 +128,7 @@ import { Button } from "@prosync/ui-kit";
             <ViewRo v-model:visible="showDetailsModal" :order="selectedOrder" :isPurchasingRole="isPurchasingRole" @approve="handleApproveFromModal" @reject="handleRejectFromModal" />
             <EditRo :visible="showEditModal" :order="selectedOrder" @update:visible="showEditModal = $event" @save="handleSaveOrder" />
             <RejectRo :visible="showRejectModal" :order-number="currentRejectOrder?.roNumber" @update:visible="showRejectModal = $event" @reject="onRejectConfirmed" />
+            <ApproveRo :visible="showApproveModal" :order-number="currentApproveOrder?.roNumber" @update:visible="showApproveModal = $event" @approve="onApproveConfirmed" />
         </div>
     </Motion>
 </template>

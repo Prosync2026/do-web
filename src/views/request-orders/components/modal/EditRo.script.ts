@@ -4,25 +4,35 @@ import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store'
 import type { AttachmentItem, CreateRequestOrderPayload, EditForm, Order } from '@/types/request-order.type';
 import { formatDateToAPI, parseDDMMYYYY } from '@/utils/dateHelper';
 import { storeToRefs } from 'pinia';
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import { usePrimeVue } from 'primevue/config';
-import DataTable from 'primevue/datatable';
-import Dialog from 'primevue/dialog';
 import FileUpload from 'primevue/fileupload';
 import InputNumber from 'primevue/inputnumber';
-import InputText from 'primevue/inputtext';
-import Menu from 'primevue/menu';
-import ProgressBar from 'primevue/progressbar';
 import { useToast } from 'primevue/usetoast';
 import type { StockItem } from '@/types/stockItem.type';
 import { defineComponent, PropType, ref, watch } from 'vue';
+import { PhCheck, PhCloudArrowUp, PhEye, PhFile, PhImages, PhPlus, PhTrash, PhX } from '@phosphor-icons/vue';
+import { ProButton, ProModal, ProTable } from '@prosync_solutions/ui';
 import CreateROModal from './CreateRo.vue';
 import CreateStockItem from './CreateStockItem.vue';
 
 export default defineComponent({
     name: 'EditRo',
-    components: { Dialog, Button, InputText, InputNumber, DataTable, Column, FileUpload, ProgressBar, Menu, CreateROModal, CreateStockItem },
+    components: { 
+        FileUpload, 
+        InputNumber, 
+        CreateROModal, 
+        CreateStockItem,
+        ProModal,
+        ProButton,
+        ProTable,
+        PhCheck,
+        PhCloudArrowUp,
+        PhEye,
+        PhFile,
+        PhImages,
+        PhPlus,
+        PhTrash,
+        PhX
+    },
     props: {
         visible: { type: Boolean, required: true },
         order: { type: Object as PropType<Order | null>, default: null }
@@ -42,7 +52,6 @@ export default defineComponent({
         const MAX_FILE_SIZE = 1_000_000;
         const attachments = ref<(File | AttachmentItem)[]>([]);
         const isAttachmentValid = ref(true);
-        const $primevue = usePrimeVue();
         const newAttachments = ref<File[]>([]);
         const existingAttachments = ref<AttachmentItem[]>([]);
 
@@ -429,7 +438,6 @@ export default defineComponent({
             MAX_FILE_SIZE,
             attachments,
             isAttachmentValid,
-            usePrimeVue,
             newAttachments,
             existingAttachments,
             removeNewAttachment,
