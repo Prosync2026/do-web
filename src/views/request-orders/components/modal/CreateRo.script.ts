@@ -1,27 +1,22 @@
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import Dropdown from 'primevue/dropdown';
-import InputText from 'primevue/inputtext';
-import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref, toRaw, watch } from 'vue';
+import { ProModal, ProTable, ProInput, ProSelect, ProDatePicker, ProButton, ProTag } from '@prosync_solutions/ui';
 
-import ReusableTable from '@/components/table/ReusableTable.vue';
 import { budgetService } from '@/services/budget.service';
 import { budgetFilterService } from '@/services/budgetFilter.service';
 import { useBudgetStore } from '@/stores/budget/budget.store';
-import type { TableColumn } from '@/types/table.type';
 import { useToast } from 'primevue/usetoast';
 import type { BudgetItem, FilterOption } from '../../../../types/request-order.type';
 
 export default defineComponent({
     name: 'CreateROModal',
     components: {
-        Dialog,
-        ReusableTable,
-        Button,
-        InputText,
-        Dropdown,
-        Tag
+        ProModal,
+        ProTable,
+        ProInput,
+        ProSelect,
+        ProDatePicker,
+        ProButton,
+        ProTag
     },
     props: {
         visible: { type: Boolean, default: false },
@@ -66,7 +61,7 @@ export default defineComponent({
         const statusOptions = ref<FilterOption[]>([]);
 
         // delivery date
-        const deliveryDate = ref<Date | null>(null);
+        const deliveryDate = ref<string | null>(null);
         const showValidation = ref(false);
 
         // statistics
@@ -166,6 +161,14 @@ export default defineComponent({
             statusOptions.value = stats.map((s) => ({ label: s, value: s }));
         });
 
+        const handleSelect = ({ selected }: { selected: Record<string, any>[] }) => {
+            selectedItems.value = selected as BudgetItem[];
+        };
+
+        const handleSelectAll = ({ selected }: { selected: Record<string, any>[] }) => {
+            selectedItems.value = selected as BudgetItem[];
+        };
+
         const hasActiveFilters = computed(
             () => !!(searchTerm.value || selectedCategory.value || selectedElement.value || selectedSubElement.value || selectedLocation1.value || selectedLocation2.value || selectedItemCode.value || selectedStatus.value)
         );
@@ -215,7 +218,7 @@ export default defineComponent({
             // Deep clone to ensure no references remain
             const items = JSON.parse(JSON.stringify(rawItems));
 
-            const dateStr = rawDate instanceof Date ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}` : rawDate ? String(rawDate) : '';
+            const dateStr = rawDate ? String(rawDate) : '';
 
             const itemsWithDeliveryDate = items.map((item: any) => {
                 return {
@@ -329,13 +332,15 @@ export default defineComponent({
             debouncedFetchOnFilter();
         });
 
-        const handlePageChange = async (page: number) => {
-            await fetchBudgetItems(page, budgetStore.pagination.pageSize);
-        };
-
-        const handlePageSizeChange = async (pageSize: number) => {
-            budgetStore.pagination.pageSize = pageSize;
-            await fetchBudgetItems(1, pageSize);
+        const handlePageChange = async (newState: { page: number; pageSize: number; total?: number }) => {
+            // Only fetch if parameters changed to avoid redundant loops
+            const changed = budgetStore.pagination.page !== newState.page || budgetStore.pagination.pageSize !== newState.pageSize;
+            budgetStore.pagination.page = newState.page;
+            budgetStore.pagination.pageSize = newState.pageSize;
+            
+            if (changed) {
+                await fetchBudgetItems(newState.page, newState.pageSize);
+            }
         };
 
         const grandTotal = computed(() => {
@@ -355,27 +360,27 @@ export default defineComponent({
             });
         });
 
-        const columns: TableColumn[] = [
-            { field: 'rowIndex', header: '#', sortable: false },
-            { field: 'itemCode', header: 'Item Code', sortable: true },
-            { field: 'description', header: 'Description', sortable: true },
-            { field: 'description2', header: 'Description 2', sortable: true },
-            { field: 'location1', header: 'Location 1', sortable: false },
-            { field: 'location2', header: 'Location 2', sortable: false },
-            { field: 'category', header: 'Category', sortable: true },
-            { field: 'elementCode', header: 'Element', sortable: true },
-            { field: 'subElement', header: 'Sub Element', sortable: true },
-            { field: 'subSubElement', header: 'Sub Sub Element', sortable: true },
-            { field: 'uom', header: 'UOM', sortable: false },
+        const columns = [
+            { key: 'rowIndex', label: '#', sortable: false },
+            { key: 'itemCode', label: 'Item Code', sortable: true },
+            { key: 'description', label: 'Description', sortable: true },
+            { key: 'description2', label: 'Description 2', sortable: true },
+            { key: 'location1', label: 'Location 1', sortable: false },
+            { key: 'location2', label: 'Location 2', sortable: false },
+            { key: 'category', label: 'Category', sortable: true },
+            { key: 'elementCode', label: 'Element', sortable: true },
+            { key: 'subElement', label: 'Sub Element', sortable: true },
+            { key: 'subSubElement', label: 'Sub Sub Element', sortable: true },
+            { key: 'uom', label: 'UOM', sortable: false },
 
             // NEW columns
-            { field: 'budgetQty', header: 'Bgt Qty', sortable: false },
-            { field: 'qtyOrdered', header: 'Qty Ordered', sortable: false },
-            { field: 'balanceQty', header: 'Balance Qty', sortable: false },
+            { key: 'budgetQty', label: 'Bgt Qty', sortable: false },
+            { key: 'qtyOrdered', label: 'Qty Ordered', sortable: false },
+            { key: 'balanceQty', label: 'Balance Qty', sortable: false },
 
-            { field: 'qty', header: 'Quantity', sortable: true },
-            { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rateSlot', visible: false },
-            { field: 'amount', header: 'Amount', bodySlot: 'amountSlot', visible: false }
+            { key: 'qty', label: 'Quantity', sortable: true },
+            { key: 'rateSlot', label: 'Rate', sortable: true },
+            { key: 'amountSlot', label: 'Amount' }
         ];
 
         onMounted(async () => {
@@ -407,7 +412,8 @@ export default defineComponent({
             addSelectedItems,
             getItemTypeSeverity,
             handlePageChange,
-            handlePageSizeChange,
+            handleSelect,
+            handleSelectAll,
             onLocation2Click,
             onSubElementClick,
             onSubSubElementClick,

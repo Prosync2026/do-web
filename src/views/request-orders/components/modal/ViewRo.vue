@@ -1,104 +1,132 @@
 <script lang="ts" src="./ViewRo.script.ts"></script>
 
 <template>
-    <Dialog v-model:visible="localVisible" modal header="Details" class="w-11/12 md:w-2/3">
+    <ProModal
+        :modelValue="localVisible"
+        @update:modelValue="(val: boolean) => { localVisible = val; if (!val) handleClose(); }"
+        title="Request Order Details"
+        size="xl"
+    >
         <div v-if="localOrder">
-            <h6 class="text-lg font-bold mb-6">
-                Request Order :
-                <span class="text-gray-500 font-normal">{{ localOrder.roNumber }}</span>
-            </h6>
+            <!-- Header Info -->
+            <div class="mb-6">
+                <h6 class="text-body-bold text-text-heading mb-4">
+                    Request Order:
+                    <span class="text-text-subtitle font-normal ml-1">{{ localOrder.roNumber }}</span>
+                </h6>
 
-            <div class="grid grid-cols-2 gap-4 text-sm mb-6">
-                <div>
-                    <p class="font-semibold">Status</p>
-                    <p>{{ localOrder.status }}</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Requested At</p>
-                    <p>{{ localOrder.requestedAt }}</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Requested By</p>
-                    <p>{{ localOrder.requestedBy }}</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Budget Type</p>
-                    <p>{{ localOrder.budgetType }}</p>
-                </div>
-                <div>
-                    <p class="font-semibold">RO Date</p>
-                    <p>{{ localOrder.roDate }}</p>
+                <div class="grid grid-cols-2 gap-4 bg-surface-gray-bg rounded-container p-4 border border-border-border">
+                    <div>
+                        <p class="text-body-sm text-text-subtitle mb-1">Status</p>
+                        <p class="text-body-sm-bold text-text-heading">{{ localOrder.status }}</p>
+                    </div>
+                    <div>
+                        <p class="text-body-sm text-text-subtitle mb-1">Requested At</p>
+                        <p class="text-body-sm-bold text-text-heading">{{ localOrder.requestedAt }}</p>
+                    </div>
+                    <div>
+                        <p class="text-body-sm text-text-subtitle mb-1">Requested By</p>
+                        <p class="text-body-sm-bold text-text-heading">{{ localOrder.requestedBy }}</p>
+                    </div>
+                    <div>
+                        <p class="text-body-sm text-text-subtitle mb-1">Budget Type</p>
+                        <p class="text-body-sm-bold text-text-heading">{{ localOrder.budgetType }}</p>
+                    </div>
+                    <div>
+                        <p class="text-body-sm text-text-subtitle mb-1">RO Date</p>
+                        <p class="text-body-sm-bold text-text-heading">{{ localOrder.roDate }}</p>
+                    </div>
                 </div>
             </div>
 
-            <h3 class="font-semibold mb-2">Requested Items</h3>
+            <!-- Requested Items Table -->
+            <h3 class="text-body-bold text-text-heading mb-3">Requested Items</h3>
+            <ProTable
+                :columns="[
+                    { key: 'code', label: 'Item Code' },
+                    { key: 'description', label: 'Description' },
+                    { key: 'uom', label: 'UOM' },
+                    { key: 'originalBudgetQty', label: 'Order Qty' },
+                    { key: 'requestedQty', label: 'Requested Qty' },
+                    { key: 'exceededQty', label: 'Exceeded Qty' },
+                    { key: 'exceededPercent', label: 'Exceeded %' },
+                    { key: 'deliveryDate', label: 'Delivery Date' },
+                    { key: 'note', label: 'Note' },
+                ]"
+                class="mb-6"
+            >
+                <tr
+                    v-for="(item, idx) in localOrder.items"
+                    :key="idx"
+                    :class="item.exceedBudget ? 'bg-surface-error/30' : ''"
+                >
+                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.code }}</td>
+                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.description }}</td>
+                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.uom }}</td>
+                    <td class="px-3 py-2 text-body-sm text-text-body">{{ String(item.originalBudgetQty ?? '-') }}</td>
+                    <td class="px-3 py-2 text-body-sm text-text-body">
+                        <span v-if="item.requestedQty" class="text-body-sm-bold text-text-heading">{{ item.requestedQty?.toFixed(2) }}</span>
+                        <span v-else class="text-text-disabled">-</span>
+                    </td>
+                    <td class="px-3 py-2 text-body-sm text-text-body">
+                        <span v-if="item.exceedBudget" class="text-body-sm-bold text-text-error">+{{ item.exceededQty?.toFixed(2) }}</span>
+                        <span v-else class="text-text-disabled">-</span>
+                    </td>
+                    <td class="px-3 py-2 text-body-sm text-text-body">
+                        <span v-if="item.exceedBudget" class="text-body-sm-bold text-text-error">{{ item.exceededPercent?.toFixed(2) }}%</span>
+                        <span v-else class="text-text-disabled">-</span>
+                    </td>
+                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.deliveryDate ?? '-' }}</td>
+                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.note ?? '-' }}</td>
+                </tr>
+            </ProTable>
 
-            <table class="w-full border text-sm">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="p-2 text-left">Item Code</th>
-                        <th class="p-2 text-left">Description</th>
-                        <th class="p-2 text-left">UOM</th>
-                        <th class="p-2 text-left">Order Qty</th>
-                        <th class="p-2 text-left">Requested Qty</th>
-                        <th class="p-2 text-left">Exceeded Qty</th>
-                        <th class="p-2 text-left">Exceeded %</th>
-                        <th class="p-2 text-left">Delivery Date</th>
-                        <th class="p-2 text-left">Note</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(item, idx) in localOrder.items" :key="idx" :class="{ 'bg-red-50': item.exceedBudget }">
-                        <td class="p-2">{{ item.code }}</td>
-                        <td class="p-2">{{ item.description }}</td>
-                        <td class="p-2">{{ item.uom }}</td>
-                        <td class="p-2">{{ item.originalBudgetQty }}</td>
-                        <td class="p-2">
-                            <span v-if="item.requestedQty" class="text-black-500 font-semibold"> {{ item.requestedQty?.toFixed(2) }} </span>
-                            <span v-else>-</span>
-                        </td>
-                        <td class="p-2">
-                            <span v-if="item.exceedBudget" class="text-red-500 font-semibold"> +{{ item.exceededQty?.toFixed(2) }} </span>
-                            <span v-else>-</span>
-                        </td>
-                        <td class="p-2">
-                            <span v-if="item.exceedBudget" class="text-red-500 font-semibold"> {{ item.exceededPercent?.toFixed(2) }}% </span>
-                            <span v-else>-</span>
-                        </td>
-                        <td class="p-2">{{ item.deliveryDate }}</td>
-                        <td class="p-2">{{ item.note }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
+            <!-- Attachments -->
             <div class="mt-4">
                 <div v-if="existingAttachments.length > 0" class="mb-4">
-                    <h4 class="text-sm font-semibold mb-2">Attachments</h4>
+                    <h4 class="text-body-sm-bold text-text-heading mb-3">Attachments</h4>
                     <div class="flex flex-wrap gap-2">
-                        <div v-for="(file, index) in existingAttachments" :key="`existing-${index}`" class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
-                            <i class="pi pi-file text-gray-500"></i>
-                            <span class="text-sm">{{ file.filename }}</span>
-                            <span v-if="file.size" class="text-xs text-gray-500">({{ formatSize(file.size) }})</span>
-                            <Button icon="pi pi-eye" text rounded severity="info" @click="previewAttachment(file)" v-tooltip="'Preview Attachment'" />
+                        <div
+                            v-for="(file, index) in existingAttachments"
+                            :key="`existing-${index}`"
+                            class="flex items-center gap-2 px-3 py-2 bg-surface-gray-bg border border-border-border rounded-button"
+                        >
+                            <PhFile :size="16" class="text-icon-default" />
+                            <span class="text-body-sm text-text-body">{{ file.filename }}</span>
+                            <span v-if="file.size" class="text-caption text-text-disabled">({{ formatSize(file.size) }})</span>
+                            <button
+                                class="w-7 h-7 flex items-center justify-center rounded-md text-brand-primary hover:bg-surface-gray-bg/80 transition-colors"
+                                @click="previewAttachment(file)"
+                                title="Preview Attachment"
+                            >
+                                <PhEye :size="14" />
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <div v-else class="text-gray-500 italic text-sm">No attachments available.</div>
+                <div v-else class="text-body-sm text-text-disabled italic">No attachments available.</div>
             </div>
         </div>
 
         <template #footer>
-            <div class="flex justify-end gap-2">
+            <div class="flex justify-end gap-3">
                 <template v-if="isPurchasingRole && localOrder?.status === 'Submitted'">
-                    <Button label="Reject Request" severity="danger" outlined icon="pi pi-times" @click="handleReject" />
-                    <Button label="Approve Request" severity="success" icon="pi pi-check" @click="handleApprove" />
+                    <ProButton variant="danger" @click="handleReject">
+                        <template #iconLeft><PhX :size="16" /></template>
+                        Reject Request
+                    </ProButton>
+                    <ProButton variant="primary" @click="handleApprove">
+                        <template #iconLeft><PhCheck :size="16" /></template>
+                        Approve Request
+                    </ProButton>
                 </template>
-
                 <template v-else>
-                    <Button label="Close" severity="secondary" icon="pi pi-times" @click="handleClose" />
+                    <ProButton variant="secondary" @click="handleClose">
+                        <template #iconLeft><PhX :size="16" /></template>
+                        Close
+                    </ProButton>
                 </template>
             </div>
         </template>
-    </Dialog>
+    </ProModal>
 </template>

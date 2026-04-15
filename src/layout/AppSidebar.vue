@@ -82,8 +82,8 @@ const navItems = computed(() =>
             <ProSidebar :nav-items="navItems" :default-expanded="true" :persist-state="false">
                 <template #logo="{ isExpanded }">
                     <router-link to="/" class="flex items-center justify-center p-1">
-                        <h1 v-if="isExpanded" class="text-2xl font-extrabold leading-tight m-0 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent truncate w-full text-center">DO SYSTEM</h1>
-                        <h1 v-else class="text-2xl font-extrabold leading-tight m-0 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">DO</h1>
+                        <h1 v-if="isExpanded" class="text-2xl font-extrabold leading-tight m-0 text-brand-primary truncate w-full text-center">DO SYSTEM</h1>
+                        <h1 v-else class="text-2xl font-extrabold leading-tight m-0 text-brand-primary">DO</h1>
                     </router-link>
                 </template>
             </ProSidebar>

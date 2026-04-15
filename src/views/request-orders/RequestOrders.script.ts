@@ -16,6 +16,7 @@ import { formatCurrency } from '@/utils/format.utils';
 import { ProButton, ProCard, ProInput, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import type { Order } from '../../types/request-order.type';
+import ApproveRo from './components/modal/ApproveRo.vue';
 import EditRo from './components/modal/EditRo.vue';
 import RejectRo from './components/modal/RejectRo.vue';
 import ViewDraftRo from './components/modal/ViewDraftRo.vue';
@@ -39,7 +40,8 @@ export default defineComponent({
         EditRo,
         Badge,
         ViewDraftRo,
-        RejectRo
+        RejectRo,
+        ApproveRo
     },
     setup() {
         const confirm = useConfirm();
@@ -246,7 +248,7 @@ export default defineComponent({
                 { key: 'budgetType', label: 'Budget Type', sortable: true },
                 { key: 'approvalProgress', label: 'Approval Status' },
                 { key: 'status', label: 'Status', sortable: true },
-                { key: 'actions', label: 'Actions' }
+                { key: 'actions', label: 'Actions', actions: true }
             );
 
             return columns;
@@ -359,17 +361,15 @@ export default defineComponent({
 
         function handleApproveFromModal(order: Order): void {
             if (order) {
-                order.status = 'Approved';
-                store.fetchOrders();
                 handleCloseModal();
+                approveOrder(order);
             }
         }
 
         function handleRejectFromModal(order: Order): void {
             if (order) {
-                order.status = 'Rejected';
-                store.fetchOrders();
                 handleCloseModal();
+                rejectOrder(order);
             }
         }
 
@@ -396,67 +396,62 @@ export default defineComponent({
             return false;
         }
 
-        function approveOrder(order: Order) {
-            confirm.require({
-                message: `Approve RO ${order.roNumber}?`,
-                header: 'Confirm Approval',
-                icon: 'pi pi-check-circle',
-                acceptClass: 'p-button-success',
-                acceptLabel: 'Yes, Approve',
-                rejectLabel: 'Cancel',
-                accept: async () => {
-                    try {
-                        if (!userRole) {
-                            toast.add({
-                                severity: 'warn',
-                                summary: 'No Role',
-                                detail: 'User role is not defined',
-                                life: 3000
-                            });
-                            return;
-                        }
-
-                        await requestOrderService.processROApproval(order.id, 'Approved', userRole);
-
-                        toast.add({
-                            severity: 'success',
-                            summary: 'Approved',
-                            detail: 'Request order approved.',
-                            life: 3000
-                        });
-
-                        await store.fetchOrders();
-                        confirm.close();
-                    } catch (err: any) {
-                        const errorDetail = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to approve';
-
-                        toast.add({
-                            severity: 'warn',
-                            summary: 'Cannot Approve',
-                            detail: errorDetail,
-                            life: 3000
-                        });
-                        confirm.close();
-                    }
-                },
-                reject: () => {
-                    confirm.close();
-                    toast.add({
-                        severity: 'info',
-                        summary: 'Cancelled',
-                        detail: 'Approve cancelled.',
-                        life: 2500
-                    });
-                }
-            });
-        }
         // Rejection modal state
         const showRejectModal = ref(false);
         const currentRejectOrder = ref<Order | null>(null);
 
         function rejectOrder(order: Order) {
             currentRejectOrder.value = order;
+            showDetailsModal.value = false;
             showRejectModal.value = true;
+        }
+
+        // Approval modal state
+        const showApproveModal = ref(false);
+        const currentApproveOrder = ref<Order | null>(null);
+
+        function approveOrder(order: Order) {
+            currentApproveOrder.value = order;
+            showDetailsModal.value = false;
+            showApproveModal.value = true;
+        }
+
+        async function onApproveConfirmed() {
+            if (!currentApproveOrder.value) return;
+
+            try {
+                if (!userRole) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'No Role',
+                        detail: 'User role is not defined',
+                        life: 3000
+                    });
+                    return;
+                }
+
+                await requestOrderService.processROApproval(currentApproveOrder.value.id, 'Approved', userRole);
+
+                toast.add({
+                    severity: 'success',
+                    summary: 'Approved',
+                    detail: 'Request order approved.',
+                    life: 3000
+                });
+
+                await store.fetchOrders();
+                showApproveModal.value = false;
+                currentApproveOrder.value = null;
+            } catch (err: any) {
+                const errorDetail = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to approve';
+
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Cannot Approve',
+                    detail: errorDetail,
+                    life: 3000
+                });
+            }
         }
 
         async function onRejectConfirmed(remark: string) {
@@ -597,6 +592,9 @@ export default defineComponent({
             showRejectModal,
             onRejectConfirmed,
             currentRejectOrder,
+            showApproveModal,
+            onApproveConfirmed,
+            currentApproveOrder,
             totalApprovedValue,
             canViewPricing,
             formatCurrency,

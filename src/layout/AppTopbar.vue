@@ -9,11 +9,8 @@ import type { Project } from '@/types';
 import { getRouteByDocumentType } from '@/utils/route-map.util';
 import { Motion } from '@motionone/vue';
 import { PhBell, PhBriefcase, PhCaretDown, PhGear, PhSignOut } from '@phosphor-icons/vue';
-import { ProModal, ProTopbar } from '@prosync_solutions/ui';
+import { ProButton, ProModal, ProTag, ProTopbar } from '@prosync_solutions/ui';
 import Badge from 'primevue/badge';
-import Button from 'primevue/button';
-import OverlayPanel from 'primevue/overlaypanel';
-import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -67,9 +64,9 @@ const selectedProject = ref<{ company: string; name: string; ProjectId: number }
 
 // notification
 const notificationStore = useNotificationStore();
-const notificationPanel = ref();
-const toggleNotificationMenu = (event: Event) => {
-    notificationPanel.value.toggle(event);
+const showNotificationDropdown = ref(false);
+const toggleNotificationMenu = () => {
+    showNotificationDropdown.value = !showNotificationDropdown.value;
 };
 
 const goToPageDetails = async (item: any) => {
@@ -78,7 +75,7 @@ const goToPageDetails = async (item: any) => {
 
         const route = getRouteByDocumentType(item.documentType);
 
-        notificationPanel.value.hide();
+        showNotificationDropdown.value = false;
 
         if (route) {
             router.push(route);
@@ -243,13 +240,13 @@ onMounted(async () => {
 
 // notification navigation
 const goToAllNotifications = () => {
-    notificationPanel.value?.hide();
+    showNotificationDropdown.value = false;
     router.push({ name: 'notifications' });
 };
 </script>
 
 <template>
-    <Motion tag="div" class="w-full relative" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
+    <Motion tag="div" class="w-full relative z-50" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
         <ProTopbar :user-name="username || 'PM User'" :user-avatar="'https://randomuser.me/api/portraits/women/44.jpg'">
             <template #left>
                 <!-- Project dropdown (Moved to left slot) -->
@@ -273,36 +270,52 @@ const goToAllNotifications = () => {
                         <PhBell :size="20" class="text-gray-600 dark:text-gray-300" />
                     </button>
                     <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" class="notification-badge absolute shadow-sm pointer-events-none" style="top: -2px; right: -4px; transform: scale(0.75); transform-origin: top right" />
-                </div>
 
-                <OverlayPanel ref="notificationPanel" class="w-96 shadow-xl rounded-xl">
-                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800">
-                        <span class="font-semibold text-gray-800 dark:text-white">Notifications</span>
-                        <Badge v-if="notificationStore.unreadCount > 0" :value="notificationStore.unreadCount" severity="danger" />
-                    </div>
-
-                    <div v-if="notificationStore.notifications.length === 0" class="text-sm text-gray-400 py-6 text-center">No notifications</div>
-
-                    <div v-else class="space-y-2 max-h-80 overflow-y-auto pr-1 mt-3">
-                        <div
-                            v-for="item in notificationStore.notifications"
-                            :key="item.id"
-                            :class="['p-3 rounded-lg cursor-pointer transition border border-transparent', item.isRead ? 'hover:bg-gray-50' : 'bg-blue-50/50 border-blue-100 hover:bg-blue-50']"
-                            @click="goToPageDetails(item)"
-                        >
-                            <div class="flex justify-between items-start gap-2">
-                                <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ item.title }}</span>
-                                <Badge :severity="item.isRead ? 'secondary' : 'info'" :value="item.isRead ? 'Read' : 'Unread'" class="text-[10px]" />
+                    <!-- Notification Dropdown -->
+                    <Transition
+                        enter-active-class="transition duration-200 ease-out"
+                        enter-from-class="opacity-0 translate-y-1"
+                        enter-to-class="opacity-100 translate-y-0"
+                        leave-active-class="transition duration-150 ease-in"
+                        leave-from-class="opacity-100 translate-y-0"
+                        leave-to-class="opacity-0 translate-y-1"
+                    >
+                        <div v-if="showNotificationDropdown" class="absolute top-full right-0 mt-2 w-96 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-border-border z-50 overflow-hidden">
+                            <!-- Header -->
+                            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                                <span class="font-semibold text-gray-800 dark:text-white">Notifications</span>
+                                <ProTag v-if="notificationStore.unreadCount > 0" variant="error">{{ notificationStore.unreadCount }}</ProTag>
                             </div>
-                            <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">{{ item.message }}</p>
-                        </div>
-                    </div>
 
-                    <!-- View All Section -->
-                    <div class="mt-3 pt-3 border-t border-gray-100 text-center">
-                        <Button label="View All Notifications" text class="w-full text-sm font-semibold" @click="goToAllNotifications" />
-                    </div>
-                </OverlayPanel>
+                            <!-- Empty State -->
+                            <div v-if="notificationStore.notifications.length === 0" class="text-sm text-gray-400 py-8 text-center">
+                                <PhBell :size="32" class="mx-auto mb-2 text-gray-300" />
+                                No notifications
+                            </div>
+
+                            <!-- Notification Items -->
+                            <div v-else class="max-h-80 overflow-y-auto">
+                                <div
+                                    v-for="item in notificationStore.notifications"
+                                    :key="item.id"
+                                    :class="['px-4 py-3 cursor-pointer transition border-b border-gray-50 dark:border-gray-800', item.isRead ? 'hover:bg-gray-50 dark:hover:bg-gray-800' : 'bg-blue-50/50 dark:bg-blue-900/20 hover:bg-blue-50 dark:hover:bg-blue-900/30']"
+                                    @click="goToPageDetails(item)"
+                                >
+                                    <div class="flex justify-between items-start gap-2">
+                                        <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ item.title }}</span>
+                                        <ProTag :variant="item.isRead ? 'secondary' : 'info'" class="text-[10px] shrink-0">{{ item.isRead ? 'Read' : 'Unread' }}</ProTag>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">{{ item.message }}</p>
+                                </div>
+                            </div>
+
+                            <!-- View All Footer -->
+                            <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-800 text-center">
+                                <ProButton variant="ghost" @click="goToAllNotifications" class="w-full text-sm font-semibold">View All Notifications</ProButton>
+                            </div>
+                        </div>
+                    </Transition>
+                </div>
             </template>
 
             <template #menu-items="{ close }">
@@ -335,6 +348,12 @@ const goToAllNotifications = () => {
             </template>
         </ProTopbar>
     </Motion>
+
+    <!-- Click-outside overlay for notifications -->
+    <Teleport to="body">
+        <div v-if="showNotificationDropdown" class="fixed inset-0 z-[49]" @click="showNotificationDropdown = false"></div>
+    </Teleport>
+
     <!-- Project Dialog -->
     <ProModal v-if="showProjectSelector" v-model="showProjectDialog" title="Select Project" size="md" class="z-[100]">
         <div v-for="group in companyProjects" :key="group.company" class="mb-6">
@@ -349,7 +368,7 @@ const goToAllNotifications = () => {
                 >
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-base font-bold text-gray-800 dark:text-gray-100">{{ project.name }}</span>
-                        <Badge :value="project.status" :severity="project.status === 'Active' ? 'success' : 'contrast'" />
+                        <ProTag :variant="project.status === 'Active' ? 'success' : 'secondary'">{{ project.status }}</ProTag>
                     </div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Budget: {{ project.budget }}</p>
                 </div>
@@ -358,7 +377,7 @@ const goToAllNotifications = () => {
     </ProModal>
     <div v-if="showReloadSpinner" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
         <div class="flex flex-col items-center gap-4">
-            <ProgressSpinner style="width: 50px; height: 50px" />
+            <div class="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
             <p class="text-white font-semibold">Loading project...</p>
         </div>
     </div>

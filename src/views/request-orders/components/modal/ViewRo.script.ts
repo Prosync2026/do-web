@@ -1,15 +1,12 @@
 import { requestOrderService } from '@/services/requestOrder.service';
 import type { AttachmentItem, Order } from '@/types/request-order.type';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
+import { PhCheck, PhEye, PhFile, PhX } from '@phosphor-icons/vue';
+import { ProButton, ProModal, ProTable } from '@prosync_solutions/ui';
 import { defineComponent, PropType, ref, watch } from 'vue';
 
 export default defineComponent({
     name: 'ViewRo',
-    components: {
-        Dialog,
-        Button
-    },
+    components: { ProModal, ProButton, ProTable, PhCheck, PhEye, PhFile, PhX },
     props: {
         visible: {
             type: Boolean,

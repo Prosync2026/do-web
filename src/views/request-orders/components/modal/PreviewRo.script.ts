@@ -1,18 +1,15 @@
 import { PreviewSummary } from '@/types/request-order.type';
 import { formatDateToAPI } from '@/utils/dateHelper';
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import Dialog from 'primevue/dialog';
+import { ProButton, ProModal, ProTable, ProTag } from '@prosync_solutions/ui';
 import { defineComponent, PropType, ref, watch } from 'vue';
 
 export default defineComponent({
     name: 'PreviewRo',
     components: {
-        Dialog,
-        Button,
-        DataTable,
-        Column
+        ProModal,
+        ProButton,
+        ProTable,
+        ProTag
     },
     props: {
         visible: {
@@ -91,12 +88,28 @@ export default defineComponent({
             return dateObj < today;
         }
 
+        const columns = [
+            { key: 'no', label: 'No', width: '50px' },
+            { key: 'itemType', label: 'Item Type', width: '100px' },
+            { key: 'itemCode', label: 'Item Code', width: '120px' },
+            { key: 'description', label: 'Description', width: '250px' },
+            { key: 'location', label: 'Location', width: '150px' },
+            { key: 'uom', label: 'UOM', width: '80px', align: 'center' },
+            { key: 'qty', label: 'QTY', width: '80px', align: 'center' },
+            { key: 'qtyRequested', label: 'ReqQty', width: '80px', align: 'center' },
+            { key: 'budgetQty', label: 'BgtQty', width: '80px', align: 'center' },
+            { key: 'qtyOrdered', label: 'QtyOrd', width: '80px', align: 'center' },
+            { key: 'qtyDelivered', label: 'QtyDelivered', width: '100px', align: 'center' },
+            { key: 'deliveryDate', label: 'Del. Date', width: '120px', align: 'center' }
+        ];
+
         return {
             isSubmitting,
             handleClose,
             handleSubmit,
             formatCurrency,
             formatDate,
+            columns,
             isOverdue,
             localVisible,
             formatDateToAPI

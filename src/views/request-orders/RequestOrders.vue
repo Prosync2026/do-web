@@ -6,17 +6,17 @@ import { Button } from "@prosync/ui-kit";
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-1">
             <!-- Header Actions teleported to AppLayout -->
-            <Teleport to="#page-header-actions">
-                <div class="flex gap-4 items-center">
+            <div class="flex gap-4 items-center justify-end w-full p-3">
+                <div class="relative">
                     <ProButton variant="secondary" @click="showDraftModal = true">
                         View Drafts
-                        <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="ml-2" />
                     </ProButton>
-                    <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')">
-                        <i class="pi pi-plus mr-2"></i> New Request Order
-                    </ProButton>
+                    <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85);" />
                 </div>
-            </Teleport>
+                <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')">
+                    <i class="pi pi-plus mr-2"></i> New Request Order
+                </ProButton>
+            </div>
             
             <ViewDraftRo :visible="showDraftModal" @update:visible="showDraftModal = $event" @update:count="draftCount = $event" />
 
@@ -96,7 +96,7 @@ import { Button } from "@prosync/ui-kit";
                                     <span class="font-semibold text-text-heading"> RM {{ formatCurrency(row.totalAmount) }} </span>
                                 </template>
 
-                                <template #cell-actions="{ row }">
+                                <template #actions="{ row }">
                                     <div class="flex items-center gap-2 relative z-50">
                                         <ProButton v-if="canViewRO" variant="secondary" size="sm" @click="handleActionClick('view', row)" title="View">
                                             <i class="pi pi-eye text-lg text-gray-700"></i>
@@ -128,6 +128,7 @@ import { Button } from "@prosync/ui-kit";
             <ViewRo v-model:visible="showDetailsModal" :order="selectedOrder" :isPurchasingRole="isPurchasingRole" @approve="handleApproveFromModal" @reject="handleRejectFromModal" />
             <EditRo :visible="showEditModal" :order="selectedOrder" @update:visible="showEditModal = $event" @save="handleSaveOrder" />
             <RejectRo :visible="showRejectModal" :order-number="currentRejectOrder?.roNumber" @update:visible="showRejectModal = $event" @reject="onRejectConfirmed" />
+            <ApproveRo :visible="showApproveModal" :order-number="currentApproveOrder?.roNumber" @update:visible="showApproveModal = $event" @approve="onApproveConfirmed" />
         </div>
     </Motion>
 </template>
