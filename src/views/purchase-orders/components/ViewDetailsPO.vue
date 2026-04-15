@@ -2,86 +2,85 @@
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-6 card glossy-card">
-            <BreadcrumbList />
+        <div class="p-1">
             <!-- Header -->
-            <h1 class="text-xl font-bold">Purchase Order</h1>
-            <p class="text-sm text-gray-500">{{ poNumber }} - {{ project?.name }}</p>
+            <div class="mb-6 p-3">
+                <h1 class="text-h2 text-text-heading">Purchase Order</h1>
+                <p class="text-body-sm text-text-subtitle">{{ poNumber }} - {{ project?.name }}</p>
+            </div>
 
-            <!-- PO Info -->
-            <div class="mt-4 p-4 border rounded">
-                <h2 class="font-semibold mb-2">Purchase Order Information</h2>
-                <div class="grid grid-cols-3 gap-4 text-sm">
+            <!-- PO Info Card -->
+            <ProCard class="mx-3 mb-6">
+                <h2 class="text-body-bold text-text-heading mb-4">Purchase Order Information</h2>
+                <div class="grid grid-cols-3 gap-6">
                     <div>
-                        <p class="font-semibold">PO Number</p>
-                        <p>{{ poNumber }}</p>
+                        <p class="text-body-sm-bold text-text-subtitle mb-1">PO Number</p>
+                        <p class="text-body-sm text-text-body">{{ poNumber }}</p>
                     </div>
                     <div>
-                        <p class="font-semibold">Supplier</p>
-                        <p>{{ supplier }}</p>
+                        <p class="text-body-sm-bold text-text-subtitle mb-1">Supplier</p>
+                        <p class="text-body-sm text-text-body">{{ supplier }}</p>
                     </div>
                     <div>
-                        <p class="font-semibold">Total Amount</p>
-                        <p>{{ totalAmount }}</p>
+                        <p class="text-body-sm-bold text-text-subtitle mb-1">Total Amount</p>
+                        <p class="text-body-sm text-text-body">{{ totalAmount }}</p>
                     </div>
                     <div>
-                        <p class="font-semibold">RO Number</p>
-                        <p>{{ roNumber }}</p>
+                        <p class="text-body-sm-bold text-text-subtitle mb-1">RO Number</p>
+                        <p class="text-body-sm text-text-body">{{ roNumber }}</p>
                     </div>
                     <div>
-                        <p class="font-semibold">PO Date</p>
-                        <p>{{ date }}</p>
+                        <p class="text-body-sm-bold text-text-subtitle mb-1">PO Date</p>
+                        <p class="text-body-sm text-text-body">{{ date }}</p>
                     </div>
                     <div>
-                        <p class="font-semibold">Status</p>
-                        <p><Tag :value="status === 'Created' ? 'Pending' : status" :severity="status === 'Completed' ? 'success' : status === 'Partially Delivered' ? 'warn' : 'info'" /></p>
+                        <p class="text-body-sm-bold text-text-subtitle mb-1">Status</p>
+                        <ProTag
+                            :label="status === 'Created' ? 'Pending' : status"
+                            :variant="status === 'Completed' ? 'success' : status === 'Partially Delivered' ? 'warn' : 'info'"
+                        />
                     </div>
                     <div>
-                        <p class="font-semibold">Project</p>
-                        <p>{{ project?.name }}</p>
+                        <p class="text-body-sm-bold text-text-subtitle mb-1">Project</p>
+                        <p class="text-body-sm text-text-body">{{ project?.name }}</p>
                     </div>
                     <div>
-                        <p class="font-semibold">Delivery Date</p>
-                        <p>{{ deliveryDate }}</p>
+                        <p class="text-body-sm-bold text-text-subtitle mb-1">Delivery Date</p>
+                        <p class="text-body-sm text-text-body">{{ deliveryDate }}</p>
                     </div>
                     <div>
-                        <p class="font-semibold">Created By</p>
-                        <p>{{ createdBy }}</p>
+                        <p class="text-body-sm-bold text-text-subtitle mb-1">Created By</p>
+                        <p class="text-body-sm text-text-body">{{ createdBy }}</p>
                     </div>
                 </div>
-            </div>
+            </ProCard>
 
             <!-- Tabs -->
-            <div class="mt-6">
-                <BaseTab v-model="activeTab" :tabs="tabItems">
-                    <template #default="{ activeTab }">
-                        <div v-if="activeTab === 'items'">
-                            <ReusableTable :value="itemsWithNo" :columns="itemsColumns">
-                                <template #no="{ data }">
-                                    {{ data.no }}
-                                </template>
+            <ProCard class="mx-3">
+                <ProTabs v-model="activeTab" :tabs="tabItems">
+                    <div v-if="activeTab === 'items'">
+                        <ProTable :data="itemsWithNo" :columns="itemsColumns" :loading="isLoading">
+                            <template #cell-status="{ row }">
+                                <ProTag
+                                    :label="row.status === 'Created' ? 'Pending' : row.status"
+                                    :variant="getStatusVariant(row.status)"
+                                />
+                            </template>
+                        </ProTable>
+                    </div>
 
-                                <template #status="{ data }">
-                                    <Tag :value="data.status === 'Created' ? 'Pending' : data.status" :severity="data.status.toLowerCase() === 'completed' ? 'success' : data.status.toLowerCase() === 'partially delivered' ? 'warn' : 'info'" />
-                                </template>
-                            </ReusableTable>
-                        </div>
-
-                        <div v-else-if="activeTab === 'delivery'">
-                            <p>Delivery orders list</p>
-                            <ReusableTable :value="itemsWithNo" :columns="itemsColumns">
-                                <template #no="{ data }">
-                                    {{ data.no }}
-                                </template>
-
-                                <template #status="{ data }">
-                                    <Tag :value="data.status === 'Created' ? 'Pending' : data.status" :severity="data.status.toLowerCase() === 'completed' ? 'success' : data.status.toLowerCase() === 'partially delivered' ? 'warn' : 'info'" />
-                                </template>
-                            </ReusableTable>
-                        </div>
-                    </template>
-                </BaseTab>
-            </div>
+                    <div v-else-if="activeTab === 'delivery'">
+                        <ProTable :data="itemsWithNo" :columns="itemsColumns" :loading="isLoading">
+                            <template #cell-status="{ row }">
+                                <ProTag
+                                    :label="row.status === 'Created' ? 'Pending' : row.status"
+                                    :variant="getStatusVariant(row.status)"
+                                />
+                            </template>
+                        </ProTable>
+                    </div>
+                </ProTabs>
+            </ProCard>
         </div>
     </Motion>
 </template>

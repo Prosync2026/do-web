@@ -1,14 +1,12 @@
-import BaseTab from '@/components/tab/BaseTab.vue';
-import ReusableTable from '@/components/table/ReusableTable.vue';
+import { ProCard, ProTable, ProTag, ProTabs } from '@prosync_solutions/ui';
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import { Motion } from '@motionone/vue';
-import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
     name: 'ViewDetailsPO',
-    components: { Tag, BaseTab, ReusableTable, Motion },
+    components: { ProTag, ProCard, ProTable, ProTabs, Motion },
     setup() {
         const route = useRoute();
         const store = usePurchaseOrderStore();
@@ -92,21 +90,30 @@ export default defineComponent({
 
         const itemsWithNo = computed(() => itemsList.value.map((item, i) => ({ ...item, no: i + 1 })));
 
+        // ProTable format: { key, label }
         const itemsColumns = ref([
-            { field: 'no', header: 'No', bodySlot: 'no' },
-            { field: 'code', header: 'Item Code' },
-            { field: 'description', header: 'Description' },
-            { field: 'ordered', header: 'Ordered' },
-            { field: 'unitPrice', header: 'Unit Price' },
-            { field: 'amount', header: 'Amount' },
-            { field: 'status', header: 'Status', bodySlot: 'status' }
+            { key: 'no', label: 'No' },
+            { key: 'code', label: 'Item Code' },
+            { key: 'description', label: 'Description' },
+            { key: 'ordered', label: 'Ordered' },
+            { key: 'unitPrice', label: 'Unit Price' },
+            { key: 'amount', label: 'Amount' },
+            { key: 'status', label: 'Status' }
         ]);
 
         const activeTab = ref('items');
         const tabItems = [
-            { value: 'items', label: 'Items' },
-            { value: 'delivery', label: 'Delivery Orders' }
+            { key: 'items', label: 'Items' },
+            { key: 'delivery', label: 'Delivery Orders' }
         ];
+
+        // Helper: map status string to ProTag variant
+        const getStatusVariant = (s: string): string => {
+            const lower = s.toLowerCase();
+            if (lower === 'completed') return 'success';
+            if (lower === 'partially delivered') return 'warn';
+            return 'info';
+        };
 
         onMounted(async () => {
             isLoading.value = true;
@@ -135,7 +142,8 @@ export default defineComponent({
             purchaseOrder,
             roNumber,
             deliveryDate,
-            itemsRemaining
+            itemsRemaining,
+            getStatusVariant
         };
     }
 });

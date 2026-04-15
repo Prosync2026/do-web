@@ -1,18 +1,13 @@
 import type { TableColumn } from '@/types/table.type';
-import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 
-import POSummaryData from '@/components/summaryCard/SummaryCard.vue';
-import BaseTabUnderLine from '@/components/tab/BaseTabUnderLine.vue';
-import ReusableTable from '@/components/table/ReusableTable.vue';
 import router from '@/router';
 import { useProjectStore } from '@/stores/project/project.store';
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
-import type { CardItem } from '@/types/card.type';
 import type { PurchaseOrderWithStatus } from '@/types/purchase.type';
 import { Motion } from '@motionone/vue';
-import Button from 'primevue/button';
-import ProgressSpinner from 'primevue/progressspinner';
+import { ProButton, ProCard, ProTable, ProTag, ProTabs } from '@prosync_solutions/ui';
+import { PhBookOpen, PhCheckCircle, PhClock, PhWarning } from '@phosphor-icons/vue';
 
 // permission composable
 import { usePurchaseOrderPermission } from '@/permissions';
@@ -20,13 +15,16 @@ import { usePurchaseOrderPermission } from '@/permissions';
 export default defineComponent({
     name: 'PurchaseOrders',
     components: {
-        Tag,
-        POSummaryData,
-        ReusableTable,
-        Button,
         Motion,
-        BaseTabUnderLine,
-        ProgressSpinner
+        ProTable,
+        ProTag,
+        ProButton,
+        ProCard,
+        ProTabs,
+        PhClock,
+        PhWarning,
+        PhCheckCircle,
+        PhBookOpen,
     },
     setup() {
         const isLoading = ref(true);
@@ -61,7 +59,7 @@ export default defineComponent({
         const partiallyList = ref<PurchaseOrderWithStatus[]>([]);
         const completedList = ref<PurchaseOrderWithStatus[]>([]);
 
-        const poSummaryData = ref<CardItem[]>([]);
+
 
         /* =========================
          * SEARCH (SERVER SIDE)
@@ -166,81 +164,77 @@ export default defineComponent({
                 partiallyList.value = list.filter((po) => po.status.toLowerCase() === 'partially delivered');
                 completedList.value = list.filter((po) => po.status.toLowerCase() === 'completed');
 
-                poSummaryData.value = [
-                    { title: 'Pending POs', value: pendingList.value.length.toString(), description: 'No items delivered yet', icon: 'pi pi-clock', color: 'blue' },
-                    { title: 'Partially Delivered', value: partiallyList.value.length.toString(), description: 'Some items delivered', icon: 'pi pi-exclamation-triangle', color: 'orange' },
-                    { title: 'Completed', value: completedList.value.length.toString(), description: 'All items delivered', icon: 'pi pi-check-circle', color: 'green' },
-                    { title: 'Total POs', value: store.purchaseOrders.length.toString(), description: 'Delivery orders created', icon: 'pi pi-book', color: 'gray' }
-                ];
+
             } finally {
                 isLoading.value = false;
             }
         };
 
         /* =========================
-         * COLUMNS
+         * COLUMNS (ProTable format: { key, label })
          * ========================= */
-        const pendingListColumn = computed<TableColumn[]>(() => {
-            const cols: TableColumn[] = [
-                { field: 'no', header: '#', sortable: false },
-                { field: 'poNumber', header: 'PO Number', sortable: true }
+        const pendingListColumn = computed(() => {
+            const cols: any[] = [
+                { key: 'no', label: '#' },
+                { key: 'poNumber', label: 'PO Number', sortable: true }
             ];
 
             if (isPurchasingRole) {
-                cols.push({ field: 'projectName', header: 'Project', sortable: true });
+                cols.push({ key: 'projectName', label: 'Project', sortable: true });
             }
 
             cols.push(
-                { field: 'supplier', header: 'Supplier', sortable: true },
-                { field: 'poDate', header: 'Date', sortable: true },
-                { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
-                { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
-                { field: 'action', header: 'Action', sortable: false, bodySlot: 'action' }
+                { key: 'supplier', label: 'Supplier', sortable: true },
+                { key: 'poDate', label: 'Date', sortable: true }
             );
 
-            // hide pricing column if no permission
-            if (!canViewPricing?.value) {
-                return cols.filter((col) => col.field !== 'totalAmount');
-            }
-
-            return cols;
-        });
-
-        const partiallyListColumn = computed<TableColumn[]>(() => {
-            const cols: TableColumn[] = [
-                { field: 'no', header: '#', sortable: false },
-                { field: 'poNumber', header: 'PO Number', sortable: true }
-            ];
-
-            if (isPurchasingRole) {
-                cols.push({ field: 'projectName', header: 'Project', sortable: true });
+            if (canViewPricing?.value) {
+                cols.push({ key: 'totalAmount', label: 'Total Amount', sortable: true });
             }
 
             cols.push(
-                { field: 'supplier', header: 'Supplier', sortable: true },
-                { field: 'poDate', header: 'Date', sortable: true },
-                { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
+                { key: 'status', label: 'Status', sortable: true },
+                { key: 'actions', label: 'Actions', actions: true }
             );
 
             return cols;
         });
 
-        const completedListColumn = computed<TableColumn[]>(() => {
-            const cols: TableColumn[] = [
-                { field: 'no', header: '#', sortable: false },
-                { field: 'doNumber', header: 'DO Number', sortable: true },
-                { field: 'poNumber', header: 'PO Number', sortable: true }
+        const partiallyListColumn = computed(() => {
+            const cols: any[] = [
+                { key: 'no', label: '#' },
+                { key: 'poNumber', label: 'PO Number', sortable: true }
             ];
 
             if (isPurchasingRole) {
-                cols.push({ field: 'projectName', header: 'Project', sortable: true });
+                cols.push({ key: 'projectName', label: 'Project', sortable: true });
             }
 
             cols.push(
-                { field: 'poDate', header: 'Date', sortable: true },
-                { field: 'receivedBy', header: 'Received By', sortable: true },
-                { field: 'discrepancyType', header: 'Discrepancy Type', sortable: true, bodySlot: 'discrepancyType' },
-                { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
+                { key: 'supplier', label: 'Supplier', sortable: true },
+                { key: 'poDate', label: 'Date', sortable: true },
+                { key: 'status', label: 'Status', sortable: true }
+            );
+
+            return cols;
+        });
+
+        const completedListColumn = computed(() => {
+            const cols: any[] = [
+                { key: 'no', label: '#' },
+                { key: 'doNumber', label: 'DO Number', sortable: true },
+                { key: 'poNumber', label: 'PO Number', sortable: true }
+            ];
+
+            if (isPurchasingRole) {
+                cols.push({ key: 'projectName', label: 'Project', sortable: true });
+            }
+
+            cols.push(
+                { key: 'poDate', label: 'Date', sortable: true },
+                { key: 'receivedBy', label: 'Received By', sortable: true },
+                { key: 'discrepancyType', label: 'Discrepancy Type', sortable: true },
+                { key: 'status', label: 'Status', sortable: true }
             );
 
             return cols;
@@ -250,9 +244,9 @@ export default defineComponent({
          * TABS & ACTION
          * ========================= */
         const tabItems = [
-            { value: '0', label: 'Pending' },
-            { value: '1', label: 'Partial Delivery' },
-            { value: '2', label: 'Completed' }
+            { key: '0', label: 'Pending' },
+            { key: '1', label: 'Partial Delivery' },
+            { key: '2', label: 'Completed' }
         ];
 
         const activeTab = ref('0');
@@ -292,6 +286,13 @@ export default defineComponent({
             loadData();
         };
 
+        const handleUpdatePagination = (newPagination: any) => {
+            if (store.pagination.page === newPagination.page && store.pagination.pageSize === newPagination.pageSize) return;
+            store.pagination.page = newPagination.page;
+            store.pagination.pageSize = newPagination.pageSize;
+            loadData();
+        };
+
         onMounted(() => {
             loadData();
             projectStore.fetchProjects();
@@ -304,8 +305,6 @@ export default defineComponent({
             partiallyList: partiallyListWithNo,
             completedList: completedListWithNo,
 
-            poSummaryData,
-
             pagination,
             currentSortField,
             currentSortOrder,
@@ -313,6 +312,7 @@ export default defineComponent({
             onSearchWrapper,
             handleSortChange,
             handleTabChange,
+            handleUpdatePagination,
 
             pendingListColumn,
             partiallyListColumn,
