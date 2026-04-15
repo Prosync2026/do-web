@@ -11,7 +11,6 @@ import { Motion } from '@motionone/vue';
 import { PhBell, PhBriefcase, PhCaretDown, PhGear, PhSignOut } from '@phosphor-icons/vue';
 import { ProButton, ProModal, ProTag, ProTopbar } from '@prosync_solutions/ui';
 import Badge from 'primevue/badge';
-import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -369,7 +368,7 @@ const goToAllNotifications = () => {
                 >
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-base font-bold text-gray-800 dark:text-gray-100">{{ project.name }}</span>
-                        <Badge :value="project.status" :severity="project.status === 'Active' ? 'success' : 'contrast'" />
+                        <ProTag :variant="project.status === 'Active' ? 'success' : 'secondary'">{{ project.status }}</ProTag>
                     </div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Budget: {{ project.budget }}</p>
                 </div>
@@ -378,7 +377,7 @@ const goToAllNotifications = () => {
     </ProModal>
     <div v-if="showReloadSpinner" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
         <div class="flex flex-col items-center gap-4">
-            <ProgressSpinner style="width: 50px; height: 50px" />
+            <div class="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
             <p class="text-white font-semibold">Loading project...</p>
         </div>
     </div>

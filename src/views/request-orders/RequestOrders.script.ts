@@ -246,7 +246,7 @@ export default defineComponent({
                 { key: 'budgetType', label: 'Budget Type', sortable: true },
                 { key: 'approvalProgress', label: 'Approval Status' },
                 { key: 'status', label: 'Status', sortable: true },
-                { key: 'actions', label: 'Actions' }
+                { key: 'actions', label: 'Actions', actions: true }
             );
 
             return columns;
