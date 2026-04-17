@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ProButton, ProStatisticCard, ProCard } from '@prosync_solutions/ui';
+import { PhCurrencyDollar, PhWarning } from '@phosphor-icons/vue';
 import { usePurchasingDashboard } from './PurchasingDashboard.script';
 
 const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequests, urgentValue, currentStatus, navigateToRequestOrders, recentActivity, formatTimeAgo } = usePurchasingDashboard();
@@ -13,28 +15,26 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
         </div>
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-12 gap-6 mb-8">
             <!-- Pending Approvals -->
-            <div class="shadow-sm border border-amber-200 rounded-lg p-6">
-                <h3 class="dark:text-amber-100 text-amber-800 font-semibold mb-2 flex items-center gap-2">
-                    <i class="pi pi-exclamation-triangle text-amber-600"></i>
-                    Pending Approvals
-                </h3>
-                <div class="dark:text-amber-100 text-3xl font-bold text-amber-900 mb-2">
-                    {{ pendingApprovals }}
-                </div>
-                <p class="dark:text-amber-100 text-amber-700 text-sm">Request orders awaiting approval</p>
-            </div>
+            <ProStatisticCard
+                class="col-span-12 md:col-span-4"
+                label="Pending Approvals"
+                :value="pendingApprovals"
+                subtitle="Request orders awaiting approval"
+                :icon="PhWarning"
+                iconBg="bg-amber-100 dark:bg-amber-900/20 text-amber-600"
+            />
 
             <!-- Pending Value -->
-            <div class="shadow-sm border border-blue-200 rounded-lg p-6">
-                <h3 class="dark:text-blue-100 text-blue-800 font-semibold mb-2 flex items-center gap-2">
-                    <i class="pi pi-dollar text-blue-600"></i>
-                    Pending Value
-                </h3>
-                <div class="dark:text-blue-100 text-3xl font-bold text-blue-900 mb-2">RM{{ pendingValue.toLocaleString() }}</div>
-                <p class="dark:text-blue-100 text-blue-700 text-sm">Total value pending approval</p>
-            </div>
+            <ProStatisticCard
+                class="col-span-12 md:col-span-4"
+                label="Pending Value"
+                :value="`RM${pendingValue.toLocaleString()}`"
+                subtitle="Total value pending approval"
+                :icon="PhCurrencyDollar"
+                iconBg="bg-blue-100 dark:bg-blue-900/20 text-blue-600"
+            />
 
             <!-- Status -->
             <!-- <div class="shadow-sm border border-gray-200 rounded-lg p-6">

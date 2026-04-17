@@ -2,6 +2,7 @@
 import SummaryCard from '@/components/summaryCard/SummaryCard.vue';
 import { budgetService } from '@/services/budget.service';
 import type { CardItem } from '@/types/card.type';
+import { PhCurrencyDollar, PhFileText, PhTruck, PhWallet } from '@phosphor-icons/vue';
 import { onMounted, ref } from 'vue';
 import RevenueStreamWidget from './components/chart/RevenueStreamWidget.vue';
 
@@ -26,28 +27,28 @@ function mapStatisticsToCards(data: any): CardItem[] {
             title: 'Total Budget',
             value: `RM ${totalBudget.toLocaleString()}`,
             description: 'Approved budget',
-            icon: 'pi pi-dollar',
+            icon: PhCurrencyDollar,
             color: 'orange'
         },
         {
             title: 'Requested',
             value: `RM ${totalRequested.toLocaleString()}`,
             description: 'Total requested amount',
-            icon: 'pi pi-file',
+            icon: PhFileText,
             color: 'blue'
         },
         {
             title: 'Delivered',
             value: `RM ${totalDelivered.toLocaleString()}`,
             description: 'Delivered value',
-            icon: 'pi pi-truck',
+            icon: PhTruck,
             color: 'green'
         },
         {
             title: 'Balance',
             value: `RM ${totalBalance.toLocaleString()}`,
             description: totalBalance < 0 ? 'Over Budget!' : 'Remaining balance',
-            icon: 'pi pi-wallet',
+            icon: PhWallet,
             color: totalBalance < 0 ? 'red' : 'purple'
         }
     ];

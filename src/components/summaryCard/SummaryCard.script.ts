@@ -1,17 +1,19 @@
-import { ProCard } from '@prosync_solutions/ui';
+import { ProStatisticCard } from '@prosync_solutions/ui';
 import { computed, defineComponent, PropType } from 'vue';
+
+import type { Component } from 'vue';
 
 export interface CardItem {
     title: string;
     value: string;
     description: string;
-    icon: string;
+    icon: Component;
     color: string;
 }
 
 export default defineComponent({
     name: 'DeliveriesSummaryData',
-    components: { ProCard },
+    components: { ProStatisticCard },
     props: {
         cardItems: {
             type: Array as PropType<CardItem[]>,

@@ -6,7 +6,7 @@ import { useProjectStore } from '@/stores/project/project.store';
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import type { PurchaseOrderWithStatus } from '@/types/purchase.type';
 import { Motion } from '@motionone/vue';
-import { ProButton, ProCard, ProTable, ProTag, ProTabs } from '@prosync_solutions/ui';
+import { ProButton, ProCard, ProStatisticCard, ProTable, ProTag, ProTabs } from '@prosync_solutions/ui';
 import { PhBookOpen, PhCheckCircle, PhClock, PhWarning } from '@phosphor-icons/vue';
 
 // permission composable
@@ -20,6 +20,7 @@ export default defineComponent({
         ProTag,
         ProButton,
         ProCard,
+        ProStatisticCard,
         ProTabs,
         PhClock,
         PhWarning,
@@ -323,7 +324,12 @@ export default defineComponent({
 
             viewPO,
             tableFilters,
-            handleFilterChange
+            handleFilterChange,
+
+            PhClock,
+            PhWarning,
+            PhCheckCircle,
+            PhBookOpen
         };
     }
 });

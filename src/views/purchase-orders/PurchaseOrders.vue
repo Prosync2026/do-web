@@ -12,62 +12,46 @@
             </div>
 
             <!-- Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 px-3">
+            <div class="grid grid-cols-12 gap-4 mb-6 px-3">
                 <!-- Pending POs -->
-                <ProCard class="shadow-sm border-0 border-l-4 border-yellow-500">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="font-semibold text-text-heading">Pending POs</h3>
-                            <p class="text-3xl font-bold text-yellow-600 mt-2">{{ pendingList.length }}</p>
-                            <p class="text-text-subtitle text-sm mt-1">No items delivered yet</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center">
-                            <PhClock :size="24" class="text-yellow-600" />
-                        </div>
-                    </div>
-                </ProCard>
+                <ProStatisticCard
+                    class="col-span-12 md:col-span-3"
+                    label="Pending POs"
+                    :value="pendingList.length"
+                    subtitle="No items delivered yet"
+                    :icon="PhClock"
+                    iconBg="bg-yellow-50 text-yellow-600"
+                />
 
                 <!-- Partially Delivered -->
-                <ProCard class="shadow-sm border-0 border-l-4 border-orange-500">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="font-semibold text-text-heading">Partially Delivered</h3>
-                            <p class="text-3xl font-bold text-orange-500 mt-2">{{ partiallyList.length }}</p>
-                            <p class="text-text-subtitle text-sm mt-1">Some items delivered</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center">
-                            <PhWarning :size="24" class="text-orange-500" />
-                        </div>
-                    </div>
-                </ProCard>
+                <ProStatisticCard
+                    class="col-span-12 md:col-span-3"
+                    label="Partially Delivered"
+                    :value="partiallyList.length"
+                    subtitle="Some items delivered"
+                    :icon="PhWarning"
+                    iconBg="bg-orange-50 text-orange-500"
+                />
 
                 <!-- Completed -->
-                <ProCard class="shadow-sm border-0 border-l-4 border-green-500">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="font-semibold text-text-heading">Completed</h3>
-                            <p class="text-3xl font-bold text-green-600 mt-2">{{ completedList.length }}</p>
-                            <p class="text-text-subtitle text-sm mt-1">All items delivered</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
-                            <PhCheckCircle :size="24" class="text-green-600" />
-                        </div>
-                    </div>
-                </ProCard>
+                <ProStatisticCard
+                    class="col-span-12 md:col-span-3"
+                    label="Completed"
+                    :value="completedList.length"
+                    subtitle="All items delivered"
+                    :icon="PhCheckCircle"
+                    iconBg="bg-green-50 text-green-600"
+                />
 
                 <!-- Total POs -->
-                <ProCard class="shadow-sm border-0 border-l-4 border-brand-primary">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="font-semibold text-text-heading">Total POs</h3>
-                            <p class="text-3xl font-bold text-brand-primary mt-2">{{ pendingList.length + partiallyList.length + completedList.length }}</p>
-                            <p class="text-text-subtitle text-sm mt-1">All purchase orders</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-full bg-brand-primary/10 flex items-center justify-center">
-                            <PhBookOpen :size="24" class="text-brand-primary" />
-                        </div>
-                    </div>
-                </ProCard>
+                <ProStatisticCard
+                    class="col-span-12 md:col-span-3"
+                    label="Total POs"
+                    :value="pendingList.length + partiallyList.length + completedList.length"
+                    subtitle="All purchase orders"
+                    :icon="PhBookOpen"
+                    iconBg="bg-brand-primary/10 text-brand-primary"
+                />
             </div>
 
             <!-- Tabs -->
