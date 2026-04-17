@@ -64,6 +64,9 @@
                         ====================== -->
                         <template v-if="activeTab === '0'">
                             <ProTable
+                                searchable
+                                searchPlaceholder="Search purchase orders..."
+                                @search="onSearchWrapper"
                                 :data="pendingList"
                                 :columns="pendingListColumn"
                                 :loading="isLoading"
@@ -71,6 +74,22 @@
                                 emptyTitle="No Pending Purchase Orders Found"
                                 @update:pagination="handleUpdatePagination"
                             >
+                                <template #toolbar>
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-36">
+                                                <ProDatePicker v-model="startDate" placeholder="Start Date" appendTo="body" @update:modelValue="onSearchWrapper('')" />
+                                            </div>
+                                            <span class="text-text-subtitle">-</span>
+                                            <div class="w-36">
+                                                <ProDatePicker v-model="endDate" placeholder="End Date" appendTo="body" @update:modelValue="onSearchWrapper('')" />
+                                            </div>
+                                        </div>
+                                        <div class="w-48" v-if="isPurchasingRole">
+                                            <ProSelect v-model="store.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="onSearchWrapper('')" />
+                                        </div>
+                                    </div>
+                                </template>
                                 <template #cell-totalAmount="{ row }">
                                     <span class="font-semibold text-text-heading">RM {{ Number(row.totalAmount).toLocaleString() }}</span>
                                 </template>
@@ -95,6 +114,9 @@
                         ====================== -->
                         <template v-else-if="activeTab === '1'">
                             <ProTable
+                                searchable
+                                searchPlaceholder="Search purchase orders..."
+                                @search="onSearchWrapper"
                                 :data="partiallyList"
                                 :columns="partiallyListColumn"
                                 :loading="isLoading"
@@ -102,6 +124,22 @@
                                 emptyTitle="No Partially Delivered Purchase Orders Found"
                                 @update:pagination="handleUpdatePagination"
                             >
+                                <template #toolbar>
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-36">
+                                                <ProDatePicker v-model="startDate" placeholder="Start Date" appendTo="body" @update:modelValue="onSearchWrapper('')" />
+                                            </div>
+                                            <span class="text-text-subtitle">-</span>
+                                            <div class="w-36">
+                                                <ProDatePicker v-model="endDate" placeholder="End Date" appendTo="body" @update:modelValue="onSearchWrapper('')" />
+                                            </div>
+                                        </div>
+                                        <div class="w-48" v-if="isPurchasingRole">
+                                            <ProSelect v-model="store.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="onSearchWrapper('')" />
+                                        </div>
+                                    </div>
+                                </template>
                                 <template #cell-status="{ row }">
                                     <ProTag label="Partially Delivered" variant="warn" />
                                 </template>
@@ -113,6 +151,9 @@
                         ====================== -->
                         <template v-else-if="activeTab === '2'">
                             <ProTable
+                                searchable
+                                searchPlaceholder="Search purchase orders..."
+                                @search="onSearchWrapper"
                                 :data="completedList"
                                 :columns="completedListColumn"
                                 :loading="isLoading"
@@ -120,6 +161,22 @@
                                 emptyTitle="No Completed Purchase Orders Found"
                                 @update:pagination="handleUpdatePagination"
                             >
+                                <template #toolbar>
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-36">
+                                                <ProDatePicker v-model="startDate" placeholder="Start Date" appendTo="body" @update:modelValue="onSearchWrapper('')" />
+                                            </div>
+                                            <span class="text-text-subtitle">-</span>
+                                            <div class="w-36">
+                                                <ProDatePicker v-model="endDate" placeholder="End Date" appendTo="body" @update:modelValue="onSearchWrapper('')" />
+                                            </div>
+                                        </div>
+                                        <div class="w-48" v-if="isPurchasingRole">
+                                            <ProSelect v-model="store.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="onSearchWrapper('')" />
+                                        </div>
+                                    </div>
+                                </template>
                                 <template #cell-discrepancyType="{ row }">
                                     <ProTag
                                         :label="row.discrepancyType"

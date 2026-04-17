@@ -244,11 +244,13 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
     function handleSearch(value: string) {
         filters.search = value;
         pagination.page = 1;
+        fetchPurchaseOrders();
     }
 
     function handleStatusChange(status: string) {
         filters.status = status;
         pagination.page = 1;
+        fetchPurchaseOrders();
     }
 
     function setSorting(sortBy: string, order: 'asc' | 'desc' | '') {
@@ -265,6 +267,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         }
 
         pagination.page = 1;
+        fetchPurchaseOrders();
     }
 
     return {

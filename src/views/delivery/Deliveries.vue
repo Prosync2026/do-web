@@ -18,6 +18,9 @@
                 <ProTabs v-model="activeTab" :tabs="tabItems" @update:modelValue="handleTabChange">
                     <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
                         <ProTable
+                            searchable
+                            searchPlaceholder="Search deliveries..."
+                            @search="handleSearch"
                             :data="filteredDeliveries"
                             :columns="deliveryListColumn"
                             :loading="deliveryStore.loading"
@@ -25,6 +28,23 @@
                             emptyTitle="No delivery orders found"
                             @update:pagination="handleUpdatePagination"
                         >
+                            <template #toolbar>
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-36">
+                                            <ProDatePicker v-model="startDate" placeholder="Start Date" appendTo="body" @update:modelValue="handleSearch('')" />
+                                        </div>
+                                        <span class="text-text-subtitle">-</span>
+                                        <div class="w-36">
+                                            <ProDatePicker v-model="endDate" placeholder="End Date" appendTo="body" @update:modelValue="handleSearch('')" />
+                                        </div>
+                                    </div>
+                                    <div class="w-48" v-if="isPurchasingRole">
+                                        <ProSelect v-model="deliveryStore.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="handleSearch('')" />
+                                    </div>
+                                </div>
+                            </template>
+
                             <template #cell-rowIndex="{ row }">
                                 <span>{{ row.rowIndex }}</span>
                             </template>

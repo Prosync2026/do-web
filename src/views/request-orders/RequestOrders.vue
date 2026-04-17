@@ -28,41 +28,20 @@ import { Button } from "@prosync/ui-kit";
                 <ProTabs v-model="activeTab" :tabs="tabItems">
                         <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
                             
-                            <!-- Filters Bar -->
-                            <div class="flex flex-wrap items-center justify-between gap-4 py-4">
-                                <div class="flex flex-wrap items-center gap-3">
-                                    <div class="w-64">
-                                        <ProInput v-model="store.filters.search" placeholder="Search orders..." icon="pi pi-search" @update:modelValue="applyFilters" />
-                                    </div>
-                                    <div class="w-48" v-if="isPurchasingRole">
-                                        <select v-model="store.filters.projectId" class="w-full appearance-none bg-surface-gray-bg border border-border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-primary" @change="applyFilters">
-                                            <option value="">All Projects</option>
-                                            <option v-for="opt in projectStore.projectOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="w-48">
-                                        <select v-model="selectedBudgetType" class="w-full appearance-none bg-surface-gray-bg border border-border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-primary" @change="applyFilters">
-                                            <option value="">All Budgets</option>
-                                            <option value="Budgeted">Budgeted</option>
-                                            <option value="NonBudgeted">NonBudgeted</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <input type="date" v-model="startDate" @change="applyFilters" class="appearance-none bg-surface-gray-bg border border-border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-primary cursor-pointer w-36 text-text-body" title="Start Date" />
-                                        <span class="text-text-subtitle">-</span>
-                                        <input type="date" v-model="endDate" @change="applyFilters" class="appearance-none bg-surface-gray-bg border border-border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-primary cursor-pointer w-36 text-text-body" title="End Date" />
-                                    </div>
-                                </div>
+                            <div class="flex justify-end mb-4">
                                 <!-- Legend -->
-                                <div class="flex justify-end gap-5 items-center text-xs py-2 px-3 border border-border-border rounded-md bg-surface-gray-bg">
+                                <div class="flex justify-end gap-3 items-center text-xs py-1.5 px-3 border border-border-border rounded-md bg-surface-gray-bg">
                                     <span class="text-text-subtitle font-medium">Legend :</span>
-                                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span><span class="text-text-body">Pending</span></div>
-                                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span class="text-text-body">Approved</span></div>
-                                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-text-body">Rejected</span></div>
+                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span><span class="text-text-body">Pending</span></div>
+                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span class="text-text-body">Approved</span></div>
+                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-text-body">Rejected</span></div>
                                 </div>
                             </div>
 
                             <ProTable
+                                searchable
+                                searchPlaceholder="Search orders..."
+                                @search="store.handleSearch"
                                 :data="filteredOrders"
                                 :columns="tableColumns"
                                 :loading="store.loading"
@@ -70,6 +49,25 @@ import { Button } from "@prosync/ui-kit";
                                 :pagination="store.pagination"
                                 @update:pagination="handleUpdatePagination"
                             >
+                                <template #toolbar>
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-36">
+                                                <ProDatePicker v-model="startDate" placeholder="Start Date" appendTo="body" @update:modelValue="applyFilters" />
+                                            </div>
+                                            <span class="text-text-subtitle">-</span>
+                                            <div class="w-36">
+                                                <ProDatePicker v-model="endDate" placeholder="End Date" appendTo="body" @update:modelValue="applyFilters" />
+                                            </div>
+                                        </div>
+                                        <div class="w-48" v-if="isPurchasingRole">
+                                            <ProSelect v-model="store.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="applyFilters" />
+                                        </div>
+                                        <div class="w-48">
+                                            <ProSelect v-model="selectedBudgetType" :options="[{ label: 'All Budgets', value: '' }, { label: 'Budgeted', value: 'Budgeted' }, { label: 'NonBudgeted', value: 'NonBudgeted' }]" placeholder="All Budgets" @update:modelValue="applyFilters" />
+                                        </div>
+                                    </div>
+                                </template>
                                 <template #cell-status="{ row }">
                                     <ProTag :label="row.status" :variant="row.status === 'Approved' ? 'success' : row.status === 'Rejected' ? 'error' : row.status === 'Processing' ? 'warn' : 'info'" />
                                 </template>
