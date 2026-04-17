@@ -1,7 +1,5 @@
-import Button from 'primevue/button';
-import InputNumber from 'primevue/inputnumber';
-import InputText from 'primevue/inputtext';
 import { computed, defineComponent, PropType } from 'vue';
+import { ProButton, ProInput } from '@prosync_solutions/ui';
 
 export interface OcrLineItem {
     itemCode: string;
@@ -22,7 +20,7 @@ const LOW_CONFIDENCE = 0.75;
 
 export default defineComponent({
     name: 'OcrResultTable',
-    components: { InputText, InputNumber, Button },
+    components: { ProButton, ProInput },
     props: {
         items: {
             type: Array as PropType<OcrLineItem[]>,

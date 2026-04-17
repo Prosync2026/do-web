@@ -1,15 +1,15 @@
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import { useProjectStore } from '@/stores/project/project.store';
 import type { TableColumn } from '@/types/table.type';
-import Tag from 'primevue/tag';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { ProCard, ProButton, ProTag, ProTable, ProTabs } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'Deliveries',
-    components: { Tag },
+    components: { ProCard, ProButton, ProTag, ProTable, ProTabs },
     setup() {
         const deliveryStore = useDeliveryStore();
         const projectStore = useProjectStore();
@@ -39,9 +39,9 @@ export default defineComponent({
 
         // Tabs
         const tabItems = [
-            { value: 'Created', label: 'Pending' },
-            { value: 'Completed', label: 'Completed' },
-            { value: 'Cancelled', label: 'Cancelled' }
+            { key: 'Created', label: 'Pending' },
+            { key: 'Completed', label: 'Completed' },
+            { key: 'Cancelled', label: 'Cancelled' }
         ];
 
         const activeTab = ref<'Created' | 'Completed' | 'Cancelled'>('Created');
@@ -85,19 +85,19 @@ export default defineComponent({
         // Columns
         const deliveryListColumn = computed<TableColumn[]>(() => {
             const cols: TableColumn[] = [
-                { field: 'rowIndex', header: '#', sortable: false },
-                { field: 'DocNo', header: 'DO Number', sortable: true },
+                { key: 'rowIndex', label: '#', sortable: false } as any,
+                { key: 'DocNo', label: 'DO Number', sortable: true } as any,
             ];
 
             if (isPurchasingRole) {
-                cols.push({ field: 'ProjectName', header: 'Project', sortable: true });
+                cols.push({ key: 'ProjectName', label: 'Project', sortable: true } as any);
             }
 
             cols.push(
-                { field: 'PlateNo', header: 'Plate No', sortable: true },
-                { field: 'Remark', header: 'Remark', sortable: false },
-                { field: 'Status', header: 'Status', sortable: true, bodySlot: 'status' },
-                { header: 'Action', action: true, actions: ['view'] }
+                { key: 'PlateNo', label: 'Plate No', sortable: true } as any,
+                { key: 'Remark', label: 'Remark', sortable: false } as any,
+                { key: 'Status', label: 'Status', sortable: true } as any,
+                { key: 'actions', label: 'Action', actions: true } as any
             );
 
             return cols;
@@ -136,13 +136,10 @@ export default defineComponent({
         };
 
         // Pagination & filter handlers
-        function handlePageChange(page: number): void {
-            deliveryStore.setPage(page);
-        }
-
-        function handlePageSizeChange(pageSize: number): void {
-            deliveryStore.setPageSize(pageSize);
-        }
+        const handleUpdatePagination = (newPagination: { page: number; limit: number }) => {
+            deliveryStore.setPageSize(newPagination.limit);
+            deliveryStore.setPage(newPagination.page);
+        };
 
         function handleFilterChange(filters: Record<string, any>): void {
             deliveryStore.filters.search = filters.search ?? '';
@@ -200,13 +197,12 @@ export default defineComponent({
             handleSortChange,
             handleTabChange,
             deliveryStore,
-            handlePageChange,
-            handlePageSizeChange,
             handleFilterChange,
             currentSortField,
             currentSortOrder,
             getStatusSeverity,
-            tableFilters
+            tableFilters,
+            handleUpdatePagination
         };
     }
 });

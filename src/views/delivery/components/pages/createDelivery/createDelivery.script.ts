@@ -5,10 +5,11 @@ import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/step3Deli
 import Review from '@/views/delivery/components/deliveryWorkFlow/step4Review/review.vue';
 import type { OcrResult } from '@/views/delivery/components/smartScan/SmartScanModal.script';
 import { useToast } from 'primevue/usetoast';
+import { ProButton, ProCard } from '@prosync_solutions/ui';
 import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
-    components: { DeliveryInfo, SelectPO, VerifyItem, Review },
+    components: { DeliveryInfo, SelectPO, VerifyItem, Review, ProCard, ProButton },
     setup() {
         // 1. DATA 
         const activeStep = ref(1);

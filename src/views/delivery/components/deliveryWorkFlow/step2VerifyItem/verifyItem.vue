@@ -9,7 +9,7 @@
             </Message>
 
             <div class="flex justify-end mt-4 gap-2 w-full">
-                <Button type="button" label="Back" severity="secondary" @click="goBack" />
+                <ProButton variant="secondary" @click="goBack">Back</ProButton>
             </div>
         </div>
 
@@ -19,7 +19,7 @@
                 Enter the actual quantities delivered for each item. Items marked as complete will be highlighted.
             </Message>
 
-            <Card class="mt-6 border">
+            <ProCard class="mt-6 shadow-sm">
                 <template #title>
                     <div class="flex flex-col gap-3">
                         <div class="flex items-center gap-2">
@@ -52,7 +52,7 @@
                 <template #content>
                     <Form @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full sm:w-full">
                         <div class="grid grid-cols-1 gap-4 p-3">
-                            <Card v-for="(item, index) in itemList" :key="index" class="border rounded-lg shadow-sm">
+                            <ProCard v-for="(item, index) in itemList" :key="index" class="border rounded-lg shadow-sm">
                                 <template #title>
                                     <div class="flex items-center gap-2 cursor-pointer" @click="toggle(index)">
                                         <i :class="['pi', expanded.includes(index) ? 'pi-chevron-down' : 'pi-chevron-right', 'text-gray-600']"></i>
@@ -63,9 +63,7 @@
                                                 <span class="text-sm text-gray-500">{{ item.order }}</span>
                                             </div>
 
-                                            <Badge :severity="item.status === 'Delivered' ? 'success' : 'secondary'" class="text-gray-800">
-                                                {{ item.status }}
-                                            </Badge>
+                                            <ProTag :variant="item.status === 'Delivered' ? 'success' : 'info'" class="text-gray-800" :label="item.status" />
                                         </div>
                                     </div>
                                 </template>
@@ -96,16 +94,16 @@
                                         </div>
                                     </div>
                                 </template>
-                            </Card>
+                            </ProCard>
                         </div>
 
                         <div class="flex justify-end mt-4 gap-2">
-                            <Button type="button" label="Back" severity="secondary" @click="goBack" />
-                            <Button type="submit" label="Next" severity="primary" />
+                            <ProButton type="button" variant="secondary" @click="goBack">Back</ProButton>
+                            <ProButton type="submit">Next</ProButton>
                         </div>
                     </Form>
                 </template>
-            </Card>
+            </ProCard>
         </div>
     </div>
 </template>

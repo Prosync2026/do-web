@@ -1,34 +1,30 @@
 import type { FormValues, UploadFile } from '@/types/delivery.type';
 import { formatDateToAPI } from '@/utils/dateHelper';
 import Form, { FormResolverOptions, FormSubmitEvent } from '@primevue/forms/form';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
-import Card from 'primevue/card';
 import FileUpload from 'primevue/fileupload';
-import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import ProgressBar from 'primevue/progressbar';
-import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { ProCard, ProButton, ProTag, ProInput, ProTextarea } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'DeliveryFormCard',
     components: {
-        Card,
-        InputText,
-        Button,
         Message,
         Toast,
         Form,
         Calendar,
-        Textarea,
         FileUpload,
         ProgressBar,
-        Badge
+        ProCard,
+        ProButton,
+        ProTag,
+        ProInput,
+        ProTextarea
     },
     props: {
         prefillAttachment: {

@@ -4,18 +4,15 @@ import type { PurchaseOrderItem } from '@/types/purchase.type';
 import type { OcrResult } from '@/views/delivery/components/smartScan/SmartScanModal.script';
 import SmartScanModal from '@/views/delivery/components/smartScan/SmartScanModal.vue';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
-import AutoComplete from 'primevue/autocomplete';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
-import Card from 'primevue/card';
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
+import { ProCard, ProButton, ProTag, ProInput } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'SelectPO',
-    components: { AutoComplete, Card, Button, Message, Toast, Form, Badge, SmartScanModal },
+    components: { Message, Toast, Form, SmartScanModal, ProCard, ProButton, ProTag, ProInput },
     emits: ['update', 'next-step', 'prev-step', 'smartScan', 'smartScanManual'],
     setup(_, { emit }) {
         const toast = useToast();
@@ -145,8 +142,23 @@ export default defineComponent({
             purchaseStore.setPageSize(pageSize);
         };
 
-        const handleManualSearch = () => {
-            // just update manualSearch ref
+        let searchTimeout: any;
+        const handleManualSearchInput = (value: string | Event) => {
+            let query = '';
+            if (typeof value === 'object' && value && 'target' in value) {
+                query = ((value as Event).target as HTMLInputElement).value;
+            } else if (typeof value === 'string') {
+                query = value;
+            } else {
+                query = manualSearch.value;
+            }
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                purchaseStore.handleSearch(query);
+                await purchaseStore.fetchPurchaseOrders();
+                manualSearch.value = query;
+            }, 300);
         };
 
         //  Smart Scan handlers 
@@ -229,12 +241,12 @@ export default defineComponent({
             displayStart,
             displayEnd,
             purchaseStore,
-            handleManualSearch,
             manualSearch,
             handlePageSizeChange,
             handleClearSearch,
             onScanConfirm,
-            onScanManual
+            onScanManual,
+            handleManualSearchInput
         };
     }
 });

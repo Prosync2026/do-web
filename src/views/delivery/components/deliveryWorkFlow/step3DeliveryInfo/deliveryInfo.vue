@@ -7,14 +7,14 @@
             Provide delivery information. Plate number and photos are optional - you can proceed directly.
         </Message>
 
-        <Card class="mt-6 border">
+        <ProCard class="mt-6 shadow-sm">
             <template #title> <i class="pi pi-truck"></i> Delivery Information </template>
             <template #content>
                 <Form :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full">
                     <div class="grid grid-cols-2 gap-4 p-3">
                         <div class="flex flex-col">
                             <label for="driverPlate">Driver Plate Number</label>
-                            <InputText name="driverPlate" v-model="initialValues.driverPlate" placeholder="Plate Number" fluid />
+                            <ProInput name="driverPlate" v-model="initialValues.driverPlate" placeholder="Plate Number" fluid />
                             <Message v-if="errors.driverPlate" severity="error" size="small" variant="simple">
                                 {{ errors.driverPlate }}
                             </Message>
@@ -32,7 +32,7 @@
                     <div class="grid grid-cols-1 gap-4 p-3">
                         <div class="flex flex-col">
                             <label for="remarks">Additional Remarks</label>
-                            <Textarea name="remarks" v-model="initialValues.remarks" rows="5" cols="30" />
+                            <ProTextarea name="remarks" v-model="initialValues.remarks" rows="5" />
                         </div>
                     </div>
 
@@ -54,9 +54,9 @@
                                         <span class="font-semibold text-ellipsis max-w-60">{{ file.name }}</span>
                                         <div>{{ formatSize(file.size) }}</div>
 
-                                        <Badge value="Pending" severity="warn" />
+                                        <ProTag label="Pending" variant="warn" />
 
-                                        <Button icon="pi pi-times" @click="onRemoveFile(file, removeFileCallback, index)" variant="outlined" rounded severity="danger" />
+                                        <ProButton icon="pi pi-times" @click="onRemoveFile(file, removeFileCallback, index)" variant="secondary" rounded class="!text-red-500 !border-red-500" />
                                     </div>
                                 </div>
                             </template>
@@ -90,9 +90,9 @@
                                         <span class="font-semibold text-ellipsis max-w-60">{{ file.name }}</span>
                                         <div>{{ formatSize(file.size) }}</div>
 
-                                        <Badge value="Pending" severity="warn" />
+                                        <ProTag label="Pending" variant="warn" />
 
-                                        <Button icon="pi pi-times" @click="onRemoveEvidenceFile(file, removeFileCallback, index)" variant="outlined" rounded severity="danger" />
+                                        <ProButton icon="pi pi-times" @click="onRemoveEvidenceFile(file, removeFileCallback, index)" variant="secondary" rounded class="!text-red-500 !border-red-500" />
                                     </div>
                                 </div>
                             </template>
@@ -109,11 +109,11 @@
                     </div>
 
                     <div class="flex justify-end mt-4">
-                        <Button type="button" label="Cancel" severity="secondary" @click="goBack" />
-                        <Button type="submit" label="Next" severity="primary" class="ms-2" />
+                        <ProButton type="button" variant="secondary" @click="goBack">Cancel</ProButton>
+                        <ProButton type="submit" class="ms-2">Next</ProButton>
                     </div>
                 </Form>
             </template>
-        </Card>
+        </ProCard>
     </div>
 </template>

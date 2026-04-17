@@ -2,42 +2,53 @@
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-6 card mb-0">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-2xl font-bold">Delivery Verification</h1>
-                <Button @click="$router.push('/deliveries/createDelivery')"> + New Delivery Verification </Button>
+        <div class="p-1">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6 p-3">
+                <div>
+                    <h1 class="text-h2 text-text-heading">Delivery Verification</h1>
+                </div>
+                <ProButton @click="$router.push('/deliveries/createDelivery')">
+                    <i class="pi pi-plus mr-2" /> New Delivery Verification
+                </ProButton>
             </div>
 
-            <BaseTab v-model="activeTab" :tabs="tabItems" @update:modelValue="handleTabChange">
-                <template #default>
-                    <ReusableTable
-                        :value="filteredDeliveries"
-                        :columns="deliveryListColumn"
-                        :loading="deliveryStore.loading"
-                        :pagination="deliveryStore.pagination"
-                        :sortField="currentSortField"
-                        :sortOrder="currentSortOrder"
-                        :onPageChange="handlePageChange"
-                        :onPageSizeChange="handlePageSizeChange"
-                        :onFilterChange="handleFilterChange"
-                        :onSearch="handleSearch"
-                        :onSortChange="handleSortChange"
-                        :extraFilters="tableFilters"
-                        :onActionClick="handleAction"
-                        emptyTitle="No delivery orders found"
-                    >
-                        <!-- Numbering -->
-                        <template #rowIndex="{ data }">
-                            {{ data.rowIndex }}
-                        </template>
+            <!-- Tabs and Table -->
+            <ProCard class="shadow-sm mt-6">
+                <ProTabs v-model="activeTab" :tabs="tabItems" @update:modelValue="handleTabChange">
+                    <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
+                        <ProTable
+                            :data="filteredDeliveries"
+                            :columns="deliveryListColumn"
+                            :loading="deliveryStore.loading"
+                            :pagination="{
+                                page: deliveryStore.pagination.page,
+                                limit: deliveryStore.pagination.pageSize,
+                                total: deliveryStore.pagination.totalItems
+                            }"
+                            emptyTitle="No delivery orders found"
+                            @update:pagination="handleUpdatePagination"
+                        >
+                            <template #cell-rowIndex="{ row }">
+                                <span>{{ row.rowIndex }}</span>
+                            </template>
 
-                        <!-- Status -->
-                        <template #status="{ data }">
-                            <Tag :value="data.Status === 'Created' ? 'Pending' : data.Status" :severity="data.Status === 'Created' ? 'warn' : data.Status === 'Completed' ? 'success' : 'danger'" />
-                        </template>
-                    </ReusableTable>
-                </template>
-            </BaseTab>
+                            <template #cell-status="{ row }">
+                                <ProTag 
+                                    :label="row.Status === 'Created' ? 'Pending' : row.Status" 
+                                    :variant="getStatusSeverity(row.Status)" 
+                                />
+                            </template>
+
+                            <template #actions="{ row }">
+                                <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
+                                    <i class="pi pi-eye text-base text-gray-700"></i>
+                                </ProButton>
+                            </template>
+                        </ProTable>
+                    </Motion>
+                </ProTabs>
+            </ProCard>
         </div>
     </Motion>
 </template>

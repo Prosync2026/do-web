@@ -8,7 +8,7 @@
         </Message>
         <Form @submit="onFormSubmit" class="flex flex-col gap-4 mt-4">
             <div class="flex flex-col md:flex-row gap-4 mt-4">
-                <Card class="flex-1 border">
+                <ProCard class="flex-1 shadow-sm">
                     <template #title>
                         <i class="pi pi-truck mr-2"></i>
                         <span class="text-base font-semibold">Delivery Information</span>
@@ -33,9 +33,9 @@
                             </div>
                         </div>
                     </template>
-                </Card>
+                </ProCard>
 
-                <Card class="flex-1 border">
+                <ProCard class="flex-1 shadow-sm">
                     <template #title>
                         <i class="pi pi-box mr-2"></i>
                         <span class="text-base font-semibold">Purchase Order</span>
@@ -50,33 +50,33 @@
                                 <span class="font-medium">Total Items:</span>
                                 <span>{{ verifyItem?.length }}</span>
                             </div>
-                            <div class="flex justify-between">
+                            <div class="flex justify-between items-center">
                                 <span class="font-medium">Items Delivered:</span>
-                                <Badge severity="secondary" class="text-gray-800">-</Badge>
+                                <ProTag variant="secondary" class="text-gray-800" label="-" />
                             </div>
-                            <div class="flex justify-between">
+                            <div class="flex justify-between items-center">
                                 <span class="font-medium">Status:</span>
-                                <Badge severity="secondary" class="text-gray-800"> Pending </Badge>
+                                <ProTag variant="secondary" class="text-gray-800" label="Pending" />
                             </div>
                         </div>
                     </template>
-                </Card>
+                </ProCard>
             </div>
 
             <div class="grid mt-4">
                 <div class="col-12">
-                    <Card class="border">
+                    <ProCard class="shadow-sm">
                         <template #content>
                             <h3 class="text-lg font-semibold mb-2">Items Summary</h3>
-                            <ReusableTable v-if="hasDeliveredItems" :value="deliveredItems" :columns="deliveryListColumn" emptyTitle="No Delivered Items" :loading="false" />
+                            <ProTable v-if="hasDeliveredItems" :data="deliveredItems" :columns="deliveryListColumn" emptyTitle="No Delivered Items" :loading="false" />
                         </template>
-                    </Card>
+                    </ProCard>
                 </div>
             </div>
 
             <div class="flex justify-end mt-4 gap-2">
-                <Button type="button" label="Cancel" severity="secondary" @click="goBack" />
-                <Button type="submit" label="Save Delivery Verification" severity="primary" />
+                <ProButton type="button" variant="secondary" @click="goBack">Cancel</ProButton>
+                <ProButton type="submit">Save Delivery Verification</ProButton>
             </div>
         </Form>
     </div>
