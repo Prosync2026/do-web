@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePageHeader } from '@/composables/usePageHeader';
+import { usePageHeaderState } from '@/composables/usePageHeader';
 import { useLayout } from '@/layout/composables/layout';
 import { ProPageHeader } from '@prosync_solutions/ui';
 import Toast from 'primevue/toast';
@@ -10,7 +10,39 @@ import AppTopbar from './AppTopbar.vue';
 
 const { isSidebarActive, layoutState } = useLayout();
 const route = useRoute();
-const { breadcrumbs, pageTitle, pageSubtitle } = usePageHeader();
+const { pageHeaderState } = usePageHeaderState();
+
+const pageTitle = computed(() => {
+    if (pageHeaderState.title) return pageHeaderState.title;
+    const meta = (route.meta.breadcrumb ?? []) as any[];
+    if (meta.length > 0) return meta[meta.length - 1].label;
+    return '';
+});
+
+const pageSubtitle = computed(() => {
+    if (pageHeaderState.subtitle) return pageHeaderState.subtitle;
+    return (route.meta.subtitle as string) || '';
+});
+
+const breadcrumbs = computed(() => {
+    if (pageHeaderState.breadcrumbs.length > 0) {
+        return pageHeaderState.breadcrumbs.map(b => ({
+            label: b.label,
+            to: b.to || b.route
+        }));
+    }
+
+    const meta = (route.meta.breadcrumb ?? []) as any[];
+    if (meta.length <= 1) return [];
+
+    return meta.map((item, index) => {
+        const isLast = index === meta.length - 1;
+        return {
+            label: item.label,
+            ...(isLast ? {} : { to: item.route || item.to })
+        };
+    });
+});
 
 const outsideClickListener = ref<((event: Event) => void) | null>(null);
 
@@ -65,7 +97,7 @@ const containerClass = computed(() => {
             <AppTopbar />
 
             <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6">
-                <ProPageHeader v-if="breadcrumbs.length > 0" :title="pageTitle" :subtitle="pageSubtitle" :breadcrumbs="breadcrumbs" class="mb-4">
+                <ProPageHeader v-if="pageTitle" :title="pageTitle" :subtitle="pageSubtitle" :breadcrumbs="breadcrumbs" class="mb-4">
                     <template #actions>
                         <div id="page-header-actions"></div>
                     </template>

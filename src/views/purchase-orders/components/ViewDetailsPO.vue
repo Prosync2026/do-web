@@ -3,12 +3,6 @@
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-1">
-            <!-- Header -->
-            <div class="mb-6 p-3">
-                <h1 class="text-h2 text-text-heading">Purchase Order</h1>
-                <p class="text-body-sm text-text-subtitle">{{ poNumber }} - {{ project?.name }}</p>
-            </div>
-
             <!-- PO Info Card -->
             <ProCard class="mx-3 mb-6">
                 <h2 class="text-body-bold text-text-heading mb-4">Purchase Order Information</h2>
