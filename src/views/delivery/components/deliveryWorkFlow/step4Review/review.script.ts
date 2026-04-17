@@ -1,7 +1,6 @@
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { DeliveryFlow } from '@/types/delivery.type';
 import type { TableColumn } from '@/types/table.type';
-import Form from '@primevue/forms/form';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, ref, watch } from 'vue';
@@ -12,7 +11,6 @@ export default defineComponent({
     name: 'Review',
     components: {
         Toast,
-        Form,
         ProCard,
         ProButton,
         ProTag,
@@ -77,9 +75,7 @@ export default defineComponent({
         // 3. SUBMIT FUNCTION
         // ---------------------------
 
-        const onFormSubmit = async (event: { valid: boolean; originalEvent: Event }) => {
-            // Prevent native form submission
-            event.originalEvent?.preventDefault?.();
+        const onFormSubmit = async () => {
 
             if (!deliveryInfo.value || !selectPO.value) {
                 toast.add({

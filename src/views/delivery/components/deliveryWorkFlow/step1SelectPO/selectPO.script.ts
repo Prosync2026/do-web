@@ -7,7 +7,7 @@ import Form, { FormSubmitEvent } from '@primevue/forms/form';
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-import { computed, defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref, nextTick } from 'vue';
 import { ProCard, ProButton, ProTag, ProInput } from '@prosync_solutions/ui';
 
 export default defineComponent({
@@ -168,52 +168,11 @@ export default defineComponent({
 
         async function onScanConfirm(result: OcrResult) {
             showScanModal.value = false;
-
-            const scannedSO = result.soNo?.trim();
-
-            // Find a matching PO in the store by DocNo
-            const matchedPO = purchaseStore.purchaseOrders.find(
-                (po) => po.DocNo?.trim().toLowerCase() === scannedSO?.toLowerCase()
-            );
-
-            const proceedWithScan = (po: any) => {
-                const items = po.purchase_order_items ?? po.PurchaseOrderItems ?? [];
-                emit('update', {
-                    id: po.Id,
-                    poNumber: po.DocNo,
-                    items,
-                    scannedFile: result.sourceFile ?? null,
-                    scannedPlate: result.plateNo ?? ''
-                });
-                emit('next-step');
-                toast.add({
-                    severity: 'success',
-                    summary: 'Smart Scan Complete',
-                    detail: `Matched PO: ${po.DocNo}. Delivery info pre-filled.`,
-                    life: 3000
-                });
-            };
-
-            if (matchedPO) {
-                // Perfect match - auto-proceed
-                proceedWithScan(matchedPO);
-            } else if (scannedSO) {
-                // SO found in scan but not in DB — warn, user picks PO manually
-                toast.add({
-                    severity: 'warn',
-                    summary: 'SO Number Mismatch',
-                    detail: `"${scannedSO}" was not found in the system. Please select the correct PO manually.`,
-                    life: 5000
-                });
-            } else {
-                // No SO found in scan at all
-                toast.add({
-                    severity: 'warn',
-                    summary: 'No SO Number Detected',
-                    detail: 'Could not detect an SO number from the document. Please select the PO manually.',
-                    life: 3500
-                });
-            }
+            // Introduce a short delay so the Teleport modal fully unmounts its background mask 
+            // before the parent container gets set to display:none when activeStep advances to 3.
+            setTimeout(() => {
+                emit('smartScan', result);
+            }, 100);
         }
 
         const handlePageSizeChange = (event: Event) => {

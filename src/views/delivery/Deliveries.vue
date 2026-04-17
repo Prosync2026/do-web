@@ -21,11 +21,7 @@
                             :data="filteredDeliveries"
                             :columns="deliveryListColumn"
                             :loading="deliveryStore.loading"
-                            :pagination="{
-                                page: deliveryStore.pagination.page,
-                                limit: deliveryStore.pagination.pageSize,
-                                total: deliveryStore.pagination.totalItems
-                            }"
+                            :pagination="deliveryStore.pagination"
                             emptyTitle="No delivery orders found"
                             @update:pagination="handleUpdatePagination"
                         >

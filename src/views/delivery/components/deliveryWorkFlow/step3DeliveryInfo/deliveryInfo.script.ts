@@ -1,30 +1,24 @@
-import type { FormValues, UploadFile } from '@/types/delivery.type';
 import { formatDateToAPI } from '@/utils/dateHelper';
-import Form, { FormResolverOptions, FormSubmitEvent } from '@primevue/forms/form';
 import Calendar from 'primevue/calendar';
-import FileUpload from 'primevue/fileupload';
 import Message from 'primevue/message';
-import ProgressBar from 'primevue/progressbar';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { ProCard, ProButton, ProTag, ProInput, ProTextarea } from '@prosync_solutions/ui';
+import { ProCard, ProButton, ProTag, ProInput, ProTextarea, ProUploadFile } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'DeliveryFormCard',
     components: {
         Message,
         Toast,
-        Form,
         Calendar,
-        FileUpload,
-        ProgressBar,
         ProCard,
         ProButton,
         ProTag,
         ProInput,
-        ProTextarea
+        ProTextarea,
+        ProUploadFile
     },
     props: {
         prefillAttachment: {
@@ -51,9 +45,7 @@ export default defineComponent({
         const errors = reactive<{ driverPlate?: string; deliveryDate?: string }>({});
 
         // MAIN ATTACHMENTS (with preview)
-        const deliveryAttachments = ref<UploadFile[]>([]);
-        const totalSize = ref(0);
-        const totalSizePercent = ref(0);
+        const deliveryAttachments = ref<any[]>([]);
 
         // Pre-fill with the SmartScan uploaded file and/or lorry plate if provided
         watch(
@@ -74,16 +66,15 @@ export default defineComponent({
                     const exists = deliveryAttachments.value.some((a) => a.name === newAttachment.name);
                     if (!exists) {
                         const f = newAttachment;
-                        const uploadFile: UploadFile = {
+                        deliveryAttachments.value.push({
+                            id: f.name,
+                            file: f,
                             name: f.name,
                             size: f.size,
                             type: f.type,
-                            raw: f,
-                            preview: f.type.startsWith('image') ? URL.createObjectURL(f) : undefined
-                        };
-                        deliveryAttachments.value.push(uploadFile);
-                        totalSize.value = deliveryAttachments.value.reduce((sum, f) => sum + f.size, 0);
-                        totalSizePercent.value = (totalSize.value / 10_000_000) * 100;
+                            status: 'done',
+                            url: f.type.startsWith('image') ? URL.createObjectURL(f) : undefined
+                        });
                     }
                 }
             },
@@ -91,95 +82,12 @@ export default defineComponent({
         );
 
         // EVIDENCE ATTACHMENTS (with preview)
-        const evidenceFiles = ref<UploadFile[]>([]);
-        const evidenceTotalSize = ref(0);
-        const evidenceTotalSizePercent = ref(0);
-
-        const formatSize = (bytes: number) => {
-            const k = 1024;
-            const dm = 2;
-            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-            if (bytes === 0) return `0 ${sizes[0]}`;
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-        };
-
-        const resolver = (options: FormResolverOptions) => {
-            const values = options.values as FormValues;
-            errors.driverPlate = '';
-            errors.deliveryDate = '';
-
-            return { values, errors };
-        };
-
-        const onSelectedFiles = (event: { files: File[] }) => {
-            const newFiles = event.files.map((f) => ({
-                name: f.name,
-                size: f.size,
-                type: f.type,
-                raw: f,
-                preview: URL.createObjectURL(f)
-            }));
-
-            // Check for duplicates before adding
-            const existingNames = new Set(deliveryAttachments.value.map((f) => f.name));
-            const uniqueNewFiles = newFiles.filter((f) => !existingNames.has(f.name));
-
-            if (uniqueNewFiles.length > 0) {
-                deliveryAttachments.value.push(...uniqueNewFiles);
-            }
-
-            totalSize.value = deliveryAttachments.value.reduce((sum, f) => sum + f.size, 0);
-            totalSizePercent.value = (totalSize.value / 10_000_000) * 100;
-        };
-
-        const onRemoveFile = (file: UploadFile, removeCallback: (index: number) => void, index: number) => {
-            removeCallback(index);
-
-            if (file.preview) URL.revokeObjectURL(file.preview);
-
-            deliveryAttachments.value.splice(index, 1);
-
-            totalSize.value = deliveryAttachments.value.reduce((sum, f) => sum + f.size, 0);
-            totalSizePercent.value = (totalSize.value / 10_000_000) * 100;
-        };
-
-        const onSelectedEvidenceFiles = (event: { files: File[] }) => {
-            const newFiles = event.files.map((f) => ({
-                name: f.name,
-                size: f.size,
-                type: f.type,
-                raw: f,
-                preview: URL.createObjectURL(f)
-            }));
-
-            // Check for duplicates before adding
-            const existingNames = new Set(evidenceFiles.value.map((f) => f.name));
-            const uniqueNewFiles = newFiles.filter((f) => !existingNames.has(f.name));
-
-            if (uniqueNewFiles.length > 0) {
-                evidenceFiles.value.push(...uniqueNewFiles);
-            }
-
-            evidenceTotalSize.value = evidenceFiles.value.reduce((s, f) => s + f.size, 0);
-            evidenceTotalSizePercent.value = (evidenceTotalSize.value / 10_000_000) * 100;
-        };
-
-        const onRemoveEvidenceFile = (file: UploadFile, removeCallback: (index: number) => void, index: number) => {
-            removeCallback(index);
-
-            if (file.preview) URL.revokeObjectURL(file.preview);
-
-            evidenceFiles.value.splice(index, 1);
-
-            evidenceTotalSize.value = evidenceFiles.value.reduce((s, f) => s + f.size, 0);
-            evidenceTotalSizePercent.value = (evidenceTotalSize.value / 10_000_000) * 100;
-        };
+        const evidenceFiles = ref<any[]>([]);
 
         // -------------------------------------------------------
         const uploadEvent = (callback: () => void) => callback();
 
-        const onFormSubmit = async (event: FormSubmitEvent<Record<string, any>>) => {
+        const onFormSubmit = async () => {
             const values = initialValues;
 
             errors.driverPlate = '';
@@ -221,8 +129,8 @@ export default defineComponent({
                 Date: formatDateToAPI(values.deliveryDate) || '',
                 DeliveryDate: formatDateToAPI(values.deliveryDate) || '',
                 Remarks: values.remarks || '',
-                attachments: deliveryAttachments.value.map((f) => f.raw), // Delivery documents
-                attachments2: evidenceFiles.value.map((f) => f.raw) // Evidence/photos sent as attachments2
+                attachments: deliveryAttachments.value.map((f: any) => f.file || f.raw || f), // Delivery documents
+                attachments2: evidenceFiles.value.map((f: any) => f.file || f.raw || f) // Evidence/photos sent as attachments2
             };
 
             emit('update', dataToEmit);
@@ -243,22 +151,10 @@ export default defineComponent({
             errors,
 
             deliveryAttachments,
-            totalSize,
-            totalSizePercent,
-
             evidenceFiles,
-            evidenceTotalSize,
-            evidenceTotalSizePercent,
 
             toastRef,
-            formatSize,
-            resolver,
             onFormSubmit,
-            onSelectedFiles,
-            onRemoveFile,
-            onSelectedEvidenceFiles,
-            onRemoveEvidenceFile,
-            uploadEvent,
             goBack
         };
     }

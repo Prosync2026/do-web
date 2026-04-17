@@ -12,7 +12,7 @@
                 <!-- Steps relative layout -->
                 <div class="flex justify-between items-center w-full z-10 relative">
                     <!-- Step 1 -->
-                    <div class="flex flex-col items-center gap-2 cursor-pointer w-24">
+                    <div class="flex flex-col items-center gap-2 w-24" :class="activeStep > 1 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 1 && goStep(1)">
                         <div :class="['w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 1 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
                             <i class="pi pi-box"></i>
                         </div>
@@ -20,7 +20,7 @@
                     </div>
 
                     <!-- Step 2 -->
-                    <div class="flex flex-col items-center gap-2 cursor-pointer w-24">
+                    <div class="flex flex-col items-center gap-2 w-24" :class="activeStep > 2 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 2 && goStep(2)">
                         <div :class="['w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 2 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
                             <i class="pi pi-check"></i>
                         </div>
@@ -28,7 +28,7 @@
                     </div>
 
                     <!-- Step 3 -->
-                    <div class="flex flex-col items-center gap-2 cursor-pointer w-24">
+                    <div class="flex flex-col items-center gap-2 w-24" :class="activeStep > 3 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 3 && goStep(3)">
                         <div :class="['w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 3 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
                             <i class="pi pi-truck"></i>
                         </div>
@@ -36,7 +36,7 @@
                     </div>
 
                     <!-- Step 4 -->
-                    <div class="flex flex-col items-center gap-2 cursor-pointer w-24">
+                    <div class="flex flex-col items-center gap-2 w-24 cursor-default">
                         <div :class="['w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 4 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
                             <i class="pi pi-file"></i>
                         </div>

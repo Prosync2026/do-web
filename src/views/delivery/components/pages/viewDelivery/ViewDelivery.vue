@@ -4,11 +4,8 @@
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-1">
             <ProCard class="shadow-sm mb-6">
-                <div class="w-full mb-4">
-                    <BreadcrumbList />
-                </div>
-                <h1 class="text-h2 text-text-heading">Delivery Order</h1>
-                <p class="text-body-sm text-text-subtitle">{{ singleDelivery?.DocNo }} - {{ singleDelivery?.RefDoc }}</p>
+                <!-- <h1 class="text-h2 text-text-heading">Delivery Order</h1>
+                <p class="text-body-sm text-text-subtitle">{{ singleDelivery?.DocNo }} - {{ singleDelivery?.RefDoc }}</p> -->
 
                 <div v-if="loading" class="mt-4 text-center text-gray-500">Loading...</div>
 
