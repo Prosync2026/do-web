@@ -28,28 +28,28 @@ function mapStatisticsToCards(data: any): CardItem[] {
             value: `RM ${totalBudget.toLocaleString()}`,
             description: 'Approved budget',
             icon: PhCurrencyDollar,
-            color: 'orange'
+            color: 'bg-surface-info'
         },
         {
             title: 'Requested',
             value: `RM ${totalRequested.toLocaleString()}`,
             description: 'Total requested amount',
             icon: PhFileText,
-            color: 'blue'
+            color: 'bg-surface-warn'
         },
         {
             title: 'Delivered',
             value: `RM ${totalDelivered.toLocaleString()}`,
             description: 'Delivered value',
             icon: PhTruck,
-            color: 'green'
+            color: 'bg-surface-success'
         },
         {
             title: 'Balance',
             value: `RM ${totalBalance.toLocaleString()}`,
             description: totalBalance < 0 ? 'Over Budget!' : 'Remaining balance',
             icon: PhWallet,
-            color: totalBalance < 0 ? 'red' : 'purple'
+            color: totalBalance < 0 ? 'bg-surface-error' : 'bg-surface-primary'
         }
     ];
 }

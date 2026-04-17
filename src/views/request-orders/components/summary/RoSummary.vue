@@ -20,7 +20,7 @@ defineProps<{
             :value="submittedCount"
             subtitle="Awaiting approval"
             :icon="AlertTriangle"
-            iconBg="bg-yellow-50 text-yellow-600"
+            iconBg="bg-surface-warn"
         />
 
         <!-- Approved Orders -->
@@ -30,7 +30,7 @@ defineProps<{
             :value="approvedCount"
             subtitle="Approved for purchase"
             :icon="CheckCircle"
-            iconBg="bg-green-50 text-green-600"
+            iconBg="bg-surface-success"
         />
 
         <!-- Total Request Order Value -->
@@ -40,7 +40,7 @@ defineProps<{
             :value="`RM ${formatCurrency(totalApprovedValue)}`"
             subtitle="Overall accepted value"
             :icon="DollarSign"
-            iconBg="bg-brand-primary/10 text-brand-primary"
+            iconBg="bg-surface-primary"
         />
     </div>
 </template>

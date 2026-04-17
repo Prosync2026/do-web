@@ -20,7 +20,7 @@
                     :value="pendingList.length"
                     subtitle="No items delivered yet"
                     :icon="PhClock"
-                    iconBg="bg-yellow-50 text-yellow-600"
+                    iconBg="bg-surface-info"
                 />
 
                 <!-- Partially Delivered -->
@@ -30,7 +30,7 @@
                     :value="partiallyList.length"
                     subtitle="Some items delivered"
                     :icon="PhWarning"
-                    iconBg="bg-orange-50 text-orange-500"
+                    iconBg="bg-surface-warn"
                 />
 
                 <!-- Completed -->
@@ -40,7 +40,7 @@
                     :value="completedList.length"
                     subtitle="All items delivered"
                     :icon="PhCheckCircle"
-                    iconBg="bg-green-50 text-green-600"
+                    iconBg="bg-surface-success"
                 />
 
                 <!-- Total POs -->
@@ -50,7 +50,7 @@
                     :value="pendingList.length + partiallyList.length + completedList.length"
                     subtitle="All purchase orders"
                     :icon="PhBookOpen"
-                    iconBg="bg-brand-primary/10 text-brand-primary"
+                    iconBg="bg-surface-primary"
                 />
             </div>
 

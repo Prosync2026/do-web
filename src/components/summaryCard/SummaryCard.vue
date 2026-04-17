@@ -7,7 +7,7 @@
             :value="item.value"
             :subtitle="item.description"
             :icon="item.icon"
-            :iconBg="`bg-${item.color}-100 dark:bg-${item.color}-400/10 text-${item.color}-500`"
+            :iconBg="item.color"
         />
     </div>
 </template>

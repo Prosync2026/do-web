@@ -23,7 +23,7 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
                 :value="pendingApprovals"
                 subtitle="Request orders awaiting approval"
                 :icon="PhWarning"
-                iconBg="bg-amber-100 dark:bg-amber-900/20 text-amber-600"
+                iconBg="bg-surface-warn"
             />
 
             <!-- Pending Value -->
@@ -33,7 +33,7 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
                 :value="`RM${pendingValue.toLocaleString()}`"
                 subtitle="Total value pending approval"
                 :icon="PhCurrencyDollar"
-                iconBg="bg-blue-100 dark:bg-blue-900/20 text-blue-600"
+                iconBg="bg-surface-info"
             />
 
             <!-- Status -->
