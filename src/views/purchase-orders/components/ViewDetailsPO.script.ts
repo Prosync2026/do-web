@@ -1,8 +1,9 @@
 import { ProCard, ProTable, ProTag, ProTabs } from '@prosync_solutions/ui';
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import { Motion } from '@motionone/vue';
-import { computed, defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { usePageHeader } from '@/composables/usePageHeader';
 
 export default defineComponent({
     name: 'ViewDetailsPO',
@@ -10,8 +11,10 @@ export default defineComponent({
     setup() {
         const route = useRoute();
         const store = usePurchaseOrderStore();
+        const pageHeader = usePageHeader();
 
         const poId = ref(route.query.id as string);
+        const paramPoNumber = (route.params.poNumber as string) || 'View PO';
         const isLoading = ref(false);
 
         const purchaseOrder = computed(() => store.selectedPurchaseOrder);
@@ -117,12 +120,31 @@ export default defineComponent({
 
         onMounted(async () => {
             isLoading.value = true;
+            
+            // Set initial page header synchronously 
+            pageHeader.setBreadcrumbs([
+                { label: 'Purchase Orders', to: '/purchase-orders' },
+                { label: paramPoNumber }
+            ]);
+            pageHeader.setTitle('Purchase Order Details', `${paramPoNumber}`);
+
             try {
                 const result = await store.fetchPurchaseOrderById(poId.value);
             } catch (error) {
                 console.error('Failed to load purchase order details:', error);
             } finally {
                 isLoading.value = false;
+            }
+        });
+
+        // Update header reactively when data loads fully
+        watch([poNumber, project], ([newPo, newProject]) => {
+            if (newPo !== 'N/A') {
+                pageHeader.setBreadcrumbs([
+                    { label: 'Purchase Orders', to: '/purchase-orders' },
+                    { label: newPo }
+                ]);
+                pageHeader.setTitle('Purchase Order Details', `${newPo} • ${newProject?.name || ''}`);
             }
         });
 

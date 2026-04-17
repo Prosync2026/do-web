@@ -3,6 +3,7 @@ import { budgetService } from '@/services/budget.service';
 import type { CardItem } from '@/types/card.type';
 import { showError, showWarning } from '@/utils/showNotification.utils';
 import { ProCard, ProSpinner } from '@prosync_solutions/ui';
+import { PhCurrencyDollar, PhDatabase, PhBuildings } from '@phosphor-icons/vue';
 import { Chart } from 'highcharts-vue';
 import { computed, defineComponent, onMounted, reactive, ref, watch } from 'vue';
 
@@ -77,22 +78,22 @@ export default defineComponent({
                     title: 'Total Budget',
                     value: `RM ${totalBudget.toLocaleString()}`,
                     description: 'Total approved budget',
-                    icon: 'pi pi-dollar',
-                    color: 'orange'
+                    icon: PhCurrencyDollar,
+                    color: 'bg-surface-info'
                 },
                 {
                     title: 'Total Requested',
                     value: `RM ${totalRequested.toLocaleString()}`,
                     description: 'Total requested budget',
-                    icon: 'pi pi-database',
-                    color: 'green'
+                    icon: PhDatabase,
+                    color: 'bg-surface-success'
                 },
                 {
                     title: 'Total Balance',
                     value: `RM ${totalBalance.toLocaleString()}`,
                     description: 'Remaining budget balance',
-                    icon: 'pi pi-building',
-                    color: 'blue'
+                    icon: PhBuildings,
+                    color: 'bg-surface-warn'
                 }
             ];
         }

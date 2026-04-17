@@ -11,6 +11,7 @@ import { Motion } from '@motionone/vue';
 import { ProButton, ProCard, ProInput, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { PhWarningCircle, PhChatText, PhCheckCircle, PhTrendUp } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
@@ -32,9 +33,9 @@ export default defineComponent({
             const formattedTotal = totalApprovedValue.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
             const cards: CardItem[] = [
-                { title: 'Under Review', value: reviewCount.toString(), description: 'Waiting CM Review', icon: 'pi pi-exclamation-triangle', color: 'red' },
-                { title: 'Pending Review', value: pendingReviewCount.toString(), description: 'CM review done. Ready for PM/PD/Manager.', icon: 'pi pi-comment', color: 'orange' },
-                { title: 'Approved', value: approvedCount.toString(), description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' }
+                { title: 'Under Review', value: reviewCount.toString(), description: 'Waiting CM Review', icon: PhWarningCircle, color: 'bg-surface-warn' },
+                { title: 'Pending Review', value: pendingReviewCount.toString(), description: 'CM review done. Ready for PM/PD/Manager.', icon: PhChatText, color: 'bg-surface-info' },
+                { title: 'Approved', value: approvedCount.toString(), description: 'Ready for implement', icon: PhCheckCircle, color: 'bg-surface-success' }
             ];
 
             if (canViewPricing.value) {
@@ -42,8 +43,8 @@ export default defineComponent({
                     title: 'Total Value',
                     value: `$ ${formattedTotal}`,
                     description: 'Estimated budget impact',
-                    icon: 'pi pi-chart-line',
-                    color: 'blue'
+                    icon: PhTrendUp,
+                    color: 'bg-surface-primary'
                 });
             }
 

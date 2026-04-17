@@ -6,6 +6,7 @@
         @update:modelValue="(val: boolean) => { localVisible = val; if (!val) handleCancel(); }"
         title="Edit Request Order"
         size="full"
+        class="!z-[100]"
     >
         <div v-if="order">
             <form @submit.prevent="handleSave">

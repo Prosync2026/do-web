@@ -1,7 +1,7 @@
 <script lang="ts" src="./PreviewRo.script.ts"></script>
 
 <template>
-    <ProModal :modelValue="localVisible" @update:modelValue="(val: boolean) => { localVisible = val; if (!val) $emit('update:visible', false); }" title="Summary Order" size="full">
+    <ProModal :modelValue="localVisible" @update:modelValue="(val: boolean) => { localVisible = val; if (!val) $emit('update:visible', false); }" title="Summary Order" size="full" class="!z-[110]">
         <!-- Summary Section -->
         <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-6 shadow-sm">
             <div class="grid grid-cols-2 gap-3 text-sm">

@@ -1,51 +1,96 @@
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import type { Component } from 'vue';
+import { onUnmounted, reactive } from 'vue';
 
-interface BreadcrumbMeta {
+// Types
+export interface PageHeaderTab {
+    key: string;
     label: string;
-    route?: string;
 }
 
-interface BreadcrumbItem {
+export interface PageHeaderAction {
+    key: string;
+    label: string;
+    icon?: string | Component;
+    severity?: 'primary' | 'secondary' | 'danger' | 'warning' | 'ghost';
+    visible: boolean;
+    onClick: () => void;
+}
+
+export interface PageHeaderBreadcrumb {
     label: string;
     to?: string;
+    route?: string; // backwards compatibility
 }
 
+export interface PageHeaderState {
+    title: string;
+    subtitle?: string;
+    breadcrumbs: PageHeaderBreadcrumb[];
+    tabs: PageHeaderTab[];
+    activeTab: string;
+    actions: PageHeaderAction[];
+}
+
+// Shared reactive state (module-level singleton)
+const pageHeaderState = reactive<PageHeaderState>({
+    title: '',
+    subtitle: undefined,
+    breadcrumbs: [],
+    tabs: [],
+    activeTab: '',
+    actions: []
+});
+
+function resetPageHeaderState() {
+    pageHeaderState.title = '';
+    pageHeaderState.subtitle = undefined;
+    pageHeaderState.breadcrumbs = [];
+    pageHeaderState.tabs = [];
+    pageHeaderState.activeTab = '';
+    pageHeaderState.actions = [];
+}
+
+// usePageHeaderState() — For Layout to read the state
+export function usePageHeaderState() {
+    return { pageHeaderState };
+}
+
+// usePageHeader() — For detail pages to set/update header info
 export function usePageHeader() {
-    const route = useRoute();
+    resetPageHeaderState();
 
-    const breadcrumbs = computed<BreadcrumbItem[]>(() => {
-        const meta = (route.meta.breadcrumb ?? []) as BreadcrumbMeta[];
-        if (meta.length === 0) return [];
-
-        const items: BreadcrumbItem[] = [];
-
-        // Always prepend Dashboard unless we're on the dashboard itself
-        const isDashboard = route.name === 'dashboard';
-        if (!isDashboard) {
-            items.push({ label: 'Dashboard', to: '/' });
-        }
-
-        meta.forEach((item, index) => {
-            const isLast = index === meta.length - 1;
-            items.push({
-                label: item.label,
-                ...(isLast ? {} : { to: item.route })
-            });
-        });
-
-        return items;
+    onUnmounted(() => {
+        resetPageHeaderState();
     });
 
-    const pageTitle = computed(() => {
-        const meta = (route.meta.breadcrumb ?? []) as BreadcrumbMeta[];
-        if (meta.length === 0) return '';
-        return meta[meta.length - 1].label;
-    });
+    const setTitle = (title: string, subtitle?: string) => {
+        pageHeaderState.title = title;
+        pageHeaderState.subtitle = subtitle;
+    };
 
-    const pageSubtitle = computed(() => {
-        return (route.meta.subtitle as string) ?? '';
-    });
+    const setBreadcrumbs = (breadcrumbs: PageHeaderBreadcrumb[]) => {
+        pageHeaderState.breadcrumbs = breadcrumbs;
+    };
 
-    return { breadcrumbs, pageTitle, pageSubtitle };
+    const setTabs = (tabs: PageHeaderTab[], defaultTab?: string) => {
+        pageHeaderState.tabs = tabs;
+        pageHeaderState.activeTab = defaultTab || tabs[0]?.key || '';
+    };
+
+    const setActiveTab = (tabKey: string) => {
+        pageHeaderState.activeTab = tabKey;
+    };
+
+    const setActions = (actions: PageHeaderAction[]) => {
+        pageHeaderState.actions = actions;
+    };
+
+    return {
+        state: pageHeaderState,
+        setTitle,
+        setBreadcrumbs,
+        setTabs,
+        setActiveTab,
+        setActions
+    };
 }

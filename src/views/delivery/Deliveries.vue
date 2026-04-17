@@ -17,7 +17,31 @@
             <ProCard class="shadow-sm mt-6">
                 <ProTabs v-model="activeTab" :tabs="tabItems" @update:modelValue="handleTabChange">
                     <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
+
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-600">Rows per page:</span>
+                                <ProSelect :modelValue="deliveryStore.pagination.pageSize" @update:modelValue="handleUpdatePagination({ page: 1, pageSize: $event })" :options="[{label:'10', value:10}, {label:'25', value:25}, {label:'50', value:50}, {label:'100', value:100}]" class="w-24 text-sm" />
+                            </div>
+                            <div class="flex gap-2 items-center flex-wrap justify-end">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-36">
+                                        <ProDatePicker v-model="startDate" placeholder="Start Date" appendTo="body" @update:modelValue="handleSearch('')" />
+                                    </div>
+                                    <span class="text-text-subtitle">-</span>
+                                    <div class="w-36">
+                                        <ProDatePicker v-model="endDate" placeholder="End Date" appendTo="body" @update:modelValue="handleSearch('')" />
+                                    </div>
+                                </div>
+                                <div class="w-48" v-if="isPurchasingRole">
+                                    <ProSelect v-model="deliveryStore.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="handleSearch('')" />
+                                </div>
+                                <ProInput :modelValue="deliveryStore.filters.search" placeholder="Search deliveries..." class="w-64" @update:modelValue="deliveryStore.handleSearch" />
+                            </div>
+                        </div>
+
                         <ProTable
+                            @search="handleSearch"
                             :data="filteredDeliveries"
                             :columns="deliveryListColumn"
                             :loading="deliveryStore.loading"
@@ -25,6 +49,7 @@
                             emptyTitle="No delivery orders found"
                             @update:pagination="handleUpdatePagination"
                         >
+
                             <template #cell-rowIndex="{ row }">
                                 <span>{{ row.rowIndex }}</span>
                             </template>

@@ -95,6 +95,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
     async function handleSearch(value: string) {
         search.value = value;
         pagination.page = 1; // Reset to first page when searching
+        fetchDeliveryOrders();
     }
 
     async function createDeliveryOrder(formData: FormData) {
@@ -175,6 +176,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
             sorting.sortOrder = order;
         }
         pagination.page = 1;
+        fetchDeliveryOrders();
     }
 
     // ------------------------------

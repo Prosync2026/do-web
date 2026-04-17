@@ -5,11 +5,11 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { ProCard, ProButton, ProTag, ProTable, ProTabs } from '@prosync_solutions/ui';
+import { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'Deliveries',
-    components: { ProCard, ProButton, ProTag, ProTable, ProTabs },
+    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput },
     setup() {
         const deliveryStore = useDeliveryStore();
         const projectStore = useProjectStore();
@@ -111,7 +111,12 @@ export default defineComponent({
             }
         };
 
+        const startDate = ref('');
+        const endDate = ref('');
+
         const handleSearch = (value: string) => {
+            deliveryStore.filters.startDate = startDate.value;
+            deliveryStore.filters.endDate = endDate.value;
             deliveryStore.handleSearch(value);
             loadData();
         };
@@ -194,6 +199,8 @@ export default defineComponent({
             deliveryListColumn,
             handleAction,
             handleSearch,
+            startDate,
+            endDate,
             handleSortChange,
             handleTabChange,
             deliveryStore,
@@ -202,7 +209,9 @@ export default defineComponent({
             currentSortOrder,
             getStatusSeverity,
             tableFilters,
-            handleUpdatePagination
+            handleUpdatePagination,
+            projectStore,
+            isPurchasingRole
         };
     }
 });

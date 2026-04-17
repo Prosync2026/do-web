@@ -6,6 +6,7 @@
         @update:modelValue="(val: boolean) => { localVisible = val; if (!val) handleClose(); }"
         title="Request Order Details"
         size="xl"
+        class="!z-[100]"
     >
         <div v-if="localOrder">
             <!-- Header Info -->

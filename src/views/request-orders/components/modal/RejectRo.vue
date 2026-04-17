@@ -49,6 +49,7 @@ function confirmReject() {
         @update:modelValue="(val: boolean) => { localVisible = val; if (!val) cancel(); }"
         title="Reject Request Order"
         size="sm"
+        class="!z-[100]"
     >
         <div class="flex flex-col gap-4">
             <p v-if="orderNumber" class="text-body-sm text-text-subtitle">
