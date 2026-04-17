@@ -1,10 +1,11 @@
 <script lang="ts" src="./SmartScanModal.script.ts"></script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :closable="!isScanning" :style="{ width: phase === 'result' ? '1300px' : '860px', maxWidth: '97vw' }" :pt="{ content: { class: 'p-0' } }" @hide="onClose">
+    <Teleport to="body">
+        <ProModal v-model="visible" @update:modelValue="(val: boolean) => { if(!val && !isScanning) onClose() }" :size="phase === 'result' ? 'full' : 'large'" class="!z-[999]">
         <template #header>
-            <div class="flex items-center gap-2 px-2">
-                <i class="pi pi-sparkles text-primary text-xl" />
+            <div class="flex items-center gap-2">
+                <i class="pi pi-sparkles text-brand-primary text-xl" />
                 <span class="font-bold text-lg">Smart Scan Delivery Order</span>
             </div>
         </template>
@@ -41,13 +42,13 @@
                     <p class="font-semibold text-sm truncate">{{ selectedFile.name }}</p>
                     <p class="text-xs text-gray-400">{{ formatSize(selectedFile.size) }}</p>
                 </div>
-                <Button icon="pi pi-times" severity="secondary" text rounded size="small" @click="clearFile" />
+                <ProButton icon="pi pi-times" variant="plain" @click="clearFile" />
             </div>
 
             <!-- Actions -->
             <div class="flex justify-end gap-2 mt-5">
-                <Button label="Cancel" severity="secondary" @click="onClose" />
-                <Button label="Scan Document" icon="pi pi-sparkles" :loading="false" :disabled="!selectedFile" @click="startScan" />
+                <ProButton variant="secondary" @click="onClose">Cancel</ProButton>
+                <ProButton :loading="isScanning" :disabled="!selectedFile" @click="startScan"><i class="pi pi-sparkles mt-1 mr-2" /> Scan Document</ProButton>
             </div>
         </div>
 
@@ -76,23 +77,23 @@
                     <div class="grid grid-cols-2 gap-3 mb-4">
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">SO / PO Number</label>
-                            <InputText v-model="ocrResult.soNo" size="small" placeholder="SO-XXXXX" />
+                            <ProInput v-model="ocrResult.soNo" placeholder="SO-XXXXX" />
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">DO Number</label>
-                            <InputText v-model="ocrResult.doNo" size="small" placeholder="DO-XXXXX" />
+                            <ProInput v-model="ocrResult.doNo" placeholder="DO-XXXXX" />
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Delivery Date</label>
-                            <InputText v-model="ocrResult.deliveryDate" size="small" placeholder="YYYY-MM-DD" />
+                            <ProInput v-model="ocrResult.deliveryDate" placeholder="YYYY-MM-DD" />
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Lorry Plate No</label>
-                            <InputText v-model="ocrResult.plateNo" size="small" placeholder="e.g. WXY1234" />
+                            <ProInput v-model="ocrResult.plateNo" placeholder="e.g. WXY1234" />
                         </div>
                         <div class="flex flex-col gap-1 col-span-2">
                             <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Supplier / Vendor</label>
-                            <InputText v-model="ocrResult.supplierName" size="small" placeholder="Supplier name" class="w-full" />
+                            <ProInput v-model="ocrResult.supplierName" placeholder="Supplier name" class="w-full" />
                         </div>
                     </div>
 
@@ -134,12 +135,12 @@
             </div>
 
             <!-- Actions footer -->
-            <div class="flex justify-between items-center px-4 py-3 border-t border-surface-200">
+            <div class="flex justify-between items-center px-4 py-3 border-t border-surface-200 mt-4">
                 <div class="flex gap-2">
-                    <Button label="Re-scan" icon="pi pi-refresh" severity="secondary" outlined @click="phase = 'upload'" />
-                    <Button label="Enter Manually" icon="pi pi-pencil" severity="secondary" text @click="onManualFallback" />
+                    <ProButton variant="secondary" @click="phase = 'upload'"><i class="pi pi-refresh mt-1 mr-2" /> Re-scan</ProButton>
+                    <ProButton variant="plain" @click="onManualFallback"><i class="pi pi-pencil mt-1 mr-2" /> Enter Manually</ProButton>
                 </div>
-                <Button label="Confirm &amp; Proceed" icon="pi pi-check" :disabled="ocrResult.items.length === 0" @click="onConfirm" />
+                <ProButton :disabled="ocrResult.items.length === 0" @click="onConfirm"><i class="pi pi-check mt-1 mr-2" /> Confirm &amp; Proceed</ProButton>
             </div>
         </div>
 
@@ -153,9 +154,10 @@
                 <p class="text-sm text-gray-500 mt-1 max-w-sm">{{ errorMessage }}</p>
             </div>
             <div class="flex gap-2">
-                <Button label="Try Again" icon="pi pi-refresh" @click="phase = 'upload'" />
-                <Button label="Enter Manually" icon="pi pi-pencil" severity="secondary" @click="onManualFallback" />
+                <ProButton @click="phase = 'upload'"><i class="pi pi-refresh mt-1 mr-2" /> Try Again</ProButton>
+                <ProButton variant="secondary" @click="onManualFallback"><i class="pi pi-pencil mt-1 mr-2" /> Enter Manually</ProButton>
             </div>
         </div>
-    </Dialog>
+        </ProModal>
+    </Teleport>
 </template>

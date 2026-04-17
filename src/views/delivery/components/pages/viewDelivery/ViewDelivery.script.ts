@@ -1,4 +1,3 @@
-import ReusableTable from '@/components/table/ReusableTable.vue';
 import { deliveryOrderService } from '@/services/deliveryOrder.service';
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { AttachmentItem } from '@/types/request-order.type';
@@ -6,13 +5,13 @@ import { formatDate } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 import { storeToRefs } from 'pinia';
-import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { ProCard, ProButton, ProTag, ProTable } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'ViewDelivery',
-    components: { Tag, ReusableTable, Motion },
+    components: { ProCard, ProButton, ProTag, ProTable },
     setup() {
         const route = useRoute();
         const deliveryStore = useDeliveryStore();
@@ -25,13 +24,12 @@ export default defineComponent({
         const deliveryId = Number(route.params.deliveryOrderId);
 
         const itemsColumns = ref([
-            { field: 'no', header: 'No', bodySlot: 'no' },
-            { field: 'ItemCode', header: 'Item Code' },
-            { field: 'Name', header: 'Description' },
-            { field: 'Uom', header: 'UOM' },
-            { field: 'Quantity', header: 'Quantity' },
-            // { field: 'DeliveryDate', header: 'Delivery Date', bodySlot: 'deliveryDate' },
-            { field: 'status', header: 'Status', bodySlot: 'status' }
+            { key: 'no', label: 'No' },
+            { key: 'ItemCode', label: 'Item Code' },
+            { key: 'Name', label: 'Description' },
+            { key: 'Uom', label: 'UOM' },
+            { key: 'Quantity', label: 'Quantity' },
+            { key: 'status', label: 'Status' }
         ]);
 
         // Parse attachment JSON string

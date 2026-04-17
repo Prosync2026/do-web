@@ -1,37 +1,20 @@
-import ReusableTable from '@/components/table/ReusableTable.vue';
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { DeliveryFlow } from '@/types/delivery.type';
 import type { TableColumn } from '@/types/table.type';
-import Form from '@primevue/forms/form';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
-import Calendar from 'primevue/calendar';
-import Card from 'primevue/card';
-import FileUpload from 'primevue/fileupload';
-import InputText from 'primevue/inputtext';
-import Message from 'primevue/message';
-import ProgressBar from 'primevue/progressbar';
-import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { ProCard, ProButton, ProTag, ProTable } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'Review',
     components: {
-        Card,
-        InputText,
-        Button,
-        Message,
         Toast,
-        Form,
-        Calendar,
-        Textarea,
-        FileUpload,
-        ProgressBar,
-        Badge,
-        ReusableTable
+        ProCard,
+        ProButton,
+        ProTag,
+        ProTable
     },
     emits: ['update', 'next-step', 'prev-step'],
     props: {
@@ -54,12 +37,12 @@ export default defineComponent({
 
         const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 
-        const deliveryListColumn: TableColumn[] = [
-            { field: 'ItemCode', header: 'Item Code', sortable: true },
-            { field: 'SoDocNo', header: 'DO No.', sortable: true },
-            { field: 'Name', header: 'Item Name', sortable: true },
-            { field: 'Price', header: 'Unit Price' },
-            { field: 'Quantity', header: 'Quantity' }
+        const deliveryListColumn: any[] = [
+            { key: 'ItemCode', label: 'Item Code', sortable: true },
+            { key: 'SoDocNo', label: 'DO No.', sortable: true },
+            { key: 'Name', label: 'Item Name', sortable: true },
+            { key: 'Price', label: 'Unit Price' },
+            { key: 'Quantity', label: 'Quantity' }
         ];
 
         // ---------------------------
@@ -92,9 +75,7 @@ export default defineComponent({
         // 3. SUBMIT FUNCTION
         // ---------------------------
 
-        const onFormSubmit = async (event: { valid: boolean; originalEvent: Event }) => {
-            // Prevent native form submission
-            event.originalEvent?.preventDefault?.();
+        const onFormSubmit = async () => {
 
             if (!deliveryInfo.value || !selectPO.value) {
                 toast.add({

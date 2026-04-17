@@ -5,10 +5,11 @@ import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/step3Deli
 import Review from '@/views/delivery/components/deliveryWorkFlow/step4Review/review.vue';
 import type { OcrResult } from '@/views/delivery/components/smartScan/SmartScanModal.script';
 import { useToast } from 'primevue/usetoast';
+import { ProButton, ProCard } from '@prosync_solutions/ui';
 import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
-    components: { DeliveryInfo, SelectPO, VerifyItem, Review },
+    components: { DeliveryInfo, SelectPO, VerifyItem, Review, ProCard, ProButton },
     setup() {
         // 1. DATA 
         const activeStep = ref(1);
@@ -89,8 +90,28 @@ export default defineComponent({
                     items
                 };
 
-                // Store the uploaded file to pre-fill delivery attachments in step 3
+                // Map the smart scan quantities to the PO items to populate step 2 data
+                const mappedVerifyItems = items.map((i: any) => {
+                    const itemCodeToMatch = (i.ItemCode || i.code || '').toLowerCase();
+                    const descToMatch = (i.Name || i.description || '').toLowerCase();
+                    
+                    const matchedScanItem = result.items?.find((scanItem: any) => 
+                        (scanItem.itemCode && scanItem.itemCode.toLowerCase() === itemCodeToMatch) ||
+                        (scanItem.description && scanItem.description.toLowerCase() === descToMatch)
+                    );
+
+                    return {
+                        purchaseOrderItemId: i.Id || i.id,
+                        requestOrderId: i.requestOrderId || 0,
+                        delivered: matchedScanItem ? (matchedScanItem.qty || 0) : 0
+                    };
+                });
+                
+                deliveryData.value.verifyItem = mappedVerifyItems;
+
+                // Store the uploaded file & plate to pre-fill delivery info in step 3
                 scanAttachment.value = result.sourceFile ?? null;
+                scannedPlate.value = result.plateNo ?? '';
 
                 toast.add({
                     severity: 'success',

@@ -19,37 +19,24 @@
                     <p class="text-sm text-gray-500 mt-0.5">Upload it and AI will extract all items, quantities and SO number automatically.</p>
                 </div>
             </div>
-            <Button label="Smart Scan DO" icon="pi pi-sparkles" @click="showScanModal = true" class="shrink-0" />
+            <ProButton @click="showScanModal = true" class="shrink-0"><i class="pi pi-sparkles mt-1 mr-2" /> Smart Scan DO</ProButton>
         </div>
 
         <!-- Search + Cards -->
-        <Card class="mt-6 border">
-            <template #title>
-                <div class="flex items-center gap-2">
-                    <i class="pi pi-search"></i>
-                    <span>Search Purchase Order</span>
-                </div>
-            </template>
-
-            <template #content>
+        <ProCard title="Search Purchase Order" class="mt-6 shadow-sm">
                 <Form @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full sm:w-full">
                     <!-- AutoComplete Search -->
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-3">
-                        <!-- AutoComplete Search -->
-                        <div class="flex gap-2">
-                            <AutoComplete v-model="selectedCard" :suggestions="filteredCards" field="title" option-label="title" forceSelection dropdown placeholder="Search PO Number..." @complete="handlePOSearch" />
-                            <Button icon="pi pi-times" severity="secondary" class="bg-gray-200" rounded @click="handleClearSearch" v-tooltip="'Clear search'" />
+                        <div class="flex gap-2 relative">
+                            <ProInput v-model="searchTerm" placeholder="Search PO Number..." class="w-full" @input="handleManualSearchInput" />
+                            <ProButton variant="secondary" class="bg-gray-200 shrink-0" rounded @click="handleClearSearch" title="Clear search"><i class="pi pi-times mt-1 shrink-0" /></ProButton>
                         </div>
-
-                        <!-- Manual PO Number Search -->
-                        <!-- <InputText v-model="manualSearch" placeholder="Search by PO Number..." class="w-full" @input="handleManualSearch" /> -->
                     </div>
 
                     <!-- Cards List -->
                     <div class="grid grid-cols-1 gap-4 p-3">
-                        <Card v-for="card in filteredCards" :key="card.id" class="relative border rounded-lg cursor-pointer transition-colors" :class="isSelected(card) ? 'selected' : ''" @click="toggleSelect(card)">
-                            <template #content>
+                        <ProCard v-for="card in filteredCards" :key="card.id" class="relative border rounded-lg cursor-pointer transition-colors" :class="isSelected(card) ? 'bg-gray-100 hover:bg-gray-200 border-primary shadow-sm' : 'hover:border-gray-300'" @click="toggleSelect(card)">
                                 <div v-if="isSelected(card)" class="absolute top-2 left-2 right-2 flex items-center justify-between">
                                     <div class="flex items-center gap-2">
                                         <span class="w-7 h-7 bg-green-500 rounded-full flex items-center justify-center text-white text-sm">✓</span>
@@ -63,7 +50,7 @@
                                         <h4 class="font-semibold mb-1">{{ card.title }}</h4>
                                         <p class="text-gray-600 mb-2 text-xs">{{ card.content }}</p>
                                         <div class="flex gap-2 flex-wrap" v-if="!isSelected(card)">
-                                            <Badge v-for="(badge, i) in card.badges" :key="i" :value="badge" severity="secondary" class="bg-gray-200 text-gray-700" />
+                                            <ProTag v-for="(badge, i) in card.badges" :key="i" :label="badge" variant="info" class="bg-gray-200 text-gray-700" />
                                         </div>
                                     </div>
 
@@ -71,8 +58,7 @@
                                         <i :class="['text-gray-700 text-xl pi', card.icon]"></i>
                                     </div>
                                 </div>
-                            </template>
-                        </Card>
+                        </ProCard>
                     </div>
 
                     <!-- Pagination Controls -->
@@ -85,11 +71,11 @@
                         </div>
 
                         <div class="flex items-center gap-1">
-                            <Button icon="pi pi-angle-double-left" text :disabled="(purchaseStore.pagination?.page ?? 1) <= 1" @click="setPage(1)" />
-                            <Button icon="pi pi-angle-left" text :disabled="(purchaseStore.pagination?.page ?? 1) <= 1" @click="setPage((purchaseStore.pagination?.page ?? 1) - 1)" />
+                            <ProButton variant="ghost" :disabled="(purchaseStore.pagination?.page ?? 1) <= 1" @click="setPage(1)"><i class="pi pi-angle-double-left shrink-0" /></ProButton>
+                            <ProButton variant="ghost" :disabled="(purchaseStore.pagination?.page ?? 1) <= 1" @click="setPage((purchaseStore.pagination?.page ?? 1) - 1)"><i class="pi pi-angle-left shrink-0" /></ProButton>
                             <span> Page {{ purchaseStore.pagination?.page ?? 1 }} / {{ purchaseStore.pagination?.totalPages ?? 1 }} </span>
-                            <Button icon="pi pi-angle-right" text :disabled="(purchaseStore.pagination?.page ?? 1) >= (purchaseStore.pagination?.totalPages ?? 1)" @click="setPage((purchaseStore.pagination?.page ?? 1) + 1)" />
-                            <Button icon="pi pi-angle-double-right" text :disabled="(purchaseStore.pagination?.page ?? 1) >= (purchaseStore.pagination?.totalPages ?? 1)" @click="setPage(purchaseStore.pagination?.totalPages ?? 1)" />
+                            <ProButton variant="ghost" :disabled="(purchaseStore.pagination?.page ?? 1) >= (purchaseStore.pagination?.totalPages ?? 1)" @click="setPage((purchaseStore.pagination?.page ?? 1) + 1)"><i class="pi pi-angle-right shrink-0" /></ProButton>
+                            <ProButton variant="ghost" :disabled="(purchaseStore.pagination?.page ?? 1) >= (purchaseStore.pagination?.totalPages ?? 1)" @click="setPage(purchaseStore.pagination?.totalPages ?? 1)"><i class="pi pi-angle-double-right shrink-0" /></ProButton>
                         </div>
 
                         <div>
@@ -100,11 +86,10 @@
 
                     <!-- Navigation Buttons -->
                     <div class="flex justify-end mt-4 gap-2">
-                        <Button type="submit" label="Next" severity="primary" />
+                        <ProButton type="submit">Next</ProButton>
                     </div>
                 </Form>
-            </template>
-        </Card>
+        </ProCard>
         <!-- Smart Scan Modal -->
         <SmartScanModal v-model="showScanModal" @confirm="onScanConfirm" @manual="onScanManual" />
     </div>

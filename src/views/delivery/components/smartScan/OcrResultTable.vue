@@ -2,15 +2,15 @@
 
 <template>
     <div class="w-full overflow-x-auto">
-        <table class="w-full text-sm border-collapse">
+        <table class="w-full text-sm border-collapse" style="min-width: 1200px;">
             <thead>
                 <tr class="bg-surface-50 border-b">
                     <th class="px-3 py-2 text-left font-semibold text-gray-600 w-10">#</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600">Item Code</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600">Description</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600 w-24">Qty</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600 w-24">UOM</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600">Remarks</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[150px]">Item Code</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[500px]">Description <span class="text-xs text-gray-400">  (Hover to see the full description)</span></th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600">Qty</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600">UOM</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[250px]">Remarks</th>
                     <th class="px-3 py-2 w-10"></th>
                 </tr>
             </thead>
@@ -21,34 +21,34 @@
                     <!-- Item Code -->
                     <td class="px-2 py-1">
                         <div class="relative">
-                            <InputText v-model="item.itemCode" size="small" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.itemCode) }" placeholder="Item code" />
-                            <i v-if="isLow(item.confidence?.itemCode)" class="pi pi-exclamation-triangle absolute right-2 top-2 text-amber-500 text-xs" v-tooltip="'Low confidence — please verify'" />
+                            <ProInput v-model="item.itemCode" :title="item.itemCode" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.itemCode) }" placeholder="Item code" />
+                            <i v-if="isLow(item.confidence?.itemCode)" class="pi pi-exclamation-triangle absolute right-2 top-2 text-amber-500 text-xs" title="Low confidence — please verify" />
                         </div>
                     </td>
 
                     <!-- Description -->
                     <td class="px-2 py-1">
-                        <InputText v-model="item.description" size="small" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.description) }" placeholder="Description" />
+                        <ProInput v-model="item.description" :title="item.description" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.description) }" placeholder="Description" />
                     </td>
 
                     <!-- Qty -->
                     <td class="px-2 py-1">
-                        <InputNumber v-model="item.qty" size="small" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.qty) }" :minFractionDigits="0" :maxFractionDigits="3" placeholder="0" />
+                        <ProInput v-model="item.qty" type="number" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.qty) }" placeholder="0" />
                     </td>
 
                     <!-- UOM -->
                     <td class="px-2 py-1">
-                        <InputText v-model="item.uom" size="small" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.uom) }" placeholder="UOM" />
+                        <ProInput v-model="item.uom" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.uom) }" placeholder="UOM" />
                     </td>
 
                     <!-- Remarks -->
                     <td class="px-2 py-1">
-                        <InputText v-model="item.remarks" size="small" class="w-full" placeholder="Remarks" />
+                        <ProInput v-model="item.remarks" :title="item.remarks" class="w-full" placeholder="Remarks" />
                     </td>
 
                     <!-- Remove row -->
                     <td class="px-2 py-1 text-center">
-                        <Button icon="pi pi-trash" severity="danger" text rounded size="small" @click="removeRow(idx)" v-tooltip="'Remove row'" />
+                        <ProButton variant="danger" rounded @click="removeRow(idx)" title="Remove row"><i class="pi pi-trash mt-1 shrink-0" /></ProButton>
                     </td>
                 </tr>
 
@@ -67,7 +67,7 @@
 
         <!-- Add row button -->
         <div class="mt-3">
-            <Button label="Add Row" icon="pi pi-plus" severity="secondary" size="small" outlined @click="addRow" />
+            <ProButton variant="secondary" @click="addRow"><i class="pi pi-plus mt-1 mr-2" /> Add Row</ProButton>
         </div>
     </div>
 </template>

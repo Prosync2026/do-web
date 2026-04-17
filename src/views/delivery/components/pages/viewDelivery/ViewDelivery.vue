@@ -2,83 +2,91 @@
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-6 card">
-            <div class="w-full mb-4">
-                <BreadcrumbList />
-            </div>
-            <h1 class="text-xl font-bold">Delivery Order</h1>
-            <p class="text-sm text-gray-500">{{ singleDelivery?.DocNo }} - {{ singleDelivery?.RefDoc }}</p>
+        <div class="p-1">
+            <ProCard class="shadow-sm mb-6">
+                <!-- <h1 class="text-h2 text-text-heading">Delivery Order</h1>
+                <p class="text-body-sm text-text-subtitle">{{ singleDelivery?.DocNo }} - {{ singleDelivery?.RefDoc }}</p> -->
 
-            <div v-if="loading" class="mt-4 text-center text-gray-500">Loading...</div>
+                <div v-if="loading" class="mt-4 text-center text-gray-500">Loading...</div>
 
-            <div v-else-if="singleDelivery" class="mt-4 p-4 border rounded">
-                <h2 class="font-semibold mb-2">Delivery Order Information</h2>
-                <div class="grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                        <p class="font-semibold">DO Number</p>
-                        <p>{{ singleDelivery.DocNo }}</p>
-                    </div>
-                    <div>
-                        <p class="font-semibold">PO Number</p>
-                        <p>{{ singleDelivery.RefDoc || '-' }}</p>
-                    </div>
-                    <div>
-                        <p class="font-semibold">Driver Plate</p>
-                        <p>{{ singleDelivery.PlateNo || '-' }}</p>
-                    </div>
-                    <div>
-                        <p class="font-semibold">Delivery Date</p>
-                        <p>{{ formatDate(singleDelivery.Date) || '-' }}</p>
-                    </div>
-                    <div>
-                        <p class="font-semibold">Status</p>
-                        <Tag :value="singleDelivery.Status" :severity="singleDelivery.Status === 'Pending' ? 'danger' : 'success'" />
-                    </div>
-                </div>
-
-                <!-- Attachments (Delivery Documents) -->
-                <div class="mt-4">
-                    <div v-if="parsedAttachments.length > 0" class="mb-4">
-                        <h4 class="text-sm font-semibold mb-2">Delivery Document</h4>
-                        <div class="flex flex-wrap gap-2">
-                            <div v-for="(file, index) in parsedAttachments" :key="`attachment-${index}`" class="flex items-center gap-2 px-3 py-2 rounded-lg border">
-                                <i class="pi pi-file text-blue-500"></i>
-                                <span class="text-sm">{{ file.filename }}</span>
-                                <span v-if="file.size" class="text-xs text-gray-500">({{ formatSize(file.size) }})</span>
-                                <Button icon="pi pi-eye" text rounded severity="info" @click="previewAttachment(file)" v-tooltip="'Preview Attachment'" />
-                            </div>
+                <div v-else-if="singleDelivery" class="mt-6">
+                    <h2 class="font-semibold text-text-heading mb-4">Delivery Order Information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 text-sm mb-6 pb-6 border-b border-gray-100">
+                        <div>
+                            <p class="text-text-subtitle text-xs uppercase tracking-wider mb-1">DO Number</p>
+                            <p class="font-medium text-text-heading">{{ singleDelivery.DocNo }}</p>
+                        </div>
+                        <div>
+                            <p class="text-text-subtitle text-xs uppercase tracking-wider mb-1">PO Number</p>
+                            <p class="font-medium text-text-heading">{{ singleDelivery.RefDoc || '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-text-subtitle text-xs uppercase tracking-wider mb-1">Driver Plate</p>
+                            <p class="font-medium text-text-heading">{{ singleDelivery.PlateNo || '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-text-subtitle text-xs uppercase tracking-wider mb-1">Delivery Date</p>
+                            <p class="font-medium text-text-heading">{{ formatDate(singleDelivery.Date) || '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-text-subtitle text-xs uppercase tracking-wider mb-1">Status</p>
+                            <ProTag :label="singleDelivery.Status" :variant="singleDelivery.Status === 'Pending' ? 'error' : 'success'" />
                         </div>
                     </div>
-                    <div v-else class="text-gray-500 italic text-sm">No delivery documents available.</div>
-                </div>
 
-                <!--  Attachment2 (Evidence Photos) -->
-                <div class="mt-4">
-                    <div v-if="parsedAttachment2.length > 0" class="mb-4">
-                        <h4 class="text-sm font-semibold mb-2">Evidence Photos</h4>
-                        <div class="flex flex-wrap gap-2">
-                            <div v-for="(file, index) in parsedAttachment2" :key="`attachment2-${index}`" class="flex items-center gap-2 px-3 py-2 rounded-lg border">
-                                <i class="pi pi-image text-green-500"></i>
-                                <span class="text-sm">{{ file.filename }}</span>
-                                <span v-if="file.size" class="text-xs text-gray-500">({{ formatSize(file.size) }})</span>
-                                <Button icon="pi pi-eye" text rounded severity="success" @click="previewAttachment(file)" v-tooltip="'Preview Photo'" />
+                    <!-- Attachments (Delivery Documents) -->
+                    <div class="mb-6">
+                        <h4 class="text-text-heading font-medium mb-3">Delivery Document</h4>
+                        <div v-if="parsedAttachments.length > 0" class="flex flex-wrap gap-3">
+                            <div v-for="(file, index) in parsedAttachments" :key="`attachment-${index}`" class="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
+                                <i class="pi pi-file text-brand-primary text-lg"></i>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium text-text-heading">{{ file.filename }}</span>
+                                    <span v-if="file.size" class="text-xs text-text-subtitle">{{ formatSize(file.size) }}</span>
+                                </div>
+                                <ProButton variant="secondary" size="sm" @click="previewAttachment(file)" title="Preview Attachment" class="ml-2">
+                                    <i class="pi pi-eye"></i>
+                                </ProButton>
                             </div>
                         </div>
+                        <div v-else class="text-text-subtitle italic text-sm">No delivery documents available.</div>
                     </div>
-                    <div v-else class="text-gray-500 italic text-sm">No evidence photos available.</div>
-                </div>
-            </div>
 
-            <!-- Table -->
-            <div style="margin-top: 60px">
-                <ReusableTable :value="items" :columns="itemsColumns" :onSearch="onSearchWrapper" emptyTitle="No Delivery Items Found">
-                    <template #no="{ data }">{{ data.no }}</template>
-                    <template #deliveryDate="{ data }">{{ formatDate(data.DeliveryDate) }}</template>
-                    <template #status="{ data }">
-                        <Tag :value="data.status" :severity="data.status === 'Completed' ? 'success' : 'warn'" />
+                    <!-- Evidence Photos -->
+                    <div class="mb-2">
+                        <h4 class="text-text-heading font-medium mb-3">Evidence Photos</h4>
+                        <div v-if="parsedAttachment2.length > 0" class="flex flex-wrap gap-3">
+                            <div v-for="(file, index) in parsedAttachment2" :key="`attachment2-${index}`" class="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
+                                <i class="pi pi-image text-green-600 text-lg"></i>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium text-text-heading">{{ file.filename }}</span>
+                                    <span v-if="file.size" class="text-xs text-text-subtitle">{{ formatSize(file.size) }}</span>
+                                </div>
+                                <ProButton variant="secondary" size="sm" @click="previewAttachment(file)" title="Preview Photo" class="ml-2">
+                                    <i class="pi pi-eye"></i>
+                                </ProButton>
+                            </div>
+                        </div>
+                        <div v-else class="text-text-subtitle italic text-sm">No evidence photos available.</div>
+                    </div>
+                </div>
+            </ProCard>
+
+            <ProCard class="shadow-sm mt-6">
+                <!-- Table -->
+                <ProTable 
+                    :data="items" 
+                    :columns="itemsColumns" 
+                    :onSearch="onSearchWrapper" 
+                    emptyTitle="No Delivery Items Found"
+                >
+                    <template #cell-no="{ row }">{{ row.no }}</template>
+                    <template #cell-DeliveryDate="{ row }">{{ formatDate(row.DeliveryDate) }}</template>
+                    <template #cell-status="{ row }">
+                        <ProTag :label="row.status" :variant="row.status === 'Completed' ? 'success' : 'warn'" />
                     </template>
-                </ReusableTable>
-            </div>
+                </ProTable>
+            </ProCard>
         </div>
     </Motion>
 </template>

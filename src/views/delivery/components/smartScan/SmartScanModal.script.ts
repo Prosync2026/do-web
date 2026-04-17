@@ -1,10 +1,8 @@
 import { extractDeliveryOrder } from '@/services/smartScan.service';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import { defineComponent, onUnmounted, ref, watch } from 'vue';
+import { ProModal, ProButton, ProInput } from '@prosync_solutions/ui';
 import type { OcrLineItem } from './OcrResultTable.script';
 import OcrResultTable from './OcrResultTable.vue';
 
@@ -25,7 +23,7 @@ const SCANNING_MESSAGES = ['Analysing layout…', 'Detecting text regions…', '
 
 export default defineComponent({
     name: 'SmartScanModal',
-    components: { Dialog, Button, Message, InputText, ProgressSpinner, OcrResultTable },
+    components: { Message, ProgressSpinner, OcrResultTable, ProModal, ProButton, ProInput },
     props: {
         modelValue: {
             type: Boolean,

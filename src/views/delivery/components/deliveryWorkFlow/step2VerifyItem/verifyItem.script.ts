@@ -1,10 +1,7 @@
 import type { VerifyPurchaseOrderItem } from '@/types/delivery.type';
 import type { PurchaseOrder, PurchaseOrderItem } from '@/types/purchase.type';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
-import Card from 'primevue/card';
 import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
@@ -13,13 +10,11 @@ import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, ref, watch } from 'vue';
+import { ProCard, ProButton, ProTag, ProInput } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'VerifyItem',
     components: {
-        Card,
-        InputText,
-        Button,
         Message,
         Toast,
         Form,
@@ -27,7 +22,10 @@ export default defineComponent({
         Textarea,
         FileUpload,
         ProgressBar,
-        Badge
+        ProCard,
+        ProButton,
+        ProTag,
+        ProInput
     },
     emits: ['update', 'next-step', 'prev-step'],
     props: {
