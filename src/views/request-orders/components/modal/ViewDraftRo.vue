@@ -3,7 +3,7 @@
 <template>
     <Toast />
 
-    <ProModal :modelValue="localVisible" @update:modelValue="(val: boolean) => { localVisible = val; if (!val) handleClose(); }" title="Draft Request Orders" size="full">
+    <ProModal :modelValue="localVisible" @update:modelValue="(val: boolean) => { localVisible = val; if (!val) handleClose(); }" title="Draft Request Orders" size="full" class="!z-[100]">
         <div class="mb-4">
             <p class="text-gray-600">Continue editing saved draft request orders or delete unused drafts.</p>
         </div>

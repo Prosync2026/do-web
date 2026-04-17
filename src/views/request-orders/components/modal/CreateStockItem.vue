@@ -1,7 +1,7 @@
 <script lang="ts" src="./CreateStockItem.script.ts"></script>
 
 <template>
-    <Dialog v-model:visible="localVisible" modal header="Add Items from Stock" style="width: 90vw; max-width: 1200px" @hide="closeModal">
+    <Dialog v-model:visible="localVisible" modal header="Add Items from Stock" style="width: 90vw; max-width: 1200px" class="!z-[110]" appendTo="body" @hide="closeModal">
         <!-- Search -->
         <div class="flex gap-3 mb-4">
             <InputText v-model="searchTerm" placeholder="Search item code or name" class="w-full" />

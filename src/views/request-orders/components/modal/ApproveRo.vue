@@ -39,6 +39,7 @@ function confirmApprove() {
         @update:modelValue="(val: boolean) => { localVisible = val; if (!val) cancel(); }"
         title="Confirm Approval"
         size="sm"
+        class="!z-[100]"
     >
         <div class="flex flex-col gap-4">
             <p class="text-body-sm text-text-body">

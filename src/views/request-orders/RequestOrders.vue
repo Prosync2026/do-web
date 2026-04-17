@@ -17,8 +17,9 @@ import { Button } from "@prosync/ui-kit";
                     <i class="pi pi-plus mr-2"></i> New Request Order
                 </ProButton>
             </div>
-            
-            <ViewDraftRo :visible="showDraftModal" @update:visible="showDraftModal = $event" @update:count="draftCount = $event" />
+            <teleport to="body">
+                <ViewDraftRo :visible="showDraftModal" @update:visible="showDraftModal = $event" @update:count="draftCount = $event" />
+            </teleport>
 
             <RoSummary :submittedCount="submittedCount" :approvedCount="approvedCount" :totalApprovedValue="totalApprovedValue" :totalValue="totalValue" />
 
@@ -97,27 +98,58 @@ import { Button } from "@prosync/ui-kit";
                                 </template>
 
                                 <template #actions="{ row }">
-                                    <div class="flex items-center gap-2 relative z-50">
-                                        <ProButton v-if="canViewRO" variant="secondary" size="sm" @click="handleActionClick('view', row)" title="View">
-                                            <i class="pi pi-eye text-lg text-gray-700"></i>
-                                        </ProButton>
-                                        
-                                        <ProButton v-if="canEditRO && ['Pending', 'Submitted', 'Processing'].includes(row.status)" variant="secondary" size="sm" @click="handleActionClick('edit', row)" title="Edit">
-                                            <i class="pi pi-pencil text-lg text-blue-600"></i>
-                                        </ProButton>
-
-                                        <template v-if="canApproveRow(row)">
-                                            <ProButton variant="secondary" size="sm" @click="handleActionClick('approve', row)" title="Approve">
-                                                <i class="pi pi-check text-lg text-green-600 font-bold"></i>
-                                            </ProButton>
-                                            <ProButton variant="secondary" size="sm" @click="handleActionClick('reject', row)" title="Reject">
-                                                <i class="pi pi-times text-lg text-red-600 font-bold"></i>
-                                            </ProButton>
+                                    <div class="flex items-center gap-1 relative z-50">
+                                        <!-- If only 1 action is available, show it directly -->
+                                        <template v-if="getAvailableActions(row).length === 1">
+                                            <ProIconButton :tooltip="getAvailableActions(row)[0].label" :variant="getAvailableActions(row)[0].variant" @click.stop="getAvailableActions(row)[0].onClick">
+                                                <component :is="getAvailableActions(row)[0].icon" :size="18" :class="getAvailableActions(row)[0].iconClass" />
+                                            </ProIconButton>
                                         </template>
 
-                                        <ProButton v-if="canDeleteRO" variant="secondary" size="sm" @click="handleActionClick('delete', row)" title="Delete">
-                                            <i class="pi pi-trash text-lg text-red-600"></i>
-                                        </ProButton>
+                                        <!-- If more than 1 action is available, show the overflow menu -->
+                                        <template v-else-if="getAvailableActions(row).length > 1">
+                                            <ProMenu align="right" width="w-48">
+                                                <template #trigger="{ isOpen }">
+                                                    <button
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-button transition-all duration-150 cursor-pointer"
+                                                        :class="isOpen ? 'bg-surface-gray-bg-strong text-text-heading' : 'text-text-body hover:bg-surface-gray-bg hover:text-text-heading'"
+                                                        aria-label="More actions"
+                                                    >
+                                                        <PhDotsThreeVertical :size="16" weight="bold" />
+                                                    </button>
+                                                </template>
+                                                <template #items="{ close }">
+                                                    <div class="py-1">
+                                                        <button
+                                                            v-for="action in getAvailableActions(row).filter((a: any) => a.tier !== 'destructive')"
+                                                            :key="action.label"
+                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                            @click.stop="
+                                                                close();
+                                                                action.onClick?.();
+                                                            "
+                                                        >
+                                                            <component :is="action.icon" :size="15" class="shrink-0 text-text-subtitle" :class="action.iconClass" />
+                                                            {{ action.label }}
+                                                        </button>
+                                                        <div v-if="getAvailableActions(row).some((a: any) => a.tier === 'destructive') && getAvailableActions(row).some((a: any) => a.tier !== 'destructive')" class="my-1 border-t border-border-border" />
+                                                        <button
+                                                            v-for="action in getAvailableActions(row).filter((a: any) => a.tier === 'destructive')"
+                                                            :key="action.label"
+                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm hover:bg-surface-error/20 transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                            :class="action.iconClass || 'text-text-error'"
+                                                            @click.stop="
+                                                                close();
+                                                                action.onClick?.();
+                                                            "
+                                                        >
+                                                            <component :is="action.icon" :size="15" class="shrink-0" />
+                                                            {{ action.label }}
+                                                        </button>
+                                                    </div>
+                                                </template>
+                                            </ProMenu>
+                                        </template>
                                     </div>
                                 </template>
                             </ProTable>
@@ -125,10 +157,12 @@ import { Button } from "@prosync/ui-kit";
                 </ProTabs>
             </ProCard>
 
-            <ViewRo v-model:visible="showDetailsModal" :order="selectedOrder" :isPurchasingRole="isPurchasingRole" @approve="handleApproveFromModal" @reject="handleRejectFromModal" />
-            <EditRo :visible="showEditModal" :order="selectedOrder" @update:visible="showEditModal = $event" @save="handleSaveOrder" />
-            <RejectRo :visible="showRejectModal" :order-number="currentRejectOrder?.roNumber" @update:visible="showRejectModal = $event" @reject="onRejectConfirmed" />
-            <ApproveRo :visible="showApproveModal" :order-number="currentApproveOrder?.roNumber" @update:visible="showApproveModal = $event" @approve="onApproveConfirmed" />
+            <teleport to="body">
+                <ViewRo v-model:visible="showDetailsModal" :order="selectedOrder" :isPurchasingRole="isPurchasingRole" @approve="handleApproveFromModal" @reject="handleRejectFromModal" />
+                <EditRo :visible="showEditModal" :order="selectedOrder" @update:visible="showEditModal = $event" @save="handleSaveOrder" />
+                <RejectRo :visible="showRejectModal" :order-number="currentRejectOrder?.roNumber" @update:visible="showRejectModal = $event" @reject="onRejectConfirmed" />
+                <ApproveRo :visible="showApproveModal" :order-number="currentApproveOrder?.roNumber" @update:visible="showApproveModal = $event" @approve="onApproveConfirmed" />
+            </teleport>
         </div>
     </Motion>
 </template>

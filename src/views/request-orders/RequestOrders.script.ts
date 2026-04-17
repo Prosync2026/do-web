@@ -13,7 +13,8 @@ import { useRequestOrderPermission } from '@/permissions';
 import { useProjectStore } from '@/stores/project/project.store';
 import { USER_ROLE_TO_APPROVAL_ROLE } from '@/utils/approvalRole.util';
 import { formatCurrency } from '@/utils/format.utils';
-import { ProButton, ProCard, ProInput, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag } from '@prosync_solutions/ui';
+import { PhCheck, PhDotsThreeVertical, PhEye, PhPencilSimple, PhTrash, PhX } from '@phosphor-icons/vue';
+import { ProMenu, ProIconButton, ProButton, ProCard, ProInput, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import type { Order } from '../../types/request-order.type';
 import ApproveRo from './components/modal/ApproveRo.vue';
@@ -35,13 +36,16 @@ export default defineComponent({
         ProInput,
         ProTag,
         ProSelect,
+        ProMenu,
+        ProIconButton,
         RoSummary,
         ViewRo,
         EditRo,
         Badge,
         ViewDraftRo,
         RejectRo,
-        ApproveRo
+        ApproveRo,
+        PhDotsThreeVertical
     },
     setup() {
         const confirm = useConfirm();
@@ -511,6 +515,62 @@ export default defineComponent({
             }
         }
 
+        const getAvailableActions = (row: Order) => {
+            const actions: any[] = [];
+            
+            if (canViewRO.value) {
+                actions.push({
+                    label: 'View',
+                    icon: PhEye,
+                    tier: 'default',
+                    variant: 'secondary',
+                    onClick: () => handleActionClick('view', row)
+                });
+            }
+            
+            if (canEditRO.value && ['Pending', 'Submitted', 'Processing'].includes(row.status as string)) {
+                actions.push({
+                    label: 'Edit',
+                    icon: PhPencilSimple,
+                    tier: 'default',
+                    variant: 'secondary',
+                    onClick: () => handleActionClick('edit', row)
+                });
+            }
+
+            if (canApproveRow(row)) {
+                actions.push({
+                    label: 'Approve',
+                    icon: PhCheck,
+                    tier: 'default',
+                    variant: 'secondary',
+                    iconClass: 'text-green-600 dark:text-green-400',
+                    onClick: () => handleActionClick('approve', row)
+                });
+                actions.push({
+                    label: 'Reject',
+                    icon: PhX,
+                    tier: 'destructive',
+                    variant: 'danger',
+                    iconClass: 'text-red-500',
+                    onClick: () => handleActionClick('reject', row)
+                });
+            }
+
+            if (canDeleteRO.value) {
+                actions.push({
+                    label: 'Delete',
+                    icon: PhTrash,
+                    tier: 'destructive',
+                    variant: 'danger',
+                    iconClass: 'text-red-500',
+                    onClick: () => handleActionClick('delete', row)
+                });
+            }
+            
+            return actions;
+        };
+
         function handlePageChange(page: number): void {
             store.pagination.page = page;
             store.fetchOrders();
@@ -600,7 +660,8 @@ export default defineComponent({
             formatCurrency,
             handleUpdatePagination,
             canApproveRow,
-            projectStore
+            projectStore,
+            getAvailableActions
         };
     }
 });
