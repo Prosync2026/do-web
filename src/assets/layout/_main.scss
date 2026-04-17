@@ -69,8 +69,8 @@
 }
 
 .custom-layout-gradient {
-    --layout-gradient: linear-gradient(to right, #3b82f6, #6bdbfd);
-    @apply bg-gradient-to-r from-cyan-300 to-blue-600 shadow-lg backdrop-blur-md;
+    background-image: linear-gradient(135deg, #97f3ff 0%, #69a3ff 50%, #1d4ed8 100%);
+    @apply shadow-lg backdrop-blur-md;
 }
 
 .custom-topbar-gradient {
