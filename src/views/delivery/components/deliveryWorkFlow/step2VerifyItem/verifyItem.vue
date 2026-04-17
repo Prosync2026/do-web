@@ -20,41 +20,36 @@
             </Message>
 
             <ProCard class="mt-6 shadow-sm">
-                <template #title>
-                    <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-3 mb-6">
                         <div class="flex items-center gap-2">
                             <i class="pi pi-box"></i>
-                            <span>Delivery Summary for {{ poNumber }}</span>
+                            <span class="font-bold">Delivery Summary for {{ poNumber }}</span>
                         </div>
 
-                        <div class="grid grid-cols-3 text-center text-sm font-medium">
+                        <div class="grid grid-cols-3 text-center text-sm font-medium border border-gray-100 rounded-lg p-3 bg-gray-50">
                             <div>
-                                <div class="text-gray-500">TOTAL ITEMS</div>
+                                <div class="text-gray-500 text-xs">TOTAL ITEMS</div>
                                 <div class="text-lg font-bold text-gray-900">{{ itemList.length }}</div>
                             </div>
 
                             <div>
-                                <div class="text-gray-500">ITEM DELIVERED</div>
+                                <div class="text-gray-500 text-xs">ITEM DELIVERED</div>
                                 <div class="text-lg font-bold text-green-600">
                                     {{ itemList.filter((item) => item.status === 'Delivered').length }}
                                 </div>
                             </div>
                             <div>
-                                <div class="text-gray-500">PENDING</div>
+                                <div class="text-gray-500 text-xs">PENDING</div>
                                 <div class="text-lg font-bold text-red-500">
                                     {{ itemList.filter((item) => item.status === 'Pending').length }}
                                 </div>
                             </div>
                         </div>
                     </div>
-                </template>
-
-                <template #content>
                     <Form @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full sm:w-full">
                         <div class="grid grid-cols-1 gap-4 p-3">
                             <ProCard v-for="(item, index) in itemList" :key="index" class="border rounded-lg shadow-sm">
-                                <template #title>
-                                    <div class="flex items-center gap-2 cursor-pointer" @click="toggle(index)">
+                                    <div class="flex items-center gap-2 cursor-pointer mb-2" @click="toggle(index)">
                                         <i :class="['pi', expanded.includes(index) ? 'pi-chevron-down' : 'pi-chevron-right', 'text-gray-600']"></i>
 
                                         <div class="flex items-center justify-between w-full">
@@ -63,12 +58,9 @@
                                                 <span class="text-sm text-gray-500">{{ item.order }}</span>
                                             </div>
 
-                                            <ProTag :variant="item.status === 'Delivered' ? 'success' : 'info'" class="text-gray-800" :label="item.status" />
+                                            <ProTag :variant="item.status === 'Delivered' ? 'success' : 'info'" class="text-gray-800 shrink-0" :label="item.status" />
                                         </div>
                                     </div>
-                                </template>
-
-                                <template #content>
                                     <div v-show="expanded.includes(index)" class="text-sm text-gray-700 mt-3">
                                         <div class="grid grid-cols-3 gap-4 mb-3 ms-5">
                                             <div>
@@ -93,7 +85,6 @@
                                             <span class="text-gray-500 text-sm">{{ item.uom }} &nbsp;/&nbsp; {{ item.total }} {{ item.uom }} </span>
                                         </div>
                                     </div>
-                                </template>
                             </ProCard>
                         </div>
 
@@ -102,7 +93,6 @@
                             <ProButton type="submit">Next</ProButton>
                         </div>
                     </Form>
-                </template>
             </ProCard>
         </div>
     </div>

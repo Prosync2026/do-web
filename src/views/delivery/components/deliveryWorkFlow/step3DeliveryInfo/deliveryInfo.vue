@@ -8,9 +8,11 @@
         </Message>
 
         <ProCard class="mt-6 shadow-sm">
-            <template #title> <i class="pi pi-truck"></i> Delivery Information </template>
-            <template #content>
-                <Form :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full">
+            <div class="flex items-center gap-2 mb-6 text-xl font-bold">
+                <i class="pi pi-truck"></i>
+                <span>Delivery Information</span>
+            </div>
+            <Form :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full">
                     <div class="grid grid-cols-2 gap-4 p-3">
                         <div class="flex flex-col">
                             <label for="driverPlate">Driver Plate Number</label>
@@ -113,7 +115,6 @@
                         <ProButton type="submit" class="ms-2">Next</ProButton>
                     </div>
                 </Form>
-            </template>
         </ProCard>
     </div>
 </template>
