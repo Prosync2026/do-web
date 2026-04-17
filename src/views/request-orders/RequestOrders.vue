@@ -38,9 +38,32 @@ import { Button } from "@prosync/ui-kit";
                                 </div>
                             </div>
 
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-600">Rows per page:</span>
+                                    <ProSelect :modelValue="store.pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="[{label:'10', value:10}, {label:'25', value:25}, {label:'50', value:50}, {label:'100', value:100}]" class="w-24 text-sm" />
+                                </div>
+                                <div class="flex gap-2 items-center flex-wrap justify-end">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-36">
+                                            <ProDatePicker v-model="startDate" placeholder="Start Date" appendTo="body" @update:modelValue="applyFilters" />
+                                        </div>
+                                        <span class="text-text-subtitle">-</span>
+                                        <div class="w-36">
+                                            <ProDatePicker v-model="endDate" placeholder="End Date" appendTo="body" @update:modelValue="applyFilters" />
+                                        </div>
+                                    </div>
+                                    <div class="w-48" v-if="isPurchasingRole">
+                                        <ProSelect v-model="store.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="applyFilters" />
+                                    </div>
+                                    <div class="w-48">
+                                        <ProSelect v-model="selectedBudgetType" :options="[{ label: 'All Budgets', value: '' }, { label: 'Budgeted', value: 'Budgeted' }, { label: 'NonBudgeted', value: 'NonBudgeted' }]" placeholder="All Budgets" @update:modelValue="applyFilters" />
+                                    </div>
+                                    <ProInput :modelValue="store.filters.search" placeholder="Search orders..." class="w-64" @update:modelValue="store.handleSearch" />
+                                </div>
+                            </div>
+
                             <ProTable
-                                searchable
-                                searchPlaceholder="Search orders..."
                                 @search="store.handleSearch"
                                 :data="filteredOrders"
                                 :columns="tableColumns"
@@ -49,25 +72,6 @@ import { Button } from "@prosync/ui-kit";
                                 :pagination="store.pagination"
                                 @update:pagination="handleUpdatePagination"
                             >
-                                <template #toolbar>
-                                    <div class="flex flex-wrap items-center gap-3">
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-36">
-                                                <ProDatePicker v-model="startDate" placeholder="Start Date" appendTo="body" @update:modelValue="applyFilters" />
-                                            </div>
-                                            <span class="text-text-subtitle">-</span>
-                                            <div class="w-36">
-                                                <ProDatePicker v-model="endDate" placeholder="End Date" appendTo="body" @update:modelValue="applyFilters" />
-                                            </div>
-                                        </div>
-                                        <div class="w-48" v-if="isPurchasingRole">
-                                            <ProSelect v-model="store.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="applyFilters" />
-                                        </div>
-                                        <div class="w-48">
-                                            <ProSelect v-model="selectedBudgetType" :options="[{ label: 'All Budgets', value: '' }, { label: 'Budgeted', value: 'Budgeted' }, { label: 'NonBudgeted', value: 'NonBudgeted' }]" placeholder="All Budgets" @update:modelValue="applyFilters" />
-                                        </div>
-                                    </div>
-                                </template>
                                 <template #cell-status="{ row }">
                                     <ProTag :label="row.status" :variant="row.status === 'Approved' ? 'success' : row.status === 'Rejected' ? 'error' : row.status === 'Processing' ? 'warn' : 'info'" />
                                 </template>

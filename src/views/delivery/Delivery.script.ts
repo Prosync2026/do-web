@@ -5,11 +5,11 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker } from '@prosync_solutions/ui';
+import { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'Deliveries',
-    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker },
+    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput },
     setup() {
         const deliveryStore = useDeliveryStore();
         const projectStore = useProjectStore();
