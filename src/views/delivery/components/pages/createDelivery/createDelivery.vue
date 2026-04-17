@@ -2,9 +2,9 @@
 
 <template>
     <div class="p-1">
-        <ProCard class="flex flex-col items-center shadow-sm w-full relative z-0">
+        <ProCard class="w-full mb-4 flex flex-col shadow-sm w-full relative z-0">
             <!-- Custom HTML Stepper instead of PrimeVue Stepper -->
-            <div class="w-full max-w-4xl mx-auto mb-8 relative px-4">
+            <div class="w-full max-w-5xl mx-auto mb-8 relative px-4">
                 <!-- Connecting line -->
                 <div class="absolute top-5 left-[10%] right-[10%] h-0.5 bg-gray-200 -z-10"></div>
                 <div class="absolute top-5 left-[10%] h-0.5 bg-brand-primary -z-10 transition-all duration-300" :style="{ width: ((activeStep - 1) / 3) * 80 + '%' }"></div>
@@ -46,7 +46,7 @@
             </div>
 
             <!-- Step Panels -->
-            <div class="w-full max-w-6xl mt-4">
+            <div class="w-full mt-4">
                 <div v-show="activeStep === 1">
                     <SelectPO @update="handleStep1Update" @smartScan="handleSmartScan" @smartScanManual="handleSmartScanManual" />
                 </div>

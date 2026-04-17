@@ -2,15 +2,15 @@
 
 <template>
     <div class="w-full overflow-x-auto">
-        <table class="w-full text-sm border-collapse">
+        <table class="w-full text-sm border-collapse" style="min-width: 1200px;">
             <thead>
                 <tr class="bg-surface-50 border-b">
                     <th class="px-3 py-2 text-left font-semibold text-gray-600 w-10">#</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600">Item Code</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600">Description</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600 w-24">Qty</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600 w-24">UOM</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600">Remarks</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[150px]">Item Code</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[500px]">Description <span class="text-xs text-gray-400">  (Hover to see the full description)</span></th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600">Qty</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600">UOM</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[250px]">Remarks</th>
                     <th class="px-3 py-2 w-10"></th>
                 </tr>
             </thead>
@@ -21,14 +21,14 @@
                     <!-- Item Code -->
                     <td class="px-2 py-1">
                         <div class="relative">
-                            <ProInput v-model="item.itemCode" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.itemCode) }" placeholder="Item code" />
+                            <ProInput v-model="item.itemCode" :title="item.itemCode" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.itemCode) }" placeholder="Item code" />
                             <i v-if="isLow(item.confidence?.itemCode)" class="pi pi-exclamation-triangle absolute right-2 top-2 text-amber-500 text-xs" title="Low confidence — please verify" />
                         </div>
                     </td>
 
                     <!-- Description -->
                     <td class="px-2 py-1">
-                        <ProInput v-model="item.description" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.description) }" placeholder="Description" />
+                        <ProInput v-model="item.description" :title="item.description" class="w-full" :class="{ 'border-amber-400 bg-amber-50': isLow(item.confidence?.description) }" placeholder="Description" />
                     </td>
 
                     <!-- Qty -->
@@ -43,7 +43,7 @@
 
                     <!-- Remarks -->
                     <td class="px-2 py-1">
-                        <ProInput v-model="item.remarks" class="w-full" placeholder="Remarks" />
+                        <ProInput v-model="item.remarks" :title="item.remarks" class="w-full" placeholder="Remarks" />
                     </td>
 
                     <!-- Remove row -->

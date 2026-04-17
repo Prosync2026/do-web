@@ -1,5 +1,5 @@
-import { computed, defineComponent, PropType } from 'vue';
 import { ProButton, ProInput } from '@prosync_solutions/ui';
+import { computed, defineComponent, PropType } from 'vue';
 
 export interface OcrLineItem {
     itemCode: string;

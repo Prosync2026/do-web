@@ -1,7 +1,8 @@
 <script lang="ts" src="./SmartScanModal.script.ts"></script>
 
 <template>
-    <ProModal v-model="visible" @update:modelValue="(val: boolean) => { if(!val && !isScanning) onClose() }" :size="phase === 'result' ? 'full' : 'large'">
+    <Teleport to="body">
+        <ProModal v-model="visible" @update:modelValue="(val: boolean) => { if(!val && !isScanning) onClose() }" :size="phase === 'result' ? 'full' : 'large'" class="!z-[999]">
         <template #header>
             <div class="flex items-center gap-2">
                 <i class="pi pi-sparkles text-brand-primary text-xl" />
@@ -157,5 +158,6 @@
                 <ProButton variant="secondary" @click="onManualFallback"><i class="pi pi-pencil mt-1 mr-2" /> Enter Manually</ProButton>
             </div>
         </div>
-    </ProModal>
+        </ProModal>
+    </Teleport>
 </template>
