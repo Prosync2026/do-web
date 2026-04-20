@@ -151,22 +151,7 @@
                     </div>
                 </div>
 
-                <FileUpload ref="fileupload" name="attachments" :multiple="true" accept="image/*" :maxFileSize="1000000" :auto="false" @select="onSelectedFiles" :showUploadButton="false" :showCancelButton="false">
-                    <template #content>
-                        <div v-if="attachments && attachments.length > 0" class="flex flex-wrap gap-4 mt-4">
-                            <div v-for="(file, index) of attachments" :key="`${file.name}-${index}`" class="relative w-24 h-24">
-                                <img :src="createObjectURL(file)" :alt="file.name" class="w-full h-full object-cover rounded-lg" />
-                                <ProButton variant="danger" size="sm" class="absolute -top-2 -right-2 w-8 h-8" @click="attachments.splice(index, 1)">×</ProButton>
-                            </div>
-                        </div>
-                    </template>
-                    <template #empty>
-                        <div class="flex items-center justify-center flex-col p-8">
-                            <i class="pi pi-cloud-upload text-4xl text-gray-400 mb-2" />
-                            <p class="text-sm text-gray-500">Drag and drop image files here or click to select</p>
-                        </div>
-                    </template>
-                </FileUpload>
+                <ProUploadFile v-model="uploadFilesList" multiple accept="image/*" :maxSize="1" />
             </div>
 
             <!-- Buttons -->
@@ -181,8 +166,6 @@
             <MeterialModal v-model:visible="showBulkItemModal" @bcr-items-selected="handleBulkItems" :unRequiredDelivery="true" />
             <SingleBudgetModal v-model:visible="showSingleItemModal" @items-value="handleAddItems" />
 
-            <!-- Toast -->
-            <ProToast v-model="toastState.visible" :type="toastState.type" :message="toastState.message" :autoDismiss="true" :duration="3000" />
         </ProCard>
     </Motion>
 </template>

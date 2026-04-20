@@ -5,13 +5,14 @@ import { getCurrentProjectName } from '@/utils/contextHelper';
 import SingleBudgetModal from '@/views/budget/components/dialog/CreateSingleBudgetItem.vue';
 import MeterialModal from '@/views/request-orders/components/modal/CreateRo.vue';
 import { Motion } from '@motionone/vue';
-import { ProBanner, ProButton, ProCard, ProEmpty, ProInput, ProSelect, ProToast } from '@prosync_solutions/ui';
+import { ProBanner, ProButton, ProCard, ProEmpty, ProInput, ProSelect, ProToast, ProUploadFile, type UploadFile } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 
 export default defineComponent({
     name: 'CreateBCR',
-    components: { Motion, MeterialModal, SingleBudgetModal, ProButton, ProInput, ProSelect, ProCard, ProBanner, ProEmpty, ProToast },
+    components: { Motion, MeterialModal, SingleBudgetModal, ProButton, ProInput, ProSelect, ProCard, ProBanner, ProEmpty, ProToast, ProUploadFile },
     setup() {
         const router = useRouter();
         const budgetCRStore = useBudgetChangeRequestStore();
@@ -27,70 +28,23 @@ export default defineComponent({
         const projectName = getCurrentProjectName();
         const showValidation = ref(false);
 
-        const toastState = ref({ visible: false, message: '', type: 'information' as 'information' | 'success' | 'warn' | 'error' });
-        const showToastMsg = (type: 'information' | 'success' | 'warn' | 'error', message: string) => {
-            toastState.value = { visible: true, message, type };
+        const toast = useToast();
+        const showToastMsg = (type: 'info' | 'success' | 'warn' | 'error', message: string) => {
+            toast.add({
+                severity: type,
+                summary: 'Validation Error',
+                detail: message,
+                life: 4000
+            });
         };
 
         // File upload states
-        const totalSize = ref(0);
-        const totalSizePercent = ref(0);
-        const files = ref<File[]>([]);
         const overallRemark = ref('');
-        const MAX_FILE_SIZE = 1_000_000;
-        const attachments = ref<File[]>([]); // for payload
-        const newAttachments = ref<File[]>([]); // for UI display
+        const uploadFilesList = ref<UploadFile[]>([]);
         const existingAttachments = ref<any[]>([]);
-        const isAttachmentValid = ref(true);
-        const fileupload = ref<any>(null);
-
-        const formatBytes = (bytes: number) => {
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            if (bytes === 0) return '0 B';
-            const i = Math.floor(Math.log(bytes) / Math.log(1024));
-            return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
-        };
-
-        const createObjectURL = (file: File) => URL.createObjectURL(file);
-
-        const onSelectedFiles = (event: { files: File[] }) => {
-            // Store files for payload
-            attachments.value = Array.from(event.files);
-
-            let totalSizeTemp = 0;
-            let valid = true;
-
-            attachments.value.forEach((file: File) => {
-                const size = file.size || 0;
-                totalSizeTemp += size;
-                if (size > MAX_FILE_SIZE) valid = false;
-            });
-
-            totalSize.value = totalSizeTemp;
-            totalSizePercent.value = (totalSize.value / MAX_FILE_SIZE) * 100;
-
-            isAttachmentValid.value = valid && totalSize.value <= MAX_FILE_SIZE;
-
-            if (!isAttachmentValid.value) {
-                showToastMsg('error', `Each file must not exceed ${formatBytes(MAX_FILE_SIZE)}.`);
-            }
-        };
 
         const removeAttachment = (index: number) => {
-            newAttachments.value.splice(index, 1);
-            attachments.value.splice(index, 1);
-
-            // Recalculate total size
-            totalSize.value = newAttachments.value.reduce((sum, file) => sum + (file.size || 0), 0);
-            totalSizePercent.value = (totalSize.value / MAX_FILE_SIZE) * 100;
-        };
-
-        const formatSize = (bytes: number) => {
-            if (!bytes) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            existingAttachments.value.splice(index, 1);
         };
 
         const previewAttachment = (file: AttachmentItem) => {
@@ -330,7 +284,8 @@ export default defineComponent({
                     ExceededQty: calcExceedQty(i)
                 }))
             };
-            const attachmentsToSend = attachments.value && attachments.value.length > 0 ? attachments.value : undefined;
+            const filesToSend = uploadFilesList.value.filter(uf => uf.status !== 'done').map(uf => uf.file);
+            const attachmentsToSend = filesToSend.length > 0 ? filesToSend : undefined;
             const result = await budgetCRStore.createBudgetChangeRequest(payload, attachmentsToSend);
 
             if (result) {
@@ -360,7 +315,6 @@ export default defineComponent({
             calcExceedPercent,
             calcEstimatedExceed,
             totalVarianceAmount,
-            isAttachmentValid,
             handleExport,
             submitRequest,
             goBack,
@@ -368,18 +322,10 @@ export default defineComponent({
             showValidation,
             budgetItems,
             existingAttachments,
-            newAttachments,
             removeAttachment,
             previewAttachment,
-            formatSize,
-            files,
             overallRemark,
-            totalSize,
-            totalSizePercent,
-            fileupload,
-            onSelectedFiles,
-            createObjectURL,
-            toastState
+            uploadFilesList
         };
     }
 });
