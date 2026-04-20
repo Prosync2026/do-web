@@ -100,7 +100,7 @@ import { Button } from "@prosync/ui-kit";
                                 </template>
 
                                 <template #actions="{ row }">
-                                    <div class="flex items-center gap-1 relative z-50">
+                                    <div class="flex items-center gap-1">
                                         <!-- If only 1 action is available, show it directly -->
                                         <template v-if="getAvailableActions(row).length === 1">
                                             <ProIconButton :tooltip="getAvailableActions(row)[0].label" :variant="getAvailableActions(row)[0].variant" @click.stop="getAvailableActions(row)[0].onClick">
