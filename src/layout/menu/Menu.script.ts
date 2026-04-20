@@ -1,10 +1,9 @@
 import { PermissionCodes } from '@/permissions';
-import { requestOrderService } from '@/services/requestOrder.service';
 import { usePermissionStore } from '@/stores/permission/permission.store';
+import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import type { MenuItemType } from '@/types/sidebar.type';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import MenuItem from './MenuItem.vue';
-import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 
 export default defineComponent({
     components: { MenuItem },
