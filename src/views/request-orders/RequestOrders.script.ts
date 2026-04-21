@@ -13,7 +13,7 @@ import { useRequestOrderPermission } from '@/permissions';
 import { useProjectStore } from '@/stores/project/project.store';
 import { USER_ROLE_TO_APPROVAL_ROLE } from '@/utils/approvalRole.util';
 import { formatCurrency } from '@/utils/format.utils';
-import { PhCheck, PhDotsThreeVertical, PhEye, PhPencilSimple, PhTrash, PhX } from '@phosphor-icons/vue';
+import { PhCheck, PhDotsThreeVertical, PhEye, PhPencilSimple, PhTrash, PhX, PhArrowsLeftRight } from '@phosphor-icons/vue';
 import { ProButton, ProCard, ProIconButton, ProInput, ProMenu, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag, ProDatePicker } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import type { Order } from '../../types/request-order.type';
@@ -46,6 +46,7 @@ export default defineComponent({
         RejectRo,
         ApproveRo,
         PhDotsThreeVertical,
+        PhArrowsLeftRight,
         ProDatePicker
     },
     setup() {

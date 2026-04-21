@@ -15,7 +15,14 @@
 
             <!-- Tabs and Table -->
             <ProCard class="shadow-sm mt-6">
-                <ProTabs v-model="activeTab" :tabs="tabItems" @update:modelValue="handleTabChange">
+                
+                <!-- Mobile Tab Scroll Indicator -->
+                <div class="flex items-center text-xs text-gray-400 mb-2 lg:hidden w-full justify-end">
+                    <span class="italic mr-1">Swipe tabs</span>
+                    <PhArrowsLeftRight :size="14" class="animate-pulse" />
+                </div>
+
+                <ProTabs v-model="activeTab" :tabs="tabItems" @update:modelValue="handleTabChange" class="pro-tabs-scrollable">
                     <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
 
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">

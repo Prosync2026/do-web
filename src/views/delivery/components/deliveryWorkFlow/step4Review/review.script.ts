@@ -6,6 +6,7 @@ import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { ProCard, ProButton, ProTag, ProTable } from '@prosync_solutions/ui';
+import { PhArrowsLeftRight } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'Review',
@@ -14,7 +15,8 @@ export default defineComponent({
         ProCard,
         ProButton,
         ProTag,
-        ProTable
+        ProTable,
+        PhArrowsLeftRight
     },
     emits: ['update', 'next-step', 'prev-step'],
     props: {

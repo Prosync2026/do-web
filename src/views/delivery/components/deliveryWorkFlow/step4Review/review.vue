@@ -59,11 +59,20 @@
                 </ProCard>
             </div>
 
-            <div class="grid mt-4">
-                <div class="col-12">
+            <div class="grid mt-4 w-full" style="min-width: 0;">
+                <div class="col-12" style="min-width: 0;">
                     <ProCard class="shadow-sm">
-                        <h3 class="text-lg font-semibold mb-2">Items Summary</h3>
-                        <ProTable v-if="hasDeliveredItems" :data="deliveredItems" :columns="deliveryListColumn" emptyTitle="No Delivered Items" :loading="false" />
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 lg:mb-4 gap-2">
+                            <h3 class="text-lg font-semibold">Items Summary</h3>
+                            <!-- Mobile Tab Scroll Indicator -->
+                            <div class="flex items-center text-xs text-gray-400 lg:hidden justify-end">
+                                <span class="italic mr-1">Swipe table</span>
+                                <PhArrowsLeftRight :size="14" class="animate-pulse" />
+                            </div>
+                        </div>
+                        <div class="w-full overflow-x-auto">
+                            <ProTable v-if="hasDeliveredItems" :data="deliveredItems" :columns="deliveryListColumn" emptyTitle="No Delivered Items" :loading="false" />
+                        </div>
                     </ProCard>
                 </div>
             </div>

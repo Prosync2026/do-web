@@ -6,7 +6,7 @@ import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store'
 import { Motion } from '@motionone/vue';
 import { PhBook, PhChartBar, PhHouse, PhShoppingCart, PhTag, PhTicket, PhTruck, PhWrench } from '@phosphor-icons/vue';
 import { ProSidebar } from '@prosync_solutions/ui';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -23,7 +23,15 @@ const canViewBudget = computed(() => permissionStore.hasPermission(PermissionCod
 const canViewPO = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_PURCHASE_ORDER));
 const canViewDelivery = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_DELIVERY_ORDER));
 
+const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+
+const checkMobile = () => {
+    isMobile.value = window.innerWidth < 1024;
+};
+
 onMounted(() => {
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
     const user = localStorage.getItem('user');
     if (user) {
         try {
@@ -35,6 +43,10 @@ onMounted(() => {
             role.value = null;
         }
     }
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', checkMobile);
 });
 
 // Build the NavItems matching ProSidebar schema
@@ -79,7 +91,7 @@ const navItems = computed(() =>
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }" tag="div" class="relative z-[60]">
         <div class="h-screen bg-white">
-            <ProSidebar :key="route.path" :nav-items="navItems" :default-expanded="true" :persist-state="false">
+            <ProSidebar :key="`${route.path}-${isMobile}`" :nav-items="navItems" :default-expanded="!isMobile" :persist-state="false">
                 <template #logo="{ isExpanded }">
                     <router-link to="/" class="flex items-center justify-center p-1">
                         <h1 v-if="isExpanded" class="text-2xl font-extrabold leading-tight m-0 text-brand-primary truncate w-full text-center">DO SYSTEM</h1>

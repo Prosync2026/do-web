@@ -7,7 +7,11 @@
                 <tr class="bg-surface-50 border-b">
                     <th class="px-3 py-2 text-left font-semibold text-gray-600 w-10">#</th>
                     <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[150px]">Item Code</th>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[500px]">Description <span class="text-xs text-gray-400">  (Hover to see the full description)</span></th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[500px]">
+                        Description 
+                        <span class="text-xs text-gray-400 hidden lg:inline"> (Hover to view full)</span>
+                        <span class="text-xs text-gray-400 lg:hidden"> (Tap & swipe to read)</span>
+                    </th>
                     <th class="px-3 py-2 text-left font-semibold text-gray-600">Qty</th>
                     <th class="px-3 py-2 text-left font-semibold text-gray-600">UOM</th>
                     <th class="px-3 py-2 text-left font-semibold text-gray-600 min-w-[250px]">Remarks</th>

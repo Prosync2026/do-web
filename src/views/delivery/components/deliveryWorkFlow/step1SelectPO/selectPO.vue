@@ -62,25 +62,24 @@
                     </div>
 
                     <!-- Pagination Controls -->
-                    <div class="flex justify-between items-center mt-4 gap-2" v-if="purchaseStore.pagination">
-                        <div class="flex items-center gap-2">
-                            <span>Rows per page:</span>
-                            <select :value="purchaseStore.pagination?.pageSize ?? 10" @change="handlePageSizeChange" class="border rounded px-2 py-1">
+                    <div class="flex flex-col md:flex-row flex-wrap justify-between items-center mt-4 gap-4 text-sm" v-if="purchaseStore.pagination">
+                        <div class="flex items-center justify-center gap-2 w-full md:w-auto">
+                            <span class="text-gray-600">Rows per page:</span>
+                            <select :value="purchaseStore.pagination?.pageSize ?? 10" @change="handlePageSizeChange" class="border rounded px-2 py-1 bg-white">
                                 <option v-for="size in [10, 25, 50, 100]" :key="size" :value="size">{{ size }}</option>
                             </select>
                         </div>
 
-                        <div class="flex items-center gap-1">
+                        <div class="flex items-center justify-center gap-1 w-full md:w-auto">
                             <ProButton variant="ghost" :disabled="(purchaseStore.pagination?.page ?? 1) <= 1" @click="setPage(1)"><i class="pi pi-angle-double-left shrink-0" /></ProButton>
                             <ProButton variant="ghost" :disabled="(purchaseStore.pagination?.page ?? 1) <= 1" @click="setPage((purchaseStore.pagination?.page ?? 1) - 1)"><i class="pi pi-angle-left shrink-0" /></ProButton>
-                            <span> Page {{ purchaseStore.pagination?.page ?? 1 }} / {{ purchaseStore.pagination?.totalPages ?? 1 }} </span>
+                            <span class="px-2 font-medium"> Page {{ purchaseStore.pagination?.page ?? 1 }} / {{ purchaseStore.pagination?.totalPages ?? 1 }} </span>
                             <ProButton variant="ghost" :disabled="(purchaseStore.pagination?.page ?? 1) >= (purchaseStore.pagination?.totalPages ?? 1)" @click="setPage((purchaseStore.pagination?.page ?? 1) + 1)"><i class="pi pi-angle-right shrink-0" /></ProButton>
                             <ProButton variant="ghost" :disabled="(purchaseStore.pagination?.page ?? 1) >= (purchaseStore.pagination?.totalPages ?? 1)" @click="setPage(purchaseStore.pagination?.totalPages ?? 1)"><i class="pi pi-angle-double-right shrink-0" /></ProButton>
                         </div>
 
-                        <div>
-                            Showing
-                            {{ displayStart }} – {{ displayEnd }} of {{ purchaseStore.pagination?.total ?? 0 }}
+                        <div class="text-gray-500 text-center w-full md:w-auto text-xs md:text-sm">
+                            Showing {{ displayStart }} – {{ displayEnd }} of {{ purchaseStore.pagination?.total ?? 0 }}
                         </div>
                     </div>
 

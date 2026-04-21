@@ -9,4 +9,17 @@
            p-5;
         /* p-5 transition hover:scale-[1.02] hover:shadow-xl; */
     }
+
+    /* Target the internal tab list container of ProTabs to allow horizontal scrolling on mobile */
+    .pro-tabs-scrollable > div:first-child {
+        @apply overflow-x-auto overflow-y-hidden whitespace-nowrap;
+        flex-wrap: nowrap !important;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+    }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .pro-tabs-scrollable > div:first-child::-webkit-scrollbar {
+        display: none;
+    }
 }
