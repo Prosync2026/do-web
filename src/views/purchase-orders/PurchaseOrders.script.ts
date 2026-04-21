@@ -7,7 +7,7 @@ import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.sto
 import type { PurchaseOrderWithStatus } from '@/types/purchase.type';
 import { Motion } from '@motionone/vue';
 import { ProButton, ProCard, ProStatisticCard, ProTable, ProTag, ProTabs, ProSelect, ProDatePicker, ProInput } from '@prosync_solutions/ui';
-import { PhBookOpen, PhCheckCircle, PhClock, PhWarning } from '@phosphor-icons/vue';
+import { PhBookOpen, PhCheckCircle, PhClock, PhWarning, PhArrowsLeftRight } from '@phosphor-icons/vue';
 
 // permission composable
 import { usePurchaseOrderPermission } from '@/permissions';
@@ -28,7 +28,8 @@ export default defineComponent({
         PhBookOpen,
         ProSelect,
         ProDatePicker,
-        ProInput
+        ProInput,
+        PhArrowsLeftRight
     },
     setup() {
         const isLoading = ref(true);
