@@ -72,20 +72,20 @@
                                 <span class="text-sm text-gray-600">Rows per page:</span>
                                 <ProSelect :modelValue="store.pagination.pageSize" @update:modelValue="handleUpdatePagination({ page: 1, pageSize: $event })" :options="[{label:'10', value:10}, {label:'25', value:25}, {label:'50', value:50}, {label:'100', value:100}]" class="w-24 text-sm" />
                             </div>
-                            <div class="flex gap-2 items-center flex-wrap justify-end">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-36">
+                            <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center flex-wrap sm:justify-end w-full sm:w-auto mt-2 sm:mt-0">
+                                <div class="flex items-center gap-2 w-full sm:w-auto">
+                                    <div class="flex-1 sm:w-36">
                                         <ProDatePicker v-model="startDate" placeholder="Start Date" appendTo="body" @update:modelValue="onSearchWrapper('')" />
                                     </div>
                                     <span class="text-text-subtitle">-</span>
-                                    <div class="w-36">
+                                    <div class="flex-1 sm:w-36">
                                         <ProDatePicker v-model="endDate" placeholder="End Date" appendTo="body" @update:modelValue="onSearchWrapper('')" />
                                     </div>
                                 </div>
-                                <div class="w-48" v-if="isPurchasingRole">
+                                <div class="w-full sm:w-48" v-if="isPurchasingRole">
                                     <ProSelect v-model="store.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="onSearchWrapper('')" />
                                 </div>
-                                <ProInput :modelValue="store.filters.search" placeholder="Search purchase orders..." class="w-64" @update:modelValue="store.handleSearch" />
+                                <ProInput :modelValue="store.filters.search" placeholder="Search purchase orders..." class="w-full sm:w-64" @update:modelValue="store.handleSearch" />
                             </div>
                         </div>
 
