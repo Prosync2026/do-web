@@ -12,35 +12,35 @@
                 <!-- Steps relative layout -->
                 <div class="flex justify-between items-center w-full z-10 relative">
                     <!-- Step 1 -->
-                    <div class="flex flex-col items-center gap-2 w-24" :class="activeStep > 1 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 1 && goStep(1)">
-                        <div :class="['w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 1 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
-                            <i class="pi pi-box"></i>
+                    <div class="flex flex-col items-center gap-1 sm:gap-2 w-[70px] sm:w-24" :class="activeStep > 1 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 1 && goStep(1)">
+                        <div :class="['w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 1 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
+                            <i class="pi pi-box text-sm sm:text-base"></i>
                         </div>
-                        <span :class="['text-sm font-medium', activeStep >= 1 ? 'text-brand-primary' : 'text-gray-500']">Select PO</span>
+                        <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 1 ? 'text-brand-primary' : 'text-gray-500']">Select PO</span>
                     </div>
 
                     <!-- Step 2 -->
-                    <div class="flex flex-col items-center gap-2 w-24" :class="activeStep > 2 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 2 && goStep(2)">
-                        <div :class="['w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 2 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
-                            <i class="pi pi-check"></i>
+                    <div class="flex flex-col items-center gap-1 sm:gap-2 w-[70px] sm:w-24" :class="activeStep > 2 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 2 && goStep(2)">
+                        <div :class="['w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 2 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
+                            <i class="pi pi-check text-sm sm:text-base"></i>
                         </div>
-                        <span :class="['text-sm font-medium', activeStep >= 2 ? 'text-brand-primary' : 'text-gray-500']">Verify Items</span>
+                        <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 2 ? 'text-brand-primary' : 'text-gray-500']">Verify Items</span>
                     </div>
 
                     <!-- Step 3 -->
-                    <div class="flex flex-col items-center gap-2 w-24" :class="activeStep > 3 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 3 && goStep(3)">
-                        <div :class="['w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 3 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
-                            <i class="pi pi-truck"></i>
+                    <div class="flex flex-col items-center gap-1 sm:gap-2 w-[70px] sm:w-24" :class="activeStep > 3 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 3 && goStep(3)">
+                        <div :class="['w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 3 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
+                            <i class="pi pi-truck text-sm sm:text-base"></i>
                         </div>
-                        <span :class="['text-sm font-medium', activeStep >= 3 ? 'text-brand-primary' : 'text-gray-500']">Delivery Info</span>
+                        <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 3 ? 'text-brand-primary' : 'text-gray-500']">Delivery Info</span>
                     </div>
 
                     <!-- Step 4 -->
-                    <div class="flex flex-col items-center gap-2 w-24 cursor-default">
-                        <div :class="['w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 4 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
-                            <i class="pi pi-file"></i>
+                    <div class="flex flex-col items-center gap-1 sm:gap-2 w-[70px] sm:w-24 cursor-default">
+                        <div :class="['w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 4 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
+                            <i class="pi pi-file text-sm sm:text-base"></i>
                         </div>
-                        <span :class="['text-sm font-medium', activeStep >= 4 ? 'text-brand-primary' : 'text-gray-500']">Review</span>
+                        <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 4 ? 'text-brand-primary' : 'text-gray-500']">Review</span>
                     </div>
                 </div>
             </div>

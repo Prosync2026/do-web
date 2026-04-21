@@ -65,10 +65,10 @@
         <div v-else-if="phase === 'result'" class="flex flex-col" style="min-height: 520px;">
 
             <!-- Side-by-side body -->
-            <div class="flex flex-1 overflow-hidden divide-x divide-surface-200" style="min-height: 480px;">
+            <div class="flex flex-col lg:flex-row flex-1 lg:overflow-hidden lg:divide-x divide-y lg:divide-y-0 divide-surface-200" style="min-height: 480px;">
 
                 <!-- LEFT: Extracted OCR data -->
-                <div class="flex flex-col flex-1 overflow-y-auto p-4" style="min-width: 0;">
+                <div class="flex flex-col flex-1 overflow-auto p-4" style="min-width: 0;">
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
                         <i class="pi pi-sparkles mr-1 text-orange-500" /> AI Extracted Data
                     </p>
@@ -105,19 +105,18 @@
                 </div>
 
                 <!-- RIGHT: Original file preview -->
-                <div class="flex flex-col" style="width: 48%; min-width: 320px;">
-                    <div class="px-4 pt-4 pb-2 border-b border-surface-100 flex items-center gap-2">
+                <div class="flex flex-col w-full lg:w-[48%]" style="min-width: 0;">
+                    <div class="px-4 pt-4 pb-2 lg:border-b border-surface-100 flex items-center gap-2">
                         <i class="pi pi-file text-orange-500" />
                         <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Original Document</p>
                         <span class="ml-auto text-xs text-gray-400 truncate max-w-[160px]" :title="selectedFile?.name">{{ selectedFile?.name }}</span>
                     </div>
-                    <div class="flex-1 bg-surface-50 flex items-center justify-center overflow-hidden" style="min-height: 400px;">
+                    <div class="flex-1 bg-surface-50 w-full overflow-y-auto overflow-x-hidden md:flex md:items-center md:justify-center relative" style="min-height: 500px; -webkit-overflow-scrolling: touch;">
                         <!-- PDF preview -->
                         <iframe
                             v-if="filePreviewUrl && selectedFile?.type === 'application/pdf'"
                             :src="filePreviewUrl"
-                            class="w-full h-full border-0"
-                            style="min-height: 440px;"
+                            class="w-full h-full border-0 absolute top-0 left-0"
                         />
                         <!-- Image preview -->
                         <img

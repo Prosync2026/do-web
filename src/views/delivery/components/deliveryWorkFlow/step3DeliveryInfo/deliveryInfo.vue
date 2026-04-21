@@ -13,7 +13,7 @@
                 <span>Delivery Information</span>
             </div>
             <form @submit.prevent="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full">
-                    <div class="grid grid-cols-2 gap-4 p-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-3">
                         <div class="flex flex-col">
                             <label for="driverPlate">Driver Plate Number</label>
                             <ProInput name="driverPlate" v-model="initialValues.driverPlate" placeholder="Plate Number" fluid />
@@ -24,7 +24,7 @@
 
                         <div class="flex flex-col">
                             <label for="deliveryDate">Delivery Date</label>
-                            <Calendar name="deliveryDate" v-model="initialValues.deliveryDate" placeholder="Select Date" showIcon :showTime="false" dateFormat="yy-mm-dd" />
+                            <Calendar name="deliveryDate" v-model="initialValues.deliveryDate" placeholder="Select Date" showIcon :showTime="false" dateFormat="yy-mm-dd" class="w-full" />
                             <Message v-if="errors.deliveryDate" severity="error" size="small" variant="simple">
                                 {{ errors.deliveryDate }}
                             </Message>
