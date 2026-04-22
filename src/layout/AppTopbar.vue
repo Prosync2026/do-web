@@ -247,7 +247,14 @@ const goToAllNotifications = () => {
 
 <template>
     <Motion tag="div" class="w-full relative z-50" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
-        <ProTopbar :user-name="username || 'PM User'" :user-avatar="'https://randomuser.me/api/portraits/women/44.jpg'">
+        <ProTopbar 
+            :user-name="username || 'PM User'" 
+            :user-avatar="'https://randomuser.me/api/portraits/women/44.jpg'"
+            :user-email="authStore.user?.email"
+            :user-staff-code="authStore.user?.employee_id?.toString()"
+            :user-role="userRoleCode || 'Project Director'"
+            @logout="handleSignOut"
+        >
             <template #left>
                 <!-- Project dropdown (Moved to left slot) -->
                 <div
@@ -317,35 +324,6 @@ const goToAllNotifications = () => {
                     </Transition>
                 </div>
             </template>
-
-            <template #menu-items="{ close }">
-                <div v-if="userRoleCode === 'SSA'">
-                    <button
-                        @click="
-                            () => {
-                                close();
-                                router.push('/settings');
-                            }
-                        "
-                        class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors text-gray-700"
-                    >
-                        <PhGear :size="18" class="text-gray-500" /> Settings
-                    </button>
-                    <div class="border-t border-border-border my-1"></div>
-                </div>
-
-                <button
-                    @click="
-                        () => {
-                            close();
-                            handleSignOut();
-                        }
-                    "
-                    class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                >
-                    <PhSignOut :size="18" /> Logout
-                </button>
-            </template>
         </ProTopbar>
     </Motion>
 
@@ -382,3 +360,28 @@ const goToAllNotifications = () => {
         </div>
     </div>
 </template>
+
+<style>
+/* 
+ * FIX: The UI Library's ProTopbar natively uses Tailwind v4 primary gradient classes and text-error classes 
+ * for its beautiful profile header and logout button. Because DO System is running Tailwind v3 config misses these definitions
+ * the banner was silently falling back to a plain white background & grey text. 
+ * Defining them explicitly restores the gorgeous native Storybook graphics automatically! 
+ */
+.from-brand-primary, .bg-gradient-to-br {
+  background-image: linear-gradient(to bottom right, var(--color-brand-primary, #03439a), var(--color-brand-primary-strong, #02367b)) !important;
+  /* Tailwind variable fallbacks just in case */
+  --tw-gradient-from: var(--color-brand-primary, #03439a) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(3 67 154 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-brand-primary-strong {
+  --tw-gradient-to: var(--color-brand-primary-strong, #02367b) var(--tw-gradient-to-position);
+}
+.text-text-error {
+  color: #dc2626 !important;
+}
+.hover\:bg-surface-error:hover {
+  background-color: #fee2e2 !important;
+}
+</style>
