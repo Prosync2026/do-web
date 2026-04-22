@@ -15,7 +15,7 @@
         "@primeuix/themes": "^1.0.0",
         "@primevue/forms": "^4.3.9",
         "@primevue/themes": "^4.3.9",
-        "@prosync_solutions/ui": "^0.3.1",
+        "@prosync_solutions/ui": "^0.8.2",
         "axios": "^1.12.2",
         "chart.js": "^3.9.1",
         "cross-env": "^10.1.0",
