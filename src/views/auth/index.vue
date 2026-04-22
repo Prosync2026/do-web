@@ -1,37 +1,87 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth/auth.store';
+import { ProLoginPage } from '@prosync_solutions/ui';
+import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
-import LoginForm from './components/form/LoginForm.vue';
-import { useLoginCardAnimation } from './index.script';
+import { useRouter } from 'vue-router';
 
-const { loginCard } = useLoginCardAnimation();
+const authStore = useAuthStore();
+const router = useRouter();
+const toast = useToast();
 
-const loginUsername = ref('');
-const loginPassword = ref('');
+const isLoading = ref(false);
+const errorMessage = ref('');
+
+const handleLogin = async ({ username, password }: any) => {
+    errorMessage.value = '';
+    isLoading.value = true;
+    try {
+        const success = await authStore.login(username, password, true);
+        if (success) {
+            toast.add({
+                severity: 'success',
+                summary: 'Login Successful',
+                detail: `Welcome ${authStore.userName}!`,
+                life: 3000
+            });
+            router.push({ name: 'dashboard' });
+        } else {
+            errorMessage.value = 'Invalid username or password';
+        }
+    } catch (err) {
+        console.error('Login failed:', err);
+        errorMessage.value = 'An error occurred during login';
+    } finally {
+        isLoading.value = false;
+    }
+};
 </script>
 
 <template>
-    <div class="flex items-center justify-center min-h-screen p-4 custom-layout-gradient shadow-lg">
-        <div ref="loginCard" class="login-card flex w-full max-w-4xl rounded-lg shadow-lg overflow-hidden">
-            <!-- Left Section -->
-            <div class="hidden lg:flex w-1/2 items-center justify-center" style="background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #22d3ee 100%);">
-                <div class="flex flex-col items-center text-center px-6">
-                    <img src="/images/logo/illustration-truck.png" alt="Delivery Illustration" class="object-contain w-2/3 drop-shadow-lg -mt-4" />
-                    <h2 class="text-white text-lg font-semibold tracking-wide mt-6 mb-2">Accurate <span class="mx-3">·</span> Transparent <span class="mx-2">·</span> Reliable</h2>
-                    <p class="text-white text-sm opacity-90">Your one-stop solution for managing delivery orders</p>
-                </div>
-            </div>
-
-            <!-- Right Section -->
-            <div class="flex flex-col justify-center w-full lg:w-1/2 p-10 bg-white">
-                <div class="flex justify-center mb-6">
-                    <img src="/images/logo/prosync-logo.png" alt="Prosync Logo" class="h-10" />
-                </div>
-                <h1 class="text-2xl font-bold text-center mb-1 text-brand-primary tracking-tight">DO SYSTEM</h1>
-                <p class="text-center text-gray-500 mb-6 text-xs uppercase tracking-widest font-semibold">Delivery order management system</p>
-
-                <!-- Login Form -->
-                <LoginForm v-model:modelValueUsername="loginUsername" v-model:modelValuePassword="loginPassword" />
-            </div>
-        </div>
-    </div>
+    <ProLoginPage
+        appName="DO System"
+        subtitle="Delivery order management"
+        tagline="Accurate · Transparent · Reliable"
+        taglineDescription="Your one-stop solution for managing delivery orders."
+        logoSrc="/images/logo/prosync-p-logo.svg"
+        illustrationSrc="/images/logo/DO_system.png"
+        :loading="isLoading"
+        :error="errorMessage"
+        copyright="© 2026 Prosync DO System. All rights reserved."
+        @login="handleLogin"
+    />
 </template>
+
+<style scoped>
+/* Force the native Prosync Login Card to organically scale down */
+:deep(.pro-login-card) {
+    max-height: 100vh;
+    height: 100%;
+    min-height: auto !important;
+}
+
+/* Shrink the illustration so it cleanly fits without expanding the card's height boundary */
+:deep(.pro-login-brand__illustration img) {
+    max-height: 56vh;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Reduce tight padding on small screens to give elements breathing room */
+:deep(.pro-login-brand) {
+    padding: 2rem !important;
+}
+
+/* Force specific sizes to override legacy PrimeVue global resets */
+:deep(.pro-login-form-header h1) {
+    font-size: 32px !important;
+    line-height: 40px !important;
+}
+
+:deep(.pro-login-form-header p),
+:deep(.pro-login-form-header h2) {
+    font-size: 16px !important;
+    line-height: 24px !important;
+    font-weight: 400 !important;
+}
+</style>
