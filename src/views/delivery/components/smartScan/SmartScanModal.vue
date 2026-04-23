@@ -42,7 +42,7 @@
                     <p class="font-semibold text-sm truncate">{{ selectedFile.name }}</p>
                     <p class="text-xs text-gray-400">{{ formatSize(selectedFile.size) }}</p>
                 </div>
-                <ProButton icon="pi pi-times" variant="plain" @click="clearFile" />
+                <ProButton  variant="plain" @click="clearFile" ><template #icon><PhX /></template></ProButton>
             </div>
 
             <!-- Actions -->

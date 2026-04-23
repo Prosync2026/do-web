@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhCpu, PhFloppyDisk, PhEye, PhEyeSlash } from '@phosphor-icons/vue';
 import SettingsScript from './Settings.script';
 
 const { 
@@ -24,7 +25,7 @@ const {
             <Card class="border shadow-none">
                 <template #title>
                     <div class="flex items-center gap-2 text-lg">
-                        <i class="pi pi-microchip-ai text-primary"></i> 
+                        <PhCpu :size="18" class="text-primary"  /> 
                         Smart Scan API
                     </div>
                 </template>
@@ -42,10 +43,11 @@ const {
                                 placeholder="Enter API Bearer Token" 
                                 class="w-full pr-10" 
                             />
-                            <i 
-                                :class="[isTokenVisible ? 'pi pi-eye-slash' : 'pi pi-eye', 'absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200']"
+                            <component 
+                                :is="isTokenVisible ? PhEyeSlash : PhEye" 
+                                class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                                 @click="toggleVisibility"
-                            ></i>
+                            />
                         </div>
                         <small class="text-gray-500 mt-2">
                             This token is required for the document OCR service to parse PDF files.
@@ -56,10 +58,9 @@ const {
                     <div class="flex justify-end mt-4">
                         <Button 
                             label="Save" 
-                            icon="pi pi-save" 
                             :loading="isLoading" 
                             @click="saveToken" 
-                        />
+                        ><template #icon><PhFloppyDisk class="mr-2" /></template></Button>
                     </div>
                 </template>
             </Card>

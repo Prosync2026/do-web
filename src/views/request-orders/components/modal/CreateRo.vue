@@ -12,10 +12,10 @@
             <!-- Search Bar -->
             <div class="flex gap-4 mb-4 items-center">
                 <div class="flex-1">
-                    <ProInput v-model="searchTerm" placeholder="Search by ItemCode, Category, Element, Description..." icon="pi pi-search" />
+                    <ProInput v-model="searchTerm" placeholder="Search by ItemCode, Category, Element, Description..."  ><template #icon><PhMagnifyingGlass /></template></ProInput>
                 </div>
                 <!-- Need wrapper for fixed width if possible, but gap-4 handles it -->
-                <ProButton variant="secondary" icon="pi pi-times" @click="clearFilters" :disabled="!hasActiveFilters">Clear Filters</ProButton>
+                <ProButton variant="secondary"  @click="clearFilters" :disabled="!hasActiveFilters"><template #icon><PhX /></template>Clear Filters</ProButton>
             </div>
 
             <!-- Filter Dropdowns -->
@@ -65,12 +65,12 @@
                 <span v-else>{{ pagination?.total || 0 }} total</span>
                 items available
             </div>
-            <div v-if="loading" class="text-blue-600"><i class="pi pi-spinner pi-spin mr-2"></i>Loading...</div>
+            <div v-if="loading" class="text-blue-600"><PhSpinner :size="18" class="mr-2 animate-spin"  />Loading...</div>
         </div>
         
         <!-- Validation Error Message -->
         <div v-if="showValidation && selectedItems.length === 0" class="flex items-center gap-2 p-3 bg-red-50 text-red-600 border border-red-200 rounded-md mb-4 text-sm font-medium">
-            <i class="pi pi-times-circle"></i> At least one item must be selected
+            <PhXCircle :size="18"  /> At least one item must be selected
         </div>
 
         <!-- Delivery Date -->
@@ -116,8 +116,8 @@
                     <div class="text-sm text-gray-600 font-medium">{{ selectedItems.length }} item(s) selected</div>
 
                     <div class="flex gap-3">
-                        <ProButton variant="secondary" icon="pi pi-times" @click="closeModal">Cancel</ProButton>
-                        <ProButton variant="primary" icon="pi pi-check" @click="addSelectedItems">Add Items ({{ selectedItems.length }})</ProButton>
+                        <ProButton variant="secondary"  @click="closeModal"><template #icon><PhX /></template>Cancel</ProButton>
+                        <ProButton variant="primary"  @click="addSelectedItems"><template #icon><PhCheck /></template>Add Items ({{ selectedItems.length }})</ProButton>
                     </div>
                 </div>
             </div>

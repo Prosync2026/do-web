@@ -1,3 +1,4 @@
+import { PhTrash, PhCaretRight, PhPlus, PhCheck } from '@phosphor-icons/vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
@@ -9,11 +10,7 @@ interface RoleStep {
 
 export default defineComponent({
     name: 'EditApprovalFlowModal',
-    components: {
-        Button,
-        Dialog,
-        Dropdown
-    },
+    components: { Button, Dialog, Dropdown, PhTrash, PhCaretRight, PhPlus, PhCheck },
     props: {
         modelValue: {
             type: Boolean,

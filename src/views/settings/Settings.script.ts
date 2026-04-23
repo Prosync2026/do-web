@@ -1,3 +1,4 @@
+import { PhCpu, PhFloppyDisk } from '@phosphor-icons/vue';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
@@ -10,12 +11,7 @@ const DEFAULT_TOKEN = 'rcp_220PbLHcagDht8COyx0Sg_adC5rTXSfR6zONZib2FpCqm0CVuMz-T
 export const SMART_SCAN_TOKEN_KEY = 'smart_scan_api_token';
 
 export default {
-    components: {
-        Card,
-        InputText,
-        Button,
-        Toast
-    },
+    components: { Card, InputText, Button, Toast, PhCpu, PhFloppyDisk },
     setup() {
         const toast = useToast();
         const token = ref('');

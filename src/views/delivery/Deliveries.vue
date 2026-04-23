@@ -9,7 +9,7 @@
                     <h1 class="text-h2 text-text-heading">Delivery Verification</h1>
                 </div>
                 <ProButton @click="$router.push('/deliveries/createDelivery')">
-                    <i class="pi pi-plus mr-2" /> New Delivery Verification
+                    <PhPlus :size="18" class="mr-2" /> New Delivery Verification
                 </ProButton>
             </div>
 
@@ -70,7 +70,7 @@
 
                             <template #actions="{ row }">
                                 <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
-                                    <i class="pi pi-eye text-base text-gray-700"></i>
+                                    <PhEye :size="18" class="text-base text-gray-700" />
                                 </ProButton>
                             </template>
                         </ProTable>

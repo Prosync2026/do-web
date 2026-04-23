@@ -4,7 +4,7 @@
         <!-- Approval Flow Header -->
         <div class="flex items-center justify-between mb-5">
             <h6 class="text-gray-700 font-semibold text-lg mb-0">Approval Flow</h6>
-            <Button icon="pi pi-pencil" class="p-button-text p-button-sm hover:text-teal-700" label="Edit Flow" @click="openUpdateRoles" />
+            <Button class="p-button-text p-button-sm hover:text-teal-700" label="Edit Flow" @click="openUpdateRoles" ><template #icon><PhPencil class="mr-2" /></template></Button>
         </div>
 
         <div class="approval-flow text-center mb-8">
@@ -13,7 +13,7 @@
                     <div class="bg-gray-50 border border-gray-200 rounded-xl px-5 py-3 font-semibold min-w-[100px] text-center shadow-sm">
                         {{ step.role }}
                     </div>
-                    <i v-if="index < approvalSteps.length - 1" class="pi pi-caret-right text-gray-400 text-lg ml-3 mr-1"></i>
+                    <PhCaretRight :size="18" class="text-gray-400 text-lg ml-3 mr-1" v-if="index < approvalSteps.length - 1"  />
                 </div>
             </div>
         </div>
@@ -45,8 +45,8 @@
         </div>
 
         <template #footer>
-            <Button label="Close" icon="pi pi-times" class="p-button-text text-gray-500" @click="close" />
-            <Button label="Save Changes" icon="pi pi-check" class="p-button-primary" @click="save" />
+            <Button label="Close" class="p-button-text text-gray-500" @click="close" ><template #icon><PhX class="mr-2" /></template></Button>
+            <Button label="Save Changes" class="p-button-primary" @click="save" ><template #icon><PhCheck class="mr-2" /></template></Button>
         </template>
 
         <UpdateApprovalRoles v-model:visible="showUpdateRoles" />

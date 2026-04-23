@@ -1,3 +1,4 @@
+import { PhWarning, PhSealCheck, PhPackage } from '@phosphor-icons/vue';
 import type { VerifyPurchaseOrderItem } from '@/types/delivery.type';
 import type { PurchaseOrder, PurchaseOrderItem } from '@/types/purchase.type';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
@@ -14,19 +15,7 @@ import { ProCard, ProButton, ProTag, ProInput } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'VerifyItem',
-    components: {
-        Message,
-        Toast,
-        Form,
-        Calendar,
-        Textarea,
-        FileUpload,
-        ProgressBar,
-        ProCard,
-        ProButton,
-        ProTag,
-        ProInput
-    },
+    components: { Message, Toast, Form, Calendar, Textarea, FileUpload, ProgressBar, ProCard, ProButton, ProTag, ProInput, PhWarning, PhSealCheck, PhPackage },
     emits: ['update', 'next-step', 'prev-step'],
     props: {
         selectedPo: {

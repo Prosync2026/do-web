@@ -39,13 +39,13 @@
                         <h4 class="text-text-heading font-medium mb-3">Delivery Document</h4>
                         <div v-if="parsedAttachments.length > 0" class="flex flex-wrap gap-3">
                             <div v-for="(file, index) in parsedAttachments" :key="`attachment-${index}`" class="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                                <i class="pi pi-file text-brand-primary text-lg"></i>
+                                <PhFile :size="18" class="text-brand-primary text-lg"  />
                                 <div class="flex flex-col">
                                     <span class="text-sm font-medium text-text-heading">{{ file.filename }}</span>
                                     <span v-if="file.size" class="text-xs text-text-subtitle">{{ formatSize(file.size) }}</span>
                                 </div>
                                 <ProButton variant="secondary" size="sm" @click="previewAttachment(file)" title="Preview Attachment" class="ml-2">
-                                    <i class="pi pi-eye"></i>
+                                    <PhEye :size="18"  />
                                 </ProButton>
                             </div>
                         </div>
@@ -57,13 +57,13 @@
                         <h4 class="text-text-heading font-medium mb-3">Evidence Photos</h4>
                         <div v-if="parsedAttachment2.length > 0" class="flex flex-wrap gap-3">
                             <div v-for="(file, index) in parsedAttachment2" :key="`attachment2-${index}`" class="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                                <i class="pi pi-image text-green-600 text-lg"></i>
+                                <PhImage :size="18" class="text-green-600 text-lg"  />
                                 <div class="flex flex-col">
                                     <span class="text-sm font-medium text-text-heading">{{ file.filename }}</span>
                                     <span v-if="file.size" class="text-xs text-text-subtitle">{{ formatSize(file.size) }}</span>
                                 </div>
                                 <ProButton variant="secondary" size="sm" @click="previewAttachment(file)" title="Preview Photo" class="ml-2">
-                                    <i class="pi pi-eye"></i>
+                                    <PhEye :size="18"  />
                                 </ProButton>
                             </div>
                         </div>

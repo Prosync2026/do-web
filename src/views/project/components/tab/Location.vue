@@ -5,8 +5,8 @@
             <div class="flex justify-between items-center mb-4">
                 <span class="font-bold text-lg">Preview Location</span>
                 <div class="flex gap-2">
-                    <Button label="Export CSV" icon="pi pi-file" class="p-button-sm" @click="downloadCSV" />
-                    <Button label="Export Image" icon="pi pi-image" class="p-button-sm" @click="exportImage" />
+                    <Button label="Export CSV" class="p-button-sm" @click="downloadCSV" ><template #icon><PhFile class="mr-2" /></template></Button>
+                    <Button label="Export Image" class="p-button-sm" @click="exportImage" ><template #icon><PhImage class="mr-2" /></template></Button>
                 </div>
             </div>
 
@@ -19,7 +19,7 @@
             <div class="flex justify-between items-center mb-4">
                 <span class="font-bold text-lg">Location Set Up</span>
                 <div>
-                    <Button label="Import CSV" icon="pi pi-upload" class="p-button-sm" @click="triggerFileInput" />
+                    <Button label="Import CSV" class="p-button-sm" @click="triggerFileInput" ><template #icon><PhUpload class="mr-2" /></template></Button>
                     <input type="file" ref="fileInput" style="display: none" @change="importCSV" />
                 </div>
             </div>
@@ -37,7 +37,7 @@
                     <InputText v-model="newLocationName" placeholder="Enter location name" class="w-full" />
                 </div>
 
-                <Button type="submit" label="Submit" :disabled="!selectedLevel || !newLocationName || (selectedLevel === 2 && !selectedParents.location_1)" icon="pi pi-check" class="mt-2" />
+                <Button type="submit" label="Submit" :disabled="!selectedLevel || !newLocationName || (selectedLevel === 2 && !selectedParents.location_1)" class="mt-2" ><template #icon><PhCheck class="mr-2" /></template></Button>
             </form>
         </div>
     </div>

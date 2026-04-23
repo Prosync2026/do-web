@@ -1,7 +1,7 @@
 import { requestOrderService } from '@/services/requestOrder.service';
 import type { DraftRO } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
-import { PhPencilSimple, PhTrash, PhX } from '@phosphor-icons/vue';
+import { PhPencilSimple, PhTrash, PhX, PhPackage, PhCalendarBlank } from '@phosphor-icons/vue';
 import { ProModal, ProInput, ProTable, ProButton, ProTag } from '@prosync_solutions/ui';
 import type { TableColumn } from '@prosync_solutions/ui/dist/types';
 import { useConfirm } from 'primevue/useconfirm';
@@ -11,7 +11,7 @@ import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'ViewDraftRo',
-    components: { ProModal, ProTable, ProButton, ProInput, ProTag, PhPencilSimple, PhTrash, PhX },
+    components: { ProModal, ProTable, ProButton, ProInput, ProTag, PhPencilSimple, PhTrash, PhX, PhPackage, PhCalendarBlank },
     props: { visible: { type: Boolean, required: true } },
     emits: ['update:visible', 'update:count'],
     setup(props, { emit }) {
@@ -141,7 +141,7 @@ export default defineComponent({
             confirm.require({
                 message: `Are you sure you want to delete draft ${draft.draftId}?`,
                 header: 'Confirm Delete',
-                icon: 'pi pi-exclamation-triangle',
+                icon: markRaw(PhWarning),
                 acceptClass: 'p-button-danger',
                 rejectClass: 'p-button-secondary',
                 acceptLabel: 'Yes, Delete',

@@ -3,7 +3,7 @@ import { budgetService } from '@/services/budget.service';
 import type { CardItem } from '@/types/card.type';
 import { showError, showWarning } from '@/utils/showNotification.utils';
 import { ProCard, ProSpinner } from '@prosync_solutions/ui';
-import { PhCurrencyDollar, PhDatabase, PhBuildings } from '@phosphor-icons/vue';
+import { PhCurrencyDollar, PhDatabase, PhBuildings, PhMapPin, PhEject } from '@phosphor-icons/vue';
 import { Chart } from 'highcharts-vue';
 import { computed, defineComponent, onMounted, reactive, ref, watch } from 'vue';
 
@@ -21,12 +21,7 @@ type ChartData = {
 
 export default defineComponent({
     name: 'Overview',
-    components: {
-        BudgetSummaryData,
-        highcharts: Chart,
-        ProCard,
-        ProSpinner
-    },
+    components: { BudgetSummaryData, highcharts: Chart, ProCard, ProSpinner, PhMapPin, PhEject },
     props: {
         budgetId: {
             type: Number,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhDownload, PhFileXls } from '@phosphor-icons/vue';
 import { ProButton, ProModal, ProToast } from '@prosync_solutions/ui';
 import FileUpload from 'primevue/fileupload';
 import useImportBudgetDialogLogic from './BudgetImport.script';
@@ -22,7 +23,7 @@ const { internalVisible, onHide, onFileSelect, onDownloadFormat, onSubmitUpload,
                 </p>
 
                 <a href="javascript:void(0)" @click="onDownloadFormat" class="flex flex-col items-center text-primary text-xs hover:text-blue-600 transition-all duration-200">
-                    <i class="pi pi-download text-lg mb-1"></i>
+                    <PhDownload :size="18" class="text-lg mb-1"  />
                     <span class="text-center leading-tight">Download</span>
                 </a>
             </div>
@@ -31,7 +32,7 @@ const { internalVisible, onHide, onFileSelect, onDownloadFormat, onSubmitUpload,
             <ProToast v-model="toastState.visible" :type="toastState.type" :message="toastState.message" :autoDismiss="true" :duration="3000" />
             <FileUpload mode="basic" name="file" customUpload @select="onFileSelect" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" chooseLabel="Choose File" class="w-full mb-3" />
 
-            <div v-if="selectedFile" class="text-sm text-green-700 mt-2"><i class="pi pi-file-excel mr-1"></i> {{ selectedFile.name }}</div>
+            <div v-if="selectedFile" class="text-sm text-green-700 mt-2"><PhFileXls :size="18" class="mr-1"  /> {{ selectedFile.name }}</div>
 
             <div class="flex justify-end gap-3 mt-4">
                 <ProButton variant="secondary" @click="onHide">Cancel</ProButton>

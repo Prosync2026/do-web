@@ -5,7 +5,7 @@
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold">Notifications</h1>
 
-            <Button label="Mark All as Read" icon="pi pi-check" severity="secondary" outlined @click="markAllAsRead" />
+            <Button label="Mark All as Read" severity="secondary" outlined @click="markAllAsRead" ><template #icon><PhCheck class="mr-2" /></template></Button>
         </div>
 
         <!-- Tabs -->

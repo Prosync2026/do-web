@@ -41,13 +41,13 @@ const profileMenu = computed(() => {
     if (userRoleCode.value === 'SSA') {
         items.push({
             label: 'Settings',
-            icon: 'pi pi-cog',
+            icon: markRaw(PhGear),
             command: () => router.push('/settings')
         });
         items.push({ separator: true });
     }
 
-    items.push({ label: 'Sign Out', icon: 'pi pi-sign-out', command: handleSignOut });
+    items.push({ label: 'Sign Out', icon: markRaw(PhSignOut), command: handleSignOut });
 
     return items;
 });

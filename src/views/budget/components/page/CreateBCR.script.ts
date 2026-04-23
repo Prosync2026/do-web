@@ -1,3 +1,4 @@
+import { PhFile, PhEye } from '@phosphor-icons/vue';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { AttachmentItem, BCRTableItem, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
@@ -12,7 +13,7 @@ import { useToast } from 'primevue/usetoast';
 
 export default defineComponent({
     name: 'CreateBCR',
-    components: { Motion, MeterialModal, SingleBudgetModal, ProButton, ProInput, ProSelect, ProCard, ProBanner, ProEmpty, ProToast, ProUploadFile },
+    components: { Motion, MeterialModal, SingleBudgetModal, ProButton, ProInput, ProSelect, ProCard, ProBanner, ProEmpty, ProToast, ProUploadFile, PhFile, PhEye },
     setup() {
         const router = useRouter();
         const budgetCRStore = useBudgetChangeRequestStore();

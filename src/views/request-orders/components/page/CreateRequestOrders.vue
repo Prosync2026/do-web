@@ -12,7 +12,7 @@
                     <label class="block text-sm font-medium text-text-body mb-2"> Budget Type <span class="text-brand-danger">*</span> </label>
                     <div class="flex flex-col gap-2">
                         <ProSelect id="budgetType" v-model="budgetType" :options="budgetOptions" placeholder="Select Budget Type" class="w-full" :class="{ 'border-brand-danger': showValidation && !budgetType }" />
-                        <p v-if="showValidation && !budgetType" class="text-sm text-brand-danger flex items-center gap-1"><i class="pi pi-times-circle"></i> Budget Type is required</p>
+                        <p v-if="showValidation && !budgetType" class="text-sm text-brand-danger flex items-center gap-1"><PhXCircle :size="18"  /> Budget Type is required</p>
                     </div>
                 </div>
 
@@ -21,7 +21,7 @@
                     <label class="block text-sm font-medium text-text-body mb-2"> RO Date </label>
                     <div class="flex flex-col gap-2">
                         <input type="date" :value="formatDateToAPI(calendarValue || new Date())" readonly class="w-full appearance-none bg-surface-gray-bg border border-border-border rounded-lg px-3 py-2 text-sm text-gray-500 cursor-not-allowed opacity-75" />
-                        <p v-if="showValidation && !calendarValue" class="text-sm text-brand-danger flex items-center gap-1"><i class="pi pi-times-circle"></i> RO Date is required</p>
+                        <p v-if="showValidation && !calendarValue" class="text-sm text-brand-danger flex items-center gap-1"><PhXCircle /> RO Date is required</p>
                     </div>
                 </div>
 
@@ -36,7 +36,7 @@
                                 <div class="w-full relative" :class="{ 'p-invalid border-brand-danger rounded': showValidation && !selectedSubcon }">
                                     <AutoComplete v-model="selectedSubcon" :suggestions="filteredSubconList" field="name" option-label="name" forceSelection dropdown placeholder="Search Subcon" class="w-full" @complete="handleSubconSearch" />
                                 </div>
-                                <p v-if="showValidation && !selectedSubcon" class="text-sm text-brand-danger flex items-center gap-1"><i class="pi pi-times-circle"></i> Subcon is required for Unbudgeted Items</p>
+                                <p v-if="showValidation && !selectedSubcon" class="text-sm text-brand-danger flex items-center gap-1"><PhXCircle :size="18"  /> Subcon is required for Unbudgeted Items</p>
                             </div>
                         </div>
 
@@ -45,7 +45,7 @@
                             <label class="block text-sm font-medium text-text-body mb-2">Reason</label>
                             <div class="flex flex-col gap-2">
                                 <ProSelect v-model="selectedReason" :options="reasonOptions" placeholder="Select Reason" class="w-full" :class="{ 'border-brand-danger': showValidation && !selectedReason }" />
-                                <p v-if="showValidation && !selectedReason" class="text-sm text-brand-danger flex items-center gap-1"><i class="pi pi-times-circle"></i> Reason is required for Unbudgeted Items</p>
+                                <p v-if="showValidation && !selectedReason" class="text-sm text-brand-danger flex items-center gap-1"><PhXCircle :size="18"  /> Reason is required for Unbudgeted Items</p>
                             </div>
                         </div>
                     </div>

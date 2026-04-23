@@ -1,3 +1,4 @@
+import { PhPackage, PhCheck, PhTruck, PhFile, PhWarning } from '@phosphor-icons/vue';
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import SelectPO from '@/views/delivery/components/deliveryWorkFlow/step1SelectPO/selectPO.vue';
 import VerifyItem from '@/views/delivery/components/deliveryWorkFlow/step2VerifyItem/verifyItem.vue';
@@ -9,7 +10,7 @@ import { ProButton, ProCard } from '@prosync_solutions/ui';
 import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
-    components: { DeliveryInfo, SelectPO, VerifyItem, Review, ProCard, ProButton },
+    components: { DeliveryInfo, SelectPO, VerifyItem, Review, ProCard, ProButton, PhPackage, PhCheck, PhTruck, PhFile, PhWarning },
     setup() {
         // 1. DATA 
         const activeStep = ref(1);

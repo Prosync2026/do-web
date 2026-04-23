@@ -2,7 +2,12 @@
     <div class="location-item">
         <div class="location-row" :style="{ paddingLeft: level * 20 + 'px', marginTop: level === 0 ? '20px' : '10px' }" v-tooltip="`This is Location ${level + 1}`">
             <!-- 展开/折叠按钮 -->
-            <Button v-if="hasChildren" icon="pi" :class="isExpanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="p-button-text p-button-sm toggle-btn" @click="toggleExpand" />
+            <Button v-if="hasChildren" class="p-button-text p-button-sm toggle-btn" @click="toggleExpand">
+                <template #icon>
+                    <PhCaretDown v-if="isExpanded" />
+                    <PhCaretRight v-else />
+                </template>
+            </Button>
 
             <!-- L 形箭头 -->
             <span v-if="level > 0" class="arrow"> └─ </span>

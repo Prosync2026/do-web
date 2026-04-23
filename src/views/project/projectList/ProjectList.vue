@@ -32,9 +32,9 @@
                     </div>
 
                     <div class="text-sm text-gray-600 mb-2">
-                        <div><i class="pi pi-home"></i> {{ project.propertyType || 'LAND/HI-RISE' }}</div>
-                        <div><i class="pi pi-building"></i> {{ project.subElement }}</div>
-                        <div><i class="pi pi-map-marker"></i> {{ project.location || 'Kuala Lumpur' }}</div>
+                        <div><PhHouse /> {{ project.propertyType || 'LAND/HI-RISE' }}</div>
+                        <div><PhBuildings :size="18"  /> {{ project.subElement }}</div>
+                        <div><PhMapPin :size="18"  /> {{ project.location || 'Kuala Lumpur' }}</div>
                     </div>
 
                     <!-- Status -->

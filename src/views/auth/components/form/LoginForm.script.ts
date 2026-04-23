@@ -1,3 +1,4 @@
+import { PhEyeSlash } from '@phosphor-icons/vue';
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { useToast } from 'primevue/usetoast';
 import { nextTick, ref } from 'vue';

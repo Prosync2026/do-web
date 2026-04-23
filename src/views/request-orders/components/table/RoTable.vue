@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhDotsThreeVertical } from '@phosphor-icons/vue';
 import { Order } from '@/types/request-order.type';
 import type { ComponentPublicInstance } from 'vue';
 import { computed, ref } from 'vue';
@@ -32,7 +33,7 @@ const menuItems = computed(() => {
     const base = [
         {
             label: 'View',
-            icon: 'pi pi-eye',
+            icon: markRaw(PhEye),
             command: () => {
                 if (selectedOrder.value) {
                     emit('view', selectedOrder.value);
@@ -45,7 +46,7 @@ const menuItems = computed(() => {
         base.push(
             {
                 label: 'Approve',
-                icon: 'pi pi-check',
+                icon: markRaw(PhCheck),
                 command: () => {
                     if (selectedOrder.value) {
                         emit('approve', selectedOrder.value);
@@ -54,7 +55,7 @@ const menuItems = computed(() => {
             },
             {
                 label: 'Reject',
-                icon: 'pi pi-times',
+                icon: markRaw(PhX),
                 command: () => {
                     if (selectedOrder.value) {
                         emit('reject', selectedOrder.value);
@@ -95,7 +96,7 @@ const menuItems = computed(() => {
 
         <Column header="Action" style="width: 80px">
             <template #body="{ data }: { data: Order }">
-                <Button icon="pi pi-ellipsis-v" text @click="openMenu($event, data)" />
+                <Button text @click="openMenu($event, data)" ><template #icon><PhDotsThreeVertical class="mr-2" /></template></Button>
             </template>
         </Column>
     </DataTable>

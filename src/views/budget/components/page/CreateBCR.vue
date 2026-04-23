@@ -143,9 +143,9 @@
                     <h4 class="text-sm font-semibold mb-2">Existing Attachments</h4>
                     <div class="flex flex-wrap gap-2">
                         <div v-for="(file, index) in existingAttachments" :key="`existing-${index}`" class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
-                            <i class="pi pi-file"></i>
+                            <PhFile :size="18"  />
                             <span class="text-sm">{{ file.filename }}</span>
-                            <ProButton variant="ghost" size="sm" @click="previewAttachment(file)"><i class="pi pi-eye"></i></ProButton>
+                            <ProButton variant="ghost" size="sm" @click="previewAttachment(file)"><PhEye :size="18"  /></ProButton>
                             <ProButton variant="danger" size="sm" @click="removeAttachment(index)">Remove</ProButton>
                         </div>
                     </div>

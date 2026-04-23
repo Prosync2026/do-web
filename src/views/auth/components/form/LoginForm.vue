@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhEyeSlash, PhEye } from '@phosphor-icons/vue';
 import Button from 'primevue/button';
 import { useLoginForm } from './LoginForm.script';
 
@@ -16,8 +17,8 @@ const { username, password, showPassword, togglePasswordVisibility, handleSubmit
         <div class="relative">
             <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Password" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-sky-400 focus:outline-none pr-10" />
             <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500" @click="togglePasswordVisibility">
-                <i v-if="!showPassword" class="pi pi-eye"></i>
-                <i v-else class="pi pi-eye-slash"></i>
+                <PhEye v-if="!showPassword" :size="18" />
+                <PhEyeSlash :size="18" v-else  />
             </button>
         </div>
 

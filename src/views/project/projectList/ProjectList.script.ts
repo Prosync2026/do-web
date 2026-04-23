@@ -1,4 +1,5 @@
 // ProjectList.script.ts
+import { PhBuildings, PhMapPin } from '@phosphor-icons/vue';
 import { Company, ProjectRow } from '@/types/project.type';
 import { Motion } from '@motionone/vue';
 import Button from 'primevue/button';
@@ -8,7 +9,7 @@ import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'ProjectListCard',
-    components: { Motion, Button, Dropdown },
+    components: { Motion, Button, Dropdown, PhBuildings, PhMapPin },
     setup() {
         const router = useRouter();
         const search = ref('');

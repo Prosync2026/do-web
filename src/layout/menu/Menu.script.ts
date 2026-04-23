@@ -2,7 +2,8 @@ import { PermissionCodes } from '@/permissions';
 import { usePermissionStore } from '@/stores/permission/permission.store';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import type { MenuItemType } from '@/types/sidebar.type';
-import { computed, defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref, markRaw } from 'vue';
+import { PhHouse, PhChartBar, PhTicket, PhTag, PhShoppingCart, PhBook, PhWrench, PhCar } from '@phosphor-icons/vue';
 import MenuItem from './MenuItem.vue';
 
 export default defineComponent({
@@ -37,36 +38,36 @@ export default defineComponent({
         const fullMenuModel = computed<MenuItemType[]>(() => [
             {
                 items: [
-                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
+                    { label: 'Dashboard', icon: markRaw(PhHouse), to: '/' },
                     {
                         label: 'Budget',
-                        icon: 'pi pi-fw pi-chart-bar',
+                        icon: markRaw(PhChartBar),
                         visible: canViewBudget.value,
                         items: [
-                            { label: 'Budget List', icon: 'pi pi-fw pi-ticket', to: '/budget' },
-                            { label: 'Budget Change Request', icon: 'pi pi-fw pi-tags', to: '/bcr' }
+                            { label: 'Budget List', icon: markRaw(PhTicket), to: '/budget' },
+                            { label: 'Budget Change Request', icon: markRaw(PhTag), to: '/bcr' }
                         ]
                     },
                     {
                         label: 'Request Orders',
-                        icon: 'pi pi-fw pi-shopping-cart',
+                        icon: markRaw(PhShoppingCart),
                         to: '/request-orders',
                         badge: roStore.pendingCount,
                         visible: canViewRO.value
                     },
                     {
                         label: 'Purchase Orders',
-                        icon: 'pi pi-fw pi-book',
+                        icon: markRaw(PhBook),
                         to: '/purchase-orders',
                         visible: canViewPO.value,
-                        badgeIcon: 'pi pi-fw pi-wrench'
+                        badgeIcon: markRaw(PhWrench)
                     },
                     {
                         label: 'Deliveries',
-                        icon: 'pi pi-fw pi-car',
+                        icon: markRaw(PhCar),
                         to: '/deliveries',
                         visible: canViewDelivery.value,
-                        badgeIcon: 'pi pi-fw pi-wrench'
+                        badgeIcon: markRaw(PhWrench)
                     }
                 ]
             }

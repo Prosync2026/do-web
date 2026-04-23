@@ -1,3 +1,4 @@
+import { PhSpinner, PhXCircle } from '@phosphor-icons/vue';
 import { computed, defineComponent, onMounted, ref, toRaw, watch } from 'vue';
 import { ProModal, ProTable, ProInput, ProSelect, ProDatePicker, ProButton, ProTag } from '@prosync_solutions/ui';
 
@@ -9,15 +10,7 @@ import type { BudgetItem, FilterOption } from '../../../../types/request-order.t
 
 export default defineComponent({
     name: 'CreateROModal',
-    components: {
-        ProModal,
-        ProTable,
-        ProInput,
-        ProSelect,
-        ProDatePicker,
-        ProButton,
-        ProTag
-    },
+    components: { ProModal, ProTable, ProInput, ProSelect, ProDatePicker, ProButton, ProTag, PhSpinner, PhXCircle },
     props: {
         visible: { type: Boolean, default: false },
         projectId: { type: Number, required: true },

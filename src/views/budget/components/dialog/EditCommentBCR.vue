@@ -1,7 +1,7 @@
 <script src="./EditCommentBCR.script.ts"></script>
 <template>
     <Teleport to="body">
-        <ProModal :modelValue="visible" @update:modelValue="$emit('update:visible', $event)" title="" size="lg">
+        <ProModal :modelValue="visible" @update:modelValue="$emit('update:visible', $event)" title="" size="lg" class="!z-[1000]">
             <template #header>
                 <span class="font-bold text-xl"> Edit Comments - {{ user.role }} </span>
             </template>
