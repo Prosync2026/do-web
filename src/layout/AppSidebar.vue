@@ -2,7 +2,7 @@
 import { useLayout } from '@/layout/composables/layout';
 import { PermissionCodes } from '@/permissions';
 import { usePermissionStore } from '@/stores/permission/permission.store';
-import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
+import CartWithBadge from '@/components/icons/CartWithBadge.vue';
 import { Motion } from '@motionone/vue';
 import { PhBook, PhChartBar, PhHouse, PhShoppingCart, PhTag, PhTicket, PhTruck, PhWrench } from '@phosphor-icons/vue';
 import { ProSidebar } from '@prosync_solutions/ui';
@@ -16,7 +16,6 @@ const role = ref<string | null>(null);
 
 // Permission & Store logic migrated from Menu.script.ts
 const permissionStore = usePermissionStore();
-const roStore = useRequestOrderStore();
 
 const canViewRO = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_REQUEST_ORDER));
 const canViewBudget = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_BUDGET));
@@ -65,9 +64,8 @@ const navItems = computed(() =>
         },
         {
             label: 'Request Orders',
-            icon: PhShoppingCart,
+            icon: CartWithBadge,
             to: '/request-orders',
-            badge: roStore.pendingCount,
             visible: canViewRO.value
         },
         {
