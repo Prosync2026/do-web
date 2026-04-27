@@ -13,7 +13,7 @@
                         <h1 class="text-2xl font-bold dark:text-white">MK1 Project</h1>
                         <p class="text-sm text-gray-500 dark:text-gray-300 mt-1">Project Code: MK1-001</p>
                         <div class="flex items-center gap-2 mt-1">
-                            <i class="pi pi-building text-gray-500 dark:text-gray-300"></i>
+                            <PhBuildings :size="16" class="text-gray-500 dark:text-gray-300" />
                             <p class="text-sm text-gray-500 dark:text-gray-300 mt-1">ABC Company</p>
                         </div>
                     </div>

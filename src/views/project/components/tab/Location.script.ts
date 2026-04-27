@@ -1,3 +1,4 @@
+import { PhFile, PhImage, PhUpload, PhCheck } from '@phosphor-icons/vue';
 import LocationItem from '@/views/project/components/page/PreviewLocation.vue';
 import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
@@ -11,7 +12,7 @@ interface Location {
 
 export default defineComponent({
     name: 'LocationPreviewSetup',
-    components: { Button, Dropdown, InputText, LocationItem },
+    components: { Button, Dropdown, InputText, LocationItem, PhFile, PhImage, PhUpload, PhCheck },
     setup() {
         const exportContent = ref<HTMLElement | null>(null);
         const selectedLevel = ref<number | null>(null);

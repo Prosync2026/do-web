@@ -10,7 +10,7 @@
 
         <!-- Search Bar -->
         <div class="mb-4">
-            <ProInput v-model="searchQuery" placeholder="Search by draft ID, requester, project, or budget type..." icon="pi pi-search" class="w-full" />
+            <ProInput v-model="searchQuery" placeholder="Search by draft ID, requester, project, or budget type..."  class="w-full" ><template #icon><PhMagnifyingGlass /></template></ProInput>
         </div>
 
         <!-- Drafts Table -->
@@ -46,14 +46,14 @@
 
                 <template #cell-itemsCount="{ row }">
                     <div class="flex items-center gap-1">
-                        <i class="pi pi-box text-gray-500"></i>
+                        <PhPackage :size="18" class="text-gray-500"  />
                         <span>{{ row.itemsCount }}</span>
                     </div>
                 </template>
 
                 <template #cell-lastModified="{ row }">
                     <div class="flex items-center gap-1">
-                        <i class="pi pi-calendar text-gray-500"></i>
+                        <PhCalendarBlank :size="18" class="text-gray-500"  />
                         <span>{{ formatDate(row.lastModified) }}</span>
                     </div>
                 </template>

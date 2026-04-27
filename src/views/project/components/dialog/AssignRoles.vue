@@ -6,7 +6,7 @@
         <div class="flex items-center gap-3 mb-4">
             <Dropdown v-model="selectedRole" :options="roles" optionLabel="label" optionValue="value" placeholder="Select Project Role" class="w-[180px] p-dropdown-sm" />
             <Dropdown v-model="selectedUser" :options="users" optionLabel="label" optionValue="value" placeholder="Select System User" class="w-[180px] p-dropdown-sm" />
-            <Button label="Add" icon="pi pi-plus" class="p-button-primary p-button-sm" :disabled="!selectedRole || !selectedUser" @click="addAssignment" />
+            <Button label="Add" class="p-button-primary p-button-sm" :disabled="!selectedRole || !selectedUser" @click="addAssignment" ><template #icon><PhPlus class="mr-2" /></template></Button>
         </div>
 
         <!-- Assigned Table -->
@@ -24,7 +24,7 @@
                         <td class="py-2 px-4">{{ item.role }}</td>
                         <td class="py-2 px-4">{{ item.user }}</td>
                         <td class="py-2 px-4">
-                            <Button icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm" @click="removeAssignment(index)" />
+                            <Button class="p-button-text p-button-danger p-button-sm" @click="removeAssignment(index)" ><template #icon><PhTrash class="mr-2" /></template></Button>
                         </td>
                     </tr>
                     <tr v-if="assignments.length === 0">
@@ -37,7 +37,7 @@
         <!-- Footer -->
         <template #footer>
             <Button label="Cancel" class="p-button-text text-gray-500" @click="close" />
-            <Button label="Save" icon="pi pi-check" class="p-button-primary" @click="save" />
+            <Button label="Save" class="p-button-primary" @click="save" ><template #icon><PhCheck class="mr-2" /></template></Button>
         </template>
     </Dialog>
 </template>

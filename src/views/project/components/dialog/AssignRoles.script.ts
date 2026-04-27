@@ -1,3 +1,4 @@
+import { PhPlus, PhTrash, PhCheck } from '@phosphor-icons/vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
@@ -10,7 +11,7 @@ interface Assignment {
 
 export default defineComponent({
     name: 'AssignRoles',
-    components: { Dialog, Dropdown, Button },
+    components: { Dialog, Dropdown, Button, PhPlus, PhTrash, PhCheck },
     props: {
         modelValue: { type: Boolean, required: true }
     },

@@ -248,7 +248,7 @@ export default defineComponent({
             confirm.require({
                 message: `Switching from "${oldType}" to "${newType}" will clear all filled data to avoid conflicts. Continue?`,
                 header: 'Confirm Type Change',
-                icon: 'pi pi-exclamation-triangle',
+                icon: markRaw(PhWarning),
                 acceptLabel: 'Yes, Reset',
                 rejectLabel: 'Cancel',
                 acceptClass: 'p-button-danger',

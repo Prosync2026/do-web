@@ -5,7 +5,7 @@
         <template #header>
             <div class="flex items-center justify-between w-full">
                 <h3 class="text-lg font-semibold flex items-center gap-2">
-                    <i class="pi pi-sitemap"></i>
+                    <PhTreeStructure :size="18"  />
                     Approval Flow
                 </h3>
                 <ProButton variant="ghost" size="sm" @click="showApprovalFlow = !showApprovalFlow">{{ showApprovalFlow ? 'Hide' : 'Show' }}</ProButton>
@@ -19,10 +19,10 @@
                 <div class="flex items-center gap-3 flex-wrap">
                     <template v-for="(item, index) in discussions" :key="index">
                         <ProButton :variant="getButtonVariant(item, index)" size="sm" @click="togglePanel(index)">
-                            <i :class="getStepIcon(item)" class="mr-1"></i>
+                            <component :is="getStepIcon(item)" :size="18" class="mr-1" />
                             {{ getStepLabel(item) }}
                         </ProButton>
-                        <i v-if="index < discussions.length - 1" class="pi pi-angle-right text-gray-400"></i>
+                        <PhCaretRight :size="18" class="text-gray-400" v-if="index < discussions.length - 1"  />
                     </template>
                 </div>
 

@@ -6,18 +6,11 @@ import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { ProCard, ProButton, ProTag, ProTable } from '@prosync_solutions/ui';
-import { PhArrowsLeftRight } from '@phosphor-icons/vue';
+import { PhArrowsLeftRight, PhReceipt, PhTruck, PhPackage } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'Review',
-    components: {
-        Toast,
-        ProCard,
-        ProButton,
-        ProTag,
-        ProTable,
-        PhArrowsLeftRight
-    },
+    components: { Toast, ProCard, ProButton, ProTag, ProTable, PhArrowsLeftRight, PhReceipt, PhTruck, PhPackage },
     emits: ['update', 'next-step', 'prev-step'],
     props: {
         deliveryData: {

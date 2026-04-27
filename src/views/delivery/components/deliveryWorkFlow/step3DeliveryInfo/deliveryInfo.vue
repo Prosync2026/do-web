@@ -3,13 +3,13 @@
 <template>
     <div class="p-mb-5 mt-5">
         <Message severity="secondary" variant="outlined" :closable="false">
-            <i class="pi pi-exclamation-circle"></i>
+            <PhWarningCircle :size="18"  />
             Provide delivery information. Plate number and photos are optional - you can proceed directly.
         </Message>
 
         <ProCard class="mt-6 shadow-sm">
             <div class="flex items-center gap-2 mb-6 text-xl font-bold">
-                <i class="pi pi-truck"></i>
+                <PhTruck :size="18"  />
                 <span>Delivery Information</span>
             </div>
             <form @submit.prevent="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full">
@@ -41,7 +41,7 @@
                     <!-- ATTACHMENTS (Delivery Documents) -->
                     <div class="grid grid-cols-1 gap-4 p-3">
                         <label class="font-semibold text-gray-800 flex items-center">
-                            <i class="pi pi-file mr-2"></i>
+                            <PhFile :size="18" class="mr-2"  />
                             Attachments (Delivery Documents - optional, max 10MB)
                         </label>
                         <ProUploadFile v-model="deliveryAttachments" multiple accept="image/*" :maxSize="10" />
@@ -50,7 +50,7 @@
                     <!-- EVIDENCE FILES (Photos) -->
                     <div class="grid grid-cols-1 gap-4 p-3 mt-4">
                         <label class="font-semibold text-gray-800 flex items-center">
-                            <i class="pi pi-camera mr-2"></i>
+                            <PhCamera :size="18" class="mr-2"  />
                             Delivery Evidence Photos (optional, max 10MB)
                         </label>
                         <ProUploadFile v-model="evidenceFiles" multiple accept="image/*" :maxSize="10" />

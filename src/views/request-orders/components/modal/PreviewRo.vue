@@ -106,7 +106,7 @@
 
         <!-- Attachments Info -->
         <div v-if="summaryData.attachmentsCount > 0" class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            <i class="pi pi-paperclip mr-2"></i>
+            <PhPaperclip :size="18" class="mr-2"  />
             <span>{{ summaryData.attachmentsCount }} {{ summaryData.attachmentsCount === 1 ? 'attachment' : 'attachments' }}</span>
         </div>
 

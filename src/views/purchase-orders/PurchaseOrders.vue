@@ -114,7 +114,7 @@
 
                                 <template #actions="{ row }">
                                     <ProButton variant="secondary" size="sm" @click="viewPO(row)" title="View Purchase Order">
-                                        <i class="pi pi-eye text-base text-gray-700"></i>
+                                        <PhEye :size="18" class="text-base text-gray-700"  />
                                     </ProButton>
                                 </template>
                             </ProTable>

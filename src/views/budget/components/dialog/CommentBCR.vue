@@ -1,7 +1,7 @@
 <script src="./CommentBCR.script.ts"></script>
 <template>
     <Teleport to="body">
-        <ProModal :modelValue="visible" @update:modelValue="$emit('update:visible', $event)" title="" size="xl">
+        <ProModal :modelValue="visible" @update:modelValue="$emit('update:visible', $event)" title="" size="xl" class="!z-[1000]">
             <template #header>
                 <span class="font-bold text-xl">Add Comments - {{ user.role }}</span>
             </template>

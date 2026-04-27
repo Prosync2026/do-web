@@ -6,11 +6,11 @@ import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput } from '@prosync_solutions/ui';
-import { PhArrowsLeftRight } from '@phosphor-icons/vue';
+import { PhArrowsLeftRight, PhEye, PhPlus } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'Deliveries',
-    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, PhArrowsLeftRight },
+    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, PhArrowsLeftRight, PhEye, PhPlus },
     setup() {
         const deliveryStore = useDeliveryStore();
         const projectStore = useProjectStore();

@@ -1,5 +1,7 @@
+import { PhEyeSlash } from '@phosphor-icons/vue';
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { useToast } from 'primevue/usetoast';
+import { useAppInitializer } from '@/bootstrap/useAppInitializer';
 import { nextTick, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -38,6 +40,10 @@ export function useLoginForm() {
 
             if (success) {
                 await nextTick();
+
+                // Re-initialize app bootstraps (fetches global counts) now that we have a token
+                const { init } = useAppInitializer();
+                await init();
 
                 toast.add({
                     severity: 'success',

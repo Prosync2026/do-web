@@ -344,15 +344,14 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         if (!token) return;
 
         try {
-            const response = await requestOrderService.getSubmittedTotal();
-
-            if (!response.success) {
-                return;
+            // Mirror the local RO page logic to match the "Pending" tab count exactly
+            const response = await requestOrderService.getRequestOrders({ page: 1, pageSize: 10000 });
+            
+            if (response && response.data) {
+                const submittedOrders = response.data.filter((o: any) => o.Status === 'Submitted');
+                pendingCount.value = submittedOrders.length;
+                localStorage.setItem('ro_pending_count', String(pendingCount.value));
             }
-
-            pendingCount.value = response.count ?? 0;
-            // totalSubmitted.value = response.totalSubmittedValue ?? 0; // keep for future use if needed
-            localStorage.setItem('ro_pending_count', String(pendingCount.value));
         } catch (error) {
             console.error('Failed to refresh RO count', error);
         }

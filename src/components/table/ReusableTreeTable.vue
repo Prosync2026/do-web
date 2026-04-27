@@ -17,7 +17,7 @@
             tableStyle="min-width: 50rem"
         >
             <template #paginatorstart>
-                <Button type="button" icon="pi pi-refresh" text @click="$emit('refresh')" />
+                <Button type="button" text @click="$emit('refresh')" ><template #icon><PhArrowsClockwise class="mr-2" /></template></Button>
             </template>
 
             <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :expander="col.expander || false" :style="col.style">
@@ -30,7 +30,7 @@
             </Column>
 
             <template #paginatorend>
-                <Button type="button" icon="pi pi-download" text @click="$emit('download')" />
+                <Button type="button" text @click="$emit('download')" ><template #icon><PhDownload class="mr-2" /></template></Button>
             </template>
         </TreeTable>
     </div>

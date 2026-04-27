@@ -1,4 +1,5 @@
-import { defineComponent, onMounted, ref } from 'vue';
+import { PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle } from '@phosphor-icons/vue';
+import { defineComponent, onMounted, ref, markRaw } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { ProButton, ProCard, ProDivider, ProEmpty, ProTag, ProToast, ProTooltip } from '@prosync_solutions/ui';
@@ -12,17 +13,7 @@ import editcommentBCRModal from '@/views/budget/components/dialog/EditCommentBCR
 
 export default defineComponent({
     name: 'DiscussionThread',
-    components: {
-        ProButton,
-        ProTag,
-        ProCard,
-        ProDivider,
-        ProEmpty,
-        ProTooltip,
-        ProToast,
-        editcommentBCRModal,
-        commentBCRModal
-    },
+    components: { ProButton, ProTag, ProCard, ProDivider, ProEmpty, ProTooltip, ProToast, editcommentBCRModal, commentBCRModal, PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle },
     props: {
         editMode: {
             type: Boolean,
@@ -242,9 +233,9 @@ export default defineComponent({
         };
 
         const getStepIcon = (item: DiscussionItem) => {
-            if (item.RecommendationType === 'Reject') return 'pi pi-times-circle';
-            if (item.RecommendationType) return 'pi pi-check-circle';
-            return 'pi pi-exclamation-circle';
+            if (item.RecommendationType === 'Reject') return markRaw(PhXCircle);
+            if (item.RecommendationType) return markRaw(PhCheckCircle);
+            return markRaw(PhWarningCircle);
         };
         const getStepLabel = (item: DiscussionItem) => item.role;
 

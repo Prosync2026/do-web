@@ -3,14 +3,14 @@
 <template>
     <div class="p-mb-5 mt-5">
         <Message severity="secondary" variant="outlined" :closable="false">
-            <i class="pi pi-receipt"></i>
+            <PhReceipt :size="18"  />
             Review all delivery information before saving. Make sure all details are accurate.
         </Message>
         <form @submit.prevent="onFormSubmit" class="flex flex-col gap-4 mt-4">
             <div class="flex flex-col md:flex-row gap-4 mt-4">
                 <ProCard class="flex-1 shadow-sm">
                     <div class="flex items-center mb-4">
-                        <i class="pi pi-truck mr-2"></i>
+                        <PhTruck :size="18" class="mr-2"  />
                         <span class="text-base font-semibold">Delivery Information</span>
                     </div>
                     <div class="grid gap-2 text-sm">
@@ -35,7 +35,7 @@
 
                 <ProCard class="flex-1 shadow-sm">
                     <div class="flex items-center mb-4">
-                        <i class="pi pi-box mr-2"></i>
+                        <PhPackage :size="18" class="mr-2"  />
                         <span class="text-base font-semibold">Purchase Order</span>
                     </div>
                     <div class="grid gap-2 text-sm">

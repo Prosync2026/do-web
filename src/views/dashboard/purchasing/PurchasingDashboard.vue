@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ProButton, ProStatisticCard, ProCard } from '@prosync_solutions/ui';
-import { PhCurrencyDollar, PhWarning } from '@phosphor-icons/vue';
+import { PhCurrencyDollar, PhWarning, PhArrowsClockwise, PhList, PhFilePdf } from '@phosphor-icons/vue';
 import { usePurchasingDashboard } from './PurchasingDashboard.script';
 
 const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequests, urgentValue, currentStatus, navigateToRequestOrders, recentActivity, formatTimeAgo } = usePurchasingDashboard();
@@ -39,7 +39,7 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
             <!-- Status -->
             <!-- <div class="shadow-sm border border-gray-200 rounded-lg p-6">
                 <h3 class="dark:text-gray-100 text-gray-800 font-semibold mb-2 flex items-center gap-2">
-                    <i class="pi pi-refresh text-gray-600"></i>
+                    <PhArrowsClockwise :size="18" class="text-gray-600"  />
                     Status
                 </h3>
                 <div class="dark:text-gray-100 text-3xl font-bold text-gray-900 mb-2">
@@ -56,7 +56,7 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
                     <h3 class="dark:text-amber-100 text-amber-800 font-semibold text-lg mb-2">Urgent: {{ pendingApprovals }} Request Orders Need Approval</h3>
                     <p class="dark:text-amber-100 text-amber-700">Total value: RM{{ urgentValue.toLocaleString() }}</p>
                 </div>
-                <Button label="Review Now" icon="pi pi-exclamation-triangle" class="bg-amber-600 hover:bg-amber-700 border-amber-600 hover:border-amber-700" @click="navigateToRequestOrders" />
+                <Button label="Review Now" class="bg-amber-600 hover:bg-amber-700 border-amber-600 hover:border-amber-700" @click="navigateToRequestOrders" ><template #icon><PhWarning class="mr-2" /></template></Button>
             </div>
         </div>
 
@@ -96,8 +96,8 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
                 <div class="space-y-3">
-                    <Button label="View All Request Orders" icon="pi pi-list" outlined class="w-full" @click="navigateToRequestOrders" />
-                    <Button label="Generate Report" icon="pi pi-file-pdf" outlined class="w-full" disabled />
+                    <Button label="View All Request Orders" outlined class="w-full" @click="navigateToRequestOrders" ><template #icon><PhList class="mr-2" /></template></Button>
+                    <Button label="Generate Report" outlined class="w-full" disabled ><template #icon><PhFilePdf class="mr-2" /></template></Button>
                 </div>
             </div>
         </div>

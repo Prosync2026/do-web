@@ -1,3 +1,4 @@
+import { PhFilePlus } from '@phosphor-icons/vue';
 import AssignApproval from '@/views/project/components/dialog/AssignApproval.vue';
 import Card from 'primevue/card';
 import { defineComponent, ref } from 'vue';
@@ -8,7 +9,7 @@ interface Person {
 
 export default defineComponent({
     name: 'RequestSummaryCards',
-    components: { Card, AssignApproval },
+    components: { Card, AssignApproval, PhFilePlus },
     setup() {
         const budgetChangeList = ref<Person[]>([
             { name: 'ZIYU', role: 'PM' },

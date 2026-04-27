@@ -1,3 +1,4 @@
+import { PhPackage, PhSparkle } from '@phosphor-icons/vue';
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import { PurchaseOrderCard } from '@/types/delivery.type';
 import type { PurchaseOrderItem } from '@/types/purchase.type';
@@ -12,7 +13,7 @@ import { ProCard, ProButton, ProTag, ProInput } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'SelectPO',
-    components: { Message, Toast, Form, SmartScanModal, ProCard, ProButton, ProTag, ProInput },
+    components: { Message, Toast, Form, SmartScanModal, ProCard, ProButton, ProTag, ProInput, PhPackage, PhSparkle },
     emits: ['update', 'next-step', 'prev-step', 'smartScan', 'smartScanManual'],
     setup(_, { emit }) {
         const toast = useToast();

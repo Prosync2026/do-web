@@ -14,7 +14,7 @@ import { Button } from "@prosync/ui-kit";
                     <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85);" />
                 </div>
                 <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')">
-                    <i class="pi pi-plus mr-2"></i> New Request Order
+                    <PhPlus :size="18" class="mr-2"  /> New Request Order
                 </ProButton>
             </div>
             <teleport to="body">
@@ -86,7 +86,7 @@ import { Button } from "@prosync/ui-kit";
                                 <template #cell-budgetType="{ row }">
                                     <div class="flex items-center gap-2">
                                         <ProTag :label="row.budgetType" :variant="row.budgetType === 'Budgeted' ? 'success' : 'warn'" />
-                                        <i v-if="row.isBudgetExceeded" class="pi pi-exclamation-triangle text-red-500 text-sm" v-tooltip.top="'Budget exceeded - PD approval required'" />
+                                        <PhWarning v-if="row.isBudgetExceeded" :size="16" weight="bold" class="text-red-500 text-sm" v-tooltip.top="'Budget exceeded - PD approval required'" />
                                     </div>
                                 </template>
 

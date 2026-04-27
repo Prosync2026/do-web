@@ -15,7 +15,7 @@
                             <ProSelect v-model="selectedFromVersionCode" :options="availableVersionOptions" placeholder="Select From Version" class="w-56 h-9 text-sm" />
                         </div>
 
-                        <i class="pi pi-arrow-right text-gray-400 text-sm mt-4"></i>
+                        <PhArrowRight :size="18" class="text-gray-400 text-sm mt-4"  />
 
                         <div class="flex flex-col gap-1">
                             <label class="text-xs text-gray-500 font-medium">To Version</label>
@@ -26,7 +26,7 @@
                     <!-- Resolved labels from API response -->
                     <div class="flex items-center gap-2 mt-3">
                         <ProTag :label="previousVersionLabel" variant="secondary" />
-                        <i class="pi pi-arrow-right text-gray-400 text-sm"></i>
+                        <PhArrowRight :size="18" class="text-gray-400 text-sm"  />
                         <ProTag :label="currentVersionLabel" variant="info" />
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                 </div>
                 <div class="flex gap-2 items-center">
                     <ProInput v-model="search" placeholder="Search..." class="w-64" @keyup.enter="onSearchWrapper(search)" />
-                    <ProButton v-if="showImportFile" variant="secondary" @click="handleImportClick"> <i class="pi pi-upload mr-2"></i> Import CSV </ProButton>
+                    <ProButton v-if="showImportFile" variant="secondary" @click="handleImportClick"> <PhUpload :size="18" class="mr-2"  /> Import CSV </ProButton>
                 </div>
             </div>
 
@@ -128,7 +128,7 @@
                     </template>
                     <template #actions="{ row }">
                         <ProButton variant="ghost" size="sm" @click="handleActionClick('edit', row)">
-                            <i class="pi pi-pencil"></i>
+                            <PhPencil :size="18"  />
                         </ProButton>
                     </template>
                 </ProTable>
@@ -144,7 +144,7 @@
                 </div>
                 <div class="flex gap-2 items-center">
                     <ProInput v-model="search" placeholder="Search..." class="w-64" @keyup.enter="onSearchWrapper(search)" />
-                    <ProButton v-if="showImportFile" variant="secondary" @click="handleImportClick"> <i class="pi pi-upload mr-2"></i> Import CSV </ProButton>
+                    <ProButton v-if="showImportFile" variant="secondary" @click="handleImportClick"> <PhUpload :size="18" class="mr-2"  /> Import CSV </ProButton>
                 </div>
             </div>
 
@@ -172,7 +172,7 @@
 
                 <template #actions="{ row }">
                     <ProButton variant="ghost" size="sm" @click="handleActionClick('edit', row)">
-                        <i class="pi pi-pencil"></i>
+                        <PhPencil :size="18"  />
                     </ProButton>
                 </template>
             </ProTable>

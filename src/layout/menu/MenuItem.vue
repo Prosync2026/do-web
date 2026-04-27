@@ -1,6 +1,7 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import { Badge } from 'primevue';
+import { PhCaretDown } from '@phosphor-icons/vue';
 import { onBeforeMount, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
@@ -73,27 +74,31 @@ function checkActiveRoute(item) {
         <div v-if="root && item.visible !== false" class="layout-menuitem-root-text">{{ item.label }}</div>
 
         <a v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
-            <i :class="item.icon" class="layout-menuitem-icon"></i>
+            <div class="relative flex items-center mr-2">
+                <component :is="item.icon" :size="20" class="layout-menuitem-icon !m-0"></component>
+                <Badge v-if="Number(item.badge) > 0" :value="item.badge" class="!bg-primary !text-white absolute shadow-sm pointer-events-none" style="top: -6px; right: -8px; transform: scale(0.75); transform-origin: top right" />
+            </div>
+            
             <span class="layout-menuitem-text flex justify-between items-center w-full">
                 <span>{{ item.label }}</span>
                 <!-- Replace Badge with icon -->
-                <i v-if="item.badgeIcon" :class="item.badgeIcon" style="color: #0b55f5; font-size: 14px"></i>
-                <!-- Keep Badge for pendingCount only -->
-                <Badge v-else-if="item.badge && typeof item.badge === 'number'" :value="item.badge" severity="warn" class="absolute right-0" />
+                <component v-if="item.badgeIcon" :is="item.badgeIcon" :size="16" style="color: #0b55f5"></component>
             </span>
-            <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
+            <PhCaretDown class="layout-submenu-toggler" :size="16" weight="bold" v-if="item.items" />
         </a>
 
         <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
-            <i :class="item.icon" class="layout-menuitem-icon"></i>
+            <div class="relative flex items-center mr-2">
+                <component :is="item.icon" :size="20" class="layout-menuitem-icon !m-0"></component>
+                <Badge v-if="Number(item.badge) > 0" :value="item.badge" class="!bg-primary !text-white absolute shadow-sm pointer-events-none" style="top: -6px; right: -8px; transform: scale(0.75); transform-origin: top right" />
+            </div>
+            
             <span class="layout-menuitem-text flex justify-between items-center w-full">
                 <span>{{ item.label }}</span>
                 <!-- Replace Badge with icon -->
-                <i v-if="item.badgeIcon" :class="item.badgeIcon" style="color: #0b55f5; font-size: 14px"></i>
-                <!-- Keep Badge for pendingCount only -->
-                <Badge v-else-if="item.badge && typeof item.badge === 'number'" :value="item.badge" severity="warn" class="absolute right-0" />
+                <component v-if="item.badgeIcon" :is="item.badgeIcon" :size="16" style="color: #0b55f5"></component>
             </span>
-            <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
+            <PhCaretDown class="layout-submenu-toggler" :size="16" weight="bold" v-if="item.items" />
         </router-link>
 
         <Transition v-if="item.items && item.visible !== false" name="layout-submenu">

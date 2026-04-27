@@ -11,11 +11,11 @@ import { Motion } from '@motionone/vue';
 import { ProButton, ProCard, ProInput, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { PhWarningCircle, PhChatText, PhCheckCircle, PhTrendUp } from '@phosphor-icons/vue';
+import { PhWarningCircle, PhChatText, PhCheckCircle, PhTrendUp, PhCaretRight, PhPencil } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
-    components: { SummaryCard, Motion, ProTag, ProButton, ProTable, ProInput, ProSelect, ProCard },
+    components: { SummaryCard, Motion, ProTag, ProButton, ProTable, ProInput, ProSelect, ProCard, PhCaretRight, PhPencil },
     setup() {
         const { hasPermission } = usePermission();
 

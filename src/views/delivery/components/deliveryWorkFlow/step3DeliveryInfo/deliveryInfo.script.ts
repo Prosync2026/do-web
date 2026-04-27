@@ -1,3 +1,4 @@
+import { PhWarningCircle, PhTruck, PhFile, PhCamera } from '@phosphor-icons/vue';
 import { formatDateToAPI } from '@/utils/dateHelper';
 import Calendar from 'primevue/calendar';
 import Message from 'primevue/message';
@@ -9,17 +10,7 @@ import { ProCard, ProButton, ProTag, ProInput, ProTextarea, ProUploadFile } from
 
 export default defineComponent({
     name: 'DeliveryFormCard',
-    components: {
-        Message,
-        Toast,
-        Calendar,
-        ProCard,
-        ProButton,
-        ProTag,
-        ProInput,
-        ProTextarea,
-        ProUploadFile
-    },
+    components: { Message, Toast, Calendar, ProCard, ProButton, ProTag, ProInput, ProTextarea, ProUploadFile, PhWarningCircle, PhTruck, PhFile, PhCamera },
     props: {
         prefillAttachment: {
             type: File,

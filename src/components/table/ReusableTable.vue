@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhPlus, PhUpload, PhDotsThreeVertical, PhCaretDoubleLeft, PhCaretLeft, PhDownload } from '@phosphor-icons/vue';
 import type { TableColumn } from '@/types/table.type';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
@@ -301,8 +302,8 @@ function handleFilterChange(field: string, value: any) {
                 <Calendar v-else-if="f.type === 'date'" :placeholder="f.placeholder" v-model="activeFilters[f.field]" @input="handleFilterChange(f.field, activeFilters[f.field])" dateFormat="yy-mm-dd" class="min-w-[10rem]" />
             </template>
 
-            <Button v-if="props.showCreate" label="Create" icon="pi pi-plus" @click="props.onCreate?.()" />
-            <Button v-if="props.showImportFile" label="Import CSV" icon="pi pi-upload" @click="props.onImportFile?.()" />
+            <Button v-if="props.showCreate" label="Create" @click="props.onCreate?.()" ><template #icon><PhPlus class="mr-2" /></template></Button>
+            <Button v-if="props.showImportFile" label="Import CSV" @click="props.onImportFile?.()" ><template #icon><PhUpload class="mr-2" /></template></Button>
         </div>
     </div>
 
@@ -344,7 +345,7 @@ function handleFilterChange(field: string, value: any) {
 
                 <template v-else-if="col.action" #body="slotProps">
                     <div class="flex gap-2">
-                        <Button icon="pi pi-ellipsis-v" text @click="openMenu($event, slotProps.data, col.actions)" />
+                        <Button text @click="openMenu($event, slotProps.data, col.actions)" ><template #icon><PhDotsThreeVertical class="mr-2" /></template></Button>
                     </div>
                 </template>
 
@@ -366,7 +367,7 @@ function handleFilterChange(field: string, value: any) {
 
                 <template v-else-if="col.action" #body="slotProps">
                     <div class="flex gap-2">
-                        <Button icon="pi pi-ellipsis-v" text @click="openMenu($event, slotProps.data, col.actions)" />
+                        <Button text @click="openMenu($event, slotProps.data, col.actions)" ><template #icon><PhDotsThreeVertical class="mr-2" /></template></Button>
                     </div>
                 </template>
 
@@ -381,8 +382,8 @@ function handleFilterChange(field: string, value: any) {
             <div class="w-full sm:w-1/3 text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">Showing {{ displayStart }} – {{ displayEnd }} of {{ props.pagination.total }}</div>
 
             <div class="w-full sm:w-1/3 flex justify-center items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">
-                <Button icon="pi pi-angle-double-left" text :disabled="props.pagination.page === 1" @click="props.onPageChange?.(1)" title="First Page" />
-                <Button icon="pi pi-angle-left" text :disabled="props.pagination.page === 1" @click="props.onPageChange?.(props.pagination.page - 1)" title="Previous Page" />
+                <Button text :disabled="props.pagination.page === 1" @click="props.onPageChange?.(1)" title="First Page" ><template #icon><PhCaretDoubleLeft class="mr-2" /></template></Button>
+                <Button text :disabled="props.pagination.page === 1" @click="props.onPageChange?.(props.pagination.page - 1)" title="Previous Page" ><template #icon><PhCaretLeft class="mr-2" /></template></Button>
 
                 <div class="flex gap-1">
                     <Button
@@ -402,7 +403,7 @@ function handleFilterChange(field: string, value: any) {
             </div>
 
             <div class="w-full sm:w-1/3 flex justify-end mt-2 sm:mt-0">
-                <Button type="button" icon="pi pi-download" text @click="handleExport" title="Export CSV" />
+                <Button type="button" text @click="handleExport" title="Export CSV" ><template #icon><PhDownload class="mr-2" /></template></Button>
             </div>
         </div>
     </template>

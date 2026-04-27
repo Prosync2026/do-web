@@ -14,7 +14,7 @@
                     <!-- Step 1 -->
                     <div class="flex flex-col items-center gap-1 sm:gap-2 w-[70px] sm:w-24" :class="activeStep > 1 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 1 && goStep(1)">
                         <div :class="['w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 1 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
-                            <i class="pi pi-box text-sm sm:text-base"></i>
+                            <PhPackage :size="18" class="text-sm sm:text-base"  />
                         </div>
                         <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 1 ? 'text-brand-primary' : 'text-gray-500']">Select PO</span>
                     </div>
@@ -22,7 +22,7 @@
                     <!-- Step 2 -->
                     <div class="flex flex-col items-center gap-1 sm:gap-2 w-[70px] sm:w-24" :class="activeStep > 2 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 2 && goStep(2)">
                         <div :class="['w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 2 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
-                            <i class="pi pi-check text-sm sm:text-base"></i>
+                            <PhCheck :size="18" class="text-sm sm:text-base"  />
                         </div>
                         <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 2 ? 'text-brand-primary' : 'text-gray-500']">Verify Items</span>
                     </div>
@@ -30,7 +30,7 @@
                     <!-- Step 3 -->
                     <div class="flex flex-col items-center gap-1 sm:gap-2 w-[70px] sm:w-24" :class="activeStep > 3 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'" @click="activeStep > 3 && goStep(3)">
                         <div :class="['w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 3 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
-                            <i class="pi pi-truck text-sm sm:text-base"></i>
+                            <PhTruck :size="18" class="text-sm sm:text-base"  />
                         </div>
                         <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 3 ? 'text-brand-primary' : 'text-gray-500']">Delivery Info</span>
                     </div>
@@ -38,7 +38,7 @@
                     <!-- Step 4 -->
                     <div class="flex flex-col items-center gap-1 sm:gap-2 w-[70px] sm:w-24 cursor-default">
                         <div :class="['w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 4 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
-                            <i class="pi pi-file text-sm sm:text-base"></i>
+                            <PhFile :size="18" class="text-sm sm:text-base"  />
                         </div>
                         <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 4 ? 'text-brand-primary' : 'text-gray-500']">Review</span>
                     </div>
@@ -62,7 +62,7 @@
                     </div>
                     <div v-else class="flex flex-col justify-center py-5 gap-4 w-full">
                         <Message severity="warn" variant="outlined" :closable="false">
-                            <i class="pi pi-exclamation-triangle mr-2"></i>
+                            <PhWarning :size="18" class="mr-2"  />
                             Please complete all previous steps before reviewing.
                         </Message>
                         <div class="flex justify-end mt-4 gap-2 w-full">

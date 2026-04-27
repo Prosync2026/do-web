@@ -4,7 +4,7 @@
             <template #title>
                 <div class="border-b-2 border-primary-400 pb-2 mb-3 flex justify-between items-center">
                     <span class="text-lg font-semibold text-gray-800">Budget Change Request</span>
-                    <i class="pi pi-file-plus text-primary text-xl" @click="onAssignRoles"></i>
+                    <PhFilePlus :size="18" class="text-primary text-xl"  @click="onAssignRoles" />
                 </div>
             </template>
             <template #content>
@@ -24,7 +24,7 @@
             <template #title>
                 <div class="border-b-2 border-primary-400 pb-2 mb-3 flex justify-between items-center">
                     <span class="text-lg font-semibold text-gray-800">Request Order</span>
-                    <i class="pi pi-file-plus text-primary text-xl" @click="onAssignRoles"></i>
+                    <PhFilePlus :size="18" class="text-primary text-xl"  @click="onAssignRoles" />
                 </div>
             </template>
             <template #content>
@@ -44,7 +44,7 @@
             <template #title>
                 <div class="border-b-2 border-primary-400 pb-2 mb-3 flex justify-between items-center">
                     <span class="text-lg font-semibold text-gray-800">Request Order Exceeded Budget</span>
-                    <i class="pi pi-file-plus text-primary text-xl" @click="onAssignRoles"></i>
+                    <PhFilePlus :size="18" class="text-primary text-xl"  @click="onAssignRoles" />
                 </div>
             </template>
             <template #content>
