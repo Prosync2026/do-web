@@ -7,6 +7,9 @@ export default {
     plugins: [PrimeUI],
     theme: {
         extend: {
+            fontFamily: {
+                sans: ['"Open Sans"', 'sans-serif']
+            },
             colors: {
                 brand: {
                     primary: '#03439a',
