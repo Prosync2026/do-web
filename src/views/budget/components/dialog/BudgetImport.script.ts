@@ -1,4 +1,3 @@
-import { PhDownload, PhFileXls } from '@phosphor-icons/vue';
 import { budgetService } from '@/services/budget.service';
 import { useToast } from 'primevue/usetoast';
 import { ref, watch } from 'vue';
@@ -50,7 +49,6 @@ export default function useImportBudgetDialogLogic(
                     'UOM', // uom
                     'BUDGET QTY', // budget_qty
                     'RATE', // rate
-                    'AMOUNT', // amount
                     'WASTAGE' // wastage
                 ]
             ];
@@ -142,7 +140,6 @@ export default function useImportBudgetDialogLogic(
                 'UOM',
                 'BUDGET QTY',
                 'RATE',
-                'AMOUNT',
                 'WASTAGE'
             ];
 
