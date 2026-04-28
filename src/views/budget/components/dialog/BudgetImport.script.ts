@@ -40,6 +40,7 @@ export default function useImportBudgetDialogLogic(
                 [
                     'ITEM CODE', // item_code
                     'PUR.DESCRIPTION', // description
+                    'CATEGORY', // category
                     'ELEMENT', // element
                     'SUB ELEMENT', // sub_element
                     '1ST SUB ELEMENT', // 1st_sub_element
@@ -131,6 +132,7 @@ export default function useImportBudgetDialogLogic(
             const EXPECTED_HEADERS = [
                 'ITEM CODE',
                 'PUR.DESCRIPTION',
+                'CATEGORY',
                 'ELEMENT',
                 'SUB ELEMENT',
                 '1ST SUB ELEMENT',
