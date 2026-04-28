@@ -53,33 +53,33 @@
         <!-- Filters Row -->
         <div class="flex flex-wrap gap-3 mb-5 p-4">
             <!-- Change Type -->
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-1 min-w-[150px]">
                 <label class="text-xs text-gray-500 font-medium">Change Type</label>
-                <ProSelect v-model="activeFilters.changeType" :options="changeTypeOptions" class="min-w-[180px] text-sm" @update:modelValue="handleFilterChange" />
+                <ProSelect v-model="activeFilters.changeType" :options="changeTypeOptions" class="w-full text-sm" @update:modelValue="handleFilterChange" />
             </div>
 
             <!-- Location 1 -->
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-1 min-w-[150px]">
                 <label class="text-xs text-gray-500 font-medium">Location 1</label>
-                <ProSelect v-model="activeFilters.location1" :options="filterOptions.locations1" placeholder="All" class="min-w-[180px] text-sm" @update:modelValue="handleFilterChange" />
+                <ProSelect v-model="activeFilters.location1" :options="filterOptions.locations1" placeholder="All" class="w-full text-sm" @update:modelValue="handleFilterChange" />
             </div>
 
             <!-- Location 2 -->
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-1 min-w-[150px]">
                 <label class="text-xs text-gray-500 font-medium">Location 2</label>
-                <ProSelect v-model="activeFilters.location2" :options="filterOptions.locations2" placeholder="All" class="min-w-[180px] text-sm" @update:modelValue="handleFilterChange" />
+                <ProSelect v-model="activeFilters.location2" :options="filterOptions.locations2" placeholder="All" class="w-full text-sm" @update:modelValue="handleFilterChange" />
             </div>
 
             <!-- Element -->
-            <div class="flex flex-col gap-1" v-if="filterOptions.elements.length">
+            <div class="flex flex-col gap-1 min-w-[150px]" v-if="filterOptions.elements.length">
                 <label class="text-xs text-gray-500 font-medium">Element</label>
-                <ProSelect v-model="activeFilters.element" :options="filterOptions.elements" placeholder="All" class="min-w-[180px] text-sm" @update:modelValue="handleFilterChange" />
+                <ProSelect v-model="activeFilters.element" :options="filterOptions.elements" placeholder="All" class="w-full text-sm" @update:modelValue="handleFilterChange" />
             </div>
 
             <!-- Category -->
-            <div class="flex flex-col gap-1" v-if="filterOptions.categories.length">
+            <div class="flex flex-col gap-1 min-w-[150px]" v-if="filterOptions.categories.length">
                 <label class="text-xs text-gray-500 font-medium">Category</label>
-                <ProSelect v-model="activeFilters.category" :options="filterOptions.categories" placeholder="All" class="min-w-[180px] text-sm" @update:modelValue="handleFilterChange" />
+                <ProSelect v-model="activeFilters.category" :options="filterOptions.categories" placeholder="All" class="w-full text-sm" @update:modelValue="handleFilterChange" />
             </div>
 
             <!-- Reset -->
