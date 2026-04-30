@@ -1,13 +1,18 @@
 
-.p-datatable {
+.p-datatable .p-datatable-tbody > tr > td,
+.p-datatable .p-datatable-thead > tr > th {
     font-size: 12px !important;
 }
 .p-datatable-column-title {
     font-weight: 750 !important;
 }
 
-.p-inputtext {
-    border-width: 0.4px !important;
-    
+/* Force Prosync / PrimeVue icons to perfect absolute vertical centering regardless of global font-size hacks */
+.p-input-icon-left > i,
+.p-input-icon-right > i,
+.p-input-icon-left > svg,
+.p-input-icon-right > svg {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin-top: 0 !important;
 }
-

@@ -16,11 +16,8 @@
                         <ProInput v-model="department" label="Department" type="text" disabled />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1"> Reason for Request <span class="text-red-600 font-bold">*</span> </label>
-
-                        <ProSelect v-model="selectedReason" :options="reasonOptions" placeholder="Select Reason" class="w-full" />
-
-                        <ProBanner v-if="showValidation && !selectedReason" variant="error" title="Reason for request is required" class="mt-3" />
+                        <ProSelect v-model="selectedReason" :options="reasonOptions" placeholder="Select Reason" label="Reason for Request" required class="w-full" />
+                        <ProBanner v-if="showValidation && !selectedReason" variant="error" title="Reason for request is required" class="mt-2" />
                     </div>
                 </div>
 
@@ -30,13 +27,15 @@
             </ProCard>
 
             <!-- Materials Section -->
-            <label class="block text-sm text-gray-600 mb-1">Materials Section</label>
-
             <ProCard title="Materials" padding="md" class="mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex gap-2">
-                        <ProButton variant="primary" @click="openMeterial">＋ Add from Budget List</ProButton>
-                        <ProButton variant="secondary" @click="openSingleBudgetItem">＋ Add Manually Budget Item</ProButton>
+                        <ProButton variant="primary" @click="openMeterial">
+                            <PhPlus class="mr-2" :size="16" weight="bold" /> Add from Budget List
+                        </ProButton>
+                        <ProButton variant="secondary" @click="openSingleBudgetItem">
+                            <PhPlus class="mr-2" :size="16" weight="bold" /> Add Manually Budget Item
+                        </ProButton>
                     </div>
                 </div>
 
@@ -138,7 +137,6 @@
 
             <!-- Attachments -->
             <div class="mt-4">
-                <label class="block text-sm text-gray-600 mb-2">Attachments</label>
                 <div v-if="existingAttachments.length > 0" class="mb-4">
                     <h4 class="text-sm font-semibold mb-2">Existing Attachments</h4>
                     <div class="flex flex-wrap gap-2">
@@ -151,7 +149,7 @@
                     </div>
                 </div>
 
-                <ProUploadFile v-model="uploadFilesList" multiple accept="image/*" :maxSize="1" />
+                <ProUploadFile v-model="uploadFilesList" multiple accept="image/*" :maxSize="1" label="Attachments" />
             </div>
 
             <!-- Buttons -->

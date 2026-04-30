@@ -30,7 +30,7 @@ export default defineComponent({
 
         const roNumber = ref('');
         const requestBy = ref('');
-        const requestDate = ref<Date | null>(null);
+        const requestDate = ref('');
         const reason = ref('');
         const remark = ref('');
         const items = ref<any[]>([]);
@@ -73,7 +73,15 @@ export default defineComponent({
                 const s = singleBudgetChangeRequest.value as BudgetChangeRequest;
                 roNumber.value = s.DocNo ?? '';
                 requestBy.value = s.RequestedBy ?? '';
-                requestDate.value = s.RequestDate ? new Date(s.RequestDate) : null;
+                if (s.RequestDate) {
+                    const d = new Date(s.RequestDate);
+                    const yr = d.getFullYear();
+                    const mo = String(d.getMonth() + 1).padStart(2, '0');
+                    const da = String(d.getDate()).padStart(2, '0');
+                    requestDate.value = `${yr}-${mo}-${da}`;
+                } else {
+                    requestDate.value = '';
+                }
                 reason.value = s.Reason ?? '';
                 remark.value = s.Remark ?? '';
 
@@ -82,6 +90,7 @@ export default defineComponent({
                     BudgetChangeId: x.BudgetChangeId ?? 0,
                     BudgetItemId: x.BudgetItemId ?? 0,
                     ItemCode: x.ItemCode ?? '',
+                    ItemType: x.ItemType || (x.BudgetItemId && x.BudgetItemId !== 0 ? 'ExistingItem' : 'NewItem'),
                     Uom: x.Uom ?? '',
                     UnitPrice: x.UnitPrice ?? '0',
                     OrderedQty: x.OrderedQty ?? '0',
@@ -94,7 +103,13 @@ export default defineComponent({
                     UpdatedAt: x.UpdatedAt ?? '',
                     UpdatedBy: x.UpdatedBy ?? null,
                     location: x.location ?? '',
-                    element: x.element ?? ''
+                    location1: x.Location1 ?? '',
+                    location2: x.Location2 ?? '',
+                    element: x.Element ?? '',
+                    subElement: x.SubElement ?? '',
+                    subsubElement: x.SubSubElement ?? '',
+                    category: x.Category ?? '',
+                    wastage: x.Wastage ?? 0
                 }));
 
                 await fetchBudgetItems();
@@ -142,9 +157,10 @@ export default defineComponent({
                 TotalAmount: totalVarianceAmount.value,
                 Type: 'BudgetChangeRequest',
                 Items: items.value.map((i) => ({
-                    BudgetItemId: i.BudgetItemId,
+                    BudgetItemId: i.BudgetItemId || null,
                     ItemCode: i.ItemCode,
-                    ItemType: 'ExistingItem',
+                    ItemType: i.ItemType || (i.BudgetItemId && i.BudgetItemId !== 0 ? 'ExistingItem' : 'NewItem'),
+                    Name: i.Description,
                     Uom: i.Uom,
                     UnitPrice: Number(i.UnitPrice),
                     OrderedQty: Number(i.OrderedQty),
@@ -154,10 +170,10 @@ export default defineComponent({
                     Location1: i.location1 || '',
                     Location2: i.location2 || '',
                     Element: i.element || '',
-                    SubEelement: i.subElement || '',
+                    SubElement: i.subElement || '',
                     SubSubElement: i.subsubElement || '',
                     Category: i.category || '',
-                    Wastage: i.wastage,
+                    Wastage: i.wastage || 0,
                     ExceededQty: calcExceedQty(i)
                 }))
             };

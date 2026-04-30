@@ -11,11 +11,11 @@ import { Motion } from '@motionone/vue';
 import { ProButton, ProCard, ProInput, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { PhWarningCircle, PhChatText, PhCheckCircle, PhTrendUp, PhCaretRight, PhPencil } from '@phosphor-icons/vue';
+import { PhWarningCircle, PhChatText, PhCheckCircle, PhTrendUp, PhCaretRight, PhPencil, PhMagnifyingGlass, PhPlus } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
-    components: { SummaryCard, Motion, ProTag, ProButton, ProTable, ProInput, ProSelect, ProCard, PhCaretRight, PhPencil },
+    components: { SummaryCard, Motion, ProTag, ProButton, ProTable, ProInput, ProSelect, ProCard, PhCaretRight, PhPencil, PhMagnifyingGlass, PhPlus },
     setup() {
         const { hasPermission } = usePermission();
 
@@ -64,7 +64,7 @@ export default defineComponent({
             return budgetCRStore.budgetChangeRequestList.map((item, index) => {
                 const actions = ['view'];
 
-                if (canEditBCR.value && item.Status !== 'Approved') {
+                if (canEditBCR.value && item.Status === 'Draft') {
                     actions.push('edit');
                 }
 

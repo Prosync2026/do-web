@@ -54,7 +54,15 @@ export interface BudgetChangeItem {
     UpdatedAt: string;
     UpdatedBy: string | null;
     location: string;
+    Location1?: string;
+    Location2?: string;
     element: string;
+    Element?: string;
+    SubElement?: string;
+    SubSubElement?: string;
+    Category?: string;
+    Wastage?: number;
+    ItemType?: string;
     budgetQty?: string;
     budgetItemStatistics?: BudgetItemStatistics;
 }

@@ -63,15 +63,13 @@
 
                 <!-- Quantity -->
                 <div>
-                    <label class="required-label">Quantity</label>
-                    <InputNumber v-model="form.Quantity" :min="0" class="w-full" />
+                    <ProInput type="number" v-model.number="form.Quantity" :min="0" label="Quantity" required class="w-full" />
                     <small class="p-error text-red-500 text-xs" v-if="errors.Quantity">{{ errors.Quantity }}</small>
                 </div>
 
                 <!-- Rate -->
                 <div>
-                    <label class="required-label">Rate</label>
-                    <InputNumber v-model="form.Rate" :min="0" :minFractionDigits="2" class="w-full" />
+                    <ProInput type="number" v-model.number="form.Rate" :min="0" label="Rate" required class="w-full" />
                     <small class="p-error text-red-500 text-xs" v-if="errors.Rate">{{ errors.Rate }}</small>
                 </div>
 
@@ -82,8 +80,7 @@
 
                 <!-- Wastage -->
                 <div>
-                    <label>Wastage (%)</label>
-                    <InputNumber v-model="form.Wastage" :min="0" class="w-full" />
+                    <ProInput type="number" v-model.number="form.Wastage" :min="0" label="Wastage (%)" class="w-full" />
                 </div>
             </div>
 
@@ -97,9 +94,4 @@
     </Teleport>
 </template>
 
-<style scoped>
-.required-label::after {
-    content: ' *';
-    color: red;
-}
-</style>
+
