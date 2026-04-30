@@ -52,7 +52,7 @@
                         <div class="flex items-center gap-2 flex-wrap">
                             <template v-for="(step, index) in row.approvalFlow" :key="step.role">
                                 <ProTag :label="step.role" :variant="statusSeverity[step.status] || 'secondary'" />
-                                <i v-if="index < row.approvalFlow.length - 1" class="pi pi-angle-right text-gray-400" />
+                                <PhCaretRight v-if="index < row.approvalFlow.length - 1" :size="16" weight="bold" class="text-gray-400" />
                             </template>
                         </div>
                     </template>
@@ -60,10 +60,10 @@
                     <template #actions="{ row }">
                         <div class="flex gap-1">
                             <ProButton variant="ghost" size="sm" @click="handleActionClick('view', row)">
-                                <i class="pi pi-eye"></i>
+                                <PhEye :size="18" />
                             </ProButton>
                             <ProButton v-if="row.actions && row.actions.includes('edit')" variant="ghost" size="sm" @click="handleActionClick('edit', row)">
-                                <i class="pi pi-pencil"></i>
+                                <PhPencil :size="18" />
                             </ProButton>
                         </div>
                     </template>
