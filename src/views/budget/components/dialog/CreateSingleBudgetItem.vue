@@ -2,7 +2,7 @@
 
 <template>
     <Teleport to="body">
-        <ProModal v-model="localVisible" title="Add Manual Budget Item" size="lg" class="!z-[110]" @update:modelValue="!$event && close()">
+        <ProModal v-model="localVisible" title="Add Manual Budget Item" size="lg" class="!z-[1000]" @update:modelValue="!$event && close()">
             <div class="grid grid-cols-2 gap-4">
                 <!-- Item Code -->
                 <div>

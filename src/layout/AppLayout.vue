@@ -99,7 +99,7 @@ const containerClass = computed(() => {
             <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6">
                 <ProPageHeader v-if="pageTitle" :title="pageTitle" :subtitle="pageSubtitle" :breadcrumbs="breadcrumbs" class="mb-4">
                     <template #actions>
-                        <div id="page-header-actions"></div>
+                        <div id="page-header-actions" class="flex items-center justify-end gap-3"></div>
                     </template>
                 </ProPageHeader>
                 <router-view :key="route.path"></router-view>
