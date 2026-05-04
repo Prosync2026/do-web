@@ -3,7 +3,7 @@ import { BcrReasonEnum, BcrRecommendationEnum, BcrRoleEnum } from '@/constants/e
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BCRFinalDecisionPayload, BCRRecommendationPayload } from '@/types/budgetChangeRequest.type';
 import { getRoleConfig } from '@/utils/bcrApproval.utils';
-import { ProButton, ProEmpty, ProInput, ProModal, ProSelect, ProTextarea, ProToast } from '@prosync_solutions/ui';
+import { ProButton, ProEmpty, ProInput, ProModal, ProSelect, ProTextarea, ProToast, ProUploadFile, type UploadFile } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 interface AdjustmentItem {
@@ -15,7 +15,7 @@ interface AdjustmentItem {
 }
 
 export default defineComponent({
-    components: { ProModal, ProInput, ProButton, ProTextarea, ProEmpty, ProSelect, ProToast },
+    components: { ProModal, ProInput, ProButton, ProTextarea, ProEmpty, ProSelect, ProToast, ProUploadFile },
     props: { visible: { type: Boolean, required: true } },
     emits: ['update:visible', 'submit'],
     setup(props, { emit }) {
@@ -34,7 +34,7 @@ export default defineComponent({
         const selection = ref<BcrRecommendationEnum | ''>('');
         const remark = ref('');
         const adjustments = ref<AdjustmentItem[]>([]);
-        const selectedFiles = ref<File[]>([]);
+        const selectedFiles = ref<UploadFile[]>([]);
 
         const reasonOptions = ref<BcrRoleConfig['reasons']>([]);
         const recommendationOptions = ref<BcrRoleConfig['recommendations']>([]);
@@ -76,10 +76,7 @@ export default defineComponent({
                 rowItem.OrderedQty = selected.OrderedQty;
             }
         }
-        function onFileSelect(event: { files: File[] }) {
-            selectedFiles.value = event.files;
-            showToastMsg('information', `${event.files.length} file(s) added`);
-        }
+
 
         onMounted(async () => {
             if (budgetChangeRequestId) {
@@ -107,8 +104,10 @@ export default defineComponent({
                 }))
             };
 
+            const filesToSend = selectedFiles.value.filter(uf => uf.status !== 'done' && uf.file).map(uf => uf.file as File);
+
             budgetCRStore
-                .createBCRRecommendation(budgetChangeRequestId, payload, selectedFiles.value)
+                .createBCRRecommendation(budgetChangeRequestId, payload, filesToSend)
                 .then(() => {
                     selection.value = '';
                     reasonSelection.value = '';
@@ -162,7 +161,6 @@ export default defineComponent({
             showAdjustmentList,
             budgetItemList,
             selectedFiles,
-            onFileSelect,
             handleSubmit,
             toastState
         };

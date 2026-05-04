@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import CartWithBadge from '@/components/icons/CartWithBadge.vue';
 import { useLayout } from '@/layout/composables/layout';
 import { PermissionCodes } from '@/permissions';
 import { usePermissionStore } from '@/stores/permission/permission.store';
-import CartWithBadge from '@/components/icons/CartWithBadge.vue';
 import { Motion } from '@motionone/vue';
-import { PhBook, PhChartBar, PhHouse, PhShoppingCart, PhTag, PhTicket, PhTruck, PhWrench } from '@phosphor-icons/vue';
+import { PhBook, PhChartBar, PhHouse, PhTag, PhTicket, PhTruck, PhWrench } from '@phosphor-icons/vue';
 import { ProSidebar } from '@prosync_solutions/ui';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRoute } from 'vue-router';

@@ -2,7 +2,7 @@
 
 <template>
     <Teleport to="body">
-        <ProModal v-model="localVisible" title="Add Single Budget Item" size="lg" class="!z-[110]" @update:modelValue="!$event && close()">
+        <ProModal v-model="localVisible" title="Add Manual Budget Item" size="lg" class="!z-[1000]" @update:modelValue="!$event && close()">
             <div class="grid grid-cols-2 gap-4">
                 <!-- Item Code -->
                 <div>
@@ -63,28 +63,24 @@
 
                 <!-- Quantity -->
                 <div>
-                    <label class="required-label">Quantity</label>
-                    <InputNumber v-model.number="form.Quantity" :min="0" class="w-full" />
+                    <ProInput type="number" v-model.number="form.Quantity" :min="0" label="Quantity" required class="w-full" />
                     <small class="p-error text-red-500 text-xs" v-if="errors.Quantity">{{ errors.Quantity }}</small>
                 </div>
 
                 <!-- Rate -->
                 <div>
-                    <label>Rate</label>
-                    <InputNumber v-model.number="form.Rate" :min="0" class="w-full" />
+                    <ProInput type="number" v-model.number="form.Rate" :min="0" label="Rate" class="w-full" />
                 </div>
 
                 <!-- Amount -->
                 <div>
-                    <label class="required-label">Amount</label>
-                    <InputNumber v-model.number="form.Amount" :min="0" class="w-full" />
+                    <ProInput type="number" v-model.number="form.Amount" :min="0" label="Amount" required class="w-full" />
                     <small class="p-error text-red-500 text-xs" v-if="errors.Amount">{{ errors.Amount }}</small>
                 </div>
 
                 <!-- Wastage -->
                 <div>
-                    <label>Wastage (%)</label>
-                    <InputNumber v-model.number="form.Wastage" :min="0" class="w-full" />
+                    <ProInput type="number" v-model.number="form.Wastage" :min="0" label="Wastage (%)" class="w-full" />
                 </div>
             </div>
 
@@ -98,9 +94,4 @@
     </Teleport>
 </template>
 
-<style scoped>
-.required-label::after {
-    content: ' *';
-    color: red;
-}
-</style>
+

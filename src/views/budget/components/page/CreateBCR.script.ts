@@ -1,4 +1,4 @@
-import { PhFile, PhEye } from '@phosphor-icons/vue';
+import { PhFile, PhEye, PhPlus } from '@phosphor-icons/vue';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { AttachmentItem, BCRTableItem, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
@@ -13,7 +13,7 @@ import { useToast } from 'primevue/usetoast';
 
 export default defineComponent({
     name: 'CreateBCR',
-    components: { Motion, MeterialModal, SingleBudgetModal, ProButton, ProInput, ProSelect, ProCard, ProBanner, ProEmpty, ProToast, ProUploadFile, PhFile, PhEye },
+    components: { Motion, MeterialModal, SingleBudgetModal, ProButton, ProInput, ProSelect, ProCard, ProBanner, ProEmpty, ProToast, ProUploadFile, PhFile, PhEye, PhPlus },
     setup() {
         const router = useRouter();
         const budgetCRStore = useBudgetChangeRequestStore();
@@ -66,7 +66,7 @@ export default defineComponent({
         const budgetStore = useBudgetStore();
 
         // --- Current Budget Version ---
-        const latestVersionStr = localStorage.getItem('latestBudgetVersion');
+        const latestVersionStr = localStorage.getItem('selectedBudgetVersionId') || localStorage.getItem('latestBudgetVersion');
         const currentVersion = ref<number | null>(latestVersionStr !== null && !isNaN(Number(latestVersionStr)) ? Number(latestVersionStr) : null);
 
         // --- Budget Items from Store ---

@@ -3,12 +3,12 @@ import { BcrRecommendationEnum, BcrRoleEnum } from '@/constants/enum/bcrApproval
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { DiscussionItem } from '@/types/budgetChangeRequest.type';
 import { getRoleConfig } from '@/utils/bcrApproval.utils';
-import { ProButton, ProEmpty, ProInput, ProModal, ProSelect, ProTextarea, ProToast } from '@prosync_solutions/ui';
+import { ProButton, ProEmpty, ProInput, ProModal, ProSelect, ProTextarea, ProToast, ProUploadFile, type UploadFile } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
-    components: { ProModal, ProInput, ProButton, ProTextarea, ProEmpty, ProSelect, ProToast },
+    components: { ProModal, ProInput, ProButton, ProTextarea, ProEmpty, ProSelect, ProToast, ProUploadFile },
     props: {
         visible: { type: Boolean, required: true },
         item: { type: Object as () => DiscussionItem, required: true }
@@ -30,7 +30,7 @@ export default defineComponent({
         const selection = ref<BcrRecommendationEnum | ''>('');
         const remark = ref('');
         const adjustments = ref<{ id: number | null; ItemCode?: string; Description?: string; OrderedQty?: number | undefined; value?: string }[]>([]);
-        const selectedFiles = ref<File[]>([]);
+        const selectedFiles = ref<UploadFile[]>([]);
         const existingDocuments = ref<{ id: number; filename: string; path: string }[]>([]);
         const reasonOptions = ref<BcrRoleConfig['reasons']>([]);
         const recommendationOptions = ref<BcrRoleConfig['recommendations']>([]);
@@ -62,10 +62,6 @@ export default defineComponent({
             }
         }
 
-        function onFileSelect(event: { files: File[] }) {
-            selectedFiles.value = event.files;
-            showToastMsg('information', `${event.files.length} file(s) added`);
-        }
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
         user.value.role = storedUser.user_project_role_code || '';
         user.value.username = storedUser.username || '';
@@ -126,7 +122,9 @@ export default defineComponent({
                     : []
             };
 
-            await budgetCRStore.editBCRRecommendation(budgetChangeRequestId, props.item.id!, payload, selectedFiles.value);
+            const filesToSend = selectedFiles.value.filter(uf => uf.status !== 'done' && uf.file).map(uf => uf.file as File);
+
+            await budgetCRStore.editBCRRecommendation(budgetChangeRequestId, props.item.id!, payload, filesToSend);
 
             emit('update:visible', false);
             emit('submit');
@@ -149,7 +147,6 @@ export default defineComponent({
             addAdjustment,
             removeAdjustment,
             onSelectItem,
-            onFileSelect,
             handleSubmit,
             showAttachment,
             toastState

@@ -1,8 +1,10 @@
 <script src="./Budget.script.ts"></script>
 
 <template>
-    <Teleport to="#page-header-actions">
-        <ProSelect v-model="selectedVersion" :options="versionOptions" placeholder="Select Version" class="w-full md:w-64" />
+    <Teleport defer to="#page-header-actions">
+        <div class="order-2">
+            <ProSelect v-model="selectedVersion" :options="versionOptions" placeholder="Select Version" class="w-full md:w-64" />
+        </div>
     </Teleport>
 
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">

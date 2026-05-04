@@ -1,6 +1,14 @@
 <script src="./BudgetList.script.ts"></script>
 
 <template>
+    <Teleport defer to="#page-header-actions">
+        <div class="order-1">
+            <ProButton v-if="showImportFile" variant="secondary" @click="handleImportClick">
+                <PhUpload :size="18" class="mr-2" /> Import CSV
+            </ProButton>
+        </div>
+    </Teleport>
+
     <div>
         <!-- Budget Version Comparison -->
         <div class="mb-6">
@@ -87,28 +95,26 @@
                 <ProButton variant="secondary" size="sm" @click="handleFilterReset">Reset</ProButton>
             </div>
         </div>
+        <!-- Tables Area -->
         <div v-if="comparisonData">
-            <!-- Toolbar: Search + Page Size + Import -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-600">Rows per page:</span>
-                    <ProSelect :modelValue="pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="pageSizeOptions" class="w-24 h-9 text-sm" />
-                </div>
-                <div class="flex gap-2 items-center">
-                    <ProInput v-model="search" placeholder="Search..." class="w-64" @keyup.enter="onSearchWrapper(search)" />
-                    <ProButton v-if="showImportFile" variant="secondary" @click="handleImportClick"> <PhUpload :size="18" class="mr-2"  /> Import CSV </ProButton>
-                </div>
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-sm text-gray-600">Rows per page:</span>
+                <ProSelect :modelValue="pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="pageSizeOptions" class="w-24 h-9 text-sm" />
             </div>
-
             <div class="comparison-table-wrapper">
                 <ProTable
                     :columns="proTableComparisonColumns"
                     :data="comparisonTable"
                     :pagination="{ page: pagination.page, pageSize: pagination.pageSize, total: pagination.total }"
                     :showRowIndex="true"
+                    searchable
+                    searchPlaceholder="Search..."
+                    @search="(q) => { search = q; onSearchWrapper(search) }"
                     emptyTitle="Budget Comparison Data"
                     emptyDescription="No comparison data available."
                     @sort="handleProTableSort"
+                    @update:pagination="handleProTablePaginationUpdate"
+                >
                     @update:pagination="handleProTablePaginationUpdate"
                 >
                     <template #cell-originalQty="{ row }">
@@ -136,23 +142,18 @@
         </div>
 
         <div v-else>
-            <!-- Toolbar: Search + Page Size + Import -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-600">Rows per page:</span>
-                    <ProSelect :modelValue="pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="pageSizeOptions" class="w-24 text-sm" />
-                </div>
-                <div class="flex gap-2 items-center">
-                    <ProInput v-model="search" placeholder="Search..." class="w-64" @keyup.enter="onSearchWrapper(search)" />
-                    <ProButton v-if="showImportFile" variant="secondary" @click="handleImportClick"> <PhUpload :size="18" class="mr-2"  /> Import CSV </ProButton>
-                </div>
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-sm text-gray-600">Rows per page:</span>
+                <ProSelect :modelValue="pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="pageSizeOptions" class="w-24 text-sm" />
             </div>
-
             <ProTable
                 :columns="proTableBudgetColumns"
                 :data="filteredItems"
                 :pagination="{ page: pagination.page, pageSize: pagination.pageSize, total: pagination.total }"
                 :showRowIndex="true"
+                searchable
+                searchPlaceholder="Search..."
+                @search="(q) => { search = q; onSearchWrapper(search) }"
                 emptyTitle="Budget List Data"
                 emptyDescription="No budget items found."
                 @sort="handleProTableSort"
