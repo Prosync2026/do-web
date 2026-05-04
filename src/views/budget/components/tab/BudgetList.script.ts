@@ -103,6 +103,8 @@ export default defineComponent({
             location1: '' as string,
             location2: '' as string,
             element: '' as string,
+            subElement: '' as string,
+            subSubElement: '' as string,
             category: '' as string,
             changeType: 'all' as string
         });
@@ -112,6 +114,8 @@ export default defineComponent({
             locations1: comparisonData.value?.filterOptions?.locations1 || [],
             locations2: comparisonData.value?.filterOptions?.locations2 || [],
             elements: comparisonData.value?.filterOptions?.elements || [],
+            subElements: comparisonData.value?.filterOptions?.subElements || [],
+            subSubElements: comparisonData.value?.filterOptions?.subSubElements || [],
             categories: comparisonData.value?.filterOptions?.categories || []
         }));
 
@@ -132,6 +136,8 @@ export default defineComponent({
                 location1: activeFilters.value.location1 || undefined,
                 location2: activeFilters.value.location2 || undefined,
                 element: activeFilters.value.element || undefined,
+                subElement: activeFilters.value.subElement || undefined,
+                subSubElement: activeFilters.value.subSubElement || undefined,
                 category: activeFilters.value.category || undefined
             });
 
@@ -151,7 +157,7 @@ export default defineComponent({
         }
 
         function handleFilterReset() {
-            activeFilters.value = { location1: '', location2: '', element: '', category: '', changeType: 'all' };
+            activeFilters.value = { location1: '', location2: '', element: '', subElement: '', subSubElement: '', category: '', changeType: 'all' };
             search.value = '';
             pagination.value.page = 1;
             if (comparisonData.value) {
@@ -174,6 +180,8 @@ export default defineComponent({
             if (activeFilters.value.location1) params.location1 = activeFilters.value.location1;
             if (activeFilters.value.location2) params.location2 = activeFilters.value.location2;
             if (activeFilters.value.element) params.element = activeFilters.value.element;
+            if (activeFilters.value.subElement) params.subElement = activeFilters.value.subElement;
+            if (activeFilters.value.subSubElement) params.subSubElement = activeFilters.value.subSubElement;
             if (activeFilters.value.category) params.category = activeFilters.value.category;
 
             await budgetStore.fetchBudgetItems(params);
@@ -500,9 +508,13 @@ export default defineComponent({
                 { key: 'subSubElement', label: 'Sub Sub Element', sortable: true },
                 { key: 'location1', label: 'Location 1', sortable: true },
                 { key: 'location2', label: 'Location 2', sortable: true },
+                { key: 'unit', label: 'Unit', sortable: true },
+                { key: 'wastage', label: 'Wastage', sortable: true },
                 { key: 'originalQty', label: 'Old Qty', sortable: true },
+                { key: 'originalRate', label: 'Old Rate', sortable: true },
                 { key: 'originalAmount', label: 'Old Amount', sortable: true },
                 { key: 'latestQty', label: 'New Qty', sortable: true },
+                { key: 'latestRate', label: 'New Rate', sortable: true },
                 { key: 'latestAmount', label: 'New Amount', sortable: true },
                 { key: 'qtyDiff', label: 'Δ Qty', sortable: true },
                 { key: 'amountDiff', label: 'Δ Amount', sortable: true },

@@ -84,6 +84,18 @@
                 <ProSelect v-model="activeFilters.element" :options="filterOptions.elements" placeholder="All" class="w-full text-sm" @update:modelValue="handleFilterChange" />
             </div>
 
+            <!-- Sub Element -->
+            <div class="flex flex-col gap-1 min-w-[150px]" v-if="filterOptions.subElements.length">
+                <label class="text-xs text-gray-500 font-medium">Sub Element</label>
+                <ProSelect v-model="activeFilters.subElement" :options="filterOptions.subElements" placeholder="All" class="w-full text-sm" @update:modelValue="handleFilterChange" />
+            </div>
+
+            <!-- Sub Sub Element -->
+            <div class="flex flex-col gap-1 min-w-[150px]" v-if="filterOptions.subSubElements.length">
+                <label class="text-xs text-gray-500 font-medium">Sub Sub Element</label>
+                <ProSelect v-model="activeFilters.subSubElement" :options="filterOptions.subSubElements" placeholder="All" class="w-full text-sm" @update:modelValue="handleFilterChange" />
+            </div>
+
             <!-- Category -->
             <div class="flex flex-col gap-1 min-w-[150px]" v-if="filterOptions.categories.length">
                 <label class="text-xs text-gray-500 font-medium">Category</label>
@@ -117,14 +129,26 @@
                 >
                     @update:pagination="handleProTablePaginationUpdate"
                 >
+                    <template #cell-wastage="{ row }">
+                        <span v-if="row.wastage != null">{{ formatPercent(row.wastage * 100) }}</span>
+                        <span v-else>-</span>
+                    </template>
                     <template #cell-originalQty="{ row }">
                         {{ row.originalQty }}
+                    </template>
+                    <template #cell-originalRate="{ row }">
+                        <span v-if="row.originalRate != null">RM {{ formatCurrency(row.originalRate) }}</span>
+                        <span v-else>-</span>
                     </template>
                     <template #cell-originalAmount="{ row }">
                         <span :class="{ 'text-red-500': row.originalAmount < 0, 'text-green-500': row.originalAmount > 0 }"> <span v-if="row.originalAmount < 0">-</span>RM {{ formatCurrency(Math.abs(row.originalAmount || 0)) }} </span>
                     </template>
                     <template #cell-latestQty="{ row }">
                         {{ row.latestQty }}
+                    </template>
+                    <template #cell-latestRate="{ row }">
+                        <span v-if="row.latestRate != null">RM {{ formatCurrency(row.latestRate) }}</span>
+                        <span v-else>-</span>
                     </template>
                     <template #cell-latestAmount="{ row }">
                         <span :class="{ 'text-red-500': row.latestAmount < 0 }"> <span v-if="row.latestAmount < 0">-</span>RM {{ formatCurrency(Math.abs(row.latestAmount || 0)) }} </span>
@@ -185,19 +209,23 @@
 </template>
 
 <style scoped>
-/* Old Qty & Old Amount columns (10th, 11th) — grey background */
-.comparison-table-wrapper :deep(table th:nth-child(10)),
-.comparison-table-wrapper :deep(table td:nth-child(10)),
-.comparison-table-wrapper :deep(table th:nth-child(11)),
-.comparison-table-wrapper :deep(table td:nth-child(11)) {
-    background-color: #f3f4f6; /* gray-100 */
-}
-
-/* New Qty & New Amount columns (12th, 13th) — blue background */
+/* Old Qty, Old Rate, Old Amount columns (12th, 13th, 14th) — grey background */
 .comparison-table-wrapper :deep(table th:nth-child(12)),
 .comparison-table-wrapper :deep(table td:nth-child(12)),
 .comparison-table-wrapper :deep(table th:nth-child(13)),
-.comparison-table-wrapper :deep(table td:nth-child(13)) {
+.comparison-table-wrapper :deep(table td:nth-child(13)),
+.comparison-table-wrapper :deep(table th:nth-child(14)),
+.comparison-table-wrapper :deep(table td:nth-child(14)) {
+    background-color: #f3f4f6; /* gray-100 */
+}
+
+/* New Qty, New Rate, New Amount columns (15th, 16th, 17th) — blue background */
+.comparison-table-wrapper :deep(table th:nth-child(15)),
+.comparison-table-wrapper :deep(table td:nth-child(15)),
+.comparison-table-wrapper :deep(table th:nth-child(16)),
+.comparison-table-wrapper :deep(table td:nth-child(16)),
+.comparison-table-wrapper :deep(table th:nth-child(17)),
+.comparison-table-wrapper :deep(table td:nth-child(17)) {
     background-color: #eff6ff; /* blue-50 */
 }
 </style>
