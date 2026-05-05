@@ -2,7 +2,7 @@
 
 <template>
     <Teleport to="body">
-        <ProModal :modelValue="localVisible" @update:modelValue="(val: boolean) => { localVisible = val; $emit('update:visible', val); }" title="Add Bulk Items from Budget" size="full" class="create-ro-modal !z-[110]">
+        <ProModal :modelValue="localVisible" @update:modelValue="(val: boolean) => { localVisible = val; $emit('update:visible', val); }" title="Add Bulk Items from Budget" size="full" class="create-ro-modal !z-[1000]">
         <p class="text-sm text-gray-500 mb-6">
             Select multiple items from your project budget to add to your request order.
         </p>

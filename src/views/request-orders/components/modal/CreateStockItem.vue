@@ -1,17 +1,17 @@
 <script lang="ts" src="./CreateStockItem.script.ts"></script>
 
 <template>
-    <Dialog v-model:visible="localVisible" modal header="Add Items from Stock" style="width: 90vw; max-width: 1200px" class="!z-[110]" appendTo="body" @hide="closeModal">
+    <ProModal :modelValue="localVisible" @update:modelValue="(val: boolean) => { localVisible = val; if (!val) closeModal(); }" title="Add Items from Stock" size="full" class="!z-[1000]">
         <!-- Search -->
         <div class="flex gap-3 mb-4">
-            <InputText v-model="searchTerm" placeholder="Search item code or name" class="w-full" />
+            <ProInput v-model="searchTerm" placeholder="Search item code or name" class="w-full" />
         </div>
 
         <!-- Filters -->
         <div class="grid grid-cols-3 gap-4 mb-4">
-            <Dropdown v-model="selectedCategory" placeholder="Category" class="w-full" />
-            <Dropdown v-model="selectedElement" placeholder="Element" class="w-full" />
-            <Dropdown v-model="selectedItemType" placeholder="Item Type" class="w-full" />
+            <ProSelect v-model="selectedCategory" placeholder="Category" class="w-full" />
+            <ProSelect v-model="selectedElement" placeholder="Element" class="w-full" />
+            <ProSelect v-model="selectedItemType" placeholder="Item Type" class="w-full" />
         </div>
 
         <!-- Table -->
@@ -27,32 +27,30 @@
             :onPageSizeChange="handlePageSizeChange"
         >
             <template #itemTypeSlot="{ data }">
-                <Tag :value="data.itemType" />
+                <ProTag :value="data.itemType" />
             </template>
         </ReusableTable>
 
         <!-- Footer -->
         <template #footer>
-            <div class="flex flex-col gap-3 w-full">
+            <div class="flex flex-col gap-3 w-full mt-4">
                 <!-- Delivery Date -->
                 <div class="flex flex-col gap-1">
                     <div class="flex items-center gap-3">
-                        <label class="text-sm font-semibold w-32"> Delivery Date </label>
-                        <Calendar v-model="deliveryDate" dateFormat="dd/mm/yy" showIcon placeholder="Select delivery date" class="w-60" />
+                        <ProInput type="date" v-model="deliveryDate" label="Delivery Date" class="w-60" />
                         <span class="text-xs text-gray-500"> (Applied to selected items) </span>
                     </div>
-                    <!-- <Message v-if="showValidation && !deliveryDate" severity="error" ><template #icon><PhXCircle /></template> Delivery date is required </Message> -->
                 </div>
 
                 <!-- Actions -->
                 <div class="flex justify-between items-center">
                     <span>{{ selectedItems.length }} selected</span>
                     <div class="flex gap-2">
-                        <Button label="Cancel" outlined @click="closeModal" />
-                        <Button label="Add Selected Items" @click="addSelectedItems" :disabled="!selectedItems.length" />
+                        <ProButton variant="secondary" @click="closeModal">Cancel</ProButton>
+                        <ProButton variant="primary" @click="addSelectedItems" :disabled="!selectedItems.length">Add Selected Items</ProButton>
                     </div>
                 </div>
             </div>
         </template>
-    </Dialog>
+    </ProModal>
 </template>

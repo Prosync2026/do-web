@@ -135,6 +135,20 @@ const deleteRequestOrder = async (id: number): Promise<void> => {
     }
 };
 
+/**
+ * Delete a specific attachment
+ */
+const deleteAttachment = async (requestOrderId: number | string, filename: string): Promise<boolean> => {
+    try {
+        await axiosInstance.delete(`/requestOrder/${requestOrderId}/attachment/${filename}`);
+        return true;
+    } catch (error: unknown) {
+        const message = (error as AxiosError<{ message: string }>)?.response?.data?.message || `Failed to delete attachment ${filename}`;
+        showError(error, message);
+        return false;
+    }
+};
+
 // get status approval
 const getROApprovalStatus = async (id: number | string) => {
     try {
@@ -338,6 +352,7 @@ export const requestOrderService = {
     downloadAttachment,
     previewAttachment,
     getAttachmentsByROId,
+    deleteAttachment,
     getROApprovalStatus,
     updateRequestOrderDraft,
     getSubmittedTotal

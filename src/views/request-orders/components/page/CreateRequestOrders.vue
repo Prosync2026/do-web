@@ -18,11 +18,8 @@
 
                 <!-- RO Date -->
                 <div>
-                    <label class="block text-sm font-medium text-text-body mb-2"> RO Date </label>
-                    <div class="flex flex-col gap-2">
-                        <input type="date" :value="formatDateToAPI(calendarValue || new Date())" readonly class="w-full appearance-none bg-surface-gray-bg border border-border-border rounded-lg px-3 py-2 text-sm text-gray-500 cursor-not-allowed opacity-75" />
-                        <p v-if="showValidation && !calendarValue" class="text-sm text-brand-danger flex items-center gap-1"><PhXCircle /> RO Date is required</p>
-                    </div>
+                    <ProInput type="date" :modelValue="calendarValue ? formatDateToAPI(calendarValue) : formatDateToAPI(new Date())" readonly label="RO Date" required />
+                    <p v-if="showValidation && !calendarValue" class="text-sm text-brand-danger mt-1 flex items-center gap-1"><PhXCircle :size="18" /> RO Date is required</p>
                 </div>
 
                 <!-- Subcon & Reason -->
@@ -92,14 +89,21 @@
             </div>
 
             <ProTable :columns="tableColumns" :data="items" class="mt-4">
+                <template #empty>
+                    <div class="text-center text-gray-500 py-6">No items added yet. Click "Add Item" to begin.</div>
+                </template>
+
                 <template #cell-itemCode="{ row }">
-                    <input type="text" v-model="row.itemCode" readonly class="w-full bg-surface-gray-bg border border-border-border rounded px-3 py-1.5 text-sm cursor-not-allowed opacity-75 outline-none" />
+                    <div v-tooltip.top="row.itemCode" class="w-full">
+                        <ProInput v-model="row.itemCode" readonly class="w-full !text-sm cursor-not-allowed opacity-75" />
+                    </div>
                 </template>
 
                 <template #cell-description="{ row }">
                     <div class="text-sm text-text-body font-medium">{{ row.description }}</div>
-                    <div v-if="row.showNotes" class="mt-2 w-full transition-all duration-200">
-                        <textarea v-model="row.notes" rows="2" class="w-full bg-surface-base border border-brand-primary/50 rounded px-3 py-2 text-sm outline-none focus:border-brand-primary" placeholder="Add notes here..."></textarea>
+                    <div v-if="row.notes" class="mt-2 p-1.5 bg-brand-primary/5 border border-brand-primary/20 rounded-md text-sm text-brand-primary whitespace-normal break-words w-full flex items-start gap-1.5 leading-snug" v-tooltip.top="row.notes.length > 50 ? row.notes : ''">
+                        <PhFileText class="shrink-0 mt-0.5 opacity-80" />
+                        <span class="line-clamp-2 italic">Note: {{ row.notes }}</span>
                     </div>
                 </template>
 
@@ -112,11 +116,11 @@
                 </template>
 
                 <template #cell-qty="{ row }">
-                    <InputNumber v-model.number="row.qty" class="w-full !text-sm" :min="0" />
+                    <ProInput type="number" v-model.number="row.qty" :min="0" class="w-full !text-sm" />
                 </template>
 
                 <template #cell-deliveryDate="{ row }">
-                    <input type="date" :value="formatDateToAPI(row.deliveryDate || '')" @input="handleDeliveryInput($event, row)" class="w-full bg-surface-base border border-border-border rounded px-3 py-1.5 text-sm outline-none focus:border-brand-primary" :class="{ 'border-brand-danger': invalidDeliveryByCode[row.itemCode] }" />
+                    <ProInput type="date" :modelValue="formatDateToAPI(row.deliveryDate || '')" @update:modelValue="handleDeliveryPicker($event, row)" class="w-full !text-sm" :error="invalidDeliveryByCode[row.itemCode] ? ' ' : ''" />
                 </template>
 
                 <template #cell-price="{ row }">
@@ -124,20 +128,35 @@
                 </template>
 
                 <template #cell-total="{ row }">
-                    <span class="font-semibold text-text-heading pr-2">{{ ((row.price ?? 0) * (row.qty ?? 0)).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}</span>
+                    <div class="font-semibold text-text-heading pr-2 text-right">{{ ((row.price ?? 0) * (row.qty ?? 0)).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}</div>
                 </template>
 
                 <template #cell-action="{ row }">
-                    <ProButton variant="secondary" size="sm" @click="toggleMenu($event, items.indexOf(row))">
-                        <PhDotsThreeVertical />
-                    </ProButton>
-                    <Menu :model="getActionItems(row, items.indexOf(row))" :popup="true" :ref="(el: any) => setMenuRef(el, items.indexOf(row))">
-                        <template #itemicon="{ item, class: iconClass }">
-                            <component :is="item.icon" :class="iconClass" />
-                        </template>
-                    </Menu>
+                    <div class="flex justify-center w-full">
+                        <ProButton variant="secondary" size="sm" @click="toggleMenu($event, items.indexOf(row))">
+                            <PhDotsThreeVertical />
+                        </ProButton>
+                        <Menu :model="getActionItems(row, items.indexOf(row))" :popup="true" :ref="(el: any) => setMenuRef(el, items.indexOf(row))">
+                            <template #itemicon="{ item, class: iconClass }">
+                                <component :is="item.icon" :class="iconClass" />
+                            </template>
+                        </Menu>
+                    </div>
                 </template>
             </ProTable>
+
+            <!-- Note Modal -->
+            <ProModal :modelValue="!!noteModalItem" @update:modelValue="(val: boolean) => { if(!val) noteModalItem = null; }" title="Add Note"  class="!z-[1000]">
+                <div v-if="noteModalItem" class="p-4" style="min-width: 400px;">
+                    <label class="block text-sm text-gray-600 mb-2 font-semibold">Note for {{ noteModalItem.itemCode }}</label>
+                    <Textarea v-model="noteModalItem.notes" rows="4" class="w-full" placeholder="Add specific internal notes or instructions here..."></Textarea>
+                </div>
+                <template #footer>
+                    <div class="flex justify-end p-4 border-t gap-2">
+                        <ProButton variant="primary" @click="noteModalItem = null">Done</ProButton>
+                    </div>
+                </template>
+            </ProModal>
 
             <!-- Attachments -->
             <div class="mt-4">

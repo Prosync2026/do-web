@@ -6,17 +6,19 @@ import { Button } from "@prosync/ui-kit";
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-1">
             <!-- Header Actions teleported to AppLayout -->
-            <div class="flex gap-4 items-center justify-end w-full p-3">
-                <div class="relative">
+            <Teleport defer to="#page-header-actions">
+                <div class="relative order-2">
                     <ProButton variant="secondary" @click="showDraftModal = true">
                         View Drafts
                     </ProButton>
                     <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85);" />
                 </div>
-                <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')">
-                    <PhPlus :size="18" class="mr-2"  /> New Request Order
-                </ProButton>
-            </div>
+                <div class="order-3">
+                    <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')">
+                        <PhPlus :size="18" class="mr-2" /> New Request Order
+                    </ProButton>
+                </div>
+            </Teleport>
             <teleport to="body">
                 <ViewDraftRo :visible="showDraftModal" @update:visible="showDraftModal = $event" @update:count="draftCount = $event" />
             </teleport>

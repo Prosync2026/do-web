@@ -4,26 +4,25 @@ import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store'
 import type { AttachmentItem, CreateRequestOrderPayload, EditForm, Order } from '@/types/request-order.type';
 import { formatDateToAPI, parseDDMMYYYY } from '@/utils/dateHelper';
 import { storeToRefs } from 'pinia';
-import FileUpload from 'primevue/fileupload';
 import InputNumber from 'primevue/inputnumber';
 import { useToast } from 'primevue/usetoast';
 import type { StockItem } from '@/types/stockItem.type';
 import { defineComponent, PropType, ref, watch } from 'vue';
 import { PhCheck, PhCloudArrowUp, PhEye, PhFile, PhImages, PhPlus, PhTrash, PhX } from '@phosphor-icons/vue';
-import { ProButton, ProModal, ProTable } from '@prosync_solutions/ui';
+import { ProButton, ProModal, ProTable, ProUploadFile, type UploadFile } from '@prosync_solutions/ui';
 import CreateROModal from './CreateRo.vue';
 import CreateStockItem from './CreateStockItem.vue';
 
 export default defineComponent({
     name: 'EditRo',
     components: { 
-        FileUpload, 
         InputNumber, 
         CreateROModal, 
         CreateStockItem,
         ProModal,
         ProButton,
         ProTable,
+        ProUploadFile,
         PhCheck,
         PhCloudArrowUp,
         PhEye,
@@ -52,7 +51,7 @@ export default defineComponent({
         const MAX_FILE_SIZE = 1_000_000;
         const attachments = ref<(File | AttachmentItem)[]>([]);
         const isAttachmentValid = ref(true);
-        const newAttachments = ref<File[]>([]);
+        const newAttachments = ref<UploadFile[]>([]);
         const existingAttachments = ref<AttachmentItem[]>([]);
 
         const filesToUpload = ref<File[]>([]);
@@ -77,6 +76,7 @@ export default defineComponent({
         ];
 
         const defaultForm = (): EditForm => ({
+            id: 0,
             roNumber: '',
             requestedBy: '',
             roDate: null,
@@ -108,6 +108,7 @@ export default defineComponent({
                 attachments.value = newOrder.attachments || [];
 
                 editForm.value = {
+                    id: newOrder.id,
                     roNumber: newOrder.roNumber,
                     requestedBy: newOrder.requestedBy,
                     roDate: parseDDMMYYYY(newOrder.roDate),
@@ -158,9 +159,10 @@ export default defineComponent({
                 Type: 'requestOrder',
                 Remark: editForm.value.remark || '',
                 Items: (editForm.value.items || []).map((item) => ({
-                    Id: item.Id ?? item.id ?? null,
+                    Id: item.id ?? null,
                     BudgetItemId: item.budgetItemId ?? null,
                     NonBudgetItemId: item.nonBudgetItemId ?? null,
+                    StockItemId: item.nonBudgetItemId ?? null,
                     Description: item.description || '',
                     Uom: item.uom || '',
                     Quantity: Number(item.qty ?? 0),
@@ -184,7 +186,10 @@ export default defineComponent({
                     }))
                 );
 
-                const result = await requestOrderService.updateRequestOrder(props.order.id.toString(), payload, newAttachments.value);
+                const filesToSend = newAttachments.value.filter((uf: UploadFile) => uf.status !== 'done').map((uf: UploadFile) => uf.file);
+                const allAttachments = [...existingAttachments.value, ...filesToSend];
+
+                const result = await requestOrderService.updateRequestOrder(props.order.id.toString(), payload, allAttachments);
 
                 if (result.success) {
                     toast.add({
@@ -219,6 +224,7 @@ export default defineComponent({
             if (props.order) {
                 editForm.value = {
                     ...defaultForm(),
+                    id: props.order.id,
                     roNumber: props.order.roNumber || '',
                     requestedBy: props.order.requestedBy || '',
                     roDate: parseDate(props.order.roDate),
@@ -229,7 +235,7 @@ export default defineComponent({
                     terms: props.order.terms || 'Net 30',
                     refDoc: props.order.refDoc || 'RQ-001',
                     currency: props.order.currency || 'MYR',
-                    items: (props.order.items || []).map((item) => ({
+                    items: (props.order.items || []).map((item: any) => ({
                         id: item.Id ?? item.id ?? null,
                         budgetItemId: item.budgetItemId ?? null,
                         nonBudgetItemId: item.nonBudgetItemId ?? null,
@@ -282,7 +288,7 @@ export default defineComponent({
                         }
                     }
                     editForm.value.items.push({
-                        id: null,
+                        id: undefined,
                         code: item.itemCode,
                         description: item.description || '',
                         uom: item.uom || '',
@@ -324,7 +330,7 @@ export default defineComponent({
                 } else {
                     existingCodes.add(stockItem.itemCode);
                     editForm.value.items.push({
-                        id: null,
+                        id: undefined,
                         code: stockItem.itemCode,
                         description: stockItem.name || stockItem.description || '',
                         uom: stockItem.uom || '',
@@ -410,8 +416,19 @@ export default defineComponent({
             newAttachments.value.splice(index, 1);
         }
 
-        function removeExistingAttachment(index: number) {
-            existingAttachments.value.splice(index, 1);
+        async function removeExistingAttachment(index: number) {
+            if (!props.order) return;
+            const target = existingAttachments.value[index];
+            
+            if (target && target.filename) {
+                const success = await requestOrderService.deleteAttachment(props.order.id, target.filename);
+                if (success) {
+                    existingAttachments.value.splice(index, 1);
+                    toast.add({ severity: 'success', summary: 'Removed', detail: `Attachment ${target.filename} deleted.`, life: 3000 });
+                }
+            } else {
+                existingAttachments.value.splice(index, 1);
+            }
         }
 
         return {
