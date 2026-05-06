@@ -65,6 +65,5 @@ const {
                 </template>
             </Card>
         </div>
-        <Toast />
-    </div>
+            </div>
 </template>

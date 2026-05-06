@@ -3,7 +3,7 @@ import Button from 'primevue/button';
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
 import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { onMounted, ref } from 'vue';
 
 // The default token currently hardcoded in the system as fallback

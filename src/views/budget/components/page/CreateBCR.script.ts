@@ -9,7 +9,7 @@ import { Motion } from '@motionone/vue';
 import { ProBanner, ProButton, ProCard, ProEmpty, ProInput, ProSelect, ProToast, ProUploadFile, type UploadFile } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 
 export default defineComponent({
     name: 'CreateBCR',

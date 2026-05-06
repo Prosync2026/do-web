@@ -11,7 +11,7 @@ import { Motion } from '@motionone/vue';
 import { PhBell, PhBriefcase, PhCaretDown, PhGear, PhSignOut } from '@phosphor-icons/vue';
 import { ProButton, ProModal, ProTag, ProTopbar } from '@prosync_solutions/ui';
 import Badge from 'primevue/badge';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 

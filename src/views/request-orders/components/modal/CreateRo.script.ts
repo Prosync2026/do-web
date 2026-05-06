@@ -5,7 +5,7 @@ import { ProModal, ProTable, ProInput, ProSelect, ProDatePicker, ProButton, ProT
 import { budgetService } from '@/services/budget.service';
 import { budgetFilterService } from '@/services/budgetFilter.service';
 import { useBudgetStore } from '@/stores/budget/budget.store';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import type { BudgetItem, FilterOption } from '../../../../types/request-order.type';
 
 export default defineComponent({

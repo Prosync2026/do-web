@@ -7,7 +7,7 @@ import SmartScanModal from '@/views/delivery/components/smartScan/SmartScanModal
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { computed, defineComponent, onMounted, ref, nextTick } from 'vue';
 import { ProCard, ProButton, ProTag, ProInput } from '@prosync_solutions/ui';
 

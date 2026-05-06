@@ -1,7 +1,7 @@
 import { PhCheck } from '@phosphor-icons/vue';
 import { defineComponent, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { useNotificationStore } from '@/stores/notification/notification.store';
 import { getRouteByDocumentType } from '@/utils/route-map.util';
 

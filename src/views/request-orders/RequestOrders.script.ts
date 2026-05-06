@@ -6,7 +6,7 @@ import { showError } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { nextTick } from 'vue';
 
 import { useRequestOrderPermission } from '@/permissions';

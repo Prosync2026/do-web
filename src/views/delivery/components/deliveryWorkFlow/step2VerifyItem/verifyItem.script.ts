@@ -9,7 +9,7 @@ import Message from 'primevue/message';
 import ProgressBar from 'primevue/progressbar';
 import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { computed, defineComponent, ref, watch } from 'vue';
 import { ProCard, ProButton, ProTag, ProInput } from '@prosync_solutions/ui';
 

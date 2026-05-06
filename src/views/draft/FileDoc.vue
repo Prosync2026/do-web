@@ -1,5 +1,5 @@
 <script setup>
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { ref } from 'vue';
 
 const toast = useToast();
@@ -26,8 +26,7 @@ function onUpload() {
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Basic</div>
                 <div class="card flex flex-col gap-6 items-center justify-center">
-                    <Toast />
-                    <FileUpload ref="fileupload" mode="basic" name="demo[]" accept="image/*" :maxFileSize="1000000" @uploader="onUpload" customUpload />
+                                        <FileUpload ref="fileupload" mode="basic" name="demo[]" accept="image/*" :maxFileSize="1000000" @uploader="onUpload" customUpload />
                     <Button label="Upload" @click="upload" severity="secondary" />
                 </div>
             </div>

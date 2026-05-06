@@ -2,7 +2,7 @@ import ReusableTable from '@/components/table/ReusableTable.vue';
 import type { TableColumn } from '@/types/table.type';
 
 import CreateCostCenterModal from '@/views/company/components/dialog/CreateCostCenter.vue';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({

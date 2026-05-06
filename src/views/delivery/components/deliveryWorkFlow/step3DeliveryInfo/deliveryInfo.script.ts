@@ -3,7 +3,7 @@ import { formatDateToAPI } from '@/utils/dateHelper';
 import Calendar from 'primevue/calendar';
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { defineComponent, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { ProCard, ProButton, ProTag, ProInput, ProTextarea, ProUploadFile } from '@prosync_solutions/ui';

@@ -5,7 +5,7 @@ import type { AttachmentItem, CreateRequestOrderPayload, EditForm, Order } from 
 import { formatDateToAPI, parseDDMMYYYY } from '@/utils/dateHelper';
 import { storeToRefs } from 'pinia';
 import InputNumber from 'primevue/inputnumber';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import type { StockItem } from '@/types/stockItem.type';
 import { defineComponent, PropType, ref, watch } from 'vue';
 import { PhCheck, PhCloudArrowUp, PhEye, PhFile, PhImages, PhPlus, PhTrash, PhX } from '@phosphor-icons/vue';

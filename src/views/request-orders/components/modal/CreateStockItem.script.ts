@@ -5,7 +5,7 @@ import ReusableTable from '@/components/table/ReusableTable.vue';
 import { useStockItemStore } from '@/stores/budget/stockItem.store';
 import type { StockItem } from '@/types/stockItem.type';
 import type { TableColumn } from '@/types/table.type';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 
 export default defineComponent({
     name: 'CreateROStockItemModal',

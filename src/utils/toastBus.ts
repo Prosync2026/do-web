@@ -1,16 +1,31 @@
-import { useToast } from 'primevue/usetoast';
+import { ref } from 'vue';
+import type { ToastType } from '@prosync_solutions/ui';
 
-let toastInstance: ReturnType<typeof useToast> | null = null;
+export const globalToastState = ref({
+    show: false,
+    type: 'information' as ToastType,
+    message: '',
+    duration: 3000
+});
 
-// Register the global PrimeVue toast instance
-export function setGlobalToast(toast: ReturnType<typeof useToast>) {
-    toastInstance = toast;
-}
+export function useToast() {
+    return {
+        add: (options: { severity?: string; summary?: string; detail?: string; life?: number }) => {
+            let type: ToastType = 'information';
+            if (options.severity === 'success') type = 'success';
+            else if (options.severity === 'warn') type = 'warn';
+            else if (options.severity === 'error') type = 'error';
+            else if (options.severity === 'info') type = 'information';
 
-// Get the instance safely anywhere
-export function getGlobalToast() {
-    if (!toastInstance) {
-        console.warn('⚠️ PrimeVue toast not initialized yet');
-    }
-    return toastInstance;
+            globalToastState.value = {
+                show: true,
+                type,
+                message: options.detail || options.summary || '',
+                duration: options.life || 3000
+            };
+        },
+        removeAll: () => {
+            globalToastState.value.show = false;
+        }
+    };
 }

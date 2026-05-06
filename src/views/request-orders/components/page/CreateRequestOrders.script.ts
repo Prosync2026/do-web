@@ -11,7 +11,7 @@ import { usePrimeVue } from 'primevue/config';
 import Menu from 'primevue/menu';
 import ProgressBar from 'primevue/progressbar';
 import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import type { StockItem } from 'src/types/stockItem.type.ts';
 import { ComponentPublicInstance, computed, defineComponent, markRaw, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
