@@ -230,7 +230,7 @@ export interface EditFormItem {
     description: string;
     uom: string;
     qty: number;
-    deliveryDate: string | Date | null;
+    deliveryDate: Date | null;
     notes?: string;
     remark?: string;
     reason?: string;

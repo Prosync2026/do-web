@@ -6,7 +6,7 @@
         @update:modelValue="(val: boolean) => { localVisible = val; if (!val) handleCancel(); }"
         title="Edit Request Order"
         size="full"
-        class="!z-[100]"
+        class="!z-[1000]"
     >
         <div v-if="order">
             <form @submit.prevent="handleSave">
@@ -159,60 +159,9 @@
                     </div>
 
                     <!-- New File Upload -->
-                    <FileUpload
-                        name="attachments"
-                        :multiple="true"
-                        accept="image/*"
-                        :maxFileSize="1000000"
-                        :auto="false"
-                        @select="onSelectedFiles"
-                        :showUploadButton="false"
-                        :showCancelButton="false"
-                    >
-                        <template #header="{ chooseCallback, clearCallback, files }">
-                            <div class="flex gap-2">
-                                <ProButton type="button" variant="plain" @click="chooseCallback()">
-                                    <template #iconLeft><PhImages :size="16" /></template>
-                                    Choose Files
-                                </ProButton>
-                                <ProButton type="button" variant="danger" @click="clearCallback" :disabled="!files || files.length === 0">
-                                    <template #iconLeft><PhX :size="16" /></template>
-                                    Clear
-                                </ProButton>
-                            </div>
-                        </template>
-
-                        <template #content="{ files, removeFileCallback }">
-                            <div v-if="files.length > 0" class="mt-4">
-                                <h4 class="text-body-sm-bold text-text-heading mb-2">New Attachments to Upload</h4>
-                                <div class="flex flex-wrap gap-2">
-                                    <div
-                                        v-for="(file, index) in files"
-                                        :key="`new-${index}`"
-                                        class="flex items-center gap-2 px-3 py-2 bg-surface-info border border-border-info rounded-button"
-                                    >
-                                        <PhFile :size="16" class="text-icon-info" />
-                                        <span class="text-body-sm text-text-body">{{ file.name }}</span>
-                                        <span class="text-caption text-text-disabled">({{ formatSize(file.size) }})</span>
-                                        <button
-                                            type="button"
-                                            class="w-7 h-7 flex items-center justify-center rounded-md text-text-error hover:bg-surface-error/10 transition-colors"
-                                            @click="removeFileCallback(index)"
-                                        >
-                                            <PhX :size="14" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-
-                        <template #empty>
-                            <div class="flex items-center justify-center flex-col p-6 border-2 border-dashed border-border-border rounded-container">
-                                <PhCloudArrowUp :size="40" class="text-icon-default mb-2" />
-                                <p class="text-body-sm text-text-disabled">Drag and drop files here or click "Choose Files"</p>
-                            </div>
-                        </template>
-                    </FileUpload>
+                    <div class="mt-2">
+                        <ProUploadFile v-model="newAttachments" multiple accept="image/*" :maxSize="1" />
+                    </div>
                 </div>
 
                 <!-- Overall Remark -->

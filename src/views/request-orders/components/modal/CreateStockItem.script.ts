@@ -1,8 +1,4 @@
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import Dropdown from 'primevue/dropdown';
-import InputText from 'primevue/inputtext';
-import Tag from 'primevue/tag';
+import { ProModal, ProInput, ProSelect, ProButton, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, ref, toRaw, watch } from 'vue';
 
 import ReusableTable from '@/components/table/ReusableTable.vue';
@@ -14,11 +10,11 @@ import { useToast } from 'primevue/usetoast';
 export default defineComponent({
     name: 'CreateROStockItemModal',
     components: {
-        Dialog,
-        Button,
-        InputText,
-        Dropdown,
-        Tag,
+        ProModal,
+        ProButton,
+        ProInput,
+        ProSelect,
+        ProTag,
         ReusableTable
     },
     props: {
