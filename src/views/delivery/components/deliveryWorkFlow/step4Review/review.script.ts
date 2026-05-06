@@ -2,7 +2,7 @@ import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { DeliveryFlow } from '@/types/delivery.type';
 import type { TableColumn } from '@/types/table.type';
 import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { computed, defineComponent, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { ProCard, ProButton, ProTag, ProTable } from '@prosync_solutions/ui';

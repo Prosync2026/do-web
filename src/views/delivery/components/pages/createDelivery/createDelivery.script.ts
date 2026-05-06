@@ -5,7 +5,7 @@ import VerifyItem from '@/views/delivery/components/deliveryWorkFlow/step2Verify
 import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/step3DeliveryInfo/deliveryInfo.vue';
 import Review from '@/views/delivery/components/deliveryWorkFlow/step4Review/review.vue';
 import type { OcrResult } from '@/views/delivery/components/smartScan/SmartScanModal.script';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { ProButton, ProCard } from '@prosync_solutions/ui';
 import { computed, defineComponent, ref } from 'vue';
 

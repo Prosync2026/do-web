@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { ProLoginPage } from '@prosync_solutions/ui';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 

@@ -1,5 +1,5 @@
 <script setup>
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { ref } from 'vue';
 
 const toast = useToast();

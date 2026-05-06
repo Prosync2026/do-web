@@ -15,7 +15,7 @@ import App from './App.vue';
 import router from './router';
 
 import { setGlobalToast } from '@/utils/showNotification.utils';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 
 import { vPermission } from '@/directives/permission.directive';
 

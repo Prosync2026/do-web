@@ -2,7 +2,7 @@ import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import { useProjectStore } from '@/stores/project/project.store';
 import type { TableColumn } from '@/types/table.type';
 import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput } from '@prosync_solutions/ui';

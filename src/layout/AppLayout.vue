@@ -108,8 +108,7 @@ const containerClass = computed(() => {
 
         <div v-if="layoutState.staticMenuMobileActive" class="fixed inset-0 bg-black/60 z-40 md:hidden" @click="layoutState.staticMenuMobileActive = false"></div>
     </div>
-    <Toast />
-</template>
+    </template>
 
 <style scoped>
 /* No more complex scoped SCSS; replaced by Tailwind flex layout */

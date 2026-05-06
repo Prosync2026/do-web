@@ -43,8 +43,7 @@ watch(internalVisible, (visible) => {
                 </ProButton>
             </div>
 
-            <Toast />
-            <ProToast v-model="toastState.visible" :type="toastState.type" :message="toastState.message" :autoDismiss="true" :duration="3000" />
+                        <ProToast v-model="toastState.visible" :type="toastState.type" :message="toastState.message" :autoDismiss="true" :duration="3000" />
             <ProUploadFile 
                 v-model="proFiles" 
                 :multiple="false" 

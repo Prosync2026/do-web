@@ -11,7 +11,7 @@ import HierarchyLocation from '../components/tab/HierarchyLocation.vue';
 import { setGlobalToast, showError, showInfo, showWarning } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 
 export default defineComponent({
     name: 'BudgetManagement',

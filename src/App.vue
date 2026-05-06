@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useAppInitializer } from '@/bootstrap/useAppInitializer';
 import { setGlobalToast } from '@/utils/showNotification.utils';
-import { useToast } from 'primevue/usetoast';
+import { useToast, globalToastState } from '@/utils/toastBus';
+import { ProToast } from '@prosync_solutions/ui';
 import { onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -40,6 +41,11 @@ watch(
 
 <template>
     <ConfirmDialog />
-    <Toast />
+    <ProToast 
+        v-model="globalToastState.show" 
+        :type="globalToastState.type" 
+        :message="globalToastState.message" 
+        :duration="globalToastState.duration" 
+    />
     <router-view />
 </template>

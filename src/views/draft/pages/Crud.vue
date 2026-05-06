@@ -1,7 +1,7 @@
 <script setup>
 import { ProductService } from '@/service/ProductService';
 import { FilterMatchMode } from '@primevue/core/api';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { onMounted, ref } from 'vue';
 
 onMounted(() => {

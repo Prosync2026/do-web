@@ -5,7 +5,7 @@ import { PhPencilSimple, PhTrash, PhX, PhPackage, PhCalendarBlank } from '@phosp
 import { ProModal, ProInput, ProTable, ProButton, ProTag } from '@prosync_solutions/ui';
 import type { TableColumn } from '@prosync_solutions/ui/dist/types';
 import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from '@/utils/toastBus';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
