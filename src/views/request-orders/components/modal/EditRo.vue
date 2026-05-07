@@ -14,36 +14,36 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-body-sm text-text-subtitle mb-1">RO Number</label>
-                        <input
+                        <ProInput
                             v-model="editForm.roNumber"
-                            class="w-full px-3 py-2 border border-border-border rounded-button bg-surface-gray-bg text-text-body text-body-sm focus:outline-none"
+                            class="w-full"
                             disabled
                         />
                     </div>
                     <div>
                         <label class="block text-body-sm text-text-subtitle mb-1">Requested By</label>
-                        <input
+                        <ProInput
                             v-model="editForm.requestedBy"
-                            class="w-full px-3 py-2 border border-border-border rounded-button bg-surface-sub-bg text-text-body text-body-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
+                            class="w-full"
                         />
                     </div>
                     <div>
                         <label class="block text-body-sm text-text-subtitle mb-1">RO Date</label>
-                        <Calendar v-model="editForm.roDate" dateFormat="yy-mm-dd" class="w-full" />
+                        <ProDatePicker :modelValue="formatDateToAPI(editForm.roDate)" @update:modelValue="editForm.roDate = ($event ? new Date($event) : null)" class="w-full" appendTo="body" />
                     </div>
                     <div>
                         <label class="block text-body-sm text-text-subtitle mb-1">Total Amount</label>
-                        <input
-                            :value="editForm.totalAmount"
-                            class="w-full px-3 py-2 border border-border-border rounded-button bg-surface-gray-bg text-text-body text-body-sm focus:outline-none"
+                        <ProInput
+                            :modelValue="String(editForm.totalAmount)"
+                            class="w-full"
                             disabled
                         />
                     </div>
                     <div>
                         <label class="block text-body-sm text-text-subtitle mb-1">Budget Type</label>
-                        <input
-                            :value="editForm.budgetType"
-                            class="w-full px-3 py-2 border border-border-border rounded-button bg-surface-gray-bg text-text-body text-body-sm focus:outline-none"
+                        <ProInput
+                            :modelValue="editForm.budgetType"
+                            class="w-full"
                             disabled
                         />
                     </div>
@@ -56,7 +56,7 @@
                         { key: 'code', label: 'Item Code' },
                         { key: 'description', label: 'Description' },
                         { key: 'uom', label: 'UOM' },
-                        { key: 'qty', label: 'Quantity' },
+                        { key: 'qty', label: 'Quantity', width: '180px' },
                         { key: 'deliveryDate', label: 'Delivery Date' },
                         { key: 'notes', label: 'Notes' },
                         { key: 'actions', label: 'Actions' },
@@ -65,35 +65,37 @@
                 >
                     <tr v-for="(item, index) in editForm.items" :key="index">
                         <td class="px-3 py-2">
-                            <input
+                            <ProInput
                                 v-model="item.code"
-                                class="w-full px-2 py-1 border border-border-border rounded-button bg-surface-gray-bg text-body-sm text-text-body focus:outline-none"
+                                class="w-full !text-body-sm"
                                 disabled
                             />
                         </td>
                         <td class="px-3 py-2">
-                            <input
+                            <ProInput
                                 v-model="item.description"
-                                class="w-full px-2 py-1 border border-border-border rounded-button bg-surface-gray-bg text-body-sm text-text-body focus:outline-none"
+                                class="w-full !text-body-sm"
                                 disabled
                             />
                         </td>
                         <td class="px-3 py-2">
-                            <input
+                            <ProInput
                                 v-model="item.uom"
-                                class="w-full px-2 py-1 border border-border-border rounded-button bg-surface-sub-bg text-body-sm text-text-body focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
+                                class="w-full !text-body-sm"
                             />
                         </td>
                         <td class="px-3 py-2">
-                            <InputNumber v-model="item.qty" class="w-full" />
+                            <div class="min-w-[140px]">
+                                <InputNumber v-model="item.qty" :min="0" :maxFractionDigits="4" class="w-full" />
+                            </div>
                         </td>
                         <td class="px-3 py-2">
-                            <Calendar v-model="item.deliveryDate" dateFormat="yy-mm-dd" class="w-full" />
+                            <ProDatePicker :modelValue="formatDateToAPI(item.deliveryDate)" @update:modelValue="item.deliveryDate = ($event ? new Date($event) : null)" class="w-full" appendTo="body" />
                         </td>
                         <td class="px-3 py-2">
-                            <input
+                            <ProInput
                                 v-model="item.notes"
-                                class="w-full px-2 py-1 border border-border-border rounded-button bg-surface-sub-bg text-body-sm text-text-body focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
+                                class="w-full !text-body-sm"
                             />
                         </td>
                         <td class="px-3 py-2">
@@ -167,10 +169,10 @@
                 <!-- Overall Remark -->
                 <div class="mt-4">
                     <label class="block text-body-sm text-text-subtitle mb-1">Remark</label>
-                    <textarea
+                    <ProTextarea
                         v-model="editForm.remark"
                         rows="3"
-                        class="w-full px-3 py-2 border border-border-border rounded-button bg-surface-sub-bg text-body-sm text-text-body focus:outline-none focus:ring-2 focus:ring-brand-primary/30 resize-none"
+                        class="w-full"
                         placeholder="Add any additional remarks or notes..."
                     />
                 </div>
