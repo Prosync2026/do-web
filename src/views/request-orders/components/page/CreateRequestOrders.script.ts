@@ -5,13 +5,15 @@ import type { BudgetStatisticsResponse } from '@/types/budget.type';
 import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, PreviewSummary } from '@/types/request-order.type';
 import { getCurrentProjectId, getCurrentProjectName, getCurrentUsername } from '@/utils/contextHelper';
 import { formatDateToAPI } from '@/utils/dateHelper';
+import { useToast } from '@/utils/toastBus';
 import { Motion } from '@motionone/vue';
+import { PhDotsThreeVertical, PhFileText, PhPackage, PhPlus, PhTrash, PhWarning, PhXCircle } from '@phosphor-icons/vue';
+import { ProButton, ProCard, ProDatePicker, ProInput, ProModal, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag, ProTextarea, ProUploadFile, type TableColumn, type UploadFile } from '@prosync_solutions/ui';
 import AutoComplete from 'primevue/autocomplete';
 import { usePrimeVue } from 'primevue/config';
 import Menu from 'primevue/menu';
 import ProgressBar from 'primevue/progressbar';
 import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from '@/utils/toastBus';
 import type { StockItem } from 'src/types/stockItem.type.ts';
 import { ComponentPublicInstance, computed, defineComponent, markRaw, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -20,8 +22,6 @@ import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 import CreateROModal from '../modal/CreateRo.vue';
 import CreateStockItem from '../modal/CreateStockItem.vue';
 import PreviewRo from '../modal/PreviewRo.vue';
-import { ProButton, ProCard, ProInput, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag, ProTextarea, ProModal, ProDatePicker, ProUploadFile, type UploadFile, type DateRange, type TableColumn } from '@prosync_solutions/ui';
-import { PhPackage, PhPlus, PhDotsThreeVertical, PhXCircle, PhWarning, PhTrash, PhFileText } from '@phosphor-icons/vue';
 
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
@@ -70,7 +70,7 @@ export default defineComponent({
                 { key: 'description', label: 'Description', width: '25%' },
                 { key: 'location', label: 'Location', width: '18%' },
                 { key: 'uom', label: 'UOM', width: '70px', align: 'center' },
-                { key: 'qty', label: 'Quantity', width: '180px' },
+                { key: 'qty', label: 'Quantity', width: '200px' },
                 { key: 'deliveryDate', label: 'Delivery Date', width: '160px' },
                 { key: 'price', label: 'Price', width: '140px' }, // Keep logic but can hide with classes
                 { key: 'total', label: 'Total', width: '130px', align: 'right' },

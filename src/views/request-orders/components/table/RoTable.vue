@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { PhDotsThreeVertical, PhEye, PhCheck, PhX } from '@phosphor-icons/vue';
 import { Order } from '@/types/request-order.type';
+import { PhCheck, PhDotsThreeVertical, PhEye, PhX } from '@phosphor-icons/vue';
+import { ProButton, ProTable, ProTag } from '@prosync_solutions/ui';
 import type { ComponentPublicInstance } from 'vue';
-import { computed, ref, markRaw } from 'vue';
-import { ProTable, ProButton, ProTag } from '@prosync_solutions/ui';
+import { computed, markRaw, ref } from 'vue';
+import Menu from 'primevue/menu';
 
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
@@ -25,13 +26,13 @@ const emit = defineEmits<{
 const menu = ref<MenuInstance | null>(null);
 const selectedOrder = ref<Order | null>(null);
 
-function openMenu(event: Event, order: Order): void {
+function openMenu(event: any, order: any): void {
     selectedOrder.value = order;
     menu.value?.toggle(event);
 }
 
 const menuItems = computed(() => {
-    const base = [
+    const base: any[] = [
         {
             label: 'View',
             icon: markRaw(PhEye),
@@ -43,7 +44,7 @@ const menuItems = computed(() => {
         }
     ];
 
-    if (props.isPurchasingRole && selectedOrder.value?.status === 'Pending') {
+    if (props.isPurchasingRole && (selectedOrder.value?.status as string) === 'Pending') {
         base.push(
             {
                 label: 'Approve',
@@ -87,7 +88,7 @@ const tableColumns = computed(() => {
 <template>
     <ProTable :columns="tableColumns" :data="orders" searchable>
         <template #cell-status="{ row }">
-            <ProTag :value="row.status" :severity="getStatusSeverity(row.status)" />
+            <ProTag :value="row.status" :variant="(getStatusSeverity(row.status) as any)" />
         </template>
         <template #cell-actions="{ row }">
             <ProButton variant="secondary" size="sm" @click="openMenu($event, row)">

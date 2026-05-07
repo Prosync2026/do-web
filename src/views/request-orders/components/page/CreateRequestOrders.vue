@@ -116,11 +116,13 @@
                 </template>
 
                 <template #cell-qty="{ row }">
-                    <ProInput type="number" v-model.number="row.qty" :min="0" class="w-full !text-sm" />
+                    <div class="min-w-[140px]">
+                        <InputNumber v-model="row.qty" :min="0" :maxFractionDigits="4" class="w-full !text-sm" />
+                    </div>
                 </template>
 
                 <template #cell-deliveryDate="{ row }">
-                    <ProInput type="date" :modelValue="formatDateToAPI(row.deliveryDate || '')" @update:modelValue="handleDeliveryPicker($event, row)" class="w-full !text-sm" :error="invalidDeliveryByCode[row.itemCode] ? ' ' : ''" />
+                    <ProDatePicker :modelValue="formatDateToAPI(row.deliveryDate || '')" @update:modelValue="handleDeliveryPicker($event, row)" placeholder="Select Date" class="w-full !text-sm" :error="invalidDeliveryByCode[row.itemCode] ? ' ' : ''" appendTo="body" />
                 </template>
 
                 <template #cell-price="{ row }">
