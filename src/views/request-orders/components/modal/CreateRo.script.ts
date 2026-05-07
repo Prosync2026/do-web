@@ -224,7 +224,7 @@ export default defineComponent({
                     location1: item.location1 || '',
                     location2: item.location2 || '',
                     uom: item.uom,
-                    qty: item.qty,
+                    qty: item.balanceQty,
                     price: item.rate,
                     deliveryDate: dateStr,
                     isBudgeted: true
@@ -337,18 +337,22 @@ export default defineComponent({
         };
 
         const grandTotal = computed(() => {
-            return selectedItems.value.reduce((sum, item) => sum + Number(item.rate ?? 0) * Number(item.qty ?? 0), 0);
+            return selectedItems.value.reduce((sum, item) => sum + Number(item.rate ?? 0) * Number((item as any).balanceQty ?? 0), 0);
         });
 
         const paginatedItems = computed(() => {
             return budgetStore.budgetItems.map((item) => {
                 const stats = itemStats.value[item.id];
+                
+                const budgetQty = stats?.budgetQty ?? 0;
+                const totalOrderedQty = stats?.totalOrderedQty ?? 0;
+                const balanceQty = budgetQty - totalOrderedQty;
 
                 return {
                     ...item,
-                    budgetQty: stats?.budgetQty ?? 0,
-                    qtyOrdered: stats?.totalOrderedQty ?? 0,
-                    balanceQty: (stats?.budgetQty ?? 0) - (stats?.totalOrderedQty ?? 0) // New balance column
+                    budgetQty,
+                    qtyOrdered: totalOrderedQty,
+                    balanceQty: Number(balanceQty.toFixed(4))
                 };
             });
         });
@@ -367,11 +371,10 @@ export default defineComponent({
             { key: 'uom', label: 'UOM', sortable: false },
 
             // NEW columns
-            { key: 'budgetQty', label: 'Bgt Qty', sortable: false },
-            { key: 'qtyOrdered', label: 'Qty Ordered', sortable: false },
-            { key: 'balanceQty', label: 'Balance Qty', sortable: false },
+            { key: 'budgetQty', label: 'Bgt Qty', sortable: false, width: '130px' },
+            { key: 'qtyOrdered', label: 'Qty Ordered', sortable: false, width: '130px' },
+            { key: 'balanceQty', label: 'Balance Qty', sortable: false, width: '130px' },
 
-            { key: 'qty', label: 'Quantity', sortable: true },
             { key: 'rateSlot', label: 'Rate', sortable: true },
             { key: 'amountSlot', label: 'Amount' }
         ];

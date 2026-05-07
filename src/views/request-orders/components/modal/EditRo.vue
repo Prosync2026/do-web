@@ -56,7 +56,7 @@
                         { key: 'code', label: 'Item Code' },
                         { key: 'description', label: 'Description' },
                         { key: 'uom', label: 'UOM' },
-                        { key: 'qty', label: 'Quantity' },
+                        { key: 'qty', label: 'Quantity', width: '180px' },
                         { key: 'deliveryDate', label: 'Delivery Date' },
                         { key: 'notes', label: 'Notes' },
                         { key: 'actions', label: 'Actions' },

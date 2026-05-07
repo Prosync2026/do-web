@@ -70,7 +70,7 @@ export default defineComponent({
                 { key: 'description', label: 'Description', width: '25%' },
                 { key: 'location', label: 'Location', width: '18%' },
                 { key: 'uom', label: 'UOM', width: '70px', align: 'center' },
-                { key: 'qty', label: 'Quantity', width: '130px' },
+                { key: 'qty', label: 'Quantity', width: '180px' },
                 { key: 'deliveryDate', label: 'Delivery Date', width: '160px' },
                 { key: 'price', label: 'Price', width: '140px' }, // Keep logic but can hide with classes
                 { key: 'total', label: 'Total', width: '130px', align: 'right' },
