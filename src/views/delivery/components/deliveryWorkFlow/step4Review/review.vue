@@ -22,6 +22,10 @@
                             <span class="font-medium">Delivery Date:</span>
                             <span>{{ formatDate(deliveryInfo?.DeliveryDate) }}</span>
                         </div>
+                        <div class="flex justify-between" v-if="deliveryInfo?.Remarks">
+                            <span class="font-medium">Remarks:</span>
+                            <span class="text-right text-gray-700 whitespace-pre-wrap max-w-[70%]">{{ deliveryInfo?.Remarks }}</span>
+                        </div>
                         <div class="flex justify-between">
                             <span class="font-medium">Attachments:</span>
                             <span>{{ deliveryInfo?.attachments?.length || 0 }} uploaded</span>

@@ -179,6 +179,31 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         fetchDeliveryOrders();
     }
 
+    async function updateDeliveryOrderStatus(id: number, status: 'Approved' | 'Rejected') {
+        loading.value = true;
+        try {
+            const response = await deliveryOrderService.updateDeliveryOrderStatus(id, status);
+
+            if (!response.success) {
+                showError(response.message || `Failed to update delivery order to ${status}.`);
+                return false;
+            }
+
+            showSuccess(response.message || `Delivery order successfully ${status.toLowerCase()}.`);
+            await fetchDeliveryOrders();
+            return true;
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                showError(error.message, 'Failed to update status.');
+            } else {
+                showError('An unexpected error occurred.', 'Failed to update status.');
+            }
+            return false;
+        } finally {
+            loading.value = false;
+        }
+    }
+
     // ------------------------------
     // RETURN
     // ------------------------------
@@ -201,6 +226,7 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
         setPage,
         setPageSize,
         setSorting,
-        setStatus
+        setStatus,
+        updateDeliveryOrderStatus
     };
 });

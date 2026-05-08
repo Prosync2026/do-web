@@ -111,6 +111,7 @@ export interface Step3DeliveryInfo {
     PlateNo: string;
     Date: string;
     DeliveryDate: string;
+    doNumber?: string;
     Remarks?: string;
     attachments?: File[];
     attachments2?: File[];
@@ -125,6 +126,7 @@ export interface DeliveryFlow {
 export interface FormValues {
     driverPlate: string;
     deliveryDate: Date | null;
+    doNumber?: string;
     remarks?: string;
 }
 

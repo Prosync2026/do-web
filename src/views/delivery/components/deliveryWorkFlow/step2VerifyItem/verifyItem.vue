@@ -67,10 +67,7 @@
                                                 <div class="text-xs text-gray-500 font-medium">Ordered Qty</div>
                                                 <div class="font-semibold">{{ item.total }} <span class="text-gray-400 text-xs">{{ item.uom }}</span></div>
                                             </div>
-                                            <div>
-                                                <div class="text-xs text-gray-500 font-medium">Unit Price</div>
-                                                <div class="font-semibold">RM {{ item.price.toFixed(2) }}</div>
-                                            </div>
+
                                             <div>
                                                 <div class="text-xs text-gray-500 font-medium">RO Reference</div>
                                                 <div class="font-semibold text-xs">{{ item.roDocNo }}</div>

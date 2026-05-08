@@ -72,6 +72,12 @@
                                 <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
                                     <PhEye :size="18" class="text-base text-gray-700" />
                                 </ProButton>
+                                <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
+                                    <PhCheckCircle :size="18" />
+                                </ProButton>
+                                <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
+                                    <PhXCircle :size="18" />
+                                </ProButton>
                             </template>
                         </ProTable>
                     </Motion>
@@ -79,4 +85,46 @@
             </ProCard>
         </div>
     </Motion>
+
+    <!-- Approve Modal -->
+    <ProModal :modelValue="showApproveModal" @update:modelValue="(val: boolean) => { showApproveModal = val }" title="Confirm Approval" size="sm" class="!z-[1000]">
+        <div class="flex flex-col gap-4">
+            <p class="text-body-sm text-text-body">
+                Are you sure you want to approve delivery order <span v-if="selectedDeliveryNo" class="text-body-sm-bold text-text-heading">{{ selectedDeliveryNo }}</span>?
+            </p>
+        </div>
+        <template #footer>
+            <div class="flex justify-end gap-3">
+                <ProButton variant="secondary" @click="showApproveModal = false">
+                    <template #iconLeft><PhX :size="16" /></template>
+                    Cancel
+                </ProButton>
+                <ProButton variant="primary" @click="confirmApprove">
+                    <template #iconLeft><PhCheck :size="16" /></template>
+                    Yes, Approve
+                </ProButton>
+            </div>
+        </template>
+    </ProModal>
+
+    <!-- Reject Modal -->
+    <ProModal :modelValue="showRejectModal" @update:modelValue="(val: boolean) => { showRejectModal = val }" title="Confirm Rejection" size="sm" class="!z-[1000]">
+        <div class="flex flex-col gap-4">
+            <p class="text-body-sm text-text-body">
+                Are you sure you want to reject delivery order <span v-if="selectedDeliveryNo" class="text-body-sm-bold text-text-heading">{{ selectedDeliveryNo }}</span>?
+            </p>
+        </div>
+        <template #footer>
+            <div class="flex justify-end gap-3">
+                <ProButton variant="secondary" @click="showRejectModal = false">
+                    <template #iconLeft><PhX :size="16" /></template>
+                    Cancel
+                </ProButton>
+                <ProButton variant="danger" @click="confirmReject">
+                    <template #iconLeft><PhCheck :size="16" /></template>
+                    Yes, Reject
+                </ProButton>
+            </div>
+        </template>
+    </ProModal>
 </template>
