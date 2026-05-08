@@ -22,19 +22,26 @@ export default defineComponent({
         const showScanModal = ref(false);
         const selectedCard = ref<PurchaseOrderCard | null>(null);
         const manualSearch = ref('');
+        const supplierSearch = ref('');
 
         const filteredCards = computed(() => {
-            let data = purchaseStore.purchaseOrders.map((po) => ({
+            let data = purchaseStore.purchaseOrders.map((po: any) => ({
                 id: po.Id?.toString() ?? '',
                 title: po.DocNo ?? '',
-                content: `${po.PurchaseOrderItems?.length ?? 0} items`,
-                badges: po.PurchaseOrderItems?.map((i: PurchaseOrderItem) => i.ItemCode ?? '').filter(Boolean) ?? [],
-                icon: 'pi-box'
+                content: `${(po.purchase_order_items || po.PurchaseOrderItems)?.length ?? 0} items`,
+                badges: (po.purchase_order_items || po.PurchaseOrderItems)?.map((i: any) => i.ItemCode ?? i.code ?? i.itemCode ?? '').filter(Boolean) ?? [],
+                icon: 'pi-box',
+                supplierName: po.supplier?.CompanyName || ''
             }));
 
             if (manualSearch.value.trim()) {
                 const keyword = manualSearch.value.toLowerCase();
-                data = data.filter((card) => card.title.toLowerCase().includes(keyword) || card.badges.some((b) => b.toLowerCase().includes(keyword)));
+                data = data.filter((card) => card.title.toLowerCase().includes(keyword) || card.badges.some((b: string) => b.toLowerCase().includes(keyword)));
+            }
+
+            if (supplierSearch.value.trim()) {
+                const supplierKeyword = supplierSearch.value.toLowerCase();
+                data = data.filter((card) => card.supplierName.toLowerCase().includes(supplierKeyword));
             }
 
             return data;
@@ -57,11 +64,20 @@ export default defineComponent({
             manualSearch.value = query;
         };
 
-        // clear handler
+        // clear handlers
         const handleClearSearch = async () => {
             manualSearch.value = '';
             selectedCard.value = null;
-            purchaseStore.handleSearch(''); // Clear store search
+            const fullQuery = [manualSearch.value, supplierSearch.value].filter(Boolean).join(' ');
+            purchaseStore.handleSearch(fullQuery); 
+            await purchaseStore.fetchPurchaseOrders();
+        };
+
+        const handleClearSupplierSearch = async () => {
+            supplierSearch.value = '';
+            selectedCard.value = null;
+            const fullQuery = [manualSearch.value, supplierSearch.value].filter(Boolean).join(' ');
+            purchaseStore.handleSearch(fullQuery); 
             await purchaseStore.fetchPurchaseOrders();
         };
 
@@ -144,6 +160,14 @@ export default defineComponent({
         };
 
         let searchTimeout: any;
+        const triggerBackendSearch = (query: string) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                purchaseStore.handleSearch(query);
+                await purchaseStore.fetchPurchaseOrders();
+            }, 300);
+        };
+
         const handleManualSearchInput = (value: string | Event) => {
             let query = '';
             if (typeof value === 'object' && value && 'target' in value) {
@@ -153,13 +177,23 @@ export default defineComponent({
             } else {
                 query = manualSearch.value;
             }
+            manualSearch.value = query;
+            const fullQuery = [manualSearch.value, supplierSearch.value].filter(Boolean).join(' ');
+            triggerBackendSearch(fullQuery);
+        };
 
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(async () => {
-                purchaseStore.handleSearch(query);
-                await purchaseStore.fetchPurchaseOrders();
-                manualSearch.value = query;
-            }, 300);
+        const handleSupplierSearchInput = (value: string | Event) => {
+            let query = '';
+            if (typeof value === 'object' && value && 'target' in value) {
+                query = ((value as Event).target as HTMLInputElement).value;
+            } else if (typeof value === 'string') {
+                query = value;
+            } else {
+                query = supplierSearch.value;
+            }
+            supplierSearch.value = query;
+            const fullQuery = [manualSearch.value, supplierSearch.value].filter(Boolean).join(' ');
+            triggerBackendSearch(fullQuery);
         };
 
         //  Smart Scan handlers 
@@ -190,6 +224,7 @@ export default defineComponent({
             selectedCard,
             filteredCards,
             searchTerm: manualSearch,
+            supplierSearchTerm: supplierSearch,
             handlePOSearch,
             toggleSelect,
             removeCard,
@@ -202,11 +237,14 @@ export default defineComponent({
             displayEnd,
             purchaseStore,
             manualSearch,
+            supplierSearch,
             handlePageSizeChange,
             handleClearSearch,
+            handleClearSupplierSearch,
             onScanConfirm,
             onScanManual,
-            handleManualSearchInput
+            handleManualSearchInput,
+            handleSupplierSearchInput
         };
     }
 });

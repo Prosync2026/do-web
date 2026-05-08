@@ -27,10 +27,14 @@
                 <Form @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full sm:w-full">
                     <!-- AutoComplete Search -->
                     <!-- Search Section -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-3">
-                        <div class="flex gap-2 relative">
-                            <ProInput v-model="searchTerm" placeholder="Search PO Number..." class="w-full" @input="handleManualSearchInput" />
+                    <div class="flex flex-col md:flex-row gap-4 p-3 w-full">
+                        <div class="flex gap-2 relative flex-1 w-full">
+                            <ProInput v-model="searchTerm" placeholder="Search PO Number..." class="w-full flex-1" fluid @input="handleManualSearchInput" />
                             <ProButton variant="secondary" class="bg-gray-200 shrink-0" rounded @click="handleClearSearch" title="Clear search"><i class="pi pi-times mt-1 shrink-0" /></ProButton>
+                        </div>
+                        <div class="flex gap-2 relative flex-1 w-full">
+                            <ProInput v-model="supplierSearchTerm" placeholder="Search Supplier Name..." class="w-full flex-1" fluid @input="handleSupplierSearchInput" />
+                            <ProButton variant="secondary" class="bg-gray-200 shrink-0" rounded @click="handleClearSupplierSearch" title="Clear search"><i class="pi pi-times mt-1 shrink-0" /></ProButton>
                         </div>
                     </div>
 
@@ -48,6 +52,7 @@
                                 <div :class="['flex justify-between items-start', isSelected(card) ? 'mt-5' : 'mt-0']">
                                     <div>
                                         <h4 class="font-semibold mb-1">{{ card.title }}</h4>
+                                        <p class="text-sm font-medium text-gray-700 mb-1" v-if="card.supplierName">{{ card.supplierName }}</p>
                                         <p class="text-gray-600 mb-2 text-xs">{{ card.content }}</p>
                                         <div class="flex gap-2 flex-wrap" v-if="!isSelected(card)">
                                             <ProTag v-for="(badge, i) in card.badges" :key="i" :label="badge" variant="info" class="bg-gray-200 text-gray-700" />

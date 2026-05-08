@@ -84,7 +84,8 @@ export default defineComponent({
 
             const payload = {
                 PurchaseOrderId: selectPO.value.id ?? selectPO.value.purchaseOrderId,
-                DocNo: selectPO.value.poNumber ?? selectPO.value.DocNo,
+                DocNo: deliveryInfo.value.doNumber || selectPO.value.poNumber || selectPO.value.DocNo,
+                RefDoc: selectPO.value.poNumber || selectPO.value.DocNo,
                 Date: deliveryInfo.value.DeliveryDate,
                 PlateNo: deliveryInfo.value.PlateNo,
                 Remarks: deliveryInfo.value.Remarks,

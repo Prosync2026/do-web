@@ -1,16 +1,16 @@
 import { PhWarningCircle, PhTruck, PhFile, PhCamera } from '@phosphor-icons/vue';
 import { formatDateToAPI } from '@/utils/dateHelper';
-import Calendar from 'primevue/calendar';
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
 import { useToast } from '@/utils/toastBus';
+import type { FormValues } from '@/types/delivery.type';
 import { defineComponent, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { ProCard, ProButton, ProTag, ProInput, ProTextarea, ProUploadFile } from '@prosync_solutions/ui';
+import { ProCard, ProButton, ProTag, ProInput, ProTextarea, ProUploadFile, ProDatePicker } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'DeliveryFormCard',
-    components: { Message, Toast, Calendar, ProCard, ProButton, ProTag, ProInput, ProTextarea, ProUploadFile, PhWarningCircle, PhTruck, PhFile, PhCamera },
+    components: { Message, Toast, ProDatePicker, ProCard, ProButton, ProTag, ProInput, ProTextarea, ProUploadFile, PhWarningCircle, PhTruck, PhFile, PhCamera },
     props: {
         prefillAttachment: {
             type: File,
@@ -29,7 +29,8 @@ export default defineComponent({
 
         const initialValues = reactive<FormValues>({
             driverPlate: '',
-            deliveryDate: null,
+            deliveryDate: new Date(),
+            doNumber: '',
             remarks: ''
         });
 
@@ -119,6 +120,7 @@ export default defineComponent({
                 PlateNo: values.driverPlate,
                 Date: formatDateToAPI(values.deliveryDate) || '',
                 DeliveryDate: formatDateToAPI(values.deliveryDate) || '',
+                doNumber: values.doNumber || '',
                 Remarks: values.remarks || '',
                 attachments: deliveryAttachments.value.map((f: any) => f.file || f.raw || f), // Delivery documents
                 attachments2: evidenceFiles.value.map((f: any) => f.file || f.raw || f) // Evidence/photos sent as attachments2
@@ -146,7 +148,8 @@ export default defineComponent({
 
             toastRef,
             onFormSubmit,
-            goBack
+            goBack,
+            formatDateToAPI
         };
     }
 });
