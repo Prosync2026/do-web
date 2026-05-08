@@ -5,12 +5,12 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from '@/utils/toastBus';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput } from '@prosync_solutions/ui';
-import { PhArrowsLeftRight, PhEye, PhPlus } from '@phosphor-icons/vue';
+import { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, ProModal } from '@prosync_solutions/ui';
+import { PhArrowsLeftRight, PhEye, PhPlus, PhCheckCircle, PhXCircle, PhCheck, PhX } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'Deliveries',
-    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, PhArrowsLeftRight, PhEye, PhPlus },
+    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, ProModal, PhArrowsLeftRight, PhEye, PhPlus, PhCheckCircle, PhXCircle, PhCheck, PhX },
     setup() {
         const deliveryStore = useDeliveryStore();
         const projectStore = useProjectStore();
@@ -154,11 +154,38 @@ export default defineComponent({
             loadData();
         }
 
-        function handleAction(type: 'view', row: any) {
+        function handleAction(type: 'view' | 'approve' | 'reject', row: any) {
             if (type === 'view') {
                 router.push(`/deliveries/viewDelivery/${row.Id}`);
+            } else if (type === 'approve') {
+                selectedDeliveryId.value = row.Id;
+                selectedDeliveryNo.value = row.DocNo;
+                showApproveModal.value = true;
+            } else if (type === 'reject') {
+                selectedDeliveryId.value = row.Id;
+                selectedDeliveryNo.value = row.DocNo;
+                showRejectModal.value = true;
             }
         }
+
+        const showApproveModal = ref(false);
+        const showRejectModal = ref(false);
+        const selectedDeliveryId = ref<number | null>(null);
+        const selectedDeliveryNo = ref<string>('');
+
+        const confirmApprove = async () => {
+            if (selectedDeliveryId.value) {
+                await deliveryStore.updateDeliveryOrderStatus(selectedDeliveryId.value, 'Approved');
+                showApproveModal.value = false;
+            }
+        };
+
+        const confirmReject = async () => {
+            if (selectedDeliveryId.value) {
+                await deliveryStore.updateDeliveryOrderStatus(selectedDeliveryId.value, 'Rejected');
+                showRejectModal.value = false;
+            }
+        };
 
         onMounted(() => {
             deliveryStore.setStatus('Created'); // default = Pending
@@ -212,7 +239,14 @@ export default defineComponent({
             tableFilters,
             handleUpdatePagination,
             projectStore,
-            isPurchasingRole
+            isPurchasingRole,
+
+            showApproveModal,
+            showRejectModal,
+            selectedDeliveryId,
+            selectedDeliveryNo,
+            confirmApprove,
+            confirmReject
         };
     }
 });

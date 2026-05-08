@@ -80,11 +80,26 @@ const previewAttachment = (file: AttachmentItem) => {
     window.open(url, '_blank');
 };
 
+const updateDeliveryOrderStatus = async (id: number, status: 'Approved' | 'Rejected'): Promise<DeliveryOrderResponse> => {
+    try {
+        const response = await axiosInstance.put(`/deliveryOrder/${id}/approve/${status}`);
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        showError(error, `Failed to ${status.toLowerCase()} delivery order.`);
+        return {
+            success: false,
+            data: [],
+            message: error.response?.data?.message || error.response?.data?.error || `Failed to ${status.toLowerCase()} delivery order`
+        };
+    }
+};
+
 export const deliveryOrderService = {
     getDeliveryOrders,
     createDeliveryOrder,
     getSingleDeliveryOrder,
     getAttachmentsByDeliveryId,
     getAttachments2ByDeliveryId,
-    previewAttachment
+    previewAttachment,
+    updateDeliveryOrderStatus
 };
