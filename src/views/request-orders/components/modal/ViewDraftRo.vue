@@ -13,7 +13,7 @@
         </div>
 
         <!-- Drafts Table -->
-        <div class="border border-border-border rounded-lg overflow-hidden">
+        <div class="border border-border-border rounded-lg overflow-hidden hidden lg:block">
             <ProTable 
                 :data="filteredDrafts" 
                 :columns="columns" 
@@ -69,6 +69,60 @@
                     </div>
                 </template>
             </ProTable>
+        </div>
+
+        <!-- Mobile View -->
+        <div class="block lg:hidden">
+            <template v-if="filteredDrafts.length > 0">
+                <div class="grid grid-cols-1 gap-4">
+                    <ProCard v-for="(row, index) in filteredDrafts" :key="row.draftId" class="shadow-sm relative overflow-visible">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-start gap-2">
+                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ index + 1 }}</span>
+                                <div class="flex flex-col gap-0.5 mt-0.5">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">Draft ID</span>
+                                    <span class="font-semibold text-text-heading leading-tight">{{ row.draftId }}</span>
+                                </div>
+                            </div>
+                            <ProTag :variant="row.budgetType === 'Budgeted' ? 'success' : 'warn'">
+                                {{ row.budgetType }}
+                            </ProTag>
+                        </div>
+                        
+                        <div class="grid gap-2 mb-4">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-500 font-medium">Project</span>
+                                <span class="text-right">{{ row.project }}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-500 font-medium">Requested By</span>
+                                <span class="text-right">{{ row.requestedBy }}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-500 font-medium">Items Count</span>
+                                <span class="text-right flex items-center gap-1"><PhPackage :size="16" class="text-gray-500"/> {{ row.itemsCount }}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-500 font-medium">Last Modified</span>
+                                <span class="text-right flex items-center gap-1"><PhCalendarBlank :size="16" class="text-gray-500"/> {{ formatDate(row.lastModified) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-2 pt-3 border-t border-gray-100">
+                            <ProButton variant="primary" @click="handleContinue(row)" size="sm">
+                                <template #iconLeft><PhPencilSimple /></template>
+                                Continue
+                            </ProButton>
+                            <ProButton variant="danger" @click="handleDelete(row)" size="sm">
+                                <template #iconLeft><PhTrash /></template>
+                            </ProButton>
+                        </div>
+                    </ProCard>
+                </div>
+            </template>
+            <div v-else class="flex flex-col items-center justify-center py-6 px-4 bg-gray-50 rounded-lg border border-gray-100 mt-2">
+                <span class="text-sm text-gray-500">No draft request orders found</span>
+            </div>
         </div>
 
         <template #footer>

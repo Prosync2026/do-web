@@ -151,6 +151,12 @@
                 </div>
             </div>
 
+            <!-- Overall Remark -->
+            <div v-if="localOrder.remark" class="mt-6 mb-4 p-4 bg-surface-gray-bg border border-border-border rounded-container">
+                <h4 class="text-body-sm-bold text-text-heading mb-2">Remark</h4>
+                <p class="text-body-sm text-text-body whitespace-pre-wrap">{{ localOrder.remark }}</p>
+            </div>
+
             <!-- Attachments -->
             <div class="mt-4">
                 <div v-if="existingAttachments.length > 0" class="mb-4">

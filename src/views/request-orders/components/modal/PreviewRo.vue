@@ -38,7 +38,7 @@
         </div>
 
         <!-- Items Table -->
-        <div class="overflow-x-auto mb-4">
+        <div class="overflow-x-auto mb-4 hidden lg:block">
             <ProTable :data="summaryData.items" :columns="columns" class="text-sm">
                 <template #cell-no="{ row }">
                     {{ summaryData.items.indexOf(row) + 1 }}
@@ -86,6 +86,79 @@
                     {{ formatDate(row.deliveryDate) }}
                 </template>
             </ProTable>
+        </div>
+
+        <!-- Mobile View -->
+        <div class="block lg:hidden mb-4">
+            <div class="grid grid-cols-1 gap-4">
+                <ProCard v-for="(row, index) in summaryData.items" :key="index" class="shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-start gap-2">
+                            <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ index + 1 }}</span>
+                            <div class="flex flex-col gap-0.5 mt-0.5">
+                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">Item Code</span>
+                                <span class="font-semibold text-text-heading leading-tight">{{ row.itemCode }}</span>
+                            </div>
+                        </div>
+                        <ProTag :variant="row.itemType === 'Materials' ? 'info' : row.itemType === 'Labour' ? 'warning' : 'success'">
+                            {{ row.itemType || 'N/A' }}
+                        </ProTag>
+                    </div>
+
+                    <div class="grid gap-3 mb-2">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-xs font-medium text-gray-500">Description</span>
+                            <span class="text-sm font-medium text-text-body">{{ row.description }}</span>
+                            <div v-if="row.notes" class="mt-1 p-1.5 bg-brand-primary/5 border border-brand-primary/20 rounded-md text-xs text-brand-primary italic">
+                                Note: {{ row.notes }}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs font-medium text-gray-500">Location</span>
+                                <span class="text-sm">{{ row.location || '-' }}</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs font-medium text-gray-500">UOM</span>
+                                <span class="text-sm">{{ row.uom || '-' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs font-medium text-gray-500">Qty / Requested</span>
+                                <span class="text-sm font-semibold">{{ row.qty || '0' }} / {{ row.qtyRequested || '-' }}</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs font-medium text-gray-500">Delivery Date</span>
+                                <span class="text-sm">{{ formatDate(row.deliveryDate) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 py-2 border-y border-gray-100">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Budget</span>
+                                <span class="text-sm">{{ row.budgetQty || '-' }}</span>
+                            </div>
+                            <div class="flex flex-col gap-1 border-l border-gray-100 pl-2">
+                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Ordered</span>
+                                <span class="text-sm">{{ row.qtyOrdered || '-' }}</span>
+                            </div>
+                            <div class="flex flex-col gap-1 border-l border-gray-100 pl-2">
+                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Delivered</span>
+                                <span class="text-sm">{{ row.qtyDelivered || '-' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-1 pt-1">
+                            <span class="text-xs font-medium text-gray-500">Price</span>
+                            <span class="text-sm font-semibold text-text-heading">{{ formatCurrency(row.price || 0) }}</span>
+                            <span v-if="row.remark" class="text-xs text-gray-500 italic mt-0.5">Remark: {{ row.remark }}</span>
+                        </div>
+                    </div>
+                </ProCard>
+            </div>
         </div>
 
         <!-- Overall Remark -->

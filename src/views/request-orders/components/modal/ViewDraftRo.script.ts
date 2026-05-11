@@ -2,16 +2,17 @@ import { requestOrderService } from '@/services/requestOrder.service';
 import type { DraftRO } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
 import { PhPencilSimple, PhTrash, PhX, PhPackage, PhCalendarBlank } from '@phosphor-icons/vue';
-import { ProModal, ProInput, ProTable, ProButton, ProTag } from '@prosync_solutions/ui';
+import { ProModal, ProInput, ProTable, ProButton, ProTag, ProCard } from '@prosync_solutions/ui';
 import type { TableColumn } from '@prosync_solutions/ui/dist/types';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from '@/utils/toastBus';
-import { computed, defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, markRaw, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { PhWarning } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'ViewDraftRo',
-    components: { ProModal, ProTable, ProButton, ProInput, ProTag, PhPencilSimple, PhTrash, PhX, PhPackage, PhCalendarBlank },
+    components: { ProModal, ProTable, ProButton, ProInput, ProTag, ProCard, PhPencilSimple, PhTrash, PhX, PhPackage, PhCalendarBlank },
     props: { visible: { type: Boolean, required: true } },
     emits: ['update:visible', 'update:count'],
     setup(props, { emit }) {
@@ -141,7 +142,7 @@ export default defineComponent({
             confirm.require({
                 message: `Are you sure you want to delete draft ${draft.draftId}?`,
                 header: 'Confirm Delete',
-                icon: markRaw(PhWarning),
+                icon: markRaw(PhWarning) as any,
                 acceptClass: 'p-button-danger',
                 rejectClass: 'p-button-secondary',
                 acceptLabel: 'Yes, Delete',

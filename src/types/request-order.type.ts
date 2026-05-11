@@ -148,6 +148,10 @@ export interface PreviewItem {
     location: string;
     notes?: string;
     remark?: string;
+    qtyRequested?: number | string;
+    budgetQty?: number | string;
+    qtyOrdered?: number | string;
+    qtyDelivered?: number | string;
 }
 
 export interface PreviewSummary {

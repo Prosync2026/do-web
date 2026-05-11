@@ -1,12 +1,12 @@
 import { PhPaperclip } from '@phosphor-icons/vue';
 import { PreviewSummary } from '@/types/request-order.type';
 import { formatDateToAPI } from '@/utils/dateHelper';
-import { ProButton, ProModal, ProTable, ProTag } from '@prosync_solutions/ui';
+import { ProButton, ProModal, ProTable, ProTag, ProCard } from '@prosync_solutions/ui';
 import { defineComponent, PropType, ref, watch } from 'vue';
 
 export default defineComponent({
     name: 'PreviewRo',
-    components: { ProModal, ProButton, ProTable, ProTag, PhPaperclip },
+    components: { ProModal, ProButton, ProTable, ProTag, ProCard, PhPaperclip },
     props: {
         visible: {
             type: Boolean,
