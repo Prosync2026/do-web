@@ -28,7 +28,7 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                             <div class="flex items-center gap-2">
                                 <span class="text-sm text-gray-600">Rows per page:</span>
-                                <ProSelect :modelValue="deliveryStore.pagination.pageSize" @update:modelValue="handleUpdatePagination({ page: 1, pageSize: $event })" :options="[{label:'10', value:10}, {label:'25', value:25}, {label:'50', value:50}, {label:'100', value:100}]" class="w-24 text-sm" />
+                                <ProSelect :modelValue="deliveryStore.pagination.pageSize" @update:modelValue="handleUpdatePagination({ page: 1, limit: Number($event) })" :options="[{label:'10', value:10}, {label:'25', value:25}, {label:'50', value:50}, {label:'100', value:100}]" class="w-24 text-sm" />
                             </div>
                             <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center flex-wrap sm:justify-end w-full sm:w-auto mt-2 sm:mt-0">
                                 <div class="flex items-center gap-2 w-full sm:w-auto">
@@ -47,39 +47,107 @@
                             </div>
                         </div>
 
-                        <ProTable
-                            @search="handleSearch"
-                            :data="filteredDeliveries"
-                            :columns="deliveryListColumn"
-                            :loading="deliveryStore.loading"
-                            :pagination="deliveryStore.pagination"
-                            emptyTitle="No delivery orders found"
-                            @update:pagination="handleUpdatePagination"
-                        >
+                        <!-- Desktop View -->
+                        <div class="hidden lg:block">
+                            <ProTable
+                                @search="handleSearch"
+                                :data="filteredDeliveries"
+                                :columns="deliveryListColumn"
+                                :loading="deliveryStore.loading"
+                                :pagination="deliveryStore.pagination"
+                                emptyTitle="No delivery orders found"
+                                @update:pagination="handleUpdatePagination"
+                            >
 
-                            <template #cell-rowIndex="{ row }">
-                                <span>{{ row.rowIndex }}</span>
-                            </template>
+                                <template #cell-rowIndex="{ row }">
+                                    <span>{{ row.rowIndex }}</span>
+                                </template>
 
-                            <template #cell-status="{ row }">
-                                <ProTag 
-                                    :label="row.Status === 'Created' ? 'Pending' : row.Status" 
-                                    :variant="getStatusSeverity(row.Status)" 
-                                />
-                            </template>
+                                <template #cell-status="{ row }">
+                                    <ProTag 
+                                        :label="row.Status === 'Created' ? 'Pending' : row.Status" 
+                                        :variant="getStatusSeverity(row.Status)" 
+                                    />
+                                </template>
 
-                            <template #actions="{ row }">
-                                <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
-                                    <PhEye :size="18" class="text-base text-gray-700" />
-                                </ProButton>
-                                <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
-                                    <PhCheckCircle :size="18" />
-                                </ProButton>
-                                <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
-                                    <PhXCircle :size="18" />
-                                </ProButton>
+                                <template #actions="{ row }">
+                                    <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
+                                        <PhEye :size="18" class="text-base text-gray-700" />
+                                    </ProButton>
+                                    <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
+                                        <PhCheckCircle :size="18" />
+                                    </ProButton>
+                                    <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
+                                        <PhXCircle :size="18" />
+                                    </ProButton>
+                                </template>
+                            </ProTable>
+                        </div>
+
+                        <!-- Mobile View -->
+                        <div class="block lg:hidden mt-4">
+                            <template v-if="filteredDeliveries.length > 0">
+                                <div class="grid grid-cols-1 gap-4">
+                                    <ProCard v-for="row in filteredDeliveries" :key="row.Id" class="shadow-sm relative overflow-hidden">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">DO Number</span>
+                                                <span class="font-semibold text-text-heading">{{ row.DocNo }}</span>
+                                            </div>
+                                            <ProTag 
+                                                :label="row.Status === 'Created' ? 'Pending' : row.Status" 
+                                                :variant="getStatusSeverity(row.Status)" 
+                                            />
+                                        </div>
+
+                                        <div class="grid gap-2 mb-4">
+                                            <div v-if="isPurchasingRole && row.ProjectName" class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Project</span>
+                                                <span class="text-right">{{ row.ProjectName }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Plate No</span>
+                                                <span class="text-right">{{ row.PlateNo || '-' }}</span>
+                                            </div>
+                                            <div class="flex flex-col gap-1 mt-2" v-if="row.Remark">
+                                                <span class="text-xs font-medium text-gray-500">Remark</span>
+                                                <span class="text-sm text-gray-700 whitespace-pre-wrap">{{ row.Remark }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex justify-end gap-2 pt-3 border-t border-gray-100">
+                                            <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
+                                                <template #iconLeft><PhEye :size="16" /></template>
+                                                View
+                                            </ProButton>
+                                            <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
+                                                <template #iconLeft><PhCheckCircle :size="16" /></template>
+                                                Approve
+                                            </ProButton>
+                                            <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
+                                                <template #iconLeft><PhXCircle :size="16" /></template>
+                                                Reject
+                                            </ProButton>
+                                        </div>
+                                    </ProCard>
+                                </div>
+                                
+                                <div class="mt-6 flex justify-center">
+                                    <ProPagination 
+                                        :modelValue="deliveryStore.pagination.page" 
+                                        @update:modelValue="(val: number) => handleUpdatePagination({ page: val, limit: deliveryStore.pagination.pageSize })"
+                                        :totalPages="deliveryStore.pagination.totalPages" 
+                                        :maxVisible="5" 
+                                    />
+                                </div>
                             </template>
-                        </ProTable>
+                            
+                            <div v-else class="flex flex-col items-center justify-center py-10 px-4 bg-gray-50 rounded-lg border border-gray-100 mt-2">
+                                <PhTruck class="mx-auto text-gray-300 mb-3" :size="48" />
+                                <h3 class="text-lg font-medium text-gray-900">No delivery orders found</h3>
+                                <p class="text-gray-500 mt-1">Try adjusting your search or filters.</p>
+                            </div>
+                        </div>
                     </Motion>
                 </ProTabs>
             </ProCard>

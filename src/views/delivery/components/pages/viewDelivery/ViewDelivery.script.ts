@@ -1,4 +1,4 @@
-import { PhFile, PhEye, PhImage } from '@phosphor-icons/vue';
+import { PhFile, PhEye, PhImage, PhPackage } from '@phosphor-icons/vue';
 import { deliveryOrderService } from '@/services/deliveryOrder.service';
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { AttachmentItem } from '@/types/request-order.type';
@@ -12,7 +12,7 @@ import { ProCard, ProButton, ProTag, ProTable } from '@prosync_solutions/ui';
 
 export default defineComponent({
     name: 'ViewDelivery',
-    components: { ProCard, ProButton, ProTag, ProTable, PhFile, PhEye, PhImage },
+    components: { ProCard, ProButton, ProTag, ProTable, PhFile, PhEye, PhImage, PhPackage },
     setup() {
         const route = useRoute();
         const deliveryStore = useDeliveryStore();
