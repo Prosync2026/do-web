@@ -90,9 +90,12 @@
                                 <div class="grid grid-cols-1 gap-4">
                                     <ProCard v-for="row in filteredDeliveries" :key="row.Id" class="shadow-sm relative overflow-hidden">
                                         <div class="flex justify-between items-start mb-3">
-                                            <div class="flex flex-col gap-1">
-                                                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">DO Number</span>
-                                                <span class="font-semibold text-text-heading">{{ row.DocNo }}</span>
+                                            <div class="flex items-start gap-2">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.rowIndex }}</span>
+                                                <div class="flex flex-col gap-0.5">
+                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">DO Number</span>
+                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.DocNo }}</span>
+                                                </div>
                                             </div>
                                             <ProTag 
                                                 :label="row.Status === 'Created' ? 'Pending' : row.Status" 

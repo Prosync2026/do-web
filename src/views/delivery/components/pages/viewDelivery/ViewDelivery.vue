@@ -95,9 +95,12 @@
                         <div class="grid grid-cols-1 gap-4">
                             <ProCard v-for="row in items" :key="row.no" class="shadow-sm border border-gray-100">
                                 <div class="flex justify-between items-start mb-3">
-                                    <div class="flex flex-col gap-1">
-                                        <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Item Code</span>
-                                        <span class="font-semibold text-text-heading">{{ row.ItemCode }}</span>
+                                    <div class="flex items-start gap-2">
+                                        <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
+                                        <div class="flex flex-col gap-0.5">
+                                            <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">Item Code</span>
+                                            <span class="font-semibold text-text-heading leading-tight">{{ row.ItemCode }}</span>
+                                        </div>
                                     </div>
                                     <ProTag :label="row.status" :variant="row.status === 'Completed' ? 'success' : 'warn'" />
                                 </div>
