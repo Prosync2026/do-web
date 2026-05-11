@@ -42,45 +42,114 @@
 
             <!-- Requested Items Table -->
             <h3 class="text-body-bold text-text-heading mb-3">Requested Items</h3>
-            <ProTable
-                :columns="[
-                    { key: 'code', label: 'Item Code' },
-                    { key: 'description', label: 'Description' },
-                    { key: 'uom', label: 'UOM' },
-                    { key: 'originalBudgetQty', label: 'Order Qty' },
-                    { key: 'requestedQty', label: 'Requested Qty' },
-                    { key: 'exceededQty', label: 'Exceeded Qty' },
-                    { key: 'exceededPercent', label: 'Exceeded %' },
-                    { key: 'deliveryDate', label: 'Delivery Date' },
-                    { key: 'note', label: 'Note' },
-                ]"
-                class="mb-6"
-            >
-                <tr
-                    v-for="(item, idx) in localOrder.items"
-                    :key="idx"
-                    :class="item.exceedBudget ? 'bg-surface-error/30' : ''"
+            <div class="hidden lg:block mb-6">
+                <ProTable
+                    :columns="[
+                        { key: 'code', label: 'Item Code' },
+                        { key: 'description', label: 'Description' },
+                        { key: 'uom', label: 'UOM' },
+                        { key: 'originalBudgetQty', label: 'Order Qty' },
+                        { key: 'requestedQty', label: 'Requested Qty' },
+                        { key: 'exceededQty', label: 'Exceeded Qty' },
+                        { key: 'exceededPercent', label: 'Exceeded %' },
+                        { key: 'deliveryDate', label: 'Delivery Date' },
+                        { key: 'note', label: 'Note' },
+                    ]"
                 >
-                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.code }}</td>
-                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.description }}</td>
-                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.uom }}</td>
-                    <td class="px-3 py-2 text-body-sm text-text-body">{{ String(item.originalBudgetQty ?? '-') }}</td>
-                    <td class="px-3 py-2 text-body-sm text-text-body">
-                        <span v-if="item.requestedQty" class="text-body-sm-bold text-text-heading">{{ item.requestedQty?.toFixed(2) }}</span>
-                        <span v-else class="text-text-disabled">-</span>
-                    </td>
-                    <td class="px-3 py-2 text-body-sm text-text-body">
-                        <span v-if="item.exceedBudget" class="text-body-sm-bold text-text-error">+{{ item.exceededQty?.toFixed(2) }}</span>
-                        <span v-else class="text-text-disabled">-</span>
-                    </td>
-                    <td class="px-3 py-2 text-body-sm text-text-body">
-                        <span v-if="item.exceedBudget" class="text-body-sm-bold text-text-error">{{ item.exceededPercent?.toFixed(2) }}%</span>
-                        <span v-else class="text-text-disabled">-</span>
-                    </td>
-                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.deliveryDate ?? '-' }}</td>
-                    <td class="px-3 py-2 text-body-sm text-text-body">{{ item.note ?? '-' }}</td>
-                </tr>
-            </ProTable>
+                    <tr
+                        v-for="(item, idx) in localOrder.items"
+                        :key="idx"
+                        :class="item.exceedBudget ? 'bg-surface-error/30' : ''"
+                    >
+                        <td class="px-3 py-2 text-body-sm text-text-body">{{ item.code }}</td>
+                        <td class="px-3 py-2 text-body-sm text-text-body">{{ item.description }}</td>
+                        <td class="px-3 py-2 text-body-sm text-text-body">{{ item.uom }}</td>
+                        <td class="px-3 py-2 text-body-sm text-text-body">{{ String(item.originalBudgetQty ?? '-') }}</td>
+                        <td class="px-3 py-2 text-body-sm text-text-body">
+                            <span v-if="item.requestedQty" class="text-body-sm-bold text-text-heading">{{ item.requestedQty?.toFixed(2) }}</span>
+                            <span v-else class="text-text-disabled">-</span>
+                        </td>
+                        <td class="px-3 py-2 text-body-sm text-text-body">
+                            <span v-if="item.exceedBudget" class="text-body-sm-bold text-text-error">+{{ item.exceededQty?.toFixed(2) }}</span>
+                            <span v-else class="text-text-disabled">-</span>
+                        </td>
+                        <td class="px-3 py-2 text-body-sm text-text-body">
+                            <span v-if="item.exceedBudget" class="text-body-sm-bold text-text-error">{{ item.exceededPercent?.toFixed(2) }}%</span>
+                            <span v-else class="text-text-disabled">-</span>
+                        </td>
+                        <td class="px-3 py-2 text-body-sm text-text-body">{{ item.deliveryDate ?? '-' }}</td>
+                        <td class="px-3 py-2 text-body-sm text-text-body">{{ item.note ?? '-' }}</td>
+                    </tr>
+                </ProTable>
+            </div>
+
+            <!-- Mobile View -->
+            <div class="block lg:hidden mb-6">
+                <template v-if="localOrder.items && localOrder.items.length > 0">
+                    <div class="grid grid-cols-1 gap-4">
+                        <ProCard v-for="(item, idx) in localOrder.items" :key="idx" class="shadow-sm border border-gray-100" :class="item.exceedBudget ? 'bg-surface-error/10' : ''">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-start gap-2">
+                                    <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ idx + 1 }}</span>
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">Item Code</span>
+                                        <span class="font-semibold text-text-heading leading-tight">{{ item.code }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid gap-2 mb-2">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-medium text-gray-500">Description</span>
+                                    <span class="text-sm font-medium">{{ item.description }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mt-2 border-t border-gray-100 pt-3">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-xs font-medium text-gray-500">UOM</span>
+                                        <span class="text-sm">{{ item.uom || '-' }}</span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-xs font-medium text-gray-500">Order Qty</span>
+                                        <span class="text-sm font-medium">{{ String(item.originalBudgetQty ?? '-') }}</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mt-2 border-t border-gray-100 pt-3">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-xs font-medium text-gray-500">Requested Qty</span>
+                                        <span v-if="item.requestedQty" class="text-sm font-semibold">{{ item.requestedQty?.toFixed(2) }}</span>
+                                        <span v-else class="text-text-disabled">-</span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-xs font-medium text-gray-500">Delivery Date</span>
+                                        <span class="text-sm">{{ item.deliveryDate ?? '-' }}</span>
+                                    </div>
+                                </div>
+
+                                <div v-if="item.exceedBudget" class="mt-2 p-2 bg-surface-error/20 rounded border border-surface-error/30">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div class="flex flex-col gap-1">
+                                            <span class="text-[10px] font-medium text-text-error uppercase tracking-wider">Exceeded Qty</span>
+                                            <span class="text-sm font-bold text-text-error">+{{ item.exceededQty?.toFixed(2) }}</span>
+                                        </div>
+                                        <div class="flex flex-col gap-1">
+                                            <span class="text-[10px] font-medium text-text-error uppercase tracking-wider">Exceeded %</span>
+                                            <span class="text-sm font-bold text-text-error">{{ item.exceededPercent?.toFixed(2) }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-if="item.note" class="flex flex-col gap-1 mt-2 border-t border-gray-100 pt-3">
+                                    <span class="text-xs font-medium text-gray-500">Note</span>
+                                    <span class="text-sm italic">{{ item.note }}</span>
+                                </div>
+                            </div>
+                        </ProCard>
+                    </div>
+                </template>
+                <div v-else class="flex flex-col items-center justify-center py-6 px-4 bg-gray-50 rounded-lg border border-gray-100 mt-2">
+                    <span class="text-sm text-gray-500">No items requested.</span>
+                </div>
+            </div>
 
             <!-- Attachments -->
             <div class="mt-4">
