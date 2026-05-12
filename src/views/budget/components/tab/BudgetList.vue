@@ -109,11 +109,20 @@
         </div>
         <!-- Tables Area -->
         <div v-if="comparisonData">
-            <div class="flex items-center gap-2 mb-4">
-                <span class="text-sm text-gray-600">Rows per page:</span>
-                <ProSelect :modelValue="pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="pageSizeOptions" class="w-24 h-9 text-sm" />
+            <!-- Mobile Search -->
+            <div class="block lg:hidden mb-4 px-4">
+                <ProInput :modelValue="search" @update:modelValue="(q) => { search = q; onSearchWrapper(q) }" placeholder="Search comparison..." class="w-full" />
             </div>
-            <div class="comparison-table-wrapper">
+
+            <div class="flex items-center justify-between mb-4 px-4 lg:px-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-600 hidden lg:inline">Rows per page:</span>
+                    <span class="text-sm text-gray-600 inline lg:hidden">Rows:</span>
+                    <ProSelect :modelValue="pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="pageSizeOptions" class="w-20 lg:w-24 h-9 text-sm" />
+                </div>
+            </div>
+
+            <div class="hidden lg:block comparison-table-wrapper">
                 <ProTable
                     :columns="proTableComparisonColumns"
                     :data="comparisonTable"
@@ -125,8 +134,6 @@
                     emptyTitle="Budget Comparison Data"
                     emptyDescription="No comparison data available."
                     @sort="handleProTableSort"
-                    @update:pagination="handleProTablePaginationUpdate"
-                >
                     @update:pagination="handleProTablePaginationUpdate"
                 >
                     <template #cell-wastage="{ row }">
@@ -163,44 +170,176 @@
                     </template>
                 </ProTable>
             </div>
+
+            <!-- Mobile Card View -->
+            <div class="block lg:hidden px-4">
+                <div v-if="comparisonTable.length === 0" class="text-center text-gray-500 py-6">No comparison data available.</div>
+                <div v-else class="grid grid-cols-1 gap-4">
+                    <ProCard v-for="row in comparisonTable" :key="row.itemCode" class="shadow-sm border border-gray-200 p-4">
+                        <div class="flex justify-between items-start mb-2 border-b border-gray-100 pb-2">
+                            <div>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-wider block">Item Code</span>
+                                <span class="font-semibold text-text-heading">{{ row.itemCode }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <ProTag
+                                    :label="row.impact"
+                                    :variant="row.impact === 'Added' ? 'success' : row.impact === 'Removed' ? 'error' : row.impact === 'Increase' ? 'warn' : 'info'"
+                                />
+                                <ProButton v-if="showImportFile" variant="ghost" size="sm" @click="handleActionClick('edit', row)">
+                                    <PhPencil :size="16" />
+                                </ProButton>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-xs text-gray-500 block">Description</span>
+                            <span class="text-sm font-medium">{{ row.description }}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm mb-2 border-t border-gray-100 pt-2">
+                            <div class="bg-gray-50 p-2 rounded">
+                                <span class="text-xs font-semibold text-gray-600 block mb-1">Old Version</span>
+                                <div class="flex justify-between"><span>Qty:</span> <span>{{ row.originalQty }}</span></div>
+                                <div class="flex justify-between"><span>Rate:</span> <span>{{ row.originalRate != null ? 'RM ' + formatCurrency(row.originalRate) : '-' }}</span></div>
+                                <div class="flex justify-between font-semibold mt-1 border-t border-gray-200 pt-1"><span>Amt:</span> <span>{{ row.originalAmount != null ? 'RM ' + formatCurrency(row.originalAmount) : '-' }}</span></div>
+                            </div>
+                            <div class="bg-blue-50 p-2 rounded">
+                                <span class="text-xs font-semibold text-blue-700 block mb-1">New Version</span>
+                                <div class="flex justify-between"><span>Qty:</span> <span>{{ row.latestQty }}</span></div>
+                                <div class="flex justify-between"><span>Rate:</span> <span>{{ row.latestRate != null ? 'RM ' + formatCurrency(row.latestRate) : '-' }}</span></div>
+                                <div class="flex justify-between font-semibold mt-1 border-t border-blue-200 pt-1"><span>Amt:</span> <span>{{ row.latestAmount != null ? 'RM ' + formatCurrency(row.latestAmount) : '-' }}</span></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-sm border-t border-gray-100 pt-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-500">Δ Qty</span>
+                                <span class="font-medium">{{ row.qtyDiff }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-500">Δ Amount</span>
+                                <span class="font-medium" :class="row.amountDiff > 0 ? 'text-green-500' : row.amountDiff < 0 ? 'text-red-500' : ''">
+                                    {{ row.amountDiff < 0 ? '-' : '' }}RM {{ formatCurrency(Math.abs(row.amountDiff || 0)) }}
+                                </span>
+                            </div>
+                        </div>
+                    </ProCard>
+                </div>
+                <div class="mt-6 flex justify-center pb-4">
+                    <ProPagination :modelValue="pagination.page" :totalPages="pagination.totalPages" @update:modelValue="handlePageChange" />
+                </div>
+            </div>
         </div>
 
         <div v-else>
-            <div class="flex items-center gap-2 mb-4">
-                <span class="text-sm text-gray-600">Rows per page:</span>
-                <ProSelect :modelValue="pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="pageSizeOptions" class="w-24 text-sm" />
+            <!-- Mobile Search -->
+            <div class="block lg:hidden mb-4 px-4">
+                <ProInput :modelValue="search" @update:modelValue="(q) => { search = q; onSearchWrapper(q) }" placeholder="Search budget items..." class="w-full" />
             </div>
-            <ProTable
-                :columns="proTableBudgetColumns"
-                :data="filteredItems"
-                :pagination="{ page: pagination.page, pageSize: pagination.pageSize, total: pagination.total }"
-                :showRowIndex="true"
-                searchable
-                searchPlaceholder="Search..."
-                @search="(q) => { search = q; onSearchWrapper(search) }"
-                emptyTitle="Budget List Data"
-                emptyDescription="No budget items found."
-                @sort="handleProTableSort"
-                @update:pagination="handleProTablePaginationUpdate"
-            >
-                <template #cell-totalRemainingQty="{ row }">
-                    <div class="flex flex-col gap-1">
-                        <span>{{ row.totalRemainingQty ?? '-' }}</span>
-                        <span class="px-2 py-0.5 text-xs font-medium rounded w-fit" :class="getUtilizationClass(row.utilizationOrdered)">
-                            {{ formatPercent(row.utilizationOrdered) }}
-                        </span>
-                    </div>
-                </template>
 
-                <template #cell-rate="{ row }">RM {{ formatCurrency(row.rate) }}</template>
-                <template #cell-amount="{ row }">RM {{ formatCurrency(row.amount) }}</template>
+            <div class="flex items-center justify-between mb-4 px-4 lg:px-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-600 hidden lg:inline">Rows per page:</span>
+                    <span class="text-sm text-gray-600 inline lg:hidden">Rows:</span>
+                    <ProSelect :modelValue="pagination.pageSize" @update:modelValue="handlePageSizeChange" :options="pageSizeOptions" class="w-20 lg:w-24 text-sm" />
+                </div>
+            </div>
 
-                <template #actions="{ row }">
-                    <ProButton variant="ghost" size="sm" @click="handleActionClick('edit', row)">
-                        <PhPencil :size="18"  />
-                    </ProButton>
-                </template>
-            </ProTable>
+            <div class="hidden lg:block">
+                <ProTable
+                    :columns="proTableBudgetColumns"
+                    :data="filteredItems"
+                    :pagination="{ page: pagination.page, pageSize: pagination.pageSize, total: pagination.total }"
+                    :showRowIndex="true"
+                    searchable
+                    searchPlaceholder="Search..."
+                    @search="(q) => { search = q; onSearchWrapper(search) }"
+                    emptyTitle="Budget List Data"
+                    emptyDescription="No budget items found."
+                    @sort="handleProTableSort"
+                    @update:pagination="handleProTablePaginationUpdate"
+                >
+                    <template #cell-totalRemainingQty="{ row }">
+                        <div class="flex flex-col gap-1">
+                            <span>{{ row.totalRemainingQty ?? '-' }}</span>
+                            <span class="px-2 py-0.5 text-xs font-medium rounded w-fit" :class="getUtilizationClass(row.utilizationOrdered)">
+                                {{ formatPercent(row.utilizationOrdered) }}
+                            </span>
+                        </div>
+                    </template>
+
+                    <template #cell-rate="{ row }">RM {{ formatCurrency(row.rate) }}</template>
+                    <template #cell-amount="{ row }">RM {{ formatCurrency(row.amount) }}</template>
+
+                    <template #actions="{ row }">
+                        <ProButton variant="ghost" size="sm" @click="handleActionClick('edit', row)">
+                            <PhPencil :size="18"  />
+                        </ProButton>
+                    </template>
+                </ProTable>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="block lg:hidden px-4">
+                <div v-if="filteredItems.length === 0" class="text-center text-gray-500 py-6">No budget items found.</div>
+                <div v-else class="grid grid-cols-1 gap-4">
+                    <ProCard v-for="row in filteredItems" :key="row.itemCode" class="shadow-sm border border-gray-200 p-4">
+                        <div class="flex justify-between items-start mb-2 border-b border-gray-100 pb-2">
+                            <div>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-wider block">Item Code</span>
+                                <span class="font-semibold text-text-heading">{{ row.itemCode }}</span>
+                            </div>
+                            <ProButton v-if="showImportFile" variant="ghost" size="sm" @click="handleActionClick('edit', row)">
+                                <PhPencil :size="16" />
+                            </ProButton>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-xs text-gray-500 block">Description</span>
+                            <span class="text-sm font-medium">{{ row.description }}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mb-2 text-sm">
+                            <div>
+                                <span class="text-xs text-gray-500 block">Location 1</span>
+                                <span>{{ row.location1 || '-' }}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 block">Location 2</span>
+                                <span>{{ row.location2 || '-' }}</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mb-2 text-sm border-t border-gray-100 pt-2">
+                            <div>
+                                <span class="text-xs text-gray-500 block">Qty</span>
+                                <span>{{ row.qty }} {{ row.unit }}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 block">Rate</span>
+                                <span>RM {{ formatCurrency(row.rate) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 block">Amount</span>
+                                <span class="font-semibold text-text-heading">RM {{ formatCurrency(row.amount) }}</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-sm border-t border-gray-100 pt-2">
+                            <div>
+                                <span class="text-xs text-gray-500 block">Ordered</span>
+                                <span>{{ row.totalOrderedQty || '-' }}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 block">Remaining</span>
+                                <div class="flex items-center gap-1">
+                                    <span>{{ row.totalRemainingQty ?? '-' }}</span>
+                                    <span class="px-1.5 py-0.5 text-[10px] font-medium rounded whitespace-nowrap" :class="getUtilizationClass(row.utilizationOrdered)">
+                                        {{ formatPercent(row.utilizationOrdered) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </ProCard>
+                </div>
+                <div class="mt-6 flex justify-center pb-4">
+                    <ProPagination :modelValue="pagination.page" :totalPages="pagination.totalPages" @update:modelValue="handlePageChange" />
+                </div>
+            </div>
         </div>
     </div>
     <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" @success="handleImportSuccess" />
