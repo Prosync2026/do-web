@@ -180,6 +180,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 poNumber: o.DocNo,
                 poDate: formatDate(o.PoDate),
                 projectName: o.ProjectId ? getProjectName(o.ProjectId) : '',
+                supplier: o.supplier,
                 items: mappedItems
             };
 

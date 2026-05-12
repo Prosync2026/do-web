@@ -22,7 +22,17 @@ export default defineComponent({
         const project = ref<{ company: string; name: string } | null>(JSON.parse(localStorage.getItem('selectedProject') || 'null'));
 
         const poNumber = computed(() => purchaseOrder.value?.poNumber ?? 'N/A');
-        const supplier = computed(() => purchaseOrder.value?.SupplierId?.toString() || 'N/A');
+        const supplier = computed(() => {
+            if (purchaseOrder.value?.supplier?.CompanyName) {
+                return purchaseOrder.value.supplier.CompanyName;
+            }
+            // Fallback to checking the loaded list in case the detail endpoint doesn't include the supplier name
+            const cachedPo = store.purchaseOrders.find((p) => p.Id === purchaseOrder.value?.Id);
+            if (cachedPo && cachedPo.supplier?.CompanyName) {
+                return cachedPo.supplier.CompanyName;
+            }
+            return purchaseOrder.value?.SupplierId?.toString() || 'N/A';
+        });
         const totalAmount = computed(() => {
             const amount = purchaseOrder.value?.TotalAmount;
             if (!amount && purchaseOrder.value?.items) {

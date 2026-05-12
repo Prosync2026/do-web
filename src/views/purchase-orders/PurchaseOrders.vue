@@ -93,74 +93,213 @@
                              PENDING
                         ====================== -->
                         <template v-if="activeTab === '0'">
-                            <ProTable
-                                :data="pendingList"
-                                :columns="pendingListColumn"
-                                :loading="isLoading"
-                                :pagination="pagination"
-                                emptyTitle="No Pending Purchase Orders Found"
-                                @update:pagination="handleUpdatePagination"
-                            >
-                                <template #cell-totalAmount="{ row }">
-                                    <span class="font-semibold text-text-heading">RM {{ Number(row.totalAmount).toLocaleString() }}</span>
-                                </template>
+                            <div class="hidden lg:block">
+                                <ProTable
+                                    :data="pendingList"
+                                    :columns="pendingListColumn"
+                                    :loading="isLoading"
+                                    :pagination="pagination"
+                                    emptyTitle="No Pending Purchase Orders Found"
+                                    @update:pagination="handleUpdatePagination"
+                                >
+                                    <template #cell-totalAmount="{ row }">
+                                        <span class="font-semibold text-text-heading">RM {{ Number(row.totalAmount).toLocaleString() }}</span>
+                                    </template>
 
-                                <template #cell-status="{ row }">
-                                    <ProTag
-                                        :label="row.status === 'Created' ? 'Pending' : row.status"
-                                        :variant="row.status === 'Completed' ? 'success' : row.status === 'Partially Delivered' ? 'warn' : 'info'"
-                                    />
-                                </template>
+                                    <template #cell-status="{ row }">
+                                        <ProTag
+                                            :label="row.status === 'Created' ? 'Pending' : row.status"
+                                            :variant="row.status === 'Completed' ? 'success' : row.status === 'Partially Delivered' ? 'warn' : 'info'"
+                                        />
+                                    </template>
 
-                                <template #actions="{ row }">
-                                    <ProButton variant="secondary" size="sm" @click="viewPO(row)" title="View Purchase Order">
-                                        <PhEye :size="18" class="text-base text-gray-700"  />
-                                    </ProButton>
-                                </template>
-                            </ProTable>
+                                    <template #actions="{ row }">
+                                        <ProButton variant="secondary" size="sm" @click="viewPO(row)" title="View Purchase Order">
+                                            <PhEye :size="18" class="text-base text-gray-700"  />
+                                        </ProButton>
+                                    </template>
+                                </ProTable>
+                            </div>
+
+                            <div class="block lg:hidden mt-4">
+                                <div v-if="pendingList.length === 0" class="text-center text-gray-500 py-6">No Pending Purchase Orders Found</div>
+                                <div v-else class="grid grid-cols-1 gap-4">
+                                    <ProCard v-for="(row, index) in pendingList" :key="index" class="shadow-sm border border-gray-200">
+                                        <div class="flex justify-between items-start mb-3 border-b border-gray-100 pb-3">
+                                            <div class="flex items-start gap-2">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
+                                                <div class="flex flex-col gap-0.5 mt-0.5">
+                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">PO Number</span>
+                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.poNumber }}</span>
+                                                </div>
+                                            </div>
+                                            <ProTag
+                                                :label="row.status === 'Created' ? 'Pending' : row.status"
+                                                :variant="row.status === 'Completed' ? 'success' : row.status === 'Partially Delivered' ? 'warn' : 'info'"
+                                                class="ml-2 whitespace-nowrap"
+                                            />
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-4 mb-3">
+                                            <div v-if="isPurchasingRole" class="flex flex-col gap-1 col-span-2">
+                                                <span class="text-xs font-medium text-gray-500">Project</span>
+                                                <span class="text-sm font-medium">{{ row.projectName || '-' }}</span>
+                                            </div>
+                                            
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-xs font-medium text-gray-500">Supplier</span>
+                                                <span class="text-sm">{{ row.supplier || '-' }}</span>
+                                            </div>
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-xs font-medium text-gray-500">PO Date</span>
+                                                <span class="text-sm">{{ row.poDate || '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                                            <div v-if="canViewPricing" class="flex flex-col gap-0.5">
+                                                <span class="text-xs font-medium text-gray-500">Total Amount</span>
+                                                <span class="font-semibold text-text-heading">RM {{ Number(row.totalAmount).toLocaleString() }}</span>
+                                            </div>
+                                            <div v-else></div>
+                                            <ProButton variant="secondary" size="sm" @click="viewPO(row)">
+                                                <PhEye class="mr-2" /> View
+                                            </ProButton>
+                                        </div>
+                                    </ProCard>
+                                </div>
+                            </div>
                         </template>
 
                         <!-- =====================
                              PARTIAL DELIVERY
                         ====================== -->
                         <template v-else-if="activeTab === '1'">
-                            <ProTable
-                                :data="partiallyList"
-                                :columns="partiallyListColumn"
-                                :loading="isLoading"
-                                :pagination="pagination"
-                                emptyTitle="No Partially Delivered Purchase Orders Found"
-                                @update:pagination="handleUpdatePagination"
-                            >
-                                <template #cell-status="{ row }">
-                                    <ProTag label="Partially Delivered" variant="warn" />
-                                </template>
-                            </ProTable>
+                            <div class="hidden lg:block">
+                                <ProTable
+                                    :data="partiallyList"
+                                    :columns="partiallyListColumn"
+                                    :loading="isLoading"
+                                    :pagination="pagination"
+                                    emptyTitle="No Partially Delivered Purchase Orders Found"
+                                    @update:pagination="handleUpdatePagination"
+                                >
+                                    <template #cell-status="{ row }">
+                                        <ProTag label="Partially Delivered" variant="warn" />
+                                    </template>
+                                </ProTable>
+                            </div>
+
+                            <div class="block lg:hidden mt-4">
+                                <div v-if="partiallyList.length === 0" class="text-center text-gray-500 py-6">No Partially Delivered Purchase Orders Found</div>
+                                <div v-else class="grid grid-cols-1 gap-4">
+                                    <ProCard v-for="(row, index) in partiallyList" :key="index" class="shadow-sm border border-gray-200">
+                                        <div class="flex justify-between items-start mb-3 border-b border-gray-100 pb-3">
+                                            <div class="flex items-start gap-2">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
+                                                <div class="flex flex-col gap-0.5 mt-0.5">
+                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">PO Number</span>
+                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.poNumber }}</span>
+                                                </div>
+                                            </div>
+                                            <ProTag label="Partially Delivered" variant="warn" class="ml-2 whitespace-nowrap" />
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div v-if="isPurchasingRole" class="flex flex-col gap-1 col-span-2">
+                                                <span class="text-xs font-medium text-gray-500">Project</span>
+                                                <span class="text-sm font-medium">{{ row.projectName || '-' }}</span>
+                                            </div>
+                                            
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-xs font-medium text-gray-500">Supplier</span>
+                                                <span class="text-sm">{{ row.supplier || '-' }}</span>
+                                            </div>
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-xs font-medium text-gray-500">PO Date</span>
+                                                <span class="text-sm">{{ row.poDate || '-' }}</span>
+                                            </div>
+                                        </div>
+                                    </ProCard>
+                                </div>
+                            </div>
                         </template>
 
                         <!-- =====================
                              COMPLETED
                         ====================== -->
                         <template v-else-if="activeTab === '2'">
-                            <ProTable
-                                :data="completedList"
-                                :columns="completedListColumn"
-                                :loading="isLoading"
-                                :pagination="pagination"
-                                emptyTitle="No Completed Purchase Orders Found"
-                                @update:pagination="handleUpdatePagination"
-                            >
-                                <template #cell-discrepancyType="{ row }">
-                                    <ProTag
-                                        :label="row.discrepancyType"
-                                        :variant="row.discrepancyType === 'Partial Delivery' ? 'warn' : 'error'"
-                                    />
-                                </template>
+                            <div class="hidden lg:block">
+                                <ProTable
+                                    :data="completedList"
+                                    :columns="completedListColumn"
+                                    :loading="isLoading"
+                                    :pagination="pagination"
+                                    emptyTitle="No Completed Purchase Orders Found"
+                                    @update:pagination="handleUpdatePagination"
+                                >
+                                    <template #cell-discrepancyType="{ row }">
+                                        <ProTag
+                                            :label="row.discrepancyType"
+                                            :variant="row.discrepancyType === 'Partial Delivery' ? 'warn' : 'error'"
+                                        />
+                                    </template>
 
-                                <template #cell-status="{ row }">
-                                    <ProTag label="Completed" variant="success" />
-                                </template>
-                            </ProTable>
+                                    <template #cell-status="{ row }">
+                                        <ProTag label="Completed" variant="success" />
+                                    </template>
+                                </ProTable>
+                            </div>
+
+                            <div class="block lg:hidden mt-4">
+                                <div v-if="completedList.length === 0" class="text-center text-gray-500 py-6">No Completed Purchase Orders Found</div>
+                                <div v-else class="grid grid-cols-1 gap-4">
+                                    <ProCard v-for="(row, index) in completedList" :key="index" class="shadow-sm border border-gray-200">
+                                        <div class="flex justify-between items-start mb-3 border-b border-gray-100 pb-3">
+                                            <div class="flex items-start gap-2">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
+                                                <div class="flex flex-col gap-0.5 mt-0.5">
+                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">PO Number</span>
+                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.poNumber }}</span>
+                                                </div>
+                                            </div>
+                                            <ProTag label="Completed" variant="success" class="ml-2 whitespace-nowrap" />
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-4 mb-3">
+                                            <div class="flex flex-col gap-1 col-span-2">
+                                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">DO Number</span>
+                                                <span class="text-sm font-semibold text-text-heading">{{ row.doNumber || '-' }}</span>
+                                            </div>
+
+                                            <div v-if="isPurchasingRole" class="flex flex-col gap-1 col-span-2">
+                                                <span class="text-xs font-medium text-gray-500">Project</span>
+                                                <span class="text-sm font-medium">{{ row.projectName || '-' }}</span>
+                                            </div>
+                                            
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-xs font-medium text-gray-500">PO Date</span>
+                                                <span class="text-sm">{{ row.poDate || '-' }}</span>
+                                            </div>
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-xs font-medium text-gray-500">Received By</span>
+                                                <span class="text-sm">{{ row.receivedBy || '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-2 pt-3 border-t border-gray-100">
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-xs font-medium text-gray-500">Discrepancy</span>
+                                                <ProTag
+                                                    class="self-start"
+                                                    :label="row.discrepancyType || 'None'"
+                                                    :variant="row.discrepancyType === 'Partial Delivery' ? 'warn' : row.discrepancyType ? 'error' : 'info'"
+                                                />
+                                            </div>
+                                        </div>
+                                    </ProCard>
+                                </div>
+                            </div>
                         </template>
 
                     </Motion>
