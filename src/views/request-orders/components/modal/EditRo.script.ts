@@ -9,7 +9,7 @@ import { useToast } from '@/utils/toastBus';
 import type { StockItem } from '@/types/stockItem.type';
 import { defineComponent, PropType, ref, watch } from 'vue';
 import { PhCheck, PhCloudArrowUp, PhEye, PhFile, PhImages, PhPlus, PhTrash, PhX } from '@phosphor-icons/vue';
-import { ProButton, ProModal, ProTable, ProUploadFile, ProInput, ProDatePicker, ProTextarea, type UploadFile } from '@prosync_solutions/ui';
+import { ProButton, ProModal, ProTable, ProUploadFile, ProInput, ProDatePicker, ProTextarea, ProCard, type UploadFile } from '@prosync_solutions/ui';
 import CreateROModal from './CreateRo.vue';
 import CreateStockItem from './CreateStockItem.vue';
 
@@ -22,6 +22,7 @@ export default defineComponent({
         ProModal,
         ProButton,
         ProTable,
+        ProCard,
         ProUploadFile,
         ProInput,
         ProDatePicker,

@@ -43,6 +43,11 @@ export interface PurchaseOrder {
     purchase_order_items?: PurchaseOrderItem[];
     ProjectId?: number;
     projectName?: string;
+    supplier?: {
+        Id: number;
+        CreditorCode?: string;
+        CompanyName?: string;
+    };
 
     // Frontend-friendly aliases
     id?: number;
@@ -94,11 +99,14 @@ export interface GetPurchaseOrderParams {
     projectId?: string | number;
 }
 
-export interface PurchaseOrderWithStatus extends PurchaseOrder {
+export interface PurchaseOrderWithStatus extends Omit<PurchaseOrder, 'supplier'> {
     poNumber: string;
     supplier: string;
     totalAmount: number;
     status: string;
+    doNumber?: string;
+    receivedBy?: string;
+    discrepancyType?: string;
 }
 
 export interface PurchaseOrderItemView extends PurchaseOrderItem {

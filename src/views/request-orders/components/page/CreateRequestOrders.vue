@@ -88,64 +88,147 @@
                 </div>
             </div>
 
-            <ProTable :columns="tableColumns" :data="items" class="mt-4">
-                <template #empty>
-                    <div class="text-center text-gray-500 py-6">No items added yet. Click "Add Item" to begin.</div>
-                </template>
+            <!-- Desktop View -->
+            <div class="hidden lg:block">
+                <ProTable :columns="tableColumns" :data="items" class="mt-4">
+                    <template #empty>
+                        <div class="text-center text-gray-500 py-6">No items added yet. Click "Add Item" to begin.</div>
+                    </template>
 
-                <template #cell-itemCode="{ row }">
-                    <div v-tooltip.top="row.itemCode" class="w-full">
-                        <ProInput v-model="row.itemCode" readonly class="w-full !text-sm cursor-not-allowed opacity-75" />
-                    </div>
-                </template>
+                    <template #cell-itemCode="{ row }">
+                        <div v-tooltip.top="row.itemCode" class="w-full">
+                            <ProInput v-model="row.itemCode" readonly class="w-full !text-sm cursor-not-allowed opacity-75" />
+                        </div>
+                    </template>
 
-                <template #cell-description="{ row }">
-                    <div class="text-sm text-text-body font-medium">{{ row.description }}</div>
-                    <div v-if="row.notes" class="mt-2 p-1.5 bg-brand-primary/5 border border-brand-primary/20 rounded-md text-sm text-brand-primary whitespace-normal break-words w-full flex items-start gap-1.5 leading-snug" v-tooltip.top="row.notes.length > 50 ? row.notes : ''">
-                        <PhFileText class="shrink-0 mt-0.5 opacity-80" />
-                        <span class="line-clamp-2 italic">Note: {{ row.notes }}</span>
-                    </div>
-                </template>
+                    <template #cell-description="{ row }">
+                        <div class="text-sm text-text-body font-medium">{{ row.description }}</div>
+                        <div v-if="row.notes" class="mt-2 p-1.5 bg-brand-primary/5 border border-brand-primary/20 rounded-md text-sm text-brand-primary whitespace-normal break-words w-full flex items-start gap-1.5 leading-snug" v-tooltip.top="row.notes.length > 50 ? row.notes : ''">
+                            <PhFileText class="shrink-0 mt-0.5 opacity-80" />
+                            <span class="line-clamp-2 italic">Note: {{ row.notes }}</span>
+                        </div>
+                    </template>
 
-                <template #cell-location="{ row }">
-                    <div class="text-sm text-text-body">{{ row.location }}</div>
-                </template>
+                    <template #cell-location="{ row }">
+                        <div class="text-sm text-text-body">{{ row.location }}</div>
+                    </template>
 
-                <template #cell-uom="{ row }">
-                    <div class="text-sm text-text-body">{{ row.uom }}</div>
-                </template>
+                    <template #cell-uom="{ row }">
+                        <div class="text-sm text-text-body">{{ row.uom }}</div>
+                    </template>
 
-                <template #cell-qty="{ row }">
-                    <div class="min-w-[140px]">
-                        <InputNumber v-model="row.qty" :min="0" :maxFractionDigits="4" class="w-full !text-sm" />
-                    </div>
-                </template>
+                    <template #cell-qty="{ row }">
+                        <div class="min-w-[140px]">
+                            <ProInput type="number" v-model.number="row.qty" min="0" step="0.0001" class="w-full !text-sm" />
+                        </div>
+                    </template>
 
-                <template #cell-deliveryDate="{ row }">
-                    <ProDatePicker :modelValue="formatDateToAPI(row.deliveryDate || '')" @update:modelValue="handleDeliveryPicker($event, row)" placeholder="Select Date" class="w-full !text-sm" :error="invalidDeliveryByCode[row.itemCode] ? ' ' : ''" appendTo="body" />
-                </template>
+                    <template #cell-deliveryDate="{ row }">
+                        <ProDatePicker :modelValue="formatDateToAPI(row.deliveryDate || '')" @update:modelValue="handleDeliveryPicker($event, row)" placeholder="Select Date" class="w-full !text-sm" :error="invalidDeliveryByCode[row.itemCode] ? ' ' : ''" appendTo="body" />
+                    </template>
 
-                <template #cell-price="{ row }">
-                    <InputNumber v-model="row.price" mode="currency" currency="MYR" locale="en-MY" class="w-full !text-sm" :minFractionDigits="2" />
-                </template>
+                    <template #cell-price="{ row }">
+                        <div class="relative w-full">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 z-10 pointer-events-none font-medium select-none">RM</span>
+                            <ProInput type="number" v-model.number="row.price" min="0" step="0.01" class="w-full !text-sm pl-8" />
+                        </div>
+                    </template>
 
-                <template #cell-total="{ row }">
-                    <div class="font-semibold text-text-heading pr-2 text-right">{{ ((row.price ?? 0) * (row.qty ?? 0)).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}</div>
-                </template>
+                    <template #cell-total="{ row }">
+                        <div class="font-semibold text-text-heading pr-2 text-right">{{ ((row.price ?? 0) * (row.qty ?? 0)).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}</div>
+                    </template>
 
-                <template #cell-action="{ row }">
-                    <div class="flex justify-center w-full">
-                        <ProButton variant="secondary" size="sm" @click="toggleMenu($event, items.indexOf(row))">
-                            <PhDotsThreeVertical />
-                        </ProButton>
-                        <Menu :model="getActionItems(row, items.indexOf(row))" :popup="true" :ref="(el: any) => setMenuRef(el, items.indexOf(row))">
-                            <template #itemicon="{ item, class: iconClass }">
-                                <component :is="item.icon" :class="iconClass" />
-                            </template>
-                        </Menu>
-                    </div>
-                </template>
-            </ProTable>
+                    <template #cell-action="{ row }">
+                        <div class="flex justify-center w-full">
+                            <ProButton variant="secondary" size="sm" @click="toggleMenu($event, items.indexOf(row))">
+                                <PhDotsThreeVertical />
+                            </ProButton>
+                            <Menu :model="getActionItems(row, items.indexOf(row))" :popup="true" :ref="(el: any) => setMenuRef(el, items.indexOf(row))">
+                                <template #itemicon="{ item, class: iconClass }">
+                                    <component :is="item.icon" :class="iconClass" />
+                                </template>
+                            </Menu>
+                        </div>
+                    </template>
+                </ProTable>
+            </div>
+
+            <!-- Mobile View -->
+            <div class="block lg:hidden mt-4">
+                <div v-if="items.length === 0" class="text-center text-gray-500 py-6">
+                    No items added yet. Click "Add Item" to begin.
+                </div>
+                <div v-else class="grid grid-cols-1 gap-4">
+                    <ProCard v-for="(row, index) in items" :key="index" class="shadow-sm relative overflow-visible border border-gray-200">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-start gap-2">
+                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ index + 1 }}</span>
+                                <div class="flex flex-col gap-0.5 mt-0.5">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">Item Code</span>
+                                    <span class="font-semibold text-text-heading leading-tight">{{ row.itemCode }}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <ProButton variant="secondary" size="sm" @click="toggleMenu($event, index)">
+                                    <PhDotsThreeVertical />
+                                </ProButton>
+                                <Menu :model="getActionItems(row, index)" :popup="true" :ref="(el: any) => setMenuRef(el, index)">
+                                    <template #itemicon="{ item, class: iconClass }">
+                                        <component :is="item.icon" :class="iconClass" />
+                                    </template>
+                                </Menu>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-3 mb-2">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs font-medium text-gray-500">Description</span>
+                                <span class="text-sm text-text-body font-medium">{{ row.description }}</span>
+                                <div v-if="row.notes" class="mt-1 p-1.5 bg-brand-primary/5 border border-brand-primary/20 rounded-md text-sm text-brand-primary whitespace-normal break-words w-full flex items-start gap-1.5 leading-snug">
+                                    <PhFileText class="shrink-0 mt-0.5 opacity-80" />
+                                    <span class="italic">Note: {{ row.notes }}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-medium text-gray-500">Location</span>
+                                    <span class="text-sm">{{ row.location }}</span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-medium text-gray-500">UOM</span>
+                                    <span class="text-sm">{{ row.uom }}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="flex flex-col gap-1 min-w-0">
+                                    <span class="text-xs font-medium text-gray-500">Qty</span>
+                                    <ProInput type="number" v-model.number="row.qty" min="0" step="0.0001" class="w-full !text-sm" />
+                                </div>
+                                <div class="flex flex-col gap-1 min-w-0">
+                                    <span class="text-xs font-medium text-gray-500">Delivery Date</span>
+                                    <ProDatePicker :modelValue="formatDateToAPI(row.deliveryDate || '')" @update:modelValue="handleDeliveryPicker($event, row)" placeholder="Select Date" class="w-full !text-sm" :error="invalidDeliveryByCode[row.itemCode] ? ' ' : ''" appendTo="body" />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 pt-3 border-t border-gray-100">
+                                <div class="flex flex-col gap-1 min-w-0">
+                                    <span class="text-xs font-medium text-gray-500">Price (RM)</span>
+                                    <div class="relative w-full">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 z-10 pointer-events-none font-medium select-none">RM</span>
+                                        <ProInput type="number" v-model.number="row.price" min="0" step="0.01" class="w-full !text-sm pl-8" />
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-1 items-end min-w-0 truncate">
+                                    <span class="text-xs font-medium text-gray-500">Total</span>
+                                    <span class="text-sm font-semibold text-text-heading truncate w-full text-right">{{ ((row.price ?? 0) * (row.qty ?? 0)).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ProCard>
+                </div>
+            </div>
 
             <!-- Note Modal -->
             <ProModal :modelValue="!!noteModalItem" @update:modelValue="(val: boolean) => { if(!val) noteModalItem = null; }" title="Add Note"  class="!z-[1000]">

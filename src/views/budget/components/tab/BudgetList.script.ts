@@ -6,7 +6,7 @@ import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from 'v
 import { formatCurrency } from '@/utils/format.utils';
 import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
 import EditBudgetItem from '@/views/budget/components/dialog/EditBudgetItem.vue';
-import { ProButton, ProInput, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
+import { ProButton, ProInput, ProSelect, ProTable, ProTag, ProPagination, ProCard } from '@prosync_solutions/ui';
 
 interface PaginationConfig {
     page: number;
@@ -17,7 +17,7 @@ interface PaginationConfig {
 
 export default defineComponent({
     name: 'BudgetList',
-    components: { BudgetImportModal, EditBudgetItem, ProButton, ProInput, ProSelect, ProTable, ProTag, PhArrowRight, PhUpload, PhPencil },
+    components: { BudgetImportModal, EditBudgetItem, ProButton, ProInput, ProSelect, ProTable, ProTag, ProPagination, ProCard, PhArrowRight, PhUpload, PhPencil },
     props: {
         budgetId: {
             type: Number,

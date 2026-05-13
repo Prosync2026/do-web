@@ -162,7 +162,7 @@ export default defineComponent({
                 const list: PurchaseOrderWithStatus[] = store.purchaseOrders.map((po) => ({
                     ...po,
                     poNumber: po.DocNo,
-                    supplier: po.SupplierId?.toString() || '',
+                    supplier: po.supplier?.CompanyName || po.SupplierId?.toString() || '',
                     totalAmount:
                         po.PurchaseOrderItems?.reduce((sum, item) => {
                             const qty = typeof item.Quantity === 'string' ? Number(item.Quantity) : item.Quantity;
@@ -341,6 +341,7 @@ export default defineComponent({
             viewPO,
             tableFilters,
             handleFilterChange,
+            canViewPricing,
 
             PhClock,
             PhWarning,

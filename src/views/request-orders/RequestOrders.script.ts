@@ -3,18 +3,18 @@ import { useDashboard } from '@/composables/useDashboard';
 import { requestOrderService } from '@/services/requestOrder.service';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import { showError } from '@/utils/showNotification.utils';
+import { useToast } from '@/utils/toastBus';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from '@/utils/toastBus';
-import { nextTick } from 'vue';
+import { markRaw, nextTick } from 'vue';
 
 import { useRequestOrderPermission } from '@/permissions';
 import { useProjectStore } from '@/stores/project/project.store';
 import { USER_ROLE_TO_APPROVAL_ROLE } from '@/utils/approvalRole.util';
 import { formatCurrency } from '@/utils/format.utils';
-import { PhCheck, PhDotsThreeVertical, PhEye, PhPencilSimple, PhTrash, PhX, PhArrowsLeftRight, PhWarning, PhPlus } from '@phosphor-icons/vue';
-import { ProButton, ProCard, ProIconButton, ProInput, ProMenu, ProPageHeader, ProSelect, ProTable, ProTabs, ProTag, ProDatePicker } from '@prosync_solutions/ui';
+import { PhArrowsLeftRight, PhCheck, PhDotsThreeVertical, PhEye, PhPencilSimple, PhPlus, PhTrash, PhWarning, PhX } from '@phosphor-icons/vue';
+import { ProButton, ProCard, ProDatePicker, ProIconButton, ProInput, ProMenu, ProPageHeader, ProPagination, ProSelect, ProTable, ProTabs, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import type { Order } from '../../types/request-order.type';
 import ApproveRo from './components/modal/ApproveRo.vue';
@@ -26,7 +26,7 @@ import RoSummary from './components/summary/RoSummary.vue';
 
 export default defineComponent({
     name: 'RequestOrders',
-    components: { ProTabs, Motion, ProTable, ProPageHeader, ProButton, ProCard, ProInput, ProTag, ProSelect, ProMenu, ProIconButton, RoSummary, ViewRo, EditRo, Badge, ViewDraftRo, RejectRo, ApproveRo, PhDotsThreeVertical, PhArrowsLeftRight, ProDatePicker, PhWarning, PhPlus },
+    components: { ProTabs, Motion, ProTable, ProPageHeader, ProButton, ProCard, ProInput, ProTag, ProSelect, ProMenu, ProIconButton, RoSummary, ViewRo, EditRo, Badge, ViewDraftRo, RejectRo, ApproveRo, PhDotsThreeVertical, PhArrowsLeftRight, ProDatePicker, PhWarning, PhPlus, ProPagination },
     setup() {
         const confirm = useConfirm();
         const toast = useToast();
@@ -293,7 +293,7 @@ export default defineComponent({
             confirm.require({
                 message: `Are you sure you want to delete order ${order.roNumber}?`,
                 header: 'Confirm Delete',
-                icon: markRaw(PhWarning),
+                icon: markRaw(PhWarning) as any,
                 acceptClass: 'p-button-danger',
                 rejectClass: 'p-button-secondary',
                 acceptLabel: 'Yes, Delete',

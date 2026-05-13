@@ -73,19 +73,62 @@
             </ProCard>
 
             <ProCard class="shadow-sm mt-6">
-                <!-- Table -->
-                <ProTable 
-                    :data="items" 
-                    :columns="itemsColumns" 
-                    :onSearch="onSearchWrapper" 
-                    emptyTitle="No Delivery Items Found"
-                >
-                    <template #cell-no="{ row }">{{ row.no }}</template>
-                    <template #cell-DeliveryDate="{ row }">{{ formatDate(row.DeliveryDate) }}</template>
-                    <template #cell-status="{ row }">
-                        <ProTag :label="row.status" :variant="row.status === 'Completed' ? 'success' : 'warn'" />
+                <!-- Desktop View -->
+                <div class="hidden lg:block">
+                    <ProTable 
+                        :data="items" 
+                        :columns="itemsColumns" 
+                        :onSearch="onSearchWrapper" 
+                        emptyTitle="No Delivery Items Found"
+                    >
+                        <template #cell-no="{ row }">{{ row.no }}</template>
+                        <template #cell-DeliveryDate="{ row }">{{ formatDate(row.DeliveryDate) }}</template>
+                        <template #cell-status="{ row }">
+                            <ProTag :label="row.status" :variant="row.status === 'Completed' ? 'success' : 'warn'" />
+                        </template>
+                    </ProTable>
+                </div>
+
+                <!-- Mobile View -->
+                <div class="block lg:hidden mt-2">
+                    <template v-if="items.length > 0">
+                        <div class="grid grid-cols-1 gap-4">
+                            <ProCard v-for="row in items" :key="row.no" class="shadow-sm border border-gray-100">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex items-start gap-2">
+                                        <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
+                                        <div class="flex flex-col gap-0.5">
+                                            <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">Item Code</span>
+                                            <span class="font-semibold text-text-heading leading-tight">{{ row.ItemCode }}</span>
+                                        </div>
+                                    </div>
+                                    <ProTag :label="row.status" :variant="row.status === 'Completed' ? 'success' : 'warn'" />
+                                </div>
+                                
+                                <div class="grid gap-2 mb-2">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-xs font-medium text-gray-500">Description</span>
+                                        <span class="text-sm font-medium">{{ row.Name }}</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4 mt-2 border-t border-gray-100 pt-3">
+                                        <div class="flex flex-col gap-1">
+                                            <span class="text-xs font-medium text-gray-500">UOM</span>
+                                            <span class="text-sm">{{ row.Uom || '-' }}</span>
+                                        </div>
+                                        <div class="flex flex-col gap-1">
+                                            <span class="text-xs font-medium text-gray-500">Quantity</span>
+                                            <span class="text-sm font-semibold">{{ row.Quantity }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ProCard>
+                        </div>
                     </template>
-                </ProTable>
+                    <div v-else class="flex flex-col items-center justify-center py-8 px-4 bg-gray-50 rounded-lg border border-gray-100 mt-2">
+                        <PhPackage class="mx-auto text-gray-300 mb-3" :size="48" />
+                        <h3 class="text-lg font-medium text-gray-900">No Delivery Items Found</h3>
+                    </div>
+                </div>
             </ProCard>
         </div>
     </Motion>

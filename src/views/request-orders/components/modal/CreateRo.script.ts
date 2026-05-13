@@ -1,6 +1,6 @@
 import { PhSpinner, PhXCircle } from '@phosphor-icons/vue';
 import { computed, defineComponent, onMounted, ref, toRaw, watch } from 'vue';
-import { ProModal, ProTable, ProInput, ProSelect, ProDatePicker, ProButton, ProTag } from '@prosync_solutions/ui';
+import { ProModal, ProTable, ProInput, ProSelect, ProDatePicker, ProButton, ProTag, ProCard } from '@prosync_solutions/ui';
 
 import { budgetService } from '@/services/budget.service';
 import { budgetFilterService } from '@/services/budgetFilter.service';
@@ -10,7 +10,7 @@ import type { BudgetItem, FilterOption } from '../../../../types/request-order.t
 
 export default defineComponent({
     name: 'CreateROModal',
-    components: { ProModal, ProTable, ProInput, ProSelect, ProDatePicker, ProButton, ProTag, PhSpinner, PhXCircle },
+    components: { ProModal, ProTable, ProInput, ProSelect, ProDatePicker, ProButton, ProTag, ProCard, PhSpinner, PhXCircle },
     props: {
         visible: { type: Boolean, default: false },
         projectId: { type: Number, required: true },
@@ -160,6 +160,47 @@ export default defineComponent({
 
         const handleSelectAll = ({ selected }: { selected: Record<string, any>[] }) => {
             selectedItems.value = selected as BudgetItem[];
+        };
+
+        const toggleSelection = (item: any) => {
+            const idx = selectedItems.value.findIndex(i => i.id === item.id);
+            if (idx > -1) {
+                selectedItems.value.splice(idx, 1);
+            } else {
+                selectedItems.value.push(item as BudgetItem);
+            }
+        };
+
+        const isSelected = (item: any) => selectedItems.value.some(i => i.id === item.id);
+
+        const allSelected = computed(() => {
+            if (paginatedItems.value.length === 0) return false;
+            return paginatedItems.value.every(item => isSelected(item));
+        });
+
+        const toggleSelectAllMobile = () => {
+            const isAll = allSelected.value;
+            paginatedItems.value.forEach(item => {
+                if (isAll) {
+                    const idx = selectedItems.value.findIndex(i => i.id === item.id);
+                    if (idx > -1) selectedItems.value.splice(idx, 1);
+                } else {
+                    if (!isSelected(item)) selectedItems.value.push(item as any);
+                }
+            });
+        };
+
+        const handlePageSizeChange = (size: number) => {
+            budgetStore.pagination.pageSize = size;
+            budgetStore.pagination.page = 1;
+            fetchBudgetItems(1, size);
+        };
+
+        const onPageSizeChange = (e: Event) => {
+            const target = e.target as HTMLSelectElement | null;
+            if (target) {
+                handlePageSizeChange(Number(target.value));
+            }
         };
 
         const hasActiveFilters = computed(
@@ -410,6 +451,12 @@ export default defineComponent({
             handlePageChange,
             handleSelect,
             handleSelectAll,
+            toggleSelection,
+            isSelected,
+            allSelected,
+            toggleSelectAllMobile,
+            handlePageSizeChange,
+            onPageSizeChange,
             onLocation2Click,
             onSubElementClick,
             onSubSubElementClick,

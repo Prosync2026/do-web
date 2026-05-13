@@ -85,7 +85,7 @@
         </div>
 
         <!-- Table -->
-        <div class="border border-border-border rounded-lg overflow-hidden relative">
+        <div class="border border-border-border rounded-lg overflow-hidden relative hidden lg:block">
             <ProTable
                 :data="paginatedItems"
                 :columns="columns"
@@ -106,6 +106,131 @@
                     RM {{ Number(row.amount || 0).toLocaleString('en-MY', { minimumFractionDigits: 2 }) }}
                 </template>
             </ProTable>
+        </div>
+
+        <!-- Mobile View -->
+        <div class="block lg:hidden">
+            <template v-if="paginatedItems.length > 0">
+                <!-- Mobile Select All and Pagination Header -->
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200 mb-4 shadow-sm">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            :checked="allSelected" 
+                            @change="toggleSelectAllMobile" 
+                            class="w-4 h-4 text-brand-primary border-gray-300 rounded focus:ring-brand-primary"
+                        />
+                        <span class="text-sm font-medium text-gray-700">Select All on Page</span>
+                    </label>
+
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">Rows:</span>
+                        <select 
+                            :value="pagination.pageSize" 
+                            @change="onPageSizeChange"
+                            class="text-sm border-gray-300 rounded-md shadow-sm focus:border-brand-primary focus:ring-brand-primary py-1 pl-2 pr-6 bg-white"
+                        >
+                            <option v-for="opt in [10, 20, 50, 100]" :key="opt" :value="opt">{{ opt }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <ProCard v-for="(item, index) in paginatedItems" :key="item.id" class="shadow-sm border border-gray-100 relative overflow-visible cursor-pointer" :class="isSelected(item) ? 'bg-brand-primary/5 border-brand-primary/20' : ''" @click="toggleSelection(item)">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-start gap-2">
+                                <input 
+                                    type="checkbox" 
+                                    :checked="isSelected(item)" 
+                                    @change="toggleSelection(item)" 
+                                    @click.stop 
+                                    class="mt-1 w-4 h-4 text-brand-primary border-gray-300 rounded focus:ring-brand-primary"
+                                />
+                                <div class="flex flex-col gap-0.5">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">Item Code</span>
+                                    <span class="font-semibold text-text-heading leading-tight">{{ item.itemCode }}</span>
+                                </div>
+                            </div>
+                            <ProTag :variant="getItemTypeSeverity(item.itemType || '')">
+                                {{ item.itemType || 'N/A' }}
+                            </ProTag>
+                        </div>
+                        
+                        <div class="grid gap-2 mb-2">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs font-medium text-gray-500">Description</span>
+                                <span class="text-sm font-medium">{{ item.description }}</span>
+                            </div>
+                            <div class="flex flex-col gap-1" v-if="item.description2">
+                                <span class="text-xs font-medium text-gray-500">Description 2</span>
+                                <span class="text-sm">{{ item.description2 }}</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mt-2 border-t border-gray-100 pt-3">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-medium text-gray-500">Category</span>
+                                    <span class="text-sm">{{ item.category }}</span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-medium text-gray-500">Element</span>
+                                    <span class="text-sm">{{ item.element || '-' }}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2 mt-2 border-t border-gray-100 pt-3">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Budget Qty</span>
+                                    <span class="text-sm font-medium">{{ item.budgetQty || '-' }}</span>
+                                </div>
+                                <div class="flex flex-col gap-1 border-l border-gray-100 pl-2">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Ordered Qty</span>
+                                    <span class="text-sm font-medium">{{ item.qtyOrdered || '-' }}</span>
+                                </div>
+                                <div class="flex flex-col gap-1 border-l border-gray-100 pl-2">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Balance Qty</span>
+                                    <span class="text-sm font-semibold text-brand-primary">{{ item.balanceQty || '-' }}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mt-2 border-t border-gray-100 pt-3">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-medium text-gray-500">Rate (RM)</span>
+                                    <span class="text-sm font-medium">{{ Number(item.rate || 0).toLocaleString('en-MY', { minimumFractionDigits: 2 }) }}</span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-medium text-gray-500">Amount (RM)</span>
+                                    <span class="text-sm font-semibold text-text-heading">{{ Number(item.amount || 0).toLocaleString('en-MY', { minimumFractionDigits: 2 }) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ProCard>
+                </div>
+                
+                <div class="mt-4 flex justify-center">
+                    <ProButton 
+                        v-if="pagination.page > 1" 
+                        variant="secondary" 
+                        size="sm" 
+                        class="mr-2" 
+                        @click="handlePageChange({ page: pagination.page - 1, pageSize: pagination.pageSize })"
+                    >
+                        Previous
+                    </ProButton>
+                    <span class="text-sm text-gray-500 my-auto mx-2">Page {{ pagination.page }}</span>
+                    <ProButton 
+                        v-if="paginatedItems.length === pagination.pageSize" 
+                        variant="secondary" 
+                        size="sm" 
+                        class="ml-2" 
+                        @click="handlePageChange({ page: pagination.page + 1, pageSize: pagination.pageSize })"
+                    >
+                        Next
+                    </ProButton>
+                </div>
+            </template>
+            <div v-else class="flex flex-col items-center justify-center py-6 px-4 bg-gray-50 rounded-lg border border-gray-100 mt-2">
+                <span class="text-sm text-gray-500">No budget items found.</span>
+            </div>
         </div>
 
         <!-- Footer -->

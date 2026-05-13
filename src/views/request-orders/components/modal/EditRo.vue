@@ -51,64 +51,120 @@
 
                 <!-- Items Table -->
                 <h3 class="text-body-bold text-text-heading mb-3">Requested Items</h3>
-                <ProTable
-                    :columns="[
-                        { key: 'code', label: 'Item Code' },
-                        { key: 'description', label: 'Description' },
-                        { key: 'uom', label: 'UOM' },
-                        { key: 'qty', label: 'Quantity', width: '180px' },
-                        { key: 'deliveryDate', label: 'Delivery Date' },
-                        { key: 'notes', label: 'Notes' },
-                        { key: 'actions', label: 'Actions' },
-                    ]"
-                    class="mb-4"
-                >
-                    <tr v-for="(item, index) in editForm.items" :key="index">
-                        <td class="px-3 py-2">
-                            <ProInput
-                                v-model="item.code"
-                                class="w-full !text-body-sm"
-                                disabled
-                            />
-                        </td>
-                        <td class="px-3 py-2">
-                            <ProInput
-                                v-model="item.description"
-                                class="w-full !text-body-sm"
-                                disabled
-                            />
-                        </td>
-                        <td class="px-3 py-2">
-                            <ProInput
-                                v-model="item.uom"
-                                class="w-full !text-body-sm"
-                            />
-                        </td>
-                        <td class="px-3 py-2">
-                            <div class="min-w-[140px]">
-                                <InputNumber v-model="item.qty" :min="0" :maxFractionDigits="4" class="w-full" />
-                            </div>
-                        </td>
-                        <td class="px-3 py-2">
-                            <ProDatePicker :modelValue="formatDateToAPI(item.deliveryDate)" @update:modelValue="item.deliveryDate = ($event ? new Date($event) : null)" class="w-full" appendTo="body" />
-                        </td>
-                        <td class="px-3 py-2">
-                            <ProInput
-                                v-model="item.notes"
-                                class="w-full !text-body-sm"
-                            />
-                        </td>
-                        <td class="px-3 py-2">
-                            <button
-                                type="button"
-                                class="w-8 h-8 flex items-center justify-center rounded-md text-text-error hover:bg-surface-error/10 transition-colors"
-                                @click="removeItem(index)"
-                            >
-                                <PhTrash :size="16" />
-                            </button>
-                        </td>
-                    </tr>
-                </ProTable>
+                <div class="hidden lg:block mb-4">
+                    <ProTable
+                        :columns="[
+                            { key: 'code', label: 'Item Code' },
+                            { key: 'description', label: 'Description' },
+                            { key: 'uom', label: 'UOM' },
+                            { key: 'qty', label: 'Quantity', width: '180px' },
+                            { key: 'deliveryDate', label: 'Delivery Date' },
+                            { key: 'notes', label: 'Notes' },
+                            { key: 'actions', label: 'Actions' },
+                        ]"
+                    >
+                        <tr v-for="(item, index) in editForm.items" :key="index">
+                            <td class="px-3 py-2">
+                                <ProInput
+                                    v-model="item.code"
+                                    class="w-full !text-body-sm"
+                                    disabled
+                                />
+                            </td>
+                            <td class="px-3 py-2">
+                                <ProInput
+                                    v-model="item.description"
+                                    class="w-full !text-body-sm"
+                                    disabled
+                                />
+                            </td>
+                            <td class="px-3 py-2">
+                                <ProInput
+                                    v-model="item.uom"
+                                    class="w-full !text-body-sm"
+                                />
+                            </td>
+                            <td class="px-3 py-2">
+                                <div class="min-w-[140px]">
+                                    <InputNumber v-model="item.qty" :min="0" :maxFractionDigits="4" class="w-full" />
+                                </div>
+                            </td>
+                            <td class="px-3 py-2">
+                                <ProDatePicker :modelValue="formatDateToAPI(item.deliveryDate)" @update:modelValue="item.deliveryDate = ($event ? new Date($event) : null)" class="w-full" appendTo="body" />
+                            </td>
+                            <td class="px-3 py-2">
+                                <ProInput
+                                    v-model="item.notes"
+                                    class="w-full !text-body-sm"
+                                />
+                            </td>
+                            <td class="px-3 py-2">
+                                <button
+                                    type="button"
+                                    class="w-8 h-8 flex items-center justify-center rounded-md text-text-error hover:bg-surface-error/10 transition-colors"
+                                    @click="removeItem(index)"
+                                >
+                                    <PhTrash :size="16" />
+                                </button>
+                            </td>
+                        </tr>
+                    </ProTable>
+                </div>
+
+                <!-- Mobile View -->
+                <div class="block lg:hidden mb-4">
+                    <template v-if="editForm.items && editForm.items.length > 0">
+                        <div class="grid grid-cols-1 gap-4">
+                            <ProCard v-for="(item, index) in editForm.items" :key="index" class="shadow-sm border border-gray-100 relative overflow-visible">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex items-start gap-2">
+                                        <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ index + 1 }}</span>
+                                        <div class="flex flex-col gap-0.5 mt-1">
+                                            <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">Item Code</span>
+                                            <span class="font-semibold text-text-heading leading-tight">{{ item.code }}</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        class="w-8 h-8 flex items-center justify-center rounded-md text-text-error bg-surface-error/10 hover:bg-surface-error/20 transition-colors flex-shrink-0"
+                                        @click="removeItem(index)"
+                                        title="Remove Item"
+                                    >
+                                        <PhTrash :size="16" />
+                                    </button>
+                                </div>
+
+                                <div class="grid gap-3">
+                                    <div>
+                                        <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">Description</label>
+                                        <ProInput v-model="item.description" class="w-full !text-body-sm" disabled />
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">UOM</label>
+                                            <ProInput v-model="item.uom" class="w-full !text-body-sm" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">Quantity</label>
+                                            <InputNumber v-model="item.qty" :min="0" :maxFractionDigits="4" class="w-full" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">Delivery Date</label>
+                                        <ProDatePicker :modelValue="formatDateToAPI(item.deliveryDate)" @update:modelValue="item.deliveryDate = ($event ? new Date($event) : null)" class="w-full" appendTo="body" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">Notes</label>
+                                        <ProInput v-model="item.notes" class="w-full !text-body-sm" />
+                                    </div>
+                                </div>
+                            </ProCard>
+                        </div>
+                    </template>
+                    <div v-else class="flex flex-col items-center justify-center py-6 px-4 bg-gray-50 rounded-lg border border-gray-100 mt-2">
+                        <span class="text-sm text-gray-500">No items added yet.</span>
+                    </div>
+                </div>
 
                 <ProButton
                     variant="plain"
