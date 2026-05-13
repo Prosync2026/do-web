@@ -6,7 +6,7 @@ import { usePermissionStore } from '@/stores/permission/permission.store';
 import { Motion } from '@motionone/vue';
 import { PhBook, PhChartBar, PhHouse, PhTag, PhTicket, PhTruck, PhWrench } from '@phosphor-icons/vue';
 import { ProSidebar } from '@prosync_solutions/ui';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -24,8 +24,46 @@ const canViewDelivery = computed(() => permissionStore.hasPermission(PermissionC
 
 const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
 
+const isSidebarExpanded = ref(!isMobile.value);
+
 const checkMobile = () => {
     isMobile.value = window.innerWidth < 1024;
+    if (isMobile.value) {
+        isSidebarExpanded.value = false;
+    } else {
+        isSidebarExpanded.value = true;
+    }
+};
+
+watch(() => route.path, () => {
+    if (isMobile.value) {
+        isSidebarExpanded.value = false;
+    }
+});
+
+const sidebarWrapper = ref<HTMLElement | null>(null);
+
+const handleSidebarClick = (e: MouseEvent) => {
+    if (isMobile.value && !isSidebarExpanded.value) {
+        if (sidebarWrapper.value) {
+            const buttons = Array.from(sidebarWrapper.value.querySelectorAll('button'));
+            
+            // The toggle button in ProSidebar is typically the only button with NO text content (just an SVG icon).
+            const toggleBtn = buttons.find(btn => btn.textContent?.trim() === '');
+            
+            const target = e.target as HTMLElement;
+            const clickedBtn = target.closest('button');
+            
+            if (toggleBtn && clickedBtn === toggleBtn) {
+                // User clicked the expand/collapse button manually, so let the native behavior run!
+                return;
+            }
+            
+            if (toggleBtn) {
+                toggleBtn.click();
+            }
+        }
+    }
 };
 
 onMounted(() => {
@@ -88,8 +126,8 @@ const navItems = computed(() =>
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }" tag="div" class="relative z-[60]">
-        <div class="h-screen bg-white">
-            <ProSidebar :key="`${route.path}-${isMobile}`" :nav-items="navItems" :default-expanded="!isMobile" :persist-state="false">
+        <div class="h-screen bg-white" ref="sidebarWrapper" @click.capture="handleSidebarClick">
+            <ProSidebar :key="`${route.path}-${isMobile}`" :nav-items="navItems" :expanded="isSidebarExpanded" :default-expanded="!isMobile" :persist-state="false" @update:expanded="isSidebarExpanded = $event">
                 <template #logo="{ isExpanded }">
                     <router-link to="/" class="flex items-center justify-center p-1">
                         <h1 v-if="isExpanded" class="text-2xl font-extrabold leading-tight m-0 text-brand-primary truncate w-full text-center">DO SYSTEM</h1>
