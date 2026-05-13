@@ -287,7 +287,7 @@ const goToAllNotifications = () => {
                         leave-from-class="opacity-100 translate-y-0"
                         leave-to-class="opacity-0 translate-y-1"
                     >
-                        <div v-if="showNotificationDropdown" class="absolute top-full right-0 mt-2 w-96 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-border-border z-50 overflow-hidden">
+                        <div v-if="showNotificationDropdown" class="absolute top-full -right-2 mt-2 w-64 sm:w-96 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-border-border z-50 overflow-hidden">
                             <!-- Header -->
                             <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-800">
                                 <span class="font-semibold text-gray-800 dark:text-white">Notifications</span>
