@@ -1,12 +1,12 @@
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import { useProjectStore } from '@/stores/project/project.store';
 import type { TableColumn } from '@/types/table.type';
-import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from '@/utils/toastBus';
+import { PhArrowsLeftRight, PhCheck, PhCheckCircle, PhEye, PhPlus, PhTruck, PhX, PhXCircle } from '@phosphor-icons/vue';
+import { ProButton, ProCard, ProDatePicker, ProInput, ProModal, ProPagination, ProSelect, ProTable, ProTabs, ProTag } from '@prosync_solutions/ui';
+import { useConfirm } from 'primevue/useconfirm';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, ProModal, ProPagination } from '@prosync_solutions/ui';
-import { PhArrowsLeftRight, PhEye, PhPlus, PhCheckCircle, PhXCircle, PhCheck, PhX, PhTruck } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'Deliveries',
@@ -88,6 +88,9 @@ export default defineComponent({
             const cols: TableColumn[] = [
                 { key: 'rowIndex', label: '#', sortable: false } as any,
                 { key: 'DocNo', label: 'DO Number', sortable: true } as any,
+                { key: 'RefDoc', label: 'PO Number', sortable: true } as any,
+                { key: 'SupplierName', label: 'Supplier', sortable: false } as any,
+                { key: 'Date', label: 'Delivery Date', sortable: true } as any,
             ];
 
             if (isPurchasingRole) {
@@ -220,6 +223,16 @@ export default defineComponent({
             return filters;
         });
 
+        const formatDate = (dateString?: string | null) => {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        };
+
         return {
             activeTab,
             tabItems,
@@ -246,7 +259,8 @@ export default defineComponent({
             selectedDeliveryId,
             selectedDeliveryNo,
             confirmApprove,
-            confirmReject
+            confirmReject,
+            formatDate
         };
     }
 });

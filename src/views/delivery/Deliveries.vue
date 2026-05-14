@@ -63,7 +63,19 @@
                                     <span>{{ row.rowIndex }}</span>
                                 </template>
 
-                                <template #cell-status="{ row }">
+                                <template #cell-RefDoc="{ row }">
+                                    {{ row.RefDoc || row.purchase_order?.DocNo || '-' }}
+                                </template>
+
+                                <template #cell-SupplierName="{ row }">
+                                    {{ row.supplier?.CompanyName || row.purchase_order?.supplier?.CompanyName || row.SupplierName || '-' }}
+                                </template>
+
+                                <template #cell-Date="{ row }">
+                                    {{ formatDate(row.Date) }}
+                                </template>
+
+                                <template #cell-Status="{ row }">
                                     <ProTag 
                                         :label="row.Status === 'Created' ? 'Pending' : row.Status" 
                                         :variant="getStatusSeverity(row.Status)" 
@@ -107,6 +119,18 @@
                                             <div v-if="isPurchasingRole && row.ProjectName" class="flex justify-between items-center text-sm">
                                                 <span class="text-gray-500 font-medium">Project</span>
                                                 <span class="text-right">{{ row.ProjectName }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">PO Number</span>
+                                                <span class="text-right">{{ row.RefDoc || row.purchase_order?.DocNo || '-' }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Supplier</span>
+                                                <span class="text-right">{{ row.supplier?.CompanyName || row.purchase_order?.supplier?.CompanyName || row.SupplierName || '-' }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Delivery Date</span>
+                                                <span class="text-right">{{ formatDate(row.Date) }}</span>
                                             </div>
                                             <div class="flex justify-between items-center text-sm">
                                                 <span class="text-gray-500 font-medium">Plate No</span>

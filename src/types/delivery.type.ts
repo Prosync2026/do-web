@@ -36,6 +36,16 @@ export interface DeliveryOrder {
     UpdatedBy?: string | null;
     ProjectId: number;
     ProjectName?: string;
+    SupplierName?: string;
+    supplier?: {
+        CompanyName?: string;
+    };
+    purchase_order?: {
+        DocNo?: string;
+        supplier?: {
+            CompanyName?: string;
+        };
+    };
     // BE return lowercase
     deliveryorderitems?: DeliveryOrderItem[];
 
