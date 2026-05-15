@@ -1,3 +1,4 @@
+import { extractDeliveryOrder } from '@/services/smartScan.service';
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import { useProjectStore } from '@/stores/project/project.store';
 import type { TableColumn } from '@/types/table.type';
@@ -7,10 +8,11 @@ import { ProButton, ProCard, ProDatePicker, ProInput, ProModal, ProPagination, P
 import { useConfirm } from 'primevue/useconfirm';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import SmartScanModal from './components/smartScan/SmartScanModal.vue';
 
 export default defineComponent({
     name: 'Deliveries',
-    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, ProModal, ProPagination, PhArrowsLeftRight, PhEye, PhPlus, PhCheckCircle, PhXCircle, PhCheck, PhX, PhTruck },
+    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, ProModal, ProPagination, PhArrowsLeftRight, PhEye, PhPlus, PhCheckCircle, PhXCircle, PhCheck, PhX, PhTruck, SmartScanModal },
     setup() {
         const deliveryStore = useDeliveryStore();
         const projectStore = useProjectStore();
@@ -201,6 +203,10 @@ export default defineComponent({
                     return 'success';
                 case 'Cancelled':
                     return 'danger';
+                case 'Processing':
+                    return 'info';
+                case 'Ready for Review':
+                    return 'warn';
                 case 'Created':
                 default:
                     return 'warn';
@@ -233,12 +239,96 @@ export default defineComponent({
             });
         };
 
+        const showSmartScanModal = ref(false);
+
+        function handleSmartScanManual() {
+            showSmartScanModal.value = false;
+            router.push('/deliveries/createDelivery');
+        }
+
+        async function handleSmartScanStart(file: File) {
+            showSmartScanModal.value = false;
+            
+            // Generate a random ID for the mock
+            const mockId = Math.floor(Math.random() * 100000);
+            
+            const newMockDo = {
+                Id: mockId,
+                DocNo: `DO-SCAN-${mockId}`,
+                RefDoc: '',
+                PlateNo: '',
+                Date: new Date().toISOString(),
+                Status: 'Processing',
+                CreatedAt: new Date().toISOString(),
+                SupplierName: 'Scanning...',
+                _sourceFile: file,
+                _aiExtractedItems: []
+            };
+            
+            // Add to store
+            deliveryStore.list.unshift(newMockDo as any);
+            
+            toast.add({
+                severity: 'info',
+                summary: 'Scanning Document',
+                detail: `AI is extracting data in the background...`,
+                life: 3000
+            });
+
+            try {
+                // Call the simulated/real API extraction
+                const result = await extractDeliveryOrder(file);
+                
+                // Once done, update the mock DO
+                const docIndex = deliveryStore.list.findIndex(d => d.Id === mockId);
+                if (docIndex !== -1) {
+                    const doRef = deliveryStore.list[docIndex] as any;
+                    doRef.DocNo = result.doNo || doRef.DocNo;
+                    doRef.RefDoc = result.soNo;
+                    doRef.PlateNo = result.plateNo;
+                    doRef.Date = result.deliveryDate || doRef.Date;
+                    doRef.SupplierName = result.supplierName; 
+                    doRef._aiExtractedItems = result.items;
+                    
+                    doRef.Status = 'Ready for Review';
+                    
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Extraction Complete',
+                        detail: `${doRef.DocNo} extraction complete. Ready for review.`,
+                        life: 5000
+                    });
+                }
+            } catch (err: any) {
+                const docIndex = deliveryStore.list.findIndex(d => d.Id === mockId);
+                if (docIndex !== -1) {
+                    deliveryStore.list[docIndex].Status = 'Failed';
+                }
+                toast.add({
+                    severity: 'error',
+                    summary: 'Extraction Failed',
+                    detail: err?.message || 'Failed to extract document.',
+                    life: 5000
+                });
+            }
+        }
+
+        const handleActionWithReview = (type: 'view' | 'approve' | 'reject', row: any) => {
+            if (type === 'view' && row.Status === 'Ready for Review') {
+                // Navigate to Review Delivery
+                // We'll pass the mock data via state or store later, but for now just route
+                router.push(`/deliveries/reviewDelivery/${row.Id}`);
+                return;
+            }
+            handleAction(type, row);
+        };
+
         return {
             activeTab,
             tabItems,
             filteredDeliveries,
             deliveryListColumn,
-            handleAction,
+            handleAction: handleActionWithReview,
             handleSearch,
             startDate,
             endDate,
@@ -260,7 +350,10 @@ export default defineComponent({
             selectedDeliveryNo,
             confirmApprove,
             confirmReject,
-            formatDate
+            formatDate,
+            showSmartScanModal,
+            handleSmartScanStart,
+            handleSmartScanManual
         };
     }
 });

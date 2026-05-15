@@ -1,25 +1,22 @@
-import { PhPackage, PhSparkle } from '@phosphor-icons/vue';
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import { PurchaseOrderCard } from '@/types/delivery.type';
-import type { PurchaseOrderItem } from '@/types/purchase.type';
-import type { OcrResult } from '@/views/delivery/components/smartScan/SmartScanModal.script';
-import SmartScanModal from '@/views/delivery/components/smartScan/SmartScanModal.vue';
+import { useToast } from '@/utils/toastBus';
+import { PhPackage, PhSparkle } from '@phosphor-icons/vue';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
+import { ProButton, ProCard, ProInput, ProTag } from '@prosync_solutions/ui';
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
-import { useToast } from '@/utils/toastBus';
-import { computed, defineComponent, onMounted, ref, nextTick } from 'vue';
-import { ProCard, ProButton, ProTag, ProInput } from '@prosync_solutions/ui';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 
 export default defineComponent({
     name: 'SelectPO',
-    components: { Message, Toast, Form, SmartScanModal, ProCard, ProButton, ProTag, ProInput, PhPackage, PhSparkle },
+    components: { Message, Toast, Form, ProCard, ProButton, ProTag, ProInput, PhPackage, PhSparkle },
     emits: ['update', 'next-step', 'prev-step', 'smartScan', 'smartScanManual'],
     setup(_, { emit }) {
         const toast = useToast();
         const purchaseStore = usePurchaseOrderStore();
 
-        const showScanModal = ref(false);
+
         const selectedCard = ref<PurchaseOrderCard | null>(null);
         const manualSearch = ref('');
         const supplierSearch = ref('');
@@ -196,20 +193,6 @@ export default defineComponent({
             triggerBackendSearch(fullQuery);
         };
 
-        //  Smart Scan handlers 
-        function onScanManual() {
-            showScanModal.value = false;
-        }
-
-        async function onScanConfirm(result: OcrResult) {
-            showScanModal.value = false;
-            // Introduce a short delay so the Teleport modal fully unmounts its background mask 
-            // before the parent container gets set to display:none when activeStep advances to 3.
-            setTimeout(() => {
-                emit('smartScan', result);
-            }, 100);
-        }
-
         const handlePageSizeChange = (event: Event) => {
             const target = event.target as HTMLSelectElement;
             if (target?.value) {
@@ -220,7 +203,6 @@ export default defineComponent({
 
 
         return {
-            showScanModal,
             selectedCard,
             filteredCards,
             searchTerm: manualSearch,
@@ -241,8 +223,7 @@ export default defineComponent({
             handlePageSizeChange,
             handleClearSearch,
             handleClearSupplierSearch,
-            onScanConfirm,
-            onScanManual,
+
             handleManualSearchInput,
             handleSupplierSearchInput
         };

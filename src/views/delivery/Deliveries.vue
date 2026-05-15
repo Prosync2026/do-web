@@ -8,9 +8,14 @@
                 <div>
                     <h1 class="text-h2 text-text-heading">Delivery Verification</h1>
                 </div>
-                <ProButton @click="$router.push('/deliveries/createDelivery')">
-                    <PhPlus :size="18" class="mr-2" /> New Delivery Verification
-                </ProButton>
+                <div class="flex gap-2">
+                    <ProButton @click="showSmartScanModal = true" variant="secondary">
+                        <i class="pi pi-sparkles mt-1 mr-2 text-brand-primary" /> Smart AI Scan
+                    </ProButton>
+                    <ProButton @click="$router.push('/deliveries/createDelivery')">
+                        <PhPlus :size="18" class="mr-2" /> New Delivery Verification
+                    </ProButton>
+                </div>
             </div>
 
             <!-- Tabs and Table -->
@@ -76,14 +81,17 @@
                                 </template>
 
                                 <template #cell-Status="{ row }">
-                                    <ProTag 
-                                        :label="row.Status === 'Created' ? 'Pending' : row.Status" 
-                                        :variant="getStatusSeverity(row.Status)" 
-                                    />
+                                    <div class="flex items-center gap-2">
+                                        <ProTag 
+                                            :label="row.Status === 'Created' ? 'Pending' : row.Status" 
+                                            :variant="getStatusSeverity(row.Status)" 
+                                        />
+                                        <i v-if="row.Status === 'Processing'" class="pi pi-spinner pi-spin text-brand-primary" />
+                                    </div>
                                 </template>
 
                                 <template #actions="{ row }">
-                                    <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
+                                    <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery" :disabled="row.Status === 'Processing'">
                                         <PhEye :size="18" class="text-base text-gray-700" />
                                     </ProButton>
                                     <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
@@ -109,10 +117,13 @@
                                                     <span class="font-semibold text-text-heading leading-tight">{{ row.DocNo }}</span>
                                                 </div>
                                             </div>
-                                            <ProTag 
-                                                :label="row.Status === 'Created' ? 'Pending' : row.Status" 
-                                                :variant="getStatusSeverity(row.Status)" 
-                                            />
+                                            <div class="flex items-center gap-2">
+                                                <i v-if="row.Status === 'Processing'" class="pi pi-spinner pi-spin text-brand-primary text-sm" />
+                                                <ProTag 
+                                                    :label="row.Status === 'Created' ? 'Pending' : row.Status" 
+                                                    :variant="getStatusSeverity(row.Status)" 
+                                                />
+                                            </div>
                                         </div>
 
                                         <div class="grid gap-2 mb-4">
@@ -143,7 +154,7 @@
                                         </div>
 
                                         <div class="flex justify-end gap-2 pt-3 border-t border-gray-100">
-                                            <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
+                                            <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery" :disabled="row.Status === 'Processing'">
                                                 <template #iconLeft><PhEye :size="16" /></template>
                                                 View
                                             </ProButton>
@@ -222,4 +233,11 @@
             </div>
         </template>
     </ProModal>
+
+    <!-- Smart Scan Modal -->
+    <SmartScanModal
+        v-model="showSmartScanModal"
+        @start-scan="handleSmartScanStart"
+        @manual="handleSmartScanManual"
+    />
 </template>

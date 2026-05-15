@@ -128,6 +128,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: '/deliveries/reviewDelivery/:deliveryOrderId',
+                name: 'deliveries-review',
+                component: () => import('@/views/delivery/components/pages/reviewDelivery/ReviewDelivery.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }, { label: 'Review Delivery' }]
+                }
+            },
+            {
                 path: '/companyList',
                 name: 'companyList',
                 component: () => import('@/views/company/CompanyList.vue'),

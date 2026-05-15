@@ -8,20 +8,6 @@
             Select the Purchase Order that corresponds to this delivery. You can search by PO number or item name.
         </Message>
 
-        <!-- ─── Smart Scan Banner ───────────────────────────────────────── -->
-        <div class="mt-4 p-4 rounded-xl border border-primary/30 bg-primary-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div class="flex items-start gap-3">
-                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <i class="pi pi-sparkles text-primary text-lg" />
-                </div>
-                <div>
-                    <p class="font-semibold text-gray-800">Have a delivery document?</p>
-                    <p class="text-sm text-gray-500 mt-0.5">Upload it and AI will extract all items, quantities and SO number automatically.</p>
-                </div>
-            </div>
-            <ProButton @click="showScanModal = true" class="shrink-0"><i class="pi pi-sparkles mt-1 mr-2" /> Smart Scan DO</ProButton>
-        </div>
-
         <!-- Search + Cards -->
         <ProCard title="Search Purchase Order" class="mt-6 shadow-sm">
                 <Form @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full sm:w-full">
@@ -94,8 +80,6 @@
                     </div>
                 </Form>
         </ProCard>
-        <!-- Smart Scan Modal -->
-        <SmartScanModal v-model="showScanModal" @confirm="onScanConfirm" @manual="onScanManual" />
     </div>
 </template>
 
