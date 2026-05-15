@@ -2,11 +2,7 @@
 
 <template>
     <div class="p-mb-5 mt-5">
-        <!-- Info Message -->
-        <Message severity="secondary" variant="outlined" :closable="false">
-            <i class="pi pi-box"></i>
-            Select the Purchase Order that corresponds to this delivery. You can search by PO number or item name.
-        </Message>
+        <ProBanner variant="info" title="Select the Purchase Order that corresponds to this delivery. You can search by PO number or item name." />
 
         <!-- Search + Cards -->
         <ProCard title="Search Purchase Order" class="mt-6 shadow-sm">
@@ -74,9 +70,8 @@
                         </div>
                     </div>
 
-                    <!-- Navigation Buttons -->
+                    <!-- Navigation Buttons (Removed Next Button for Auto-Advance) -->
                     <div class="flex justify-end mt-4 gap-2">
-                        <ProButton type="submit">Next</ProButton>
                     </div>
                 </Form>
         </ProCard>

@@ -74,6 +74,14 @@ export interface SingleDeliveryOrderResponse {
     data: DeliveryOrder;
 }
 
+export interface DeliveryItemSplit {
+    _id?: string;
+    delivered: number;
+    received: number;
+    location: string;
+    remarks: string;
+}
+
 export interface VerifyPurchaseOrderItem {
     id: number;
     name: string;
@@ -84,7 +92,7 @@ export interface VerifyPurchaseOrderItem {
     requestOrderId: number;
     category: string;
     type: string;
-    delivered: number;
+    splits: DeliveryItemSplit[];
     total: number;
     uom: string;
     price: number;
@@ -107,6 +115,7 @@ export interface Step1SelectPO {
     poNumber?: string;
     purchaseOrderId: number;
     PurchaseOrderItems: PurchaseOrderItem[];
+    supplier?: { CompanyName?: string; [key: string]: any };
 
     items?: PurchaseOrderItem[];
 }
@@ -114,15 +123,18 @@ export interface Step1SelectPO {
 export interface Step2VerifyItem {
     purchaseOrderItemId: number;
     requestOrderId: number;
-    quantity: number;
+    splits: DeliveryItemSplit[];
+}
+
+export interface Step2VerifyItemPayload {
+    items: Step2VerifyItem[];
+    doNumber?: string;
+    deliveryDate?: string;
+    driverPlate?: string;
+    remarks?: string;
 }
 
 export interface Step3DeliveryInfo {
-    PlateNo: string;
-    Date: string;
-    DeliveryDate: string;
-    doNumber?: string;
-    Remarks?: string;
     attachments?: File[];
     attachments2?: File[];
 }
@@ -130,7 +142,7 @@ export interface Step3DeliveryInfo {
 export interface DeliveryFlow {
     deliveryInfo: Step3DeliveryInfo;
     selectPO: Step1SelectPO;
-    verifyItem: Step2VerifyItem[];
+    verifyItem: Step2VerifyItemPayload;
 }
 
 export interface FormValues {

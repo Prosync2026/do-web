@@ -83,7 +83,7 @@
                                 <template #cell-Status="{ row }">
                                     <div class="flex items-center gap-2">
                                         <ProTag 
-                                            :label="row.Status === 'Created' ? 'Pending' : row.Status" 
+                                            :label="row.Status" 
                                             :variant="getStatusSeverity(row.Status)" 
                                         />
                                         <i v-if="row.Status === 'Processing'" class="pi pi-spinner pi-spin text-brand-primary" />
@@ -94,11 +94,14 @@
                                     <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery" :disabled="row.Status === 'Processing'">
                                         <PhEye :size="18" class="text-base text-gray-700" />
                                     </ProButton>
-                                    <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
+                                    <ProButton v-if="isPurchasingRole && row.Status === 'Pending'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
                                         <PhCheckCircle :size="18" />
                                     </ProButton>
-                                    <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
+                                    <ProButton v-if="isPurchasingRole && row.Status === 'Pending'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
                                         <PhXCircle :size="18" />
+                                    </ProButton>
+                                    <ProButton v-if="row.Status === 'Failed'" variant="danger" size="sm" class="ml-2" @click="handleAction('delete', row)" title="Delete Failed Document">
+                                        <PhTrash :size="18" />
                                     </ProButton>
                                 </template>
                             </ProTable>
@@ -120,7 +123,7 @@
                                             <div class="flex items-center gap-2">
                                                 <i v-if="row.Status === 'Processing'" class="pi pi-spinner pi-spin text-brand-primary text-sm" />
                                                 <ProTag 
-                                                    :label="row.Status === 'Created' ? 'Pending' : row.Status" 
+                                                    :label="row.Status" 
                                                     :variant="getStatusSeverity(row.Status)" 
                                                 />
                                             </div>
@@ -158,13 +161,17 @@
                                                 <template #iconLeft><PhEye :size="16" /></template>
                                                 View
                                             </ProButton>
-                                            <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
+                                            <ProButton v-if="isPurchasingRole && row.Status === 'Pending'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
                                                 <template #iconLeft><PhCheckCircle :size="16" /></template>
                                                 Approve
                                             </ProButton>
-                                            <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
+                                            <ProButton v-if="isPurchasingRole && row.Status === 'Pending'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
                                                 <template #iconLeft><PhXCircle :size="16" /></template>
                                                 Reject
+                                            </ProButton>
+                                            <ProButton v-if="row.Status === 'Failed'" variant="danger" size="sm" class="ml-2" @click="handleAction('delete', row)" title="Delete Failed Document">
+                                                <template #iconLeft><PhTrash :size="16" /></template>
+                                                Delete
                                             </ProButton>
                                         </div>
                                     </ProCard>

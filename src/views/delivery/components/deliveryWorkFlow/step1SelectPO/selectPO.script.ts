@@ -3,14 +3,14 @@ import { PurchaseOrderCard } from '@/types/delivery.type';
 import { useToast } from '@/utils/toastBus';
 import { PhPackage, PhSparkle } from '@phosphor-icons/vue';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
-import { ProButton, ProCard, ProInput, ProTag } from '@prosync_solutions/ui';
+import { ProButton, ProCard, ProInput, ProTag, ProBanner } from '@prosync_solutions/ui';
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 
 export default defineComponent({
     name: 'SelectPO',
-    components: { Message, Toast, Form, ProCard, ProButton, ProTag, ProInput, PhPackage, PhSparkle },
+    components: { Message, Toast, Form, ProCard, ProButton, ProTag, ProInput, ProBanner, PhPackage, PhSparkle },
     emits: ['update', 'next-step', 'prev-step', 'smartScan', 'smartScanManual'],
     setup(_, { emit }) {
         const toast = useToast();
@@ -79,7 +79,21 @@ export default defineComponent({
         };
 
         const toggleSelect = (card: PurchaseOrderCard) => {
-            selectedCard.value = selectedCard.value?.id === card.id ? null : card;
+            if (selectedCard.value?.id !== card.id) {
+                selectedCard.value = card;
+                
+                const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id.toString() === card.id);
+                if (fullPO) {
+                    const items = fullPO.purchase_order_items ?? fullPO.PurchaseOrderItems ?? [];
+                    emit('update', {
+                        id: fullPO.Id,
+                        poNumber: fullPO.DocNo,
+                        items: items
+                    });
+                }
+            } else {
+                selectedCard.value = null;
+            }
         };
 
         const removeCard = (card: PurchaseOrderCard) => {

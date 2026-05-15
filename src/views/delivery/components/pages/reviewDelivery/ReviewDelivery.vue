@@ -8,7 +8,7 @@
                 <div class="flex flex-col">
                     <div class="flex items-center gap-3">
                         <h1 class="text-h2 text-text-heading">Review - {{ deliveryOrder?.DocNo || 'Loading...' }}</h1>
-                        <ProTag label="Ready for Review" variant="warning" />
+                        <ProTag label="Draft" variant="secondary" />
                     </div>
                     <p class="text-sm text-gray-500 mt-1">{{ deliveryOrder?.SupplierName || 'Unknown Supplier' }}</p>
                 </div>
@@ -16,9 +16,9 @@
                     <ProButton variant="secondary" @click="handleCancel">
                         Cancel
                     </ProButton>
-                    <ProButton variant="primary" @click="handleMarkAsReviewed">
+                    <ProButton variant="primary" @click="handleSubmit">
                         <template #iconLeft><PhCheck :size="16" /></template>
-                        Mark as Reviewed
+                        Submit
                     </ProButton>
                 </div>
             </div>
@@ -46,6 +46,17 @@
                                 <i class="pi pi-file-pdf text-4xl block mb-2" />
                                 Preview not available
                             </div>
+                        </div>
+                    </ProCard>
+
+                    <!-- EVIDENCE FILES (Photos) -->
+                    <ProCard class="shadow-sm">
+                        <div class="p-1">
+                            <label class="font-semibold text-gray-800 flex items-center mb-4 text-sm">
+                                <PhCamera :size="18" class="mr-2"  />
+                                Delivery Evidence Photos (optional, max 10MB)
+                            </label>
+                            <ProUploadFile v-model="evidenceAttachments" multiple accept="image/*" :maxSize="10" />
                         </div>
                     </ProCard>
                 </div>

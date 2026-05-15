@@ -2,6 +2,11 @@
 
 <template>
     <div class="p-1">
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-1 p-1">
+            <ProTag :label="`Step ${activeStep} of 4`" variant="info" />
+        </div>
+
         <ProCard class="w-full mb-4 flex flex-col shadow-sm w-full relative z-0">
             <!-- Custom HTML Stepper instead of PrimeVue Stepper -->
             <div class="w-full max-w-5xl mx-auto mb-8 relative px-4">
@@ -46,31 +51,48 @@
             </div>
 
             <!-- Step Panels -->
-            <div class="w-full mt-4">
-                <div v-show="activeStep === 1">
-                    <SelectPO @update="handleStep1Update" @smartScan="handleSmartScan" @smartScanManual="handleSmartScanManual" />
-                </div>
-                <div v-show="activeStep === 2">
-                    <VerifyItem @update="handleStep2Update" @next-step="goStep(3)" :selected-po="deliveryData.selectPO" @prev-step="goStep(1)" />
-                </div>
-                <div v-show="activeStep === 3">
-                    <DeliveryInfo @update="handleStep3Update" @next-step="goStep(4)" @prev-step="goStep(2)" :prefill-attachment="scanAttachment" :prefill-plate="scannedPlate" />
-                </div>
-                <div v-show="activeStep === 4">
-                    <div v-if="canPassToReview">
-                        <Review :deliveryData="deliveryData" />
+            <div class="w-full mt-4 overflow-hidden relative">
+                <Transition name="fade-slide" mode="out-in">
+                    <div v-if="activeStep === 1" key="step1">
+                        <SelectPO @update="handleStep1Update" @smartScan="handleSmartScan" @smartScanManual="handleSmartScanManual" />
                     </div>
-                    <div v-else class="flex flex-col justify-center py-5 gap-4 w-full">
-                        <Message severity="warn" variant="outlined" :closable="false">
-                            <PhWarning :size="18" class="mr-2"  />
-                            Please complete all previous steps before reviewing.
-                        </Message>
-                        <div class="flex justify-end mt-4 gap-2 w-full">
-                            <ProButton variant="secondary" @click="goStep(1)">Back</ProButton>
+                    <div v-else-if="activeStep === 2" key="step2">
+                        <VerifyItem @update="handleStep2Update" @next-step="goStep(3)" :selected-po="deliveryData.selectPO" :prefill-plate="scannedPlate" @prev-step="goStep(1)" />
+                    </div>
+                    <div v-else-if="activeStep === 3" key="step3">
+                        <DeliveryInfo @update="handleStep3Update" @next-step="goStep(4)" @prev-step="goStep(2)" :prefill-attachment="scanAttachment" />
+                    </div>
+                    <div v-else-if="activeStep === 4" key="step4">
+                        <div v-if="canPassToReview">
+                            <Review :deliveryData="deliveryData" />
+                        </div>
+                        <div v-else class="flex flex-col justify-center py-5 gap-4 w-full">
+                            <Message severity="warn" variant="outlined" :closable="false">
+                                <PhWarning :size="18" class="mr-2"  />
+                                Please complete all previous steps before reviewing.
+                            </Message>
+                            <div class="flex justify-end mt-4 gap-2 w-full">
+                                <ProButton variant="secondary" @click="goStep(1)">Back</ProButton>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </Transition>
             </div>
         </ProCard>
     </div>
 </template>
+
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateX(10px);
+}
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+</style>

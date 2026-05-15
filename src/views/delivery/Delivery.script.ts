@@ -159,7 +159,7 @@ export default defineComponent({
             loadData();
         }
 
-        function handleAction(type: 'view' | 'approve' | 'reject', row: any) {
+        function handleAction(type: 'view' | 'approve' | 'reject' | 'delete', row: any) {
             if (type === 'view') {
                 router.push(`/deliveries/viewDelivery/${row.Id}`);
             } else if (type === 'approve') {
@@ -170,6 +170,17 @@ export default defineComponent({
                 selectedDeliveryId.value = row.Id;
                 selectedDeliveryNo.value = row.DocNo;
                 showRejectModal.value = true;
+            } else if (type === 'delete') {
+                const index = deliveryStore.list.findIndex(d => d.Id === row.Id);
+                if (index !== -1) {
+                    deliveryStore.list.splice(index, 1);
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Deleted',
+                        detail: `Delivery order ${row.DocNo} has been deleted.`,
+                        life: 3000
+                    });
+                }
             }
         }
 
@@ -200,16 +211,18 @@ export default defineComponent({
         const getStatusSeverity = (status: string) => {
             switch (status) {
                 case 'Completed':
+                case 'Reviewed':
                     return 'success';
                 case 'Cancelled':
+                case 'Failed':
                     return 'danger';
                 case 'Processing':
                     return 'info';
-                case 'Ready for Review':
-                    return 'warn';
-                case 'Created':
+                case 'Pending':
+                    return 'warning';
+                case 'Draft':
                 default:
-                    return 'warn';
+                    return 'secondary';
             }
         };
 
@@ -290,7 +303,7 @@ export default defineComponent({
                     doRef.SupplierName = result.supplierName; 
                     doRef._aiExtractedItems = result.items;
                     
-                    doRef.Status = 'Ready for Review';
+                    doRef.Status = 'Draft';
                     
                     toast.add({
                         severity: 'success',
@@ -313,8 +326,8 @@ export default defineComponent({
             }
         }
 
-        const handleActionWithReview = (type: 'view' | 'approve' | 'reject', row: any) => {
-            if (type === 'view' && row.Status === 'Ready for Review') {
+        const handleActionWithReview = (type: 'view' | 'approve' | 'reject' | 'delete', row: any) => {
+            if (type === 'view' && row.Status === 'Draft') {
                 // Navigate to Review Delivery
                 // We'll pass the mock data via state or store later, but for now just route
                 router.push(`/deliveries/reviewDelivery/${row.Id}`);

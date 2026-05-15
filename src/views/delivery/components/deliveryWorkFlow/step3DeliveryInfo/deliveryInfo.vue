@@ -13,36 +13,6 @@
                 <span>Delivery Information</span>
             </div>
             <form @submit.prevent="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-3">
-                       
-                        
-                        <div class="flex flex-col">
-                            <label for="driverPlate">Driver Plate Number</label>
-                            <ProInput name="driverPlate" v-model="initialValues.driverPlate" placeholder="Plate Number" fluid />
-                            <Message v-if="errors.driverPlate" severity="error" size="small" variant="simple">
-                                {{ errors.driverPlate }}
-                            </Message>
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label for="deliveryDate">Delivery Date</label>
-                            <ProDatePicker name="deliveryDate" :modelValue="formatDateToAPI(initialValues.deliveryDate)" @update:modelValue="initialValues.deliveryDate = ($event ? new Date($event) : null)" placeholder="Select Date" class="w-full" disabled readonly />
-                            <Message v-if="errors.deliveryDate" severity="error" size="small" variant="simple">
-                                {{ errors.deliveryDate }}
-                            </Message>
-                        </div>
-                         <div class="flex flex-col md:col-span-2">
-                            <label for="doNumber">Delivery Order Number (Optional)</label>
-                            <ProInput name="doNumber" v-model="initialValues.doNumber" placeholder="Enter DO Number" fluid />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-4 p-3">
-                        <div class="flex flex-col">
-                            <label for="remarks">Additional Remarks</label>
-                            <ProTextarea name="remarks" v-model="initialValues.remarks" rows="5" />
-                        </div>
-                    </div>
 
                     <!-- ATTACHMENTS (Delivery Documents) -->
                     <div class="grid grid-cols-1 gap-4 p-3">
@@ -63,7 +33,7 @@
                     </div>
 
                     <div class="flex justify-end mt-4">
-                        <ProButton type="button" variant="secondary" @click="goBack">Cancel</ProButton>
+                        <ProButton type="button" variant="secondary" @click="goBack">Back</ProButton>
                         <ProButton type="submit" class="ms-2">Next</ProButton>
                     </div>
                 </form>
