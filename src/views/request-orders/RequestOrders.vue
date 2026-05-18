@@ -54,7 +54,7 @@ import { Button } from "@prosync/ui-kit";
                             
                             <div class="flex justify-end mb-4">
                                 <!-- Legend -->
-                                <div class="flex justify-end gap-3 items-center text-xs py-1.5 px-3 border border-border-border rounded-md bg-surface-gray-bg">
+                                <div class="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-3 items-center text-xs py-1.5 px-3 border border-border-border rounded-md bg-surface-gray-bg w-full sm:w-auto">
                                     <span class="text-text-subtitle font-medium">Legend :</span>
                                     <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span><span class="text-text-body">Pending</span></div>
                                     <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span class="text-text-body">Approved</span></div>

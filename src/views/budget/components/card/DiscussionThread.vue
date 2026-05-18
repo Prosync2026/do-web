@@ -15,19 +15,25 @@
         <!-- ================= Approval Content ================= -->
         <div v-show="showApprovalFlow">
             <!-- ================= Progress Flow ================= -->
-            <div class="flex items-center justify-between mb-4 mt-3">
-                <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center justify-end text-xs text-gray-400 mb-1 md:hidden w-full">
+                <span class="italic mr-1">Swipe flow</span>
+                <PhArrowsLeftRight :size="14" class="animate-pulse" />
+            </div>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 mt-1">
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 w-full" style="scrollbar-width: none; -ms-overflow-style: none;">
                     <template v-for="(item, index) in discussions" :key="index">
-                        <ProButton :variant="getButtonVariant(item, index)" size="sm" @click="togglePanel(index)">
+                        <ProButton :variant="getButtonVariant(item, index)" size="sm" @click="togglePanel(index)" class="shrink-0">
                             <component :is="getStepIcon(item)" :size="18" class="mr-1" />
                             {{ getStepLabel(item) }}
                         </ProButton>
-                        <PhCaretRight :size="18" class="text-gray-400" v-if="index < discussions.length - 1"  />
+                        <PhCaretRight :size="16" class="text-gray-400 shrink-0" v-if="index < discussions.length - 1"  />
                     </template>
                 </div>
 
                 <!---CHECK ACCESS PERMISSION -->
-                <ProButton variant="primary" size="sm" v-if="canRecommend" @click="handleAcknowledge">{{ currentUserRole === 'PURC' ? 'Acknowledge' : 'Add Comment' }}</ProButton>
+                <div class="flex shrink-0 justify-end">
+                    <ProButton variant="primary" size="sm" v-if="canRecommend" @click="handleAcknowledge" class="w-full sm:w-auto justify-center">{{ currentUserRole === 'PURC' ? 'Acknowledge' : 'Add Comment' }}</ProButton>
+                </div>
             </div>
 
             <!-- ================= Collapsible Panels ================= -->

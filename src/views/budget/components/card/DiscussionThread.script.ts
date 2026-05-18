@@ -1,4 +1,4 @@
-import { PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle } from '@phosphor-icons/vue';
+import { PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle, PhArrowsLeftRight } from '@phosphor-icons/vue';
 import { defineComponent, onMounted, ref, markRaw } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -13,7 +13,7 @@ import editcommentBCRModal from '@/views/budget/components/dialog/EditCommentBCR
 
 export default defineComponent({
     name: 'DiscussionThread',
-    components: { ProButton, ProTag, ProCard, ProDivider, ProEmpty, ProTooltip, ProToast, editcommentBCRModal, commentBCRModal, PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle },
+    components: { ProButton, ProTag, ProCard, ProDivider, ProEmpty, ProTooltip, ProToast, editcommentBCRModal, commentBCRModal, PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle, PhArrowsLeftRight },
     props: {
         editMode: {
             type: Boolean,
