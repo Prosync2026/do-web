@@ -4,13 +4,13 @@
     <div class="p-mb-5 mt-5">
         <Message severity="secondary" variant="outlined" :closable="false">
             <PhWarningCircle :size="18"  />
-            Provide delivery information. Plate number and photos are optional - you can proceed directly.
+            Upload attachments like delivery documents and evidence photos. Plate number and photos are optional.
         </Message>
 
         <ProCard class="mt-6 shadow-sm">
             <div class="flex items-center gap-2 mb-6 text-xl font-bold">
-                <PhTruck :size="18"  />
-                <span>Delivery Information</span>
+                <PhFile :size="18"  />
+                <span>Attachments Upload</span>
             </div>
             <form @submit.prevent="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full">
 

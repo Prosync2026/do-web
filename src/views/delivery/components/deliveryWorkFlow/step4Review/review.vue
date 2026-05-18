@@ -57,13 +57,13 @@
                 </div>
             </ProCard>
 
-            <div class="flex flex-col sm:flex-row justify-between items-center mt-2 gap-4">
-                <ProButton type="button" variant="secondary" @click="goBack" class="w-full sm:w-24 bg-gray-50 text-gray-700">Back</ProButton>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 gap-4">
+                <ProButton type="button" variant="secondary" @click="goBack" class="w-full sm:w-24 bg-gray-50 text-gray-700 justify-center">Back</ProButton>
                 
-                <div class="flex gap-2 w-full sm:w-auto justify-end">
-                    <ProButton type="button" variant="secondary" @click="cancel" class="bg-gray-50 text-gray-700">Cancel</ProButton>
-                    <ProButton type="button" variant="secondary" @click="saveAsDraft" class="bg-gray-50 text-gray-700">Save as Draft</ProButton>
-                    <ProButton type="submit" variant="primary">
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:justify-end">
+                    <ProButton type="button" variant="secondary" @click="cancel" class="w-full sm:w-auto bg-gray-50 text-gray-700 justify-center">Cancel</ProButton>
+                    <ProButton type="button" variant="secondary" @click="saveAsDraft" class="w-full sm:w-auto bg-gray-50 text-gray-700 justify-center">Save as Draft</ProButton>
+                    <ProButton type="submit" variant="primary" class="w-full sm:w-auto justify-center">
                         <i class="pi pi-check mr-2"></i> Submit
                     </ProButton>
                 </div>

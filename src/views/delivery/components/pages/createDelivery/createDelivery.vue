@@ -37,7 +37,7 @@
                         <div :class="['w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300', activeStep >= 3 ? 'bg-brand-primary border-brand-primary text-white' : 'bg-surface-main-bg border-gray-300 text-gray-400']">
                             <PhTruck :size="18" class="text-sm sm:text-base"  />
                         </div>
-                        <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 3 ? 'text-brand-primary' : 'text-gray-500']">Delivery Info</span>
+                        <span :class="['text-[10px] sm:text-sm leading-tight text-center font-medium', activeStep >= 3 ? 'text-brand-primary' : 'text-gray-500']">Attachments Upload</span>
                     </div>
 
                     <!-- Step 4 -->
@@ -64,7 +64,7 @@
                     </div>
                     <div v-else-if="activeStep === 4" key="step4">
                         <div v-if="canPassToReview">
-                            <Review :deliveryData="deliveryData" />
+                            <Review :deliveryData="deliveryData" @prev-step="goStep(3)" />
                         </div>
                         <div v-else class="flex flex-col justify-center py-5 gap-4 w-full">
                             <Message severity="warn" variant="outlined" :closable="false">
