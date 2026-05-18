@@ -3,10 +3,20 @@
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div>
-            <Teleport defer to="#page-header-actions">
-                <ProButton variant="primary" v-if="canCreateBCR" @click="$router.push('/bcr/create')">
-                    <PhPlus class="mr-2" :size="16" weight="bold" /> New Change Request
+            <!-- Mobile Header Actions (Below Title) -->
+            <div class="flex flex-row w-full mb-4 lg:hidden">
+                <ProButton variant="primary" v-if="canCreateBCR" @click="$router.push('/bcr/create')" class="w-full justify-center px-2 text-sm">
+                    <PhPlus class="mr-1 sm:mr-2" :size="16" weight="bold" /> New Change Request
                 </ProButton>
+            </div>
+
+            <!-- Desktop Header Actions teleported to AppLayout -->
+            <Teleport defer to="#page-header-actions">
+                <div class="hidden lg:flex">
+                    <ProButton variant="primary" v-if="canCreateBCR" @click="$router.push('/bcr/create')">
+                        <PhPlus class="mr-2" :size="16" weight="bold" /> New Change Request
+                    </ProButton>
+                </div>
             </Teleport>
 
             <ProCard padding="lg" class="mb-0">

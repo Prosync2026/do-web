@@ -4,16 +4,16 @@
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-1">
             <!-- Header -->
-            <div class="flex justify-between items-center mb-6 p-3">
+            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 p-3 gap-4">
                 <div>
                     <h1 class="text-h2 text-text-heading">Delivery Verification</h1>
                 </div>
-                <div class="flex gap-2">
-                    <ProButton @click="showSmartScanModal = true" variant="secondary">
-                        <i class="pi pi-sparkles mt-1 mr-2 text-brand-primary" /> Smart AI Scan
+                <div class="flex flex-row gap-2 w-full lg:w-auto">
+                    <ProButton @click="showSmartScanModal = true" variant="secondary" class="flex-1 lg:flex-none justify-center px-2 text-sm sm:text-base">
+                        <i class="pi pi-sparkles mt-0.5 mr-1 sm:mr-2 text-brand-primary" /> <span class="hidden sm:inline">Smart</span> AI Scan
                     </ProButton>
-                    <ProButton @click="$router.push('/deliveries/createDelivery')">
-                        <PhPlus :size="18" class="mr-2" /> New Delivery Verification
+                    <ProButton @click="$router.push('/deliveries/createDelivery')" class="flex-1 lg:flex-none justify-center px-2 text-sm sm:text-base">
+                        <PhPlus :size="16" class="mr-1 sm:mr-2" /> New <span class="hidden sm:inline">Delivery Verification</span><span class="sm:hidden">Delivery</span>
                     </ProButton>
                 </div>
             </div>

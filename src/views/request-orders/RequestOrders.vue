@@ -5,15 +5,30 @@ import { Button } from "@prosync/ui-kit";
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-1">
-            <!-- Header Actions teleported to AppLayout -->
+            <!-- Mobile Header Actions (Below Title) -->
+            <div class="flex flex-row gap-2 w-full mb-4 lg:hidden">
+                <div class="relative order-2 flex-1">
+                    <ProButton variant="secondary" @click="showDraftModal = true" class="w-full justify-center px-2 text-sm">
+                        View Drafts
+                    </ProButton>
+                    <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85);" />
+                </div>
+                <div class="order-3 flex-1">
+                    <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')" class="w-full justify-center px-2 text-sm">
+                        <PhPlus :size="16" class="mr-1" /> New RO
+                    </ProButton>
+                </div>
+            </div>
+
+            <!-- Desktop Header Actions teleported to AppLayout -->
             <Teleport defer to="#page-header-actions">
-                <div class="relative order-2">
+                <div class="hidden lg:flex relative order-2">
                     <ProButton variant="secondary" @click="showDraftModal = true">
                         View Drafts
                     </ProButton>
                     <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85);" />
                 </div>
-                <div class="order-3">
+                <div class="hidden lg:flex order-3">
                     <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')">
                         <PhPlus :size="18" class="mr-2" /> New Request Order
                     </ProButton>
