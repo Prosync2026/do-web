@@ -17,25 +17,27 @@
                     <h2 class="text-lg font-semibold mb-3">Budget Version Comparison</h2>
 
                     <!-- Version Selectors -->
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <div class="flex flex-col gap-1">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+                        <div class="flex flex-col gap-1 w-full sm:w-56">
                             <label class="text-xs text-gray-500 font-medium">From Version</label>
-                            <ProSelect v-model="selectedFromVersionCode" :options="availableVersionOptions" placeholder="Select From Version" class="w-56 h-9 text-sm" />
+                            <ProSelect v-model="selectedFromVersionCode" :options="availableVersionOptions" placeholder="Select From Version" class="w-full h-9 text-sm" />
                         </div>
 
-                        <PhArrowRight :size="18" class="text-gray-400 text-sm mt-4"  />
+                        <PhArrowDown :size="18" class="text-gray-400 text-sm block sm:hidden self-center my-1" />
+                        <PhArrowRight :size="18" class="text-gray-400 text-sm mt-4 hidden sm:block shrink-0" />
 
-                        <div class="flex flex-col gap-1">
+                        <div class="flex flex-col gap-1 w-full sm:w-56">
                             <label class="text-xs text-gray-500 font-medium">To Version</label>
-                            <ProSelect v-model="selectedToVersionCode" :options="availableVersionOptions" placeholder="Select To Version" class="w-56 h-9 text-sm" />
+                            <ProSelect v-model="selectedToVersionCode" :options="availableVersionOptions" placeholder="Select To Version" class="w-full h-9 text-sm" />
                         </div>
                     </div>
 
                     <!-- Resolved labels from API response -->
-                    <div class="flex items-center gap-2 mt-3">
-                        <ProTag :label="previousVersionLabel" variant="secondary" />
-                        <PhArrowRight :size="18" class="text-gray-400 text-sm"  />
-                        <ProTag :label="currentVersionLabel" variant="info" />
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 mt-4">
+                        <ProTag :label="previousVersionLabel" variant="secondary" class="w-fit max-w-full truncate" />
+                        <PhArrowDown :size="16" class="text-gray-400 text-sm block sm:hidden self-center" />
+                        <PhArrowRight :size="16" class="text-gray-400 text-sm hidden sm:block shrink-0" />
+                        <ProTag :label="currentVersionLabel" variant="info" class="w-fit max-w-full truncate" />
                     </div>
                 </div>
             </div>
@@ -195,28 +197,55 @@
                             <span class="text-xs text-gray-500 block">Description</span>
                             <span class="text-sm font-medium">{{ row.description }}</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 text-sm mb-2 border-t border-gray-100 pt-2">
-                            <div class="bg-gray-50 p-2 rounded">
-                                <span class="text-xs font-semibold text-gray-600 block mb-1">Old Version</span>
-                                <div class="flex justify-between"><span>Qty:</span> <span>{{ row.originalQty }}</span></div>
-                                <div class="flex justify-between"><span>Rate:</span> <span>{{ row.originalRate != null ? 'RM ' + formatCurrency(row.originalRate) : '-' }}</span></div>
-                                <div class="flex justify-between font-semibold mt-1 border-t border-gray-200 pt-1"><span>Amt:</span> <span>{{ row.originalAmount != null ? 'RM ' + formatCurrency(row.originalAmount) : '-' }}</span></div>
+                        <div class="grid grid-cols-2 gap-3 text-sm mb-3 border-t border-gray-100 pt-3">
+                            <!-- Old Version -->
+                            <div class="bg-gray-50 p-3 rounded h-full flex flex-col">
+                                <span class="text-[11px] font-bold text-gray-600 block mb-3 uppercase tracking-wider">Old Version</span>
+                                <div class="flex flex-col gap-2.5 mt-auto">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Qty</span>
+                                        <span class="font-medium leading-none">{{ row.originalQty }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Rate</span>
+                                        <span class="font-medium whitespace-normal">{{ row.originalRate != null ? 'RM ' + formatCurrency(row.originalRate) : '-' }}</span>
+                                    </div>
+                                    <div class="flex flex-col pt-2.5 border-t border-gray-200 mt-1">
+                                        <span class="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Amount</span>
+                                        <span class="font-bold whitespace-normal">{{ row.originalAmount != null ? 'RM ' + formatCurrency(row.originalAmount) : '-' }}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-blue-50 p-2 rounded">
-                                <span class="text-xs font-semibold text-blue-700 block mb-1">New Version</span>
-                                <div class="flex justify-between"><span>Qty:</span> <span>{{ row.latestQty }}</span></div>
-                                <div class="flex justify-between"><span>Rate:</span> <span>{{ row.latestRate != null ? 'RM ' + formatCurrency(row.latestRate) : '-' }}</span></div>
-                                <div class="flex justify-between font-semibold mt-1 border-t border-blue-200 pt-1"><span>Amt:</span> <span>{{ row.latestAmount != null ? 'RM ' + formatCurrency(row.latestAmount) : '-' }}</span></div>
+                            
+                            <!-- New Version -->
+                            <div class="bg-blue-50 p-3 rounded h-full flex flex-col">
+                                <span class="text-[11px] font-bold text-blue-700 block mb-3 uppercase tracking-wider">New Version</span>
+                                <div class="flex flex-col gap-2.5 mt-auto">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-blue-400/80 uppercase tracking-wider mb-0.5">Qty</span>
+                                        <span class="font-medium text-blue-900 leading-none">{{ row.latestQty }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-blue-400/80 uppercase tracking-wider mb-0.5">Rate</span>
+                                        <span class="font-medium text-blue-900 whitespace-normal">{{ row.latestRate != null ? 'RM ' + formatCurrency(row.latestRate) : '-' }}</span>
+                                    </div>
+                                    <div class="flex flex-col pt-2.5 border-t border-blue-200 mt-1">
+                                        <span class="text-[10px] text-blue-400/80 uppercase tracking-wider mb-0.5">Amount</span>
+                                        <span class="font-bold text-blue-900 whitespace-normal">{{ row.latestAmount != null ? 'RM ' + formatCurrency(row.latestAmount) : '-' }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 text-sm border-t border-gray-100 pt-2">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-500">Δ Qty</span>
-                                <span class="font-medium">{{ row.qtyDiff }}</span>
+                        
+                        <!-- Deltas -->
+                        <div class="grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-3">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Δ Qty</span>
+                                <span class="font-semibold">{{ row.qtyDiff }}</span>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-500">Δ Amount</span>
-                                <span class="font-medium" :class="row.amountDiff > 0 ? 'text-green-500' : row.amountDiff < 0 ? 'text-red-500' : ''">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Δ Amount</span>
+                                <span class="font-bold whitespace-normal" :class="row.amountDiff > 0 ? 'text-green-600' : row.amountDiff < 0 ? 'text-red-600' : ''">
                                     {{ row.amountDiff < 0 ? '-' : '' }}RM {{ formatCurrency(Math.abs(row.amountDiff || 0)) }}
                                 </span>
                             </div>

@@ -3,8 +3,8 @@ import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import { useProjectStore } from '@/stores/project/project.store';
 import type { TableColumn } from '@/types/table.type';
 import { useToast } from '@/utils/toastBus';
-import { PhArrowsLeftRight, PhCheck, PhCheckCircle, PhEye, PhPlus, PhTruck, PhX, PhXCircle } from '@phosphor-icons/vue';
-import { ProButton, ProCard, ProDatePicker, ProInput, ProModal, ProPagination, ProSelect, ProTable, ProTabs, ProTag } from '@prosync_solutions/ui';
+import { PhArrowsLeftRight, PhCheck, PhCheckCircle, PhDotsThreeVertical, PhEye, PhPlus, PhTrash, PhTruck, PhX, PhXCircle } from '@phosphor-icons/vue';
+import { ProButton, ProCard, ProDatePicker, ProInput, ProMenu, ProModal, ProPagination, ProSelect, ProTable, ProTabs, ProTag } from '@prosync_solutions/ui';
 import { useConfirm } from 'primevue/useconfirm';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -12,7 +12,7 @@ import SmartScanModal from './components/smartScan/SmartScanModal.vue';
 
 export default defineComponent({
     name: 'Deliveries',
-    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, ProModal, ProPagination, PhArrowsLeftRight, PhEye, PhPlus, PhCheckCircle, PhXCircle, PhCheck, PhX, PhTruck, SmartScanModal },
+    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, ProModal, ProPagination, ProMenu, PhArrowsLeftRight, PhEye, PhPlus, PhCheckCircle, PhXCircle, PhCheck, PhX, PhTruck, PhTrash, PhDotsThreeVertical, SmartScanModal },
     setup() {
         const deliveryStore = useDeliveryStore();
         const projectStore = useProjectStore();
@@ -214,6 +214,7 @@ export default defineComponent({
                 case 'Reviewed':
                     return 'success';
                 case 'Cancelled':
+                    return 'danger';
                 case 'Failed':
                     return 'danger';
                 case 'Processing':

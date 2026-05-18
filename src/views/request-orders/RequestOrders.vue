@@ -187,16 +187,77 @@ import { Button } from "@prosync/ui-kit";
                             <div class="block lg:hidden mt-4">
                                 <template v-if="filteredOrders.length > 0">
                                     <div class="grid grid-cols-1 gap-4">
-                                        <ProCard v-for="row in filteredOrders" :key="row.id" class="shadow-sm relative overflow-hidden">
-                                            <div class="flex justify-between items-start mb-3">
-                                                <div class="flex items-start gap-2">
-                                                    <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.rowIndex }}</span>
-                                                    <div class="flex flex-col gap-0.5">
-                                                        <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">RO Number</span>
-                                                        <span class="font-semibold text-text-heading leading-tight">{{ row.roNumber }}</span>
-                                                    </div>
-                                                </div>
+                                        <ProCard v-for="row in filteredOrders" :key="row.id" class="shadow-sm relative overflow-visible">
+                                            <div class="flex justify-between items-center mb-3">
                                                 <ProTag :label="row.status" :variant="row.status === 'Approved' ? 'success' : row.status === 'Rejected' ? 'error' : row.status === 'Processing' ? 'warn' : 'info'" />
+                                                
+                                                <div class="flex items-center">
+                                                    <template v-if="getAvailableActions(row).length > 0">
+                                                        <template v-if="getAvailableActions(row).length === 1">
+                                                            <ProButton 
+                                                                v-for="action in getAvailableActions(row)" 
+                                                                :key="action.label"
+                                                                :variant="action.variant" 
+                                                                size="sm" 
+                                                                @click.stop="action.onClick?.()"
+                                                            >
+                                                                <component :is="action.icon" :size="16" class="mr-1.5" />
+                                                                {{ action.label }}
+                                                            </ProButton>
+                                                        </template>
+                                                        <template v-else-if="getAvailableActions(row).length > 1">
+                                                            <ProMenu :width="160" placement="bottom-end">
+                                                                <template #trigger="{ isOpen }">
+                                                                    <button
+                                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-button transition-all duration-150 cursor-pointer -mr-2"
+                                                                        :class="isOpen ? 'bg-surface-gray-bg-strong text-text-heading' : 'text-text-body hover:bg-surface-gray-bg hover:text-text-heading'"
+                                                                        aria-label="More actions"
+                                                                    >
+                                                                        <PhDotsThreeVertical :size="16" weight="bold" />
+                                                                    </button>
+                                                                </template>
+                                                                <template #items="{ close }">
+                                                                    <div class="py-1">
+                                                                        <button
+                                                                            v-for="action in getAvailableActions(row).filter((a: any) => a.tier !== 'destructive')"
+                                                                            :key="action.label"
+                                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                                            @click.stop="
+                                                                                close();
+                                                                                action.onClick?.();
+                                                                            "
+                                                                        >
+                                                                            <component :is="action.icon" :size="15" class="shrink-0 text-text-subtitle" :class="action.iconClass" />
+                                                                            {{ action.label }}
+                                                                        </button>
+                                                                        <div v-if="getAvailableActions(row).some((a: any) => a.tier === 'destructive') && getAvailableActions(row).some((a: any) => a.tier !== 'destructive')" class="my-1 border-t border-border-border" />
+                                                                        <button
+                                                                            v-for="action in getAvailableActions(row).filter((a: any) => a.tier === 'destructive')"
+                                                                            :key="action.label"
+                                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm hover:bg-surface-error/20 transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                                            :class="action.iconClass || 'text-text-error'"
+                                                                            @click.stop="
+                                                                                close();
+                                                                                action.onClick?.();
+                                                                            "
+                                                                        >
+                                                                            <component :is="action.icon" :size="15" class="shrink-0" />
+                                                                            {{ action.label }}
+                                                                        </button>
+                                                                    </div>
+                                                                </template>
+                                                            </ProMenu>
+                                                        </template>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-start gap-2 mb-4">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.rowIndex }}</span>
+                                                <div class="flex flex-col gap-0.5">
+                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">RO Number</span>
+                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.roNumber }}</span>
+                                                </div>
                                             </div>
 
                                             <div class="grid gap-2 mb-4">
@@ -230,7 +291,6 @@ import { Button } from "@prosync/ui-kit";
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
                                                 <div class="flex flex-col gap-1 mt-2">
                                                     <span class="text-xs font-medium text-gray-500">Approval Progress</span>
                                                     <div class="flex flex-wrap gap-2 text-xs py-1">
@@ -242,20 +302,6 @@ import { Button } from "@prosync/ui-kit";
                                                         </template>
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                            <div class="flex flex-wrap justify-end gap-2 pt-3 border-t border-gray-100" v-if="getAvailableActions(row).length > 0">
-                                                <template v-for="action in getAvailableActions(row)" :key="action.label">
-                                                    <ProButton 
-                                                        :variant="action.variant" 
-                                                        size="sm" 
-                                                        @click.stop="action.onClick?.()" 
-                                                        :title="action.label"
-                                                    >
-                                                        <template #iconLeft v-if="action.icon"><component :is="action.icon" :size="16" :class="action.iconClass" /></template>
-                                                        {{ action.label }}
-                                                    </ProButton>
-                                                </template>
                                             </div>
                                         </ProCard>
                                     </div>

@@ -125,19 +125,24 @@
                                 <div v-if="pendingList.length === 0" class="text-center text-gray-500 py-6">No Pending Purchase Orders Found</div>
                                 <div v-else class="grid grid-cols-1 gap-4">
                                     <ProCard v-for="(row, index) in pendingList" :key="index" class="shadow-sm border border-gray-200">
-                                        <div class="flex justify-between items-start mb-3 border-b border-gray-100 pb-3">
-                                            <div class="flex items-start gap-2">
-                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
-                                                <div class="flex flex-col gap-0.5 mt-0.5">
-                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">PO Number</span>
-                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.poNumber }}</span>
-                                                </div>
-                                            </div>
+                                        <div class="flex justify-between items-center mb-3">
                                             <ProTag
                                                 :label="row.status === 'Created' ? 'Pending' : row.status"
                                                 :variant="row.status === 'Completed' ? 'success' : row.status === 'Partially Delivered' ? 'warn' : 'info'"
-                                                class="ml-2 whitespace-nowrap"
+                                                class="whitespace-nowrap"
                                             />
+                                            <div class="flex items-center">
+                                                <ProButton variant="secondary" size="sm" @click="viewPO(row)" class="!px-2" title="View">
+                                                    <PhEye :size="16" />
+                                                </ProButton>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-2 mb-4">
+                                            <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
+                                            <div class="flex flex-col gap-0.5">
+                                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">PO Number</span>
+                                                <span class="font-semibold text-text-heading leading-tight">{{ row.poNumber }}</span>
+                                            </div>
                                         </div>
 
                                         <div class="grid grid-cols-2 gap-4 mb-3">
@@ -156,15 +161,9 @@
                                             </div>
                                         </div>
 
-                                        <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                                            <div v-if="canViewPricing" class="flex flex-col gap-0.5">
-                                                <span class="text-xs font-medium text-gray-500">Total Amount</span>
-                                                <span class="font-semibold text-text-heading">RM {{ Number(row.totalAmount).toLocaleString() }}</span>
-                                            </div>
-                                            <div v-else></div>
-                                            <ProButton variant="secondary" size="sm" @click="viewPO(row)">
-                                                <PhEye class="mr-2" /> View
-                                            </ProButton>
+                                        <div class="flex flex-col gap-0.5 mt-3 pt-3 border-t border-gray-100" v-if="canViewPricing">
+                                            <span class="text-xs font-medium text-gray-500">Total Amount</span>
+                                            <span class="font-semibold text-text-heading">RM {{ Number(row.totalAmount).toLocaleString() }}</span>
                                         </div>
                                     </ProCard>
                                 </div>
@@ -194,15 +193,15 @@
                                 <div v-if="partiallyList.length === 0" class="text-center text-gray-500 py-6">No Partially Delivered Purchase Orders Found</div>
                                 <div v-else class="grid grid-cols-1 gap-4">
                                     <ProCard v-for="(row, index) in partiallyList" :key="index" class="shadow-sm border border-gray-200">
-                                        <div class="flex justify-between items-start mb-3 border-b border-gray-100 pb-3">
-                                            <div class="flex items-start gap-2">
-                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
-                                                <div class="flex flex-col gap-0.5 mt-0.5">
-                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">PO Number</span>
-                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.poNumber }}</span>
-                                                </div>
+                                        <div class="flex justify-between items-center mb-3">
+                                            <ProTag label="Partially Delivered" variant="warn" class="whitespace-nowrap" />
+                                        </div>
+                                        <div class="flex items-start gap-2 mb-4">
+                                            <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
+                                            <div class="flex flex-col gap-0.5">
+                                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">PO Number</span>
+                                                <span class="font-semibold text-text-heading leading-tight">{{ row.poNumber }}</span>
                                             </div>
-                                            <ProTag label="Partially Delivered" variant="warn" class="ml-2 whitespace-nowrap" />
                                         </div>
 
                                         <div class="grid grid-cols-2 gap-4">
@@ -255,15 +254,15 @@
                                 <div v-if="completedList.length === 0" class="text-center text-gray-500 py-6">No Completed Purchase Orders Found</div>
                                 <div v-else class="grid grid-cols-1 gap-4">
                                     <ProCard v-for="(row, index) in completedList" :key="index" class="shadow-sm border border-gray-200">
-                                        <div class="flex justify-between items-start mb-3 border-b border-gray-100 pb-3">
-                                            <div class="flex items-start gap-2">
-                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
-                                                <div class="flex flex-col gap-0.5 mt-0.5">
-                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">PO Number</span>
-                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.poNumber }}</span>
-                                                </div>
+                                        <div class="flex justify-between items-center mb-3">
+                                            <ProTag label="Completed" variant="success" class="whitespace-nowrap" />
+                                        </div>
+                                        <div class="flex items-start gap-2 mb-4">
+                                            <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.no }}</span>
+                                            <div class="flex flex-col gap-0.5">
+                                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">PO Number</span>
+                                                <span class="font-semibold text-text-heading leading-tight">{{ row.poNumber }}</span>
                                             </div>
-                                            <ProTag label="Completed" variant="success" class="ml-2 whitespace-nowrap" />
                                         </div>
 
                                         <div class="grid grid-cols-2 gap-4 mb-3">

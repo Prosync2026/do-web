@@ -81,16 +81,55 @@
                 <div class="block lg:hidden mt-4">
                     <template v-if="budgetChangeRequestData.length > 0">
                         <div class="grid grid-cols-1 gap-4">
-                            <ProCard v-for="row in budgetChangeRequestData" :key="row.Id" class="shadow-sm relative overflow-hidden">
-                                <div class="flex justify-between items-start mb-3">
-                                    <div class="flex items-start gap-2">
-                                        <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.rowIndex }}</span>
-                                        <div class="flex flex-col gap-0.5">
-                                            <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">BCR No</span>
-                                            <span class="font-semibold text-text-heading leading-tight">{{ row.DocNo }}</span>
-                                        </div>
-                                    </div>
+                            <ProCard v-for="row in budgetChangeRequestData" :key="row.Id" class="shadow-sm relative overflow-visible">
+                                <div class="flex justify-between items-center mb-3">
                                     <ProTag :label="row.Status" :variant="getStatusSeverity(row.Status)" />
+                                    <div class="flex items-center">
+                                        <template v-if="row.actions && row.actions.includes('edit')">
+                                            <ProMenu :width="160" placement="top-end">
+                                                <template #trigger="{ isOpen }">
+                                                    <button
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-button transition-all duration-150 cursor-pointer -mr-2"
+                                                        :class="isOpen ? 'bg-surface-gray-bg-strong text-text-heading' : 'text-text-body hover:bg-surface-gray-bg hover:text-text-heading'"
+                                                        aria-label="More actions"
+                                                    >
+                                                        <PhDotsThreeVertical :size="16" weight="bold" />
+                                                    </button>
+                                                </template>
+                                                <template #items="{ close }">
+                                                    <div class="py-1">
+                                                        <button
+                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100"
+                                                            @click.stop="close(); handleActionClick('view', row)"
+                                                        >
+                                                            <PhEye :size="15" class="shrink-0 text-text-subtitle" />
+                                                            View
+                                                        </button>
+                                                        <button
+                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100"
+                                                            @click.stop="close(); handleActionClick('edit', row)"
+                                                        >
+                                                            <PhPencil :size="15" class="shrink-0 text-text-subtitle" />
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                </template>
+                                            </ProMenu>
+                                        </template>
+                                        <template v-else>
+                                            <ProButton variant="secondary" size="sm" @click="handleActionClick('view', row)" class="!px-2" title="View">
+                                                <PhEye :size="16" />
+                                            </ProButton>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-2 mb-4">
+                                    <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.rowIndex }}</span>
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">BCR No</span>
+                                        <span class="font-semibold text-text-heading leading-tight">{{ row.DocNo }}</span>
+                                    </div>
                                 </div>
 
                                 <div class="grid gap-2 mb-4">
@@ -125,16 +164,7 @@
                                     </div>
                                 </div>
 
-                                <div class="flex justify-end gap-2 pt-3 border-t border-gray-100">
-                                    <ProButton variant="secondary" size="sm" @click="handleActionClick('view', row)">
-                                        <template #iconLeft><PhEye :size="16" /></template>
-                                        View
-                                    </ProButton>
-                                    <ProButton v-if="row.actions && row.actions.includes('edit')" variant="ghost" size="sm" @click="handleActionClick('edit', row)">
-                                        <template #iconLeft><PhPencil :size="16" /></template>
-                                        Edit
-                                    </ProButton>
-                                </div>
+
                             </ProCard>
                         </div>
                         
