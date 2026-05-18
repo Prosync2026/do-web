@@ -214,13 +214,13 @@ export default defineComponent({
                 case 'Reviewed':
                     return 'success';
                 case 'Cancelled':
-                    return 'danger';
                 case 'Failed':
-                    return 'danger';
+                    return 'error';
                 case 'Processing':
                     return 'info';
                 case 'Pending':
-                    return 'warning';
+                case 'Created':
+                    return 'warn';
                 case 'Draft':
                 default:
                     return 'secondary';
