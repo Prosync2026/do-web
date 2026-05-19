@@ -8,14 +8,14 @@ import type { TableColumn } from '@/types/table.type';
 import { buildApprovalFlow } from '@/utils/bcrApprovalFlow.util';
 import { formatDate } from '@/utils/dateHelper';
 import { Motion } from '@motionone/vue';
-import { ProButton, ProCard, ProInput, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
+import { PhCaretRight, PhChatText, PhCheckCircle, PhDotsThreeVertical, PhEye, PhMagnifyingGlass, PhPencil, PhPlus, PhTrendUp, PhWarningCircle } from '@phosphor-icons/vue';
+import { ProButton, ProCard, ProInput, ProMenu, ProPagination, ProSelect, ProTable, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { PhWarningCircle, PhChatText, PhCheckCircle, PhTrendUp, PhCaretRight, PhPencil, PhMagnifyingGlass, PhPlus, PhEye } from '@phosphor-icons/vue';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
-    components: { SummaryCard, Motion, ProTag, ProButton, ProTable, ProInput, ProSelect, ProCard, PhCaretRight, PhPencil, PhMagnifyingGlass, PhPlus, PhEye },
+    components: { SummaryCard, Motion, ProTag, ProButton, ProTable, ProInput, ProSelect, ProCard, ProPagination, ProMenu, PhCaretRight, PhPencil, PhMagnifyingGlass, PhPlus, PhEye, PhDotsThreeVertical },
     setup() {
         const { hasPermission } = usePermission();
 

@@ -1,22 +1,22 @@
-import { getCurrentProjectId } from '@/utils/contextHelper';
 import { requestOrderService } from '@/services/requestOrder.service';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import type { AttachmentItem, CreateRequestOrderPayload, EditForm, Order } from '@/types/request-order.type';
+import { getCurrentProjectId } from '@/utils/contextHelper';
 import { formatDateToAPI, parseDDMMYYYY } from '@/utils/dateHelper';
 import { storeToRefs } from 'pinia';
-import InputNumber from 'primevue/inputnumber';
-import { useToast } from '@/utils/toastBus';
+
 import type { StockItem } from '@/types/stockItem.type';
-import { defineComponent, PropType, ref, watch } from 'vue';
+import { useToast } from '@/utils/toastBus';
 import { PhCheck, PhCloudArrowUp, PhEye, PhFile, PhImages, PhPlus, PhTrash, PhX } from '@phosphor-icons/vue';
-import { ProButton, ProModal, ProTable, ProUploadFile, ProInput, ProDatePicker, ProTextarea, ProCard, type UploadFile } from '@prosync_solutions/ui';
+import { ProButton, ProCard, ProDatePicker, ProInput, ProModal, ProTable, ProTextarea, ProUploadFile, type UploadFile } from '@prosync_solutions/ui';
+import { defineComponent, PropType, ref, watch } from 'vue';
 import CreateROModal from './CreateRo.vue';
 import CreateStockItem from './CreateStockItem.vue';
 
 export default defineComponent({
     name: 'EditRo',
     components: { 
-        InputNumber, 
+ 
         CreateROModal, 
         CreateStockItem,
         ProModal,
@@ -183,12 +183,6 @@ export default defineComponent({
             };
 
             try {
-                console.log(
-                    editForm.value.items.map((i) => ({
-                        id: i.id,
-                        code: i.code
-                    }))
-                );
 
                 const filesToSend = newAttachments.value.filter((uf: UploadFile) => uf.status !== 'done').map((uf: UploadFile) => uf.file);
                 const allAttachments = [...existingAttachments.value, ...filesToSend];

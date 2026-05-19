@@ -98,7 +98,6 @@ export default defineComponent({
 
                 try {
                     const res = await requestOrderService.getRequestOrderById(draftId);
-                    console.log('Draft fetch response:', res);
                     const draft = res.data;
 
                     if (!draft) return;

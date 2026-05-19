@@ -17,10 +17,10 @@
 
                 <div v-else-if="viewMode === 'detail'">
                     <!-- DETAIL SUB-VIEW BUTTONS -->
-                    <div class="flex gap-2 mb-4">
-                        <ProButton :variant="detailViewMode === 'list' ? 'primary' : 'secondary'" size="sm" @click="detailViewMode = 'list'">List View</ProButton>
-                        <ProButton :variant="detailViewMode === 'tree' ? 'primary' : 'secondary'" size="sm" @click="detailViewMode = 'tree'">Tree Table Item Code View</ProButton>
-                        <ProButton :variant="detailViewMode === 'treeLocation' ? 'primary' : 'secondary'" size="sm" @click="detailViewMode = 'treeLocation'">Tree Table Location View</ProButton>
+                    <div class="flex flex-col sm:flex-row w-full gap-2 mb-4">
+                        <ProButton :variant="detailViewMode === 'list' ? 'primary' : 'secondary'" size="sm" class="flex-1" @click="detailViewMode = 'list'">List View</ProButton>
+                        <ProButton :variant="detailViewMode === 'tree' ? 'primary' : 'secondary'" size="sm" class="flex-1" @click="detailViewMode = 'tree'">Tree Table Item Code View</ProButton>
+                        <ProButton :variant="detailViewMode === 'treeLocation' ? 'primary' : 'secondary'" size="sm" class="flex-1" @click="detailViewMode = 'treeLocation'">Tree Table Location View</ProButton>
                     </div>
 
                     <div v-if="detailViewMode === 'list'">

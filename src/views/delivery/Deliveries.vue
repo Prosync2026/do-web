@@ -4,13 +4,18 @@
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-1">
             <!-- Header -->
-            <div class="flex justify-between items-center mb-6 p-3">
+            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 p-3 gap-4">
                 <div>
                     <h1 class="text-h2 text-text-heading">Delivery Verification</h1>
                 </div>
-                <ProButton @click="$router.push('/deliveries/createDelivery')">
-                    <PhPlus :size="18" class="mr-2" /> New Delivery Verification
-                </ProButton>
+                <div class="flex flex-row gap-2 w-full lg:w-auto">
+                    <ProButton @click="showSmartScanModal = true" variant="secondary" class="flex-1 lg:flex-none justify-center px-2 text-sm sm:text-base">
+                        <i class="pi pi-sparkles mt-0.5 mr-1 sm:mr-2 text-brand-primary" /> <span class="hidden sm:inline">Smart</span> AI Scan
+                    </ProButton>
+                    <ProButton @click="$router.push('/deliveries/createDelivery')" class="flex-1 lg:flex-none justify-center px-2 text-sm sm:text-base">
+                        <PhPlus :size="16" class="mr-1 sm:mr-2" /> New <span class="hidden sm:inline">Delivery Verification</span><span class="sm:hidden">Delivery</span>
+                    </ProButton>
+                </div>
             </div>
 
             <!-- Tabs and Table -->
@@ -63,22 +68,40 @@
                                     <span>{{ row.rowIndex }}</span>
                                 </template>
 
-                                <template #cell-status="{ row }">
-                                    <ProTag 
-                                        :label="row.Status === 'Created' ? 'Pending' : row.Status" 
-                                        :variant="getStatusSeverity(row.Status)" 
-                                    />
+                                <template #cell-RefDoc="{ row }">
+                                    {{ row.RefDoc || row.purchase_order?.DocNo || '-' }}
+                                </template>
+
+                                <template #cell-SupplierName="{ row }">
+                                    {{ row.supplier?.CompanyName || row.purchase_order?.supplier?.CompanyName || row.SupplierName || '-' }}
+                                </template>
+
+                                <template #cell-Date="{ row }">
+                                    {{ formatDate(row.Date) }}
+                                </template>
+
+                                <template #cell-Status="{ row }">
+                                    <div class="flex items-center gap-2">
+                                        <ProTag 
+                                            :label="row.Status" 
+                                            :variant="getStatusSeverity(row.Status)" 
+                                        />
+                                        <i v-if="row.Status === 'Processing'" class="pi pi-spinner pi-spin text-brand-primary" />
+                                    </div>
                                 </template>
 
                                 <template #actions="{ row }">
-                                    <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
+                                    <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery" :disabled="row.Status === 'Processing'">
                                         <PhEye :size="18" class="text-base text-gray-700" />
                                     </ProButton>
-                                    <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
+                                    <ProButton v-if="isPurchasingRole && row.Status === 'Pending'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
                                         <PhCheckCircle :size="18" />
                                     </ProButton>
-                                    <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
+                                    <ProButton v-if="isPurchasingRole && row.Status === 'Pending'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
                                         <PhXCircle :size="18" />
+                                    </ProButton>
+                                    <ProButton v-if="row.Status === 'Failed'" variant="danger" size="sm" class="ml-2" @click="handleAction('delete', row)" title="Delete Failed Document">
+                                        <PhTrash :size="18" />
                                     </ProButton>
                                 </template>
                             </ProTable>
@@ -88,25 +111,98 @@
                         <div class="block lg:hidden mt-4">
                             <template v-if="filteredDeliveries.length > 0">
                                 <div class="grid grid-cols-1 gap-4">
-                                    <ProCard v-for="row in filteredDeliveries" :key="row.Id" class="shadow-sm relative overflow-hidden">
-                                        <div class="flex justify-between items-start mb-3">
-                                            <div class="flex items-start gap-2">
-                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.rowIndex }}</span>
-                                                <div class="flex flex-col gap-0.5">
-                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">DO Number</span>
-                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.DocNo }}</span>
-                                                </div>
+                                    <ProCard v-for="row in filteredDeliveries" :key="row.Id" class="shadow-sm relative overflow-visible">
+                                        <div class="flex justify-between items-center mb-3">
+                                            <div class="flex items-center gap-2">
+                                                <i v-if="row.Status === 'Processing'" class="pi pi-spinner pi-spin text-brand-primary text-sm" />
+                                                <ProTag :label="row.Status" :variant="getStatusSeverity(row.Status)" />
                                             </div>
-                                            <ProTag 
-                                                :label="row.Status === 'Created' ? 'Pending' : row.Status" 
-                                                :variant="getStatusSeverity(row.Status)" 
-                                            />
+                                            <div class="flex items-center gap-2">
+                                                <template v-if="(isPurchasingRole && row.Status === 'Pending') || row.Status === 'Failed'">
+                                                    <ProMenu :width="160" placement="top-end">
+                                                        <template #trigger="{ isOpen }">
+                                                            <button
+                                                                class="inline-flex items-center justify-center w-8 h-8 rounded-button transition-all duration-150 cursor-pointer -mr-2"
+                                                                :class="isOpen ? 'bg-surface-gray-bg-strong text-text-heading' : 'text-text-body hover:bg-surface-gray-bg hover:text-text-heading'"
+                                                                aria-label="More actions"
+                                                            >
+                                                                <PhDotsThreeVertical :size="16" weight="bold" />
+                                                            </button>
+                                                        </template>
+                                                        <template #items="{ close }">
+                                                            <div class="py-1">
+                                                                <button
+                                                                    class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100"
+                                                                    @click.stop="close(); handleAction('view', row)"
+                                                                >
+                                                                    <PhEye :size="15" class="shrink-0 text-text-subtitle" />
+                                                                    View
+                                                                </button>
+                                                                
+                                                                <template v-if="isPurchasingRole && row.Status === 'Pending'">
+                                                                    <button
+                                                                        class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100"
+                                                                        @click.stop="close(); handleAction('approve', row)"
+                                                                    >
+                                                                        <PhCheckCircle :size="15" class="shrink-0 text-green-600" />
+                                                                        Approve
+                                                                    </button>
+                                                                    <div class="my-1 border-t border-border-border" />
+                                                                    <button
+                                                                        class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-error hover:bg-surface-error/20 transition-colors duration-100"
+                                                                        @click.stop="close(); handleAction('reject', row)"
+                                                                    >
+                                                                        <PhXCircle :size="15" class="shrink-0 text-text-error" />
+                                                                        Reject
+                                                                    </button>
+                                                                </template>
+
+                                                                <template v-if="row.Status === 'Failed'">
+                                                                    <div class="my-1 border-t border-border-border" />
+                                                                    <button
+                                                                        class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-error hover:bg-surface-error/20 transition-colors duration-100"
+                                                                        @click.stop="close(); handleAction('delete', row)"
+                                                                    >
+                                                                        <PhTrash :size="15" class="shrink-0 text-text-error" />
+                                                                        Delete
+                                                                    </button>
+                                                                </template>
+                                                            </div>
+                                                        </template>
+                                                    </ProMenu>
+                                                </template>
+                                                <template v-else>
+                                                    <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" class="!px-2" title="View" :disabled="row.Status === 'Processing'">
+                                                        <PhEye :size="16" />
+                                                    </ProButton>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-start gap-2 mb-4">
+                                            <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.rowIndex }}</span>
+                                            <div class="flex flex-col gap-0.5">
+                                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">DO Number</span>
+                                                <span class="font-semibold text-text-heading leading-tight">{{ row.DocNo }}</span>
+                                            </div>
                                         </div>
 
                                         <div class="grid gap-2 mb-4">
                                             <div v-if="isPurchasingRole && row.ProjectName" class="flex justify-between items-center text-sm">
                                                 <span class="text-gray-500 font-medium">Project</span>
                                                 <span class="text-right">{{ row.ProjectName }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">PO Number</span>
+                                                <span class="text-right">{{ row.RefDoc || row.purchase_order?.DocNo || '-' }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Supplier</span>
+                                                <span class="text-right">{{ row.supplier?.CompanyName || row.purchase_order?.supplier?.CompanyName || row.SupplierName || '-' }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Delivery Date</span>
+                                                <span class="text-right">{{ formatDate(row.Date) }}</span>
                                             </div>
                                             <div class="flex justify-between items-center text-sm">
                                                 <span class="text-gray-500 font-medium">Plate No</span>
@@ -118,20 +214,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="flex justify-end gap-2 pt-3 border-t border-gray-100">
-                                            <ProButton variant="secondary" size="sm" @click="handleAction('view', row)" title="View Delivery">
-                                                <template #iconLeft><PhEye :size="16" /></template>
-                                                View
-                                            </ProButton>
-                                            <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="success" size="sm" class="ml-2" @click="handleAction('approve', row)" title="Approve Delivery">
-                                                <template #iconLeft><PhCheckCircle :size="16" /></template>
-                                                Approve
-                                            </ProButton>
-                                            <ProButton v-if="isPurchasingRole && row.Status === 'Created'" variant="danger" size="sm" class="ml-2" @click="handleAction('reject', row)" title="Reject Delivery">
-                                                <template #iconLeft><PhXCircle :size="16" /></template>
-                                                Reject
-                                            </ProButton>
-                                        </div>
+
                                     </ProCard>
                                 </div>
                                 
@@ -198,4 +281,11 @@
             </div>
         </template>
     </ProModal>
+
+    <!-- Smart Scan Modal -->
+    <SmartScanModal
+        v-model="showSmartScanModal"
+        @start-scan="handleSmartScanStart"
+        @manual="handleSmartScanManual"
+    />
 </template>

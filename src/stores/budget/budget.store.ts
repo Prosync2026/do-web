@@ -254,6 +254,8 @@ export const useBudgetStore = defineStore('budget', () => {
         location1?: string;
         location2?: string;
         element?: string;
+        subElement?: string;
+        subSubElement?: string;
         category?: string;
     }) {
         loading.value = true;
@@ -275,6 +277,8 @@ export const useBudgetStore = defineStore('budget', () => {
             if (filters?.location1) queryParams.location1 = filters.location1;
             if (filters?.location2) queryParams.location2 = filters.location2;
             if (filters?.element) queryParams.element = filters.element;
+            if (filters?.subElement) queryParams.subElement = filters.subElement;
+            if (filters?.subSubElement) queryParams.subSubElement = filters.subSubElement;
             if (filters?.category) queryParams.category = filters.category;
 
             if (filters?.search !== undefined) {

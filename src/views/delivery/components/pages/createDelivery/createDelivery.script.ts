@@ -6,11 +6,11 @@ import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/step3Deli
 import Review from '@/views/delivery/components/deliveryWorkFlow/step4Review/review.vue';
 import type { OcrResult } from '@/views/delivery/components/smartScan/SmartScanModal.script';
 import { useToast } from '@/utils/toastBus';
-import { ProButton, ProCard } from '@prosync_solutions/ui';
+import { ProButton, ProCard, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
-    components: { DeliveryInfo, SelectPO, VerifyItem, Review, ProCard, ProButton, PhPackage, PhCheck, PhTruck, PhFile, PhWarning },
+    components: { DeliveryInfo, SelectPO, VerifyItem, Review, ProCard, ProButton, ProTag, PhPackage, PhCheck, PhTruck, PhFile, PhWarning },
     setup() {
         // 1. DATA 
         const activeStep = ref(1);
@@ -32,13 +32,11 @@ export default defineComponent({
         // 2. COMPUTED PROPERTIES
         const canPassToReview = computed(() => {
             return (
-                deliveryData.value.deliveryInfo &&
-                Object.keys(deliveryData.value.deliveryInfo).length > 0 &&
                 deliveryData.value.selectPO &&
                 Object.keys(deliveryData.value.selectPO).length > 0 &&
                 deliveryData.value.verifyItem &&
-                Array.isArray(deliveryData.value.verifyItem) &&
-                deliveryData.value.verifyItem.length > 0
+                Array.isArray((deliveryData.value.verifyItem as any).items) &&
+                (deliveryData.value.verifyItem as any).items.length > 0
             );
         });
 

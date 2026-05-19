@@ -14,7 +14,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
+    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }" class="w-full overflow-x-hidden pb-4">
         <PurchasingDashboard v-if="isPurchasingRole" />
         <GeneralDashboard v-else />
     </Motion>

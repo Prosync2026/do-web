@@ -1,4 +1,4 @@
-import { PhArrowRight, PhUpload, PhPencil } from '@phosphor-icons/vue';
+import { PhArrowRight, PhArrowDown, PhUpload, PhPencil } from '@phosphor-icons/vue';
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { TableColumn } from '@/types/table.type';
 import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -17,7 +17,7 @@ interface PaginationConfig {
 
 export default defineComponent({
     name: 'BudgetList',
-    components: { BudgetImportModal, EditBudgetItem, ProButton, ProInput, ProSelect, ProTable, ProTag, ProPagination, ProCard, PhArrowRight, PhUpload, PhPencil },
+    components: { BudgetImportModal, EditBudgetItem, ProButton, ProInput, ProSelect, ProTable, ProTag, ProPagination, ProCard, PhArrowRight, PhArrowDown, PhUpload, PhPencil },
     props: {
         budgetId: {
             type: Number,

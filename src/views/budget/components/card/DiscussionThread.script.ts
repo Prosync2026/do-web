@@ -1,4 +1,4 @@
-import { PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle } from '@phosphor-icons/vue';
+import { PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle, PhArrowsLeftRight } from '@phosphor-icons/vue';
 import { defineComponent, onMounted, ref, markRaw } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -6,14 +6,14 @@ import { ProButton, ProCard, ProDivider, ProEmpty, ProTag, ProToast, ProTooltip 
 
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { DiscussionItem, ReviewList } from '@/types/budgetChangeRequest.type';
+import type { DiscussionItem, ReviewList, AttachmentItem } from '@/types/budgetChangeRequest.type';
 import { formatDate } from '@/utils/dateHelper';
 import commentBCRModal from '@/views/budget/components/dialog/CommentBCR.vue';
 import editcommentBCRModal from '@/views/budget/components/dialog/EditCommentBCR.vue';
 
 export default defineComponent({
     name: 'DiscussionThread',
-    components: { ProButton, ProTag, ProCard, ProDivider, ProEmpty, ProTooltip, ProToast, editcommentBCRModal, commentBCRModal, PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle },
+    components: { ProButton, ProTag, ProCard, ProDivider, ProEmpty, ProTooltip, ProToast, editcommentBCRModal, commentBCRModal, PhTreeStructure, PhCaretRight, PhXCircle, PhCheckCircle, PhWarningCircle, PhArrowsLeftRight },
     props: {
         editMode: {
             type: Boolean,

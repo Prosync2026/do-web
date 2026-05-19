@@ -65,10 +65,12 @@ export default defineComponent({
                 <li v-for="(log, index) in paginatedActivities" :key="index" class="flex gap-3">
                     <ProAvatar :name="log.UserName || 'Unknown User'" size="sm" />
                     <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <span class="font-semibold">{{ log.UserName || 'Unknown User' }}</span>
-                            <ProTag :label="log.UserRole" variant="primary" />
-                            <span class="text-gray-400 text-xs">{{ formatDate(log.CreatedAt) }}</span>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-semibold">{{ log.UserName || 'Unknown User' }}</span>
+                                <ProTag :label="log.UserRole || 'Unknown'" variant="info" />
+                            </div>
+                            <span class="text-gray-400 text-xs shrink-0">{{ formatDate(log.CreatedAt) }}</span>
                         </div>
                         <div class="mt-1 text-gray-700 text-sm">
                             {{ log.ActionDetails }}

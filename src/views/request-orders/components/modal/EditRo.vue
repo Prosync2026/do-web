@@ -86,7 +86,7 @@
                             </td>
                             <td class="px-3 py-2">
                                 <div class="min-w-[140px]">
-                                    <InputNumber v-model="item.qty" :min="0" :maxFractionDigits="4" class="w-full" />
+                                    <ProInput type="number" v-model.number="item.qty" min="0" step="0.0001" class="w-full !text-sm" />
                                 </div>
                             </td>
                             <td class="px-3 py-2">
@@ -146,7 +146,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">Quantity</label>
-                                            <InputNumber v-model="item.qty" :min="0" :maxFractionDigits="4" class="w-full" />
+                                            <ProInput type="number" v-model.number="item.qty" min="0" step="0.0001" class="w-full !text-sm" />
                                         </div>
                                     </div>
                                     <div>

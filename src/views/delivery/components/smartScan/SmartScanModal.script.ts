@@ -30,7 +30,7 @@ export default defineComponent({
             required: true
         }
     },
-    emits: ['update:modelValue', 'confirm', 'manual'],
+    emits: ['update:modelValue', 'confirm', 'manual', 'start-scan'],
     setup(props, { emit }) {
         //State
         const visible = ref(props.modelValue);
@@ -133,43 +133,9 @@ export default defineComponent({
                 return;
             }
 
-            phase.value = 'scanning';
-            isScanning.value = true;
-
-            let msgIdx = 0;
-            const msgInterval = setInterval(() => {
-                msgIdx = (msgIdx + 1) % SCANNING_MESSAGES.length;
-                scanningMessage.value = SCANNING_MESSAGES[msgIdx]!;
-            }, 900);
-
-            try {
-                const result = await extractDeliveryOrder(selectedFile.value);
-
-                ocrResult.value = {
-                    soNo: result.soNo,
-                    doNo: result.doNo,
-                    supplierName: result.supplierName,
-                    deliveryDate: result.deliveryDate,
-                    plateNo: result.plateNo,
-                    sourceFile: selectedFile.value,
-                    items: result.items.map((i) => ({
-                        itemCode: i.itemCode,
-                        description: i.description,
-                        qty: i.qty,
-                        uom: i.uom,
-                        remarks: i.remarks,
-                        confidence: { itemCode: 1, description: 1, qty: 1, uom: 1 }
-                    }))
-                };
-
-                phase.value = 'result';
-            } catch (err: any) {
-                errorMessage.value = err?.message || 'An unexpected error occurred. Please try again or enter manually.';
-                phase.value = 'error';
-            } finally {
-                clearInterval(msgInterval);
-                isScanning.value = false;
-            }
+            // Immediately emit and close the modal to run in background
+            emit('start-scan', selectedFile.value);
+            visible.value = false;
         }
 
         // Actions 
