@@ -8,19 +8,14 @@ import { PhBook, PhChartBar, PhHouse, PhTag, PhTicket, PhTruck, PhWrench } from 
 import { ProSidebar } from '@prosync_solutions/ui';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { useNavigation } from '@/layout/composables/useNavigation';
 
 const route = useRoute();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 const username = ref<string | null>(null);
 const role = ref<string | null>(null);
 
-// Permission & Store logic migrated from Menu.script.ts
-const permissionStore = usePermissionStore();
-
-const canViewRO = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_REQUEST_ORDER));
-const canViewBudget = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_BUDGET));
-const canViewPO = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_PURCHASE_ORDER));
-const canViewDelivery = computed(() => permissionStore.hasPermission(PermissionCodes.VIEW_DELIVERY_ORDER));
+const { navItems } = useNavigation();
 
 const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
 
@@ -86,46 +81,11 @@ onUnmounted(() => {
     window.removeEventListener('resize', checkMobile);
 });
 
-// Build the NavItems matching ProSidebar schema
-// Flattening the outmost root array to match ProSidebar's direct list format
-const navItems = computed(() =>
-    [
-        { label: 'Dashboard', icon: PhHouse, to: '/' },
-        {
-            label: 'Budget',
-            icon: PhChartBar,
-            visible: canViewBudget.value,
-            children: [
-                { label: 'Budget List', icon: PhTicket, to: '/budget' },
-                { label: 'Budget Change Request', icon: PhTag, to: '/bcr' }
-            ]
-        },
-        {
-            label: 'Request Orders',
-            icon: CartWithBadge,
-            to: '/request-orders',
-            visible: canViewRO.value
-        },
-        {
-            label: 'Purchase Orders',
-            icon: PhBook,
-            to: '/purchase-orders',
-            visible: canViewPO.value,
-            badgeIcon: PhWrench
-        },
-        {
-            label: 'Deliveries',
-            icon: PhTruck,
-            to: '/deliveries',
-            visible: canViewDelivery.value,
-            badgeIcon: PhWrench
-        }
-    ].filter((item) => item.visible !== false)
-);
+// navItems logic moved to useNavigation.ts
 </script>
 
 <template>
-    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }" tag="div" class="relative z-[60]">
+    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }" tag="div" class="relative z-[60] hidden lg:block">
         <div class="h-screen bg-white" ref="sidebarWrapper" @click.capture="handleSidebarClick">
             <ProSidebar :key="`${route.path}-${isMobile}`" :nav-items="navItems" :expanded="isSidebarExpanded" :default-expanded="!isMobile" :persist-state="false" @update:expanded="isSidebarExpanded = $event">
                 <template #logo="{ isExpanded }">
