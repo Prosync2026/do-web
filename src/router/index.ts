@@ -47,7 +47,8 @@ const routes: RouteRecordRaw[] = [
                 name: 'purchase-orders',
                 component: () => import('@/views/purchase-orders/PurchaseOrders.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Purchase Orders', route: '/purchase-orders' }]
+                    breadcrumb: [{ label: 'Purchase Orders', route: '/purchase-orders' }],
+                    subtitle: 'Manage and monitor purchase orders while keeping track of received items and discrepancies.'
                 }
             },
             {
@@ -108,7 +109,8 @@ const routes: RouteRecordRaw[] = [
                 name: 'deliveries',
                 component: () => import('@/views/delivery/Deliveries.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }]
+                    breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }],
+                    subtitle: 'Verify and track all incoming delivery orders for your projects.'
                 }
             },
             {

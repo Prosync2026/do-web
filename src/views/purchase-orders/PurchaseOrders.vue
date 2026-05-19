@@ -2,17 +2,9 @@
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-1">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-6 p-3">
-                <div>
-                    <h1 class="text-h2 text-text-heading">Purchase Orders</h1>
-                    <p class="text-body-sm text-text-subtitle">Manage and monitor purchase orders while keeping track of received items and discrepancies.</p>
-                </div>
-            </div>
-
+        <div>
             <!-- Summary Cards -->
-            <div class="grid grid-cols-12 gap-4 mb-6 px-3">
+            <div class="grid grid-cols-12 gap-4 mb-6">
                 <!-- Pending POs -->
                 <ProStatisticCard
                     class="col-span-12 md:col-span-3"

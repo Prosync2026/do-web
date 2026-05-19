@@ -4,7 +4,7 @@ import { Button } from "@prosync/ui-kit";
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-1">
+        <div>
             <!-- Mobile Header Actions (Below Title) -->
             <div class="flex flex-row gap-2 w-full mb-4 lg:hidden">
                 <div class="relative order-2 flex-1">
