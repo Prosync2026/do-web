@@ -50,13 +50,13 @@ const { pendingApprovals, approvedCount, rejectedCount, pendingValue, urgentRequ
         </div>
 
         <!-- Urgent Action -->
-        <div class="dark:bg-gray-800 bg-amber-50 border border-amber-200 rounded-lg p-6 shadow-sm">
-            <div class="flex items-center justify-between">
+        <div class="dark:bg-gray-800 bg-amber-50 border border-amber-200 rounded-lg p-4 sm:p-6 shadow-sm">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h3 class="dark:text-amber-100 text-amber-800 font-semibold text-lg mb-2">Urgent: {{ pendingApprovals }} Request Orders Need Approval</h3>
-                    <p class="dark:text-amber-100 text-amber-700">Total value: RM{{ urgentValue.toLocaleString() }}</p>
+                    <h3 class="dark:text-amber-100 text-amber-800 font-semibold text-base sm:text-lg mb-1 sm:mb-2">Urgent: {{ pendingApprovals }} Request Orders Need Approval</h3>
+                    <p class="dark:text-amber-100 text-amber-700 text-sm sm:text-base">Total value: RM{{ urgentValue.toLocaleString() }}</p>
                 </div>
-                <Button label="Review Now" class="bg-amber-600 hover:bg-amber-700 border-amber-600 hover:border-amber-700" @click="navigateToRequestOrders" ><template #icon><PhWarning class="mr-2" /></template></Button>
+                <Button label="Review Now" class="bg-amber-600 hover:bg-amber-700 border-amber-600 hover:border-amber-700 w-full sm:w-auto" @click="navigateToRequestOrders" ><template #icon><PhWarning class="mr-2" /></template></Button>
             </div>
         </div>
 

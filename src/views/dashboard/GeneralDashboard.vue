@@ -94,7 +94,7 @@ onMounted(() => {
     <div class="grid grid-cols-12 gap-8">
         <SummaryCard :cardItems="BudgetSummaryData" :cardCol="4" />
 
-        <div class="col-span-12 xl:col-span-12">
+        <div class="col-span-12 xl:col-span-12 min-w-0">
             <RevenueStreamWidget />
         </div>
     </div>
