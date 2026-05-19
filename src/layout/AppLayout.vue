@@ -7,6 +7,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import AppSidebar from './AppSidebar.vue';
 import AppTopbar from './AppTopbar.vue';
+import AppBottomNav from './AppBottomNav.vue';
 
 const { isSidebarActive, layoutState } = useLayout();
 const route = useRoute();
@@ -96,7 +97,7 @@ const containerClass = computed(() => {
         <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
             <AppTopbar />
 
-            <main class="flex-1 overflow-auto p-4 md:p-6 pb-20 md:pb-6">
+            <main class="flex-1 overflow-auto p-4 md:p-6 pb-24 md:pb-6">
                 <ProPageHeader v-if="pageTitle" :title="pageTitle" :subtitle="pageSubtitle" :breadcrumbs="breadcrumbs" class="mb-4">
                     <template #actions>
                         <div id="page-header-actions" class="flex flex-row items-center lg:justify-end gap-2 w-full lg:w-auto mt-2 lg:mt-0"></div>
@@ -107,8 +108,10 @@ const containerClass = computed(() => {
         </div>
 
         <div v-if="layoutState.staticMenuMobileActive" class="fixed inset-0 bg-black/60 z-40 md:hidden" @click="layoutState.staticMenuMobileActive = false"></div>
+
+        <AppBottomNav />
     </div>
-    </template>
+</template>
 
 <style scoped>
 /* No more complex scoped SCSS; replaced by Tailwind flex layout */

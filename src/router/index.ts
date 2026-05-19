@@ -214,6 +214,11 @@ router.beforeEach(async (to, from, next) => {
         return next({ name: 'dashboard' });
     }
 
+    // Dummy route for Budget Drawer (prevents actual navigation)
+    if (to.path === '/_budget_drawer') {
+        return false;
+    }
+
     // Permission check
     const requiredPermissions = to.meta.permissions as PermissionCode[] | undefined;
 

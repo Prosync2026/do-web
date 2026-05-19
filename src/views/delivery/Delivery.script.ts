@@ -9,10 +9,11 @@ import { useConfirm } from 'primevue/useconfirm';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import SmartScanModal from './components/smartScan/SmartScanModal.vue';
+import { Motion } from '@motionone/vue';
 
 export default defineComponent({
     name: 'Deliveries',
-    components: { ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, ProModal, ProPagination, ProMenu, PhArrowsLeftRight, PhEye, PhPlus, PhCheckCircle, PhXCircle, PhCheck, PhX, PhTruck, PhTrash, PhDotsThreeVertical, SmartScanModal },
+    components: { Motion, ProCard, ProButton, ProTag, ProTable, ProTabs, ProSelect, ProDatePicker, ProInput, ProModal, ProPagination, ProMenu, PhArrowsLeftRight, PhEye, PhPlus, PhCheckCircle, PhXCircle, PhCheck, PhX, PhTruck, PhTrash, PhDotsThreeVertical, SmartScanModal },
     setup() {
         const deliveryStore = useDeliveryStore();
         const projectStore = useProjectStore();

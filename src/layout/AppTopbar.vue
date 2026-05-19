@@ -263,7 +263,7 @@ const goToAllNotifications = () => {
                     @click="showProjectDialog = true"
                 >
                     <PhBriefcase :size="16" class="text-gray-500 dark:text-gray-300" />
-                    <span class="text-gray-700 dark:text-gray-200 font-semibold text-sm hidden md:inline">
+                    <span class="text-gray-700 dark:text-gray-200 font-semibold text-sm truncate max-w-[110px] sm:max-w-[200px] md:max-w-none">
                         {{ selectedProject?.name || 'Select Project' }}
                     </span>
                     <PhCaretDown :size="14" class="text-gray-500 dark:text-gray-400" />

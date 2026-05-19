@@ -199,10 +199,11 @@ import { Button } from "@prosync/ui-kit";
                                                                 :key="action.label"
                                                                 :variant="action.variant" 
                                                                 size="sm" 
+                                                                class="!px-2"
+                                                                :title="action.label"
                                                                 @click.stop="action.onClick?.()"
                                                             >
-                                                                <component :is="action.icon" :size="16" class="mr-1.5" />
-                                                                {{ action.label }}
+                                                                <component :is="action.icon" :size="16" />
                                                             </ProButton>
                                                         </template>
                                                         <template v-else-if="getAvailableActions(row).length > 1">
