@@ -76,6 +76,12 @@
                                     {{ row.supplier?.CompanyName || row.purchase_order?.supplier?.CompanyName || row.SupplierName || '-' }}
                                 </template>
 
+                                <template #cell-DocNo="{ row }">
+                                    <button class="text-brand-primary hover:underline font-semibold" @click.prevent="handleAction('view', row)">
+                                        {{ row.DocNo }}
+                                    </button>
+                                </template>
+
                                 <template #cell-Date="{ row }">
                                     {{ formatDate(row.Date) }}
                                 </template>

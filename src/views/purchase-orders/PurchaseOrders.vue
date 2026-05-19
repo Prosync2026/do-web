@@ -102,6 +102,12 @@
                                     emptyTitle="No Pending Purchase Orders Found"
                                     @update:pagination="handleUpdatePagination"
                                 >
+                                    <template #cell-poNumber="{ row }">
+                                        <button class="text-brand-primary hover:underline font-semibold" @click.prevent="viewPO(row)">
+                                            {{ row.poNumber }}
+                                        </button>
+                                    </template>
+
                                     <template #cell-totalAmount="{ row }">
                                         <span class="font-semibold text-text-heading">RM {{ Number(row.totalAmount).toLocaleString() }}</span>
                                     </template>
@@ -183,6 +189,12 @@
                                     emptyTitle="No Partially Delivered Purchase Orders Found"
                                     @update:pagination="handleUpdatePagination"
                                 >
+                                    <template #cell-poNumber="{ row }">
+                                        <button class="text-brand-primary hover:underline font-semibold" @click.prevent="viewPO(row)">
+                                            {{ row.poNumber }}
+                                        </button>
+                                    </template>
+
                                     <template #cell-status="{ row }">
                                         <ProTag label="Partially Delivered" variant="warn" />
                                     </template>
@@ -237,6 +249,12 @@
                                     emptyTitle="No Completed Purchase Orders Found"
                                     @update:pagination="handleUpdatePagination"
                                 >
+                                    <template #cell-poNumber="{ row }">
+                                        <button class="text-brand-primary hover:underline font-semibold" @click.prevent="viewPO(row)">
+                                            {{ row.poNumber }}
+                                        </button>
+                                    </template>
+
                                     <template #cell-discrepancyType="{ row }">
                                         <ProTag
                                             :label="row.discrepancyType"

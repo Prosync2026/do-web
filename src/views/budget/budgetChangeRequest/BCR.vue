@@ -47,6 +47,12 @@
                             </div>
                         </template>
 
+                        <template #cell-DocNo="{ row }">
+                            <button class="text-brand-primary hover:underline font-semibold" @click.prevent="handleActionClick('view', row)">
+                                {{ row.DocNo }}
+                            </button>
+                        </template>
+
                         <template #cell-RequestDate="{ row }">
                             {{ formatDate(row.RequestDate) }}
                         </template>

@@ -98,6 +98,12 @@ import { Button } from "@prosync/ui-kit";
                                     :pagination="store.pagination"
                                     @update:pagination="handleUpdatePagination"
                                 >
+                                    <template #cell-roNumber="{ row }">
+                                        <button class="text-brand-primary hover:underline font-semibold" @click.prevent="openOrderDetails(row)">
+                                            {{ row.roNumber }}
+                                        </button>
+                                    </template>
+
                                     <template #cell-status="{ row }">
                                         <ProTag :label="row.status" :variant="row.status === 'Approved' ? 'success' : row.status === 'Rejected' ? 'error' : row.status === 'Processing' ? 'warn' : 'info'" />
                                     </template>
