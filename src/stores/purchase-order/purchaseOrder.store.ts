@@ -13,6 +13,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
     const filters = reactive({
         status: '',
         search: '',
+        supplierName: '',
         startDate: '',
         endDate: '',
         projectId: ''
@@ -61,6 +62,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
             const params: Record<string, any> = {
                 status: filters.status || undefined,
                 search: filters.search || undefined,
+                supplierName: filters.supplierName || undefined,
                 startDate: filters.startDate || undefined,
                 endDate: filters.endDate || undefined,
                 projectId: filters.projectId || undefined,
@@ -218,6 +220,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
     function clearFilters() {
         filters.status = '';
         filters.search = '';
+        filters.supplierName = '';
         filters.startDate = '';
         filters.endDate = '';
         filters.projectId = '';
@@ -244,6 +247,19 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
 
     function handleSearch(value: string) {
         filters.search = value;
+        pagination.page = 1;
+        fetchPurchaseOrders();
+    }
+
+    function handleSupplierSearch(value: string) {
+        filters.supplierName = value;
+        pagination.page = 1;
+        fetchPurchaseOrders();
+    }
+
+    function handleMultipleSearch(search: string, supplierName: string) {
+        filters.search = search;
+        filters.supplierName = supplierName;
         pagination.page = 1;
         fetchPurchaseOrders();
     }
@@ -289,6 +305,8 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         setPage,
         setPageSize,
         handleSearch,
+        handleSupplierSearch,
+        handleMultipleSearch,
         handleStatusChange,
         setSorting
     };

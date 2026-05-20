@@ -121,6 +121,25 @@ export default defineComponent({
         const startDate = ref('');
         const endDate = ref('');
 
+        const dateRange = computed({
+            get: () => {
+                if (startDate.value || endDate.value) {
+                    return { start: startDate.value, end: endDate.value };
+                }
+                return null;
+            },
+            set: (val: any) => {
+                if (val && typeof val === 'object' && !Array.isArray(val)) {
+                    startDate.value = val.start || '';
+                    endDate.value = val.end || '';
+                } else {
+                    startDate.value = '';
+                    endDate.value = '';
+                }
+                handleSearch('');
+            }
+        });
+
         const handleSearch = (value: string) => {
             deliveryStore.filters.startDate = startDate.value;
             deliveryStore.filters.endDate = endDate.value;
@@ -347,6 +366,7 @@ export default defineComponent({
             handleSearch,
             startDate,
             endDate,
+            dateRange,
             handleSortChange,
             handleTabChange,
             deliveryStore,

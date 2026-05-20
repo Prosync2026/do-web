@@ -65,17 +65,13 @@ export default defineComponent({
         const handleClearSearch = async () => {
             manualSearch.value = '';
             selectedCard.value = null;
-            const fullQuery = [manualSearch.value, supplierSearch.value].filter(Boolean).join(' ');
-            purchaseStore.handleSearch(fullQuery); 
-            await purchaseStore.fetchPurchaseOrders();
+            purchaseStore.handleMultipleSearch(manualSearch.value, supplierSearch.value); 
         };
 
         const handleClearSupplierSearch = async () => {
             supplierSearch.value = '';
             selectedCard.value = null;
-            const fullQuery = [manualSearch.value, supplierSearch.value].filter(Boolean).join(' ');
-            purchaseStore.handleSearch(fullQuery); 
-            await purchaseStore.fetchPurchaseOrders();
+            purchaseStore.handleMultipleSearch(manualSearch.value, supplierSearch.value); 
         };
 
         const toggleSelect = (card: PurchaseOrderCard) => {
@@ -171,11 +167,10 @@ export default defineComponent({
         };
 
         let searchTimeout: any;
-        const triggerBackendSearch = (query: string) => {
+        const triggerBackendSearch = (manualQ: string, supplierQ: string) => {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(async () => {
-                purchaseStore.handleSearch(query);
-                await purchaseStore.fetchPurchaseOrders();
+            searchTimeout = setTimeout(() => {
+                purchaseStore.handleMultipleSearch(manualQ, supplierQ);
             }, 300);
         };
 
@@ -189,8 +184,7 @@ export default defineComponent({
                 query = manualSearch.value;
             }
             manualSearch.value = query;
-            const fullQuery = [manualSearch.value, supplierSearch.value].filter(Boolean).join(' ');
-            triggerBackendSearch(fullQuery);
+            triggerBackendSearch(manualSearch.value, supplierSearch.value);
         };
 
         const handleSupplierSearchInput = (value: string | Event) => {
@@ -203,8 +197,7 @@ export default defineComponent({
                 query = supplierSearch.value;
             }
             supplierSearch.value = query;
-            const fullQuery = [manualSearch.value, supplierSearch.value].filter(Boolean).join(' ');
-            triggerBackendSearch(fullQuery);
+            triggerBackendSearch(manualSearch.value, supplierSearch.value);
         };
 
         const handlePageSizeChange = (event: Event) => {
