@@ -7,10 +7,11 @@ import { ProButton, ProCard, ProInput, ProTag, ProBanner } from '@prosync_soluti
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
+import { Motion } from '@motionone/vue';
 
 export default defineComponent({
     name: 'SelectPO',
-    components: { Message, Toast, Form, ProCard, ProButton, ProTag, ProInput, ProBanner, PhPackage, PhSparkle },
+    components: { Message, Toast, Form, ProCard, ProButton, ProTag, ProInput, ProBanner, PhPackage, PhSparkle, Motion },
     emits: ['update', 'next-step', 'prev-step', 'smartScan', 'smartScanManual'],
     setup(_, { emit }) {
         const toast = useToast();

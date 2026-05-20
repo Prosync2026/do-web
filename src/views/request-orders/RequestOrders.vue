@@ -5,33 +5,25 @@ import { Button } from "@prosync/ui-kit";
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div>
-            <!-- Mobile Header Actions (Below Title) -->
-            <div class="flex flex-row gap-2 w-full mb-4 lg:hidden">
+            <!-- Mobile Header Actions (Below Title) - Hidden on mobile in favor of SpeedDial -->
+            <div class="hidden flex-row gap-2 w-full mb-4">
                 <div class="relative order-2 flex-1">
-                    <ProButton variant="secondary" @click="showDraftModal = true" class="w-full justify-center px-2 text-sm">
-                        View Drafts
-                    </ProButton>
-                    <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85);" />
+                    <ProButton variant="secondary" @click="showDraftModal = true" class="w-full justify-center px-2 text-sm"> View Drafts </ProButton>
+                    <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85)" />
                 </div>
                 <div class="order-3 flex-1">
-                    <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')" class="w-full justify-center px-2 text-sm">
-                        <PhPlus :size="16" class="mr-1" /> New RO
-                    </ProButton>
+                    <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')" class="w-full justify-center px-2 text-sm"> <PhPlus :size="16" class="mr-1" /> New RO </ProButton>
                 </div>
             </div>
 
             <!-- Desktop Header Actions teleported to AppLayout -->
             <Teleport defer to="#page-header-actions">
                 <div class="hidden lg:flex relative order-2">
-                    <ProButton variant="secondary" @click="showDraftModal = true">
-                        View Drafts
-                    </ProButton>
-                    <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85);" />
+                    <ProButton variant="secondary" @click="showDraftModal = true"> View Drafts </ProButton>
+                    <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute shadow-sm" style="top: -8px; right: -10px; transform: scale(0.85)" />
                 </div>
                 <div class="hidden lg:flex order-3">
-                    <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')">
-                        <PhPlus :size="18" class="mr-2" /> New Request Order
-                    </ProButton>
+                    <ProButton v-if="canCreateRO" variant="primary" @click="$router.push('/request-orders/create')"> <PhPlus :size="18" class="mr-2" /> New Request Order </ProButton>
                 </div>
             </Teleport>
             <teleport to="body">
@@ -42,7 +34,6 @@ import { Button } from "@prosync/ui-kit";
 
             <!-- Tabs and Table Wrap in Card -->
             <ProCard class="shadow-sm">
-                
                 <!-- Mobile Tab Scroll Indicator -->
                 <div class="flex items-center text-xs text-gray-400 mb-2 lg:hidden w-full justify-end">
                     <span class="italic mr-1">Swipe tabs</span>
@@ -50,274 +41,280 @@ import { Button } from "@prosync/ui-kit";
                 </div>
 
                 <ProTabs v-model="activeTab" :tabs="tabItems" class="pro-tabs-scrollable">
-                        <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
-                            
-                            <div class="flex justify-end mb-4">
-                                <!-- Legend -->
-                                <div class="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-3 items-center text-xs py-1.5 px-3 border border-border-border rounded-md bg-surface-gray-bg w-full sm:w-auto">
-                                    <span class="text-text-subtitle font-medium">Legend :</span>
-                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span><span class="text-text-body">Pending</span></div>
-                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span class="text-text-body">Approved</span></div>
-                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-text-body">Rejected</span></div>
-                                </div>
+                    <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
+                        <div class="flex justify-end mb-4">
+                            <!-- Legend -->
+                            <div class="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-3 items-center text-xs py-1.5 px-3 border border-border-border rounded-md bg-surface-gray-bg w-full sm:w-auto">
+                                <span class="text-text-subtitle font-medium">Legend :</span>
+                                <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span><span class="text-text-body">Pending</span></div>
+                                <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span class="text-text-body">Approved</span></div>
+                                <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-text-body">Rejected</span></div>
                             </div>
+                        </div>
 
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 w-full">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 w-full">
+                            <div class="w-full sm:w-64">
+                                <ProInput :modelValue="store.filters.search" placeholder="Search orders..." class="w-full" @update:modelValue="store.handleSearch" />
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center flex-wrap sm:justify-end w-full sm:w-auto mt-2 sm:mt-0">
+                                <div class="w-full sm:w-48" v-if="isPurchasingRole">
+                                    <ProSelect v-model="store.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="applyFilters" />
+                                </div>
+                                <div class="w-full sm:w-48">
+                                    <ProSelect
+                                        v-model="selectedBudgetType"
+                                        :options="[
+                                            { label: 'All Budgets', value: '' },
+                                            { label: 'Budgeted', value: 'Budgeted' },
+                                            { label: 'NonBudgeted', value: 'NonBudgeted' }
+                                        ]"
+                                        placeholder="All Budgets"
+                                        @update:modelValue="applyFilters"
+                                    />
+                                </div>
                                 <div class="w-full sm:w-64">
-                                    <ProInput :modelValue="store.filters.search" placeholder="Search orders..." class="w-full" @update:modelValue="store.handleSearch" />
-                                </div>
-                                <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center flex-wrap sm:justify-end w-full sm:w-auto mt-2 sm:mt-0">
-                                    <div class="w-full sm:w-48" v-if="isPurchasingRole">
-                                        <ProSelect v-model="store.filters.projectId" :options="[{ label: 'All Projects', value: '' }, ...projectStore.projectOptions]" placeholder="All Projects" @update:modelValue="applyFilters" />
-                                    </div>
-                                    <div class="w-full sm:w-48">
-                                        <ProSelect v-model="selectedBudgetType" :options="[{ label: 'All Budgets', value: '' }, { label: 'Budgeted', value: 'Budgeted' }, { label: 'NonBudgeted', value: 'NonBudgeted' }]" placeholder="All Budgets" @update:modelValue="applyFilters" />
-                                    </div>
-                                    <div class="w-full sm:w-64">
-                                        <ProDatePicker v-model="dateRange" mode="range" placeholder="Date Range" appendTo="body" />
-                                    </div>
+                                    <ProDatePicker v-model="dateRange" mode="range" placeholder="Date Range" appendTo="body" />
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Desktop View -->
-                            <div class="hidden lg:block">
-                                <ProTable
-                                    @search="store.handleSearch"
-                                    :data="filteredOrders"
-                                    :columns="tableColumns"
-                                    :loading="store.loading"
-                                    emptyTitle="No request orders found"
-                                    :pagination="store.pagination"
-                                    @update:pagination="handleUpdatePagination"
-                                >
-                                    <template #cell-roNumber="{ row }">
-                                        <button class="text-brand-primary hover:underline font-semibold" @click.prevent="openOrderDetails(row)">
-                                            {{ row.roNumber }}
-                                        </button>
-                                    </template>
+                        <!-- Desktop View -->
+                        <div class="hidden lg:block">
+                            <ProTable
+                                @search="store.handleSearch"
+                                :data="filteredOrders"
+                                :columns="tableColumns"
+                                :loading="store.loading"
+                                emptyTitle="No request orders found"
+                                :pagination="store.pagination"
+                                @update:pagination="handleUpdatePagination"
+                            >
+                                <template #cell-roNumber="{ row }">
+                                    <button class="text-brand-primary hover:underline font-semibold" @click.prevent="openOrderDetails(row)">
+                                        {{ row.roNumber }}
+                                    </button>
+                                </template>
 
-                                    <template #cell-status="{ row }">
-                                        <ProTag :label="row.status" :variant="row.status === 'Approved' ? 'success' : row.status === 'Rejected' ? 'error' : row.status === 'Processing' ? 'warn' : 'info'" />
-                                    </template>
+                                <template #cell-status="{ row }">
+                                    <ProTag :label="row.status" :variant="row.status === 'Approved' ? 'success' : row.status === 'Rejected' ? 'error' : row.status === 'Processing' ? 'warn' : 'info'" />
+                                </template>
 
-                                    <template #cell-budgetType="{ row }">
-                                        <div class="flex items-center gap-2">
-                                            <ProTag :label="row.budgetType" :variant="row.budgetType === 'Budgeted' ? 'success' : 'warn'" />
-                                            <PhWarning v-if="row.isBudgetExceeded" :size="16" weight="bold" class="text-red-500 text-sm" v-tooltip.top="'Budget exceeded - PD approval required'" />
-                                        </div>
-                                    </template>
-
-                                    <template #cell-approvalProgress="{ row }">
-                                        <div class="flex flex-col gap-1 text-xs py-2">
-                                            <template v-for="(step, index) in row.approvalProgress" :key="step.level">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="w-2.5 h-2.5 rounded-full" :class="getApprovalDotClass(step.status)"></span>
-                                                    <span class="font-medium text-text-body">{{ step.level }}</span>
-                                                </div>
-                                                <div v-if="index < row.approvalProgress.length - 1" class="ml-[4px] h-2.5 border-l border-border-border"></div>
-                                            </template>
-                                        </div>
-                                    </template>
-
-                                    <template #cell-totalAmount="{ row }">
-                                        <span class="font-semibold text-text-heading"> RM {{ formatCurrency(row.totalAmount) }} </span>
-                                    </template>
-
-                                    <template #actions="{ row }">
-                                        <div class="flex items-center gap-1">
-                                            <!-- If only 1 action is available, show it directly -->
-                                            <template v-if="getAvailableActions(row).length === 1">
-                                                <ProIconButton :tooltip="getAvailableActions(row)[0].label" :variant="getAvailableActions(row)[0].variant" @click.stop="getAvailableActions(row)[0].onClick">
-                                                    <component :is="getAvailableActions(row)[0].icon" :size="18" :class="getAvailableActions(row)[0].iconClass" />
-                                                </ProIconButton>
-                                            </template>
-
-                                            <!-- If more than 1 action is available, show the overflow menu -->
-                                            <template v-else-if="getAvailableActions(row).length > 1">
-                                                <ProMenu align="right" width="w-48">
-                                                    <template #trigger="{ isOpen }">
-                                                        <button
-                                                            class="inline-flex items-center justify-center w-8 h-8 rounded-button transition-all duration-150 cursor-pointer"
-                                                            :class="isOpen ? 'bg-surface-gray-bg-strong text-text-heading' : 'text-text-body hover:bg-surface-gray-bg hover:text-text-heading'"
-                                                            aria-label="More actions"
-                                                        >
-                                                            <PhDotsThreeVertical :size="16" weight="bold" />
-                                                        </button>
-                                                    </template>
-                                                    <template #items="{ close }">
-                                                        <div class="py-1">
-                                                            <button
-                                                                v-for="action in getAvailableActions(row).filter((a: any) => a.tier !== 'destructive')"
-                                                                :key="action.label"
-                                                                class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                                                                @click.stop="
-                                                                    close();
-                                                                    action.onClick?.();
-                                                                "
-                                                            >
-                                                                <component :is="action.icon" :size="15" class="shrink-0 text-text-subtitle" :class="action.iconClass" />
-                                                                {{ action.label }}
-                                                            </button>
-                                                            <div v-if="getAvailableActions(row).some((a: any) => a.tier === 'destructive') && getAvailableActions(row).some((a: any) => a.tier !== 'destructive')" class="my-1 border-t border-border-border" />
-                                                            <button
-                                                                v-for="action in getAvailableActions(row).filter((a: any) => a.tier === 'destructive')"
-                                                                :key="action.label"
-                                                                class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm hover:bg-surface-error/20 transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                                                                :class="action.iconClass || 'text-text-error'"
-                                                                @click.stop="
-                                                                    close();
-                                                                    action.onClick?.();
-                                                                "
-                                                            >
-                                                                <component :is="action.icon" :size="15" class="shrink-0" />
-                                                                {{ action.label }}
-                                                            </button>
-                                                        </div>
-                                                    </template>
-                                                </ProMenu>
-                                            </template>
-                                        </div>
-                                    </template>
-                                </ProTable>
-                            </div>
-
-                            <!-- Mobile View -->
-                            <div class="block lg:hidden mt-4">
-                                <template v-if="filteredOrders.length > 0">
-                                    <div class="grid grid-cols-1 gap-4">
-                                        <ProCard v-for="row in filteredOrders" :key="row.id" class="shadow-sm relative overflow-visible">
-                                            <div class="flex justify-between items-center mb-3">
-                                                <ProTag :label="row.status" :variant="row.status === 'Approved' ? 'success' : row.status === 'Rejected' ? 'error' : row.status === 'Processing' ? 'warn' : 'info'" />
-                                                
-                                                <div class="flex items-center">
-                                                    <template v-if="getAvailableActions(row).length > 0">
-                                                        <template v-if="getAvailableActions(row).length === 1">
-                                                            <ProButton 
-                                                                v-for="action in getAvailableActions(row)" 
-                                                                :key="action.label"
-                                                                :variant="action.variant" 
-                                                                size="sm" 
-                                                                class="!px-2"
-                                                                :title="action.label"
-                                                                @click.stop="action.onClick?.()"
-                                                            >
-                                                                <component :is="action.icon" :size="16" />
-                                                            </ProButton>
-                                                        </template>
-                                                        <template v-else-if="getAvailableActions(row).length > 1">
-                                                            <ProMenu :width="160" placement="bottom-end">
-                                                                <template #trigger="{ isOpen }">
-                                                                    <button
-                                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-button transition-all duration-150 cursor-pointer -mr-2"
-                                                                        :class="isOpen ? 'bg-surface-gray-bg-strong text-text-heading' : 'text-text-body hover:bg-surface-gray-bg hover:text-text-heading'"
-                                                                        aria-label="More actions"
-                                                                    >
-                                                                        <PhDotsThreeVertical :size="16" weight="bold" />
-                                                                    </button>
-                                                                </template>
-                                                                <template #items="{ close }">
-                                                                    <div class="py-1">
-                                                                        <button
-                                                                            v-for="action in getAvailableActions(row).filter((a: any) => a.tier !== 'destructive')"
-                                                                            :key="action.label"
-                                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                                                                            @click.stop="
-                                                                                close();
-                                                                                action.onClick?.();
-                                                                            "
-                                                                        >
-                                                                            <component :is="action.icon" :size="15" class="shrink-0 text-text-subtitle" :class="action.iconClass" />
-                                                                            {{ action.label }}
-                                                                        </button>
-                                                                        <div v-if="getAvailableActions(row).some((a: any) => a.tier === 'destructive') && getAvailableActions(row).some((a: any) => a.tier !== 'destructive')" class="my-1 border-t border-border-border" />
-                                                                        <button
-                                                                            v-for="action in getAvailableActions(row).filter((a: any) => a.tier === 'destructive')"
-                                                                            :key="action.label"
-                                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm hover:bg-surface-error/20 transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                                                                            :class="action.iconClass || 'text-text-error'"
-                                                                            @click.stop="
-                                                                                close();
-                                                                                action.onClick?.();
-                                                                            "
-                                                                        >
-                                                                            <component :is="action.icon" :size="15" class="shrink-0" />
-                                                                            {{ action.label }}
-                                                                        </button>
-                                                                    </div>
-                                                                </template>
-                                                            </ProMenu>
-                                                        </template>
-                                                    </template>
-                                                </div>
-                                            </div>
-
-                                            <div class="flex items-start gap-2 mb-4">
-                                                <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.rowIndex }}</span>
-                                                <div class="flex flex-col gap-0.5">
-                                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">RO Number</span>
-                                                    <span class="font-semibold text-text-heading leading-tight">{{ row.roNumber }}</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="grid gap-2 mb-4">
-                                                <div v-if="isPurchasingRole" class="flex justify-between items-center text-sm">
-                                                    <span class="text-gray-500 font-medium">Project</span>
-                                                    <span class="text-right truncate max-w-[200px]" :title="row.projectName">{{ row.projectName }}</span>
-                                                </div>
-                                                <div class="flex justify-between items-center text-sm">
-                                                    <span class="text-gray-500 font-medium">Requested By</span>
-                                                    <span class="text-right">{{ row.requestedBy }}</span>
-                                                </div>
-                                                <div class="flex justify-between items-center text-sm">
-                                                    <span class="text-gray-500 font-medium">RO Date</span>
-                                                    <span class="text-right">{{ row.roDate }}</span>
-                                                </div>
-                                                <div class="flex justify-between items-center text-sm">
-                                                    <span class="text-gray-500 font-medium">Delivery Date</span>
-                                                    <span class="text-right">{{ row.deliveryDate || '-' }}</span>
-                                                </div>
-                                                <div v-if="canViewPricing" class="flex justify-between items-center text-sm">
-                                                    <span class="text-gray-500 font-medium">Total Amount</span>
-                                                    <span class="text-right font-semibold text-text-heading">RM {{ formatCurrency(row.totalAmount) }}</span>
-                                                </div>
-                                                
-                                                <div class="flex flex-col gap-1 mt-2 border-t border-gray-100 pt-3">
-                                                    <div class="flex justify-between items-center">
-                                                        <span class="text-xs font-medium text-gray-500">Budget Type</span>
-                                                        <div class="flex items-center gap-2">
-                                                            <ProTag :label="row.budgetType" :variant="row.budgetType === 'Budgeted' ? 'success' : 'warn'" />
-                                                            <PhWarning v-if="row.isBudgetExceeded" :size="16" weight="bold" class="text-red-500" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="flex flex-col gap-1 mt-2">
-                                                    <span class="text-xs font-medium text-gray-500">Approval Progress</span>
-                                                    <div class="flex flex-wrap gap-2 text-xs py-1">
-                                                        <template v-for="(step, index) in row.approvalProgress" :key="step.level">
-                                                            <div class="flex items-center gap-1.5" :title="step.status">
-                                                                <span class="w-2 h-2 rounded-full" :class="getApprovalDotClass(step.status)"></span>
-                                                                <span class="font-medium text-gray-700">{{ step.level }}</span>
-                                                            </div>
-                                                        </template>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </ProCard>
-                                    </div>
-                                    <div class="mt-6 flex justify-center">
-                                        <ProPagination 
-                                            :modelValue="store.pagination.page" 
-                                            @update:modelValue="(val: number) => handleUpdatePagination({ page: val, pageSize: store.pagination.pageSize })"
-                                            :totalPages="store.pagination.totalPages" 
-                                            :maxVisible="5" 
-                                        />
+                                <template #cell-budgetType="{ row }">
+                                    <div class="flex items-center gap-2">
+                                        <ProTag :label="row.budgetType" :variant="row.budgetType === 'Budgeted' ? 'success' : 'warn'" />
+                                        <PhWarning v-if="row.isBudgetExceeded" :size="16" weight="bold" class="text-red-500 text-sm" v-tooltip.top="'Budget exceeded - PD approval required'" />
                                     </div>
                                 </template>
-                                <div v-else class="flex flex-col items-center justify-center py-10 px-4 bg-gray-50 rounded-lg border border-gray-100 mt-2">
-                                    <h3 class="text-lg font-medium text-gray-900">No request orders found</h3>
+
+                                <template #cell-approvalProgress="{ row }">
+                                    <div class="flex flex-col gap-1 text-xs py-2">
+                                        <template v-for="(step, index) in row.approvalProgress" :key="step.level">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-2.5 h-2.5 rounded-full" :class="getApprovalDotClass(step.status)"></span>
+                                                <span class="font-medium text-text-body">{{ step.level }}</span>
+                                            </div>
+                                            <div v-if="index < row.approvalProgress.length - 1" class="ml-[4px] h-2.5 border-l border-border-border"></div>
+                                        </template>
+                                    </div>
+                                </template>
+
+                                <template #cell-totalAmount="{ row }">
+                                    <span class="font-semibold text-text-heading"> RM {{ formatCurrency(row.totalAmount) }} </span>
+                                </template>
+
+                                <template #actions="{ row }">
+                                    <div class="flex items-center gap-1">
+                                        <!-- If only 1 action is available, show it directly -->
+                                        <template v-if="getAvailableActions(row).length === 1">
+                                            <ProIconButton :tooltip="getAvailableActions(row)[0].label" :variant="getAvailableActions(row)[0].variant" @click.stop="getAvailableActions(row)[0].onClick">
+                                                <component :is="getAvailableActions(row)[0].icon" :size="18" :class="getAvailableActions(row)[0].iconClass" />
+                                            </ProIconButton>
+                                        </template>
+
+                                        <!-- If more than 1 action is available, show the overflow menu -->
+                                        <template v-else-if="getAvailableActions(row).length > 1">
+                                            <ProMenu align="right" width="w-48">
+                                                <template #trigger="{ isOpen }">
+                                                    <button
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-button transition-all duration-150 cursor-pointer"
+                                                        :class="isOpen ? 'bg-surface-gray-bg-strong text-text-heading' : 'text-text-body hover:bg-surface-gray-bg hover:text-text-heading'"
+                                                        aria-label="More actions"
+                                                    >
+                                                        <PhDotsThreeVertical :size="16" weight="bold" />
+                                                    </button>
+                                                </template>
+                                                <template #items="{ close }">
+                                                    <div class="py-1">
+                                                        <button
+                                                            v-for="action in getAvailableActions(row).filter((a: any) => a.tier !== 'destructive')"
+                                                            :key="action.label"
+                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                            @click.stop="
+                                                                close();
+                                                                action.onClick?.();
+                                                            "
+                                                        >
+                                                            <component :is="action.icon" :size="15" class="shrink-0 text-text-subtitle" :class="action.iconClass" />
+                                                            {{ action.label }}
+                                                        </button>
+                                                        <div
+                                                            v-if="getAvailableActions(row).some((a: any) => a.tier === 'destructive') && getAvailableActions(row).some((a: any) => a.tier !== 'destructive')"
+                                                            class="my-1 border-t border-border-border"
+                                                        />
+                                                        <button
+                                                            v-for="action in getAvailableActions(row).filter((a: any) => a.tier === 'destructive')"
+                                                            :key="action.label"
+                                                            class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm hover:bg-surface-error/20 transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                            :class="action.iconClass || 'text-text-error'"
+                                                            @click.stop="
+                                                                close();
+                                                                action.onClick?.();
+                                                            "
+                                                        >
+                                                            <component :is="action.icon" :size="15" class="shrink-0" />
+                                                            {{ action.label }}
+                                                        </button>
+                                                    </div>
+                                                </template>
+                                            </ProMenu>
+                                        </template>
+                                    </div>
+                                </template>
+                            </ProTable>
+                        </div>
+
+                        <!-- Mobile View -->
+                        <div class="block lg:hidden mt-4">
+                            <template v-if="filteredOrders.length > 0">
+                                <div class="grid grid-cols-1 gap-4">
+                                    <ProCard v-for="row in filteredOrders" :key="row.id" class="shadow-sm relative overflow-visible">
+                                        <div class="flex justify-between items-center mb-3">
+                                            <ProTag :label="row.status" :variant="row.status === 'Approved' ? 'success' : row.status === 'Rejected' ? 'error' : row.status === 'Processing' ? 'warn' : 'info'" />
+
+                                            <div class="flex items-center">
+                                                <template v-if="getAvailableActions(row).length > 0">
+                                                    <template v-if="getAvailableActions(row).length === 1">
+                                                        <ProButton v-for="action in getAvailableActions(row)" :key="action.label" :variant="action.variant" size="sm" class="!px-2" :title="action.label" @click.stop="action.onClick?.()">
+                                                            <component :is="action.icon" :size="16" />
+                                                        </ProButton>
+                                                    </template>
+                                                    <template v-else-if="getAvailableActions(row).length > 1">
+                                                        <ProMenu :width="160" placement="bottom-end">
+                                                            <template #trigger="{ isOpen }">
+                                                                <button
+                                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-button transition-all duration-150 cursor-pointer -mr-2"
+                                                                    :class="isOpen ? 'bg-surface-gray-bg-strong text-text-heading' : 'text-text-body hover:bg-surface-gray-bg hover:text-text-heading'"
+                                                                    aria-label="More actions"
+                                                                >
+                                                                    <PhDotsThreeVertical :size="16" weight="bold" />
+                                                                </button>
+                                                            </template>
+                                                            <template #items="{ close }">
+                                                                <div class="py-1">
+                                                                    <button
+                                                                        v-for="action in getAvailableActions(row).filter((a: any) => a.tier !== 'destructive')"
+                                                                        :key="action.label"
+                                                                        class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm text-text-body hover:bg-surface-gray-bg transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                                        @click.stop="
+                                                                            close();
+                                                                            action.onClick?.();
+                                                                        "
+                                                                    >
+                                                                        <component :is="action.icon" :size="15" class="shrink-0 text-text-subtitle" :class="action.iconClass" />
+                                                                        {{ action.label }}
+                                                                    </button>
+                                                                    <div
+                                                                        v-if="getAvailableActions(row).some((a: any) => a.tier === 'destructive') && getAvailableActions(row).some((a: any) => a.tier !== 'destructive')"
+                                                                        class="my-1 border-t border-border-border"
+                                                                    />
+                                                                    <button
+                                                                        v-for="action in getAvailableActions(row).filter((a: any) => a.tier === 'destructive')"
+                                                                        :key="action.label"
+                                                                        class="w-full flex items-center gap-2.5 px-3 py-2 text-body-sm hover:bg-surface-error/20 transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                                        :class="action.iconClass || 'text-text-error'"
+                                                                        @click.stop="
+                                                                            close();
+                                                                            action.onClick?.();
+                                                                        "
+                                                                    >
+                                                                        <component :is="action.icon" :size="15" class="shrink-0" />
+                                                                        {{ action.label }}
+                                                                    </button>
+                                                                </div>
+                                                            </template>
+                                                        </ProMenu>
+                                                    </template>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-start gap-2 mb-4">
+                                            <span class="flex-shrink-0 w-6 h-6 rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">{{ row.rowIndex }}</span>
+                                            <div class="flex flex-col gap-0.5">
+                                                <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider leading-none">RO Number</span>
+                                                <span class="font-semibold text-text-heading leading-tight">{{ row.roNumber }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="grid gap-2 mb-4">
+                                            <div v-if="isPurchasingRole" class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Project</span>
+                                                <span class="text-right truncate max-w-[200px]" :title="row.projectName">{{ row.projectName }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Requested By</span>
+                                                <span class="text-right">{{ row.requestedBy }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">RO Date</span>
+                                                <span class="text-right">{{ row.roDate }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Delivery Date</span>
+                                                <span class="text-right">{{ row.deliveryDate || '-' }}</span>
+                                            </div>
+                                            <div v-if="canViewPricing" class="flex justify-between items-center text-sm">
+                                                <span class="text-gray-500 font-medium">Total Amount</span>
+                                                <span class="text-right font-semibold text-text-heading">RM {{ formatCurrency(row.totalAmount) }}</span>
+                                            </div>
+
+                                            <div class="flex flex-col gap-1 mt-2 border-t border-gray-100 pt-3">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs font-medium text-gray-500">Budget Type</span>
+                                                    <div class="flex items-center gap-2">
+                                                        <ProTag :label="row.budgetType" :variant="row.budgetType === 'Budgeted' ? 'success' : 'warn'" />
+                                                        <PhWarning v-if="row.isBudgetExceeded" :size="16" weight="bold" class="text-red-500" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col gap-1 mt-2">
+                                                <span class="text-xs font-medium text-gray-500">Approval Progress</span>
+                                                <div class="flex flex-wrap gap-2 text-xs py-1">
+                                                    <template v-for="(step, index) in row.approvalProgress" :key="step.level">
+                                                        <div class="flex items-center gap-1.5" :title="step.status">
+                                                            <span class="w-2 h-2 rounded-full" :class="getApprovalDotClass(step.status)"></span>
+                                                            <span class="font-medium text-gray-700">{{ step.level }}</span>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ProCard>
                                 </div>
+                                <div class="mt-6 flex justify-center">
+                                    <ProPagination
+                                        :modelValue="store.pagination.page"
+                                        @update:modelValue="(val: number) => handleUpdatePagination({ page: val, pageSize: store.pagination.pageSize })"
+                                        :totalPages="store.pagination.totalPages"
+                                        :maxVisible="5"
+                                    />
+                                </div>
+                            </template>
+                            <div v-else class="flex flex-col items-center justify-center py-10 px-4 bg-gray-50 rounded-lg border border-gray-100 mt-2">
+                                <h3 class="text-lg font-medium text-gray-900">No request orders found</h3>
                             </div>
-                        </Motion>
+                        </div>
+                    </Motion>
                 </ProTabs>
             </ProCard>
 
@@ -326,6 +323,34 @@ import { Button } from "@prosync/ui-kit";
                 <EditRo :visible="showEditModal" :order="selectedOrder" @update:visible="showEditModal = $event" @save="handleSaveOrder" />
                 <RejectRo :visible="showRejectModal" :order-number="currentRejectOrder?.roNumber" @update:visible="showRejectModal = $event" @reject="onRejectConfirmed" />
                 <ApproveRo :visible="showApproveModal" :order-number="currentApproveOrder?.roNumber" @update:visible="showApproveModal = $event" @approve="onApproveConfirmed" />
+
+                <!-- Custom Mobile SpeedDial FAB -->
+                <div class="fixed bottom-24 right-4 z-50 lg:hidden flex flex-col items-end gap-3">
+                    <!-- SpeedDial Items -->
+                    <Motion
+                        v-if="isSpeedDialOpen"
+                        :initial="{ opacity: 0, y: 10, scale: 0.9 }"
+                        :animate="{ opacity: 1, y: 0, scale: 1 }"
+                        :transition="{ duration: 0.2 }"
+                        class="flex flex-col items-end gap-3 origin-bottom"
+                    >
+                        <div v-for="(item, index) in speedDialItems" :key="index" class="flex items-center gap-3 cursor-pointer mb-1 mr-1" @click="item.command(); isSpeedDialOpen = false">
+                            <span class="bg-white text-gray-800 px-3 py-1.5 rounded shadow-md text-sm font-medium whitespace-nowrap">{{ item.label }}</span>
+                            <button class="bg-white text-brand-primary rounded-full w-12 h-12 flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors border border-gray-200">
+                                <i :class="item.icon" class="text-xl"></i>
+                            </button>
+                        </div>
+                    </Motion>
+                    
+                    <!-- Main FAB Button -->
+                    <button
+                        @click="toggleSpeedDial"
+                        class="bg-brand-primary text-white rounded-full w-[3.5rem] h-[3.5rem] flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all outline-none border-none relative z-10"
+                    >
+                        <PhX v-if="isSpeedDialOpen" :size="24" weight="bold" />
+                        <PhPlus v-else :size="24" weight="bold" />
+                    </button>
+                </div>
             </teleport>
         </div>
     </Motion>

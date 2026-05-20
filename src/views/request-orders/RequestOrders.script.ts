@@ -6,6 +6,7 @@ import { showError } from '@/utils/showNotification.utils';
 import { useToast } from '@/utils/toastBus';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
+import SpeedDial from 'primevue/speeddial';
 import { useConfirm } from 'primevue/useconfirm';
 import { markRaw, nextTick } from 'vue';
 
@@ -16,6 +17,7 @@ import { formatCurrency } from '@/utils/format.utils';
 import { PhArrowsLeftRight, PhCheck, PhDotsThreeVertical, PhEye, PhPencilSimple, PhPlus, PhTrash, PhWarning, PhX } from '@phosphor-icons/vue';
 import { ProButton, ProCard, ProDatePicker, ProIconButton, ProInput, ProMenu, ProPageHeader, ProPagination, ProSelect, ProTable, ProTabs, ProTag } from '@prosync_solutions/ui';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import type { Order } from '../../types/request-order.type';
 import ApproveRo from './components/modal/ApproveRo.vue';
 import EditRo from './components/modal/EditRo.vue';
@@ -26,7 +28,7 @@ import RoSummary from './components/summary/RoSummary.vue';
 
 export default defineComponent({
     name: 'RequestOrders',
-    components: { ProTabs, Motion, ProTable, ProPageHeader, ProButton, ProCard, ProInput, ProTag, ProSelect, ProMenu, ProIconButton, RoSummary, ViewRo, EditRo, Badge, ViewDraftRo, RejectRo, ApproveRo, PhDotsThreeVertical, PhArrowsLeftRight, ProDatePicker, PhWarning, PhPlus, ProPagination },
+    components: { ProTabs, Motion, ProTable, ProPageHeader, ProButton, ProCard, ProInput, ProTag, ProSelect, ProMenu, ProIconButton, RoSummary, ViewRo, EditRo, Badge, SpeedDial, ViewDraftRo, RejectRo, ApproveRo, PhDotsThreeVertical, PhArrowsLeftRight, ProDatePicker, PhWarning, PhPlus, ProPagination },
     setup() {
         const confirm = useConfirm();
         const toast = useToast();
@@ -37,6 +39,36 @@ export default defineComponent({
         const showDetailsModal = ref(false);
         const showEditModal = ref(false);
         const selectedOrder = ref<Order | null>(null);
+
+        const router = useRouter();
+        
+        const speedDialItems = computed(() => {
+            const items = [
+                {
+                    label: 'View Drafts',
+                    icon: 'pi pi-file-edit',
+                    command: () => {
+                        showDraftModal.value = true;
+                    }
+                }
+            ];
+            
+            if (canCreateRO.value) {
+                items.unshift({
+                    label: 'New RO',
+                    icon: 'pi pi-plus',
+                    command: () => {
+                        router.push('/request-orders/create');
+                    }
+                });
+            }
+            return items;
+        });
+
+        const isSpeedDialOpen = ref(false);
+        const toggleSpeedDial = () => {
+            isSpeedDialOpen.value = !isSpeedDialOpen.value;
+        };
 
         const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, submitted: 0, totalValue: 0, totalApprovedValue: 0 });
 
@@ -660,6 +692,9 @@ export default defineComponent({
             formatCurrency,
             handleUpdatePagination,
             canApproveRow,
+            speedDialItems,
+            isSpeedDialOpen,
+            toggleSpeedDial,
             projectStore,
             getAvailableActions
         };

@@ -3,8 +3,8 @@
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div>
-            <!-- Mobile Header Actions (Below Title) -->
-            <div class="flex flex-row gap-2 w-full mb-4 lg:hidden">
+            <!-- Mobile Header Actions (Below Title) - Hidden on mobile in favor of FAB -->
+            <div class="hidden flex-row gap-2 w-full mb-4">
                 <ProButton @click="showSmartScanModal = true" variant="secondary" class="flex-1 justify-center px-2 text-sm sm:text-base">
                     <i class="pi pi-sparkles mt-0.5 mr-1 sm:mr-2 text-brand-primary" /> <span class="hidden sm:inline">Smart</span> AI Scan
                 </ProButton>
@@ -286,6 +286,13 @@
             </div>
         </template>
     </ProModal>
+
+    <!-- Mobile FAB for New Delivery -->
+    <div class="fixed bottom-24 right-4 z-50 lg:hidden">
+        <button @click="$router.push('/deliveries/createDelivery')" class="bg-brand-primary text-white rounded-full w-[3.5rem] h-[3.5rem] flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all outline-none border-none">
+            <PhPlus :size="24" weight="bold" />
+        </button>
+    </div>
 
     <!-- Smart Scan Modal -->
     <SmartScanModal

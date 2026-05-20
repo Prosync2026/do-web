@@ -1,7 +1,8 @@
 <script lang="ts" src="./selectPO.script.ts"></script>
 
 <template>
-    <div class="p-mb-5 mt-5">
+    <Motion :initial="{ opacity: 0, y: 15 }" :animate="{ opacity: 1, y: 0 }" :transition="{ duration: 0.5, ease: 'easeOut' }">
+        <div class="p-mb-5 mt-5">
         <ProBanner variant="info" title="Select the Purchase Order that corresponds to this delivery. You can search by PO number or item name." />
 
         <!-- Search + Cards -->
@@ -75,7 +76,8 @@
                     </div>
                 </Form>
         </ProCard>
-    </div>
+        </div>
+    </Motion>
 </template>
 
 <style scoped>
