@@ -1,9 +1,9 @@
+import CartWithBadge from '@/components/icons/CartWithBadge.vue';
 import { PermissionCodes } from '@/permissions';
 import { usePermissionStore } from '@/stores/permission/permission.store';
-import { PhBook, PhChartBar, PhHouse, PhTag, PhTicket, PhTruck, PhWrench } from '@phosphor-icons/vue';
-import { computed } from 'vue';
-import CartWithBadge from '@/components/icons/CartWithBadge.vue';
+import { PhBook, PhHouse, PhTruck, PhWrench } from '@phosphor-icons/vue';
 import type { Component } from 'vue';
+import { computed } from 'vue';
 
 export interface NavItem {
     label: string;
@@ -34,15 +34,15 @@ export function useNavigation() {
     const navItems = computed<NavItem[]>(() =>
         [
             { label: 'Dashboard', icon: PhHouse, to: '/' },
-            {
-                label: 'Budget',
-                icon: PhChartBar,
-                visible: canViewBudget.value,
-                children: [
-                    { label: 'Budget List', icon: PhTicket, to: '/budget' },
-                    { label: 'Budget Change Request', icon: PhTag, to: '/bcr' }
-                ]
-            },
+            // {
+            //     label: 'Budget',
+            //     icon: PhChartBar,
+            //     visible: canViewBudget.value,
+            //     children: [
+            //         { label: 'Budget List', icon: PhTicket, to: '/budget' },
+            //         { label: 'Budget Change Request', icon: PhTag, to: '/bcr' }
+            //     ]
+            // },
             {
                 label: 'Request Orders',
                 icon: CartWithBadge,

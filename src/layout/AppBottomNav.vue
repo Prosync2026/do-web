@@ -19,7 +19,7 @@ const bottomNavItems = computed<BottomNavItem[]>(() => {
             label: 'Budget', 
             icon: markRaw(PhChartBar), 
             to: '/_budget_drawer',
-            visible: canViewBudget.value,
+            visible: false, // Temporarily hidden as per user request
             onClick: (e?: Event) => {
                 e?.preventDefault();
                 showBudgetDrawer.value = true;
